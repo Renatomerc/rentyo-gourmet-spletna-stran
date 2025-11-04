@@ -129,25 +129,33 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
     });
 
     // ==========================================================
-    // ⭐ ZAŠČITENA POT: /api/auth/profil
+    // ✅ POPRAVLJENA ZAŠČITENA POT: /api/auth/profil
     // ==========================================================
-    router.get('/profil', preveriGosta, async (req, res) => {
+    // Opomba: Odstranimo 'async', saj middleware že skrbi za asinhronost
+    router.get('/profil', preveriGosta, (req, res) => { 
         
-        try { 
-            if (req.uporabnik) {
-                const { _id, ime, email, jeLastnik, cena } = req.uporabnik;
-
-                res.json({
-                    msg: "Podatki profila uspešno pridobljeni.",
-                    uporabnik: { _id, ime, email, jeLastnik, cena }
-                });
-                
-            } else {
-                 res.status(401).json({ msg: "Za dostop do profila je potrebna prijava." });
-            }
-        } catch (err) {
-             console.error('❌ KRITIČNA NAPAKA PRI NALOGANJU PROFILA:', err);
-             res.status(500).json({ msg: 'Kritična napaka strežnika pri dostopu do profila.' });
+        //🔥 KLJUČNI POPRAVEK:
+        // Ker je req.uporabnik sedaj že navaden JSON objekt (nastavljen v authMiddleware.js)
+        // se izognemo destrukturiranju znotraj try/catch, da zagotovimo stabilnost.
+        
+        if (req.uporabnik && req.uporabnik.id) { // Preverimo, ali je uporabnik avtenticiran (ima ID, ne le anonimni gost)
+            const uporabnikPodatki = req.uporabnik;
+            
+            // Posredujemo samo potrebne podatke in izpustimo geslo, ki bi sicer moralo biti že odstranjeno v middleware
+            res.json({
+                msg: "Podatki profila uspešno pridobljeni.",
+                uporabnik: { 
+                    _id: uporabnikPodatki._id || uporabnikPodatki.id, 
+                    ime: uporabnikPodatki.ime, 
+                    email: uporabnikPodatki.email, 
+                    jeLastnik: uporabnikPodatki.jeLastnik, 
+                    cena: uporabnikPodatki.cena 
+                }
+            });
+            
+        } else {
+             // Če ni avtenticiran, vrnemo 401
+             res.status(401).json({ msg: "Za dostop do profila je potrebna prijava." });
         }
     });
 
