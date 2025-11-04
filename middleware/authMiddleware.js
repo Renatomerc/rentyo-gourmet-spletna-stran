@@ -23,16 +23,19 @@ module.exports = (JWT_SECRET_KEY) => {
 
     if (!JWT_SECRET) {
          console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni bil prenesen v authMiddleware. Klic zavrnjen.");
-         // Če ni ključa, se ne moremo avtenticirati.
+         // Lahko vrnete prazno middleware, da se izognete takojšnjim padcem strežnika
+         return { preveriGosta: (req, res, next) => next(), zahtevajPrijavo: (req, res, next) => res.status(500).json({ error: 'Server Error', message: 'Auth secret key missing.' }) };
     }
     
     // Pomožna funkcija za varno branje lastnosti iz req.body
     const preberiAnonimnePodatke = (req) => {
-        const body = req.body || {}; 
+        // 🚨 POPRAVEK: Zagotovi, da je req.body vedno objekt, če ni definiran (npr. pri OPTIONS klicih ali preden deluje body-parser)
+        const body = req.body && typeof req.body === 'object' ? req.body : {}; 
         
         return {
             ime: body.imeGosta || 'Anonimni gost',
-            telefon: body.telefon || 'N/A', 
+            // POPRAVEK: Dodaj varno branje lastnosti
+            telefon: body.telefon && typeof body.telefon === 'string' ? body.telefon : 'N/A', 
             // Dodatek: Anonimni gost NIKOLI ni prijavljen. KLJUČNO ZA zahtevajPrijavo
             jePrijavljen: false 
         };
@@ -49,11 +52,13 @@ module.exports = (JWT_SECRET_KEY) => {
         // 1. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA
         if (req.signedCookies && req.signedCookies.auth_token) {
             token = req.signedCookies.auth_token;
+            console.log("DEBUG: Žeton najden v signed cookie.");
         }
         
         // 2. REZERVA: Poskusi branje iz glave Authorization
         else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
+            console.log("DEBUG: Žeton najden v Authorization glavi.");
         }
 
 
@@ -65,7 +70,10 @@ module.exports = (JWT_SECRET_KEY) => {
                 const uporabnik = await Uporabnik.findById(dekodirano.id).select('-geslo -__v'); 
 
                 if (!uporabnik) {
-                    console.log("Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
+                    console.log("DEBUG: Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
+                    // 🚨 V primeru, da je piškotek prisoten, a neveljaven, ga IZBRIŠEMO
+                    res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
+                    
                     req.uporabnik = preberiAnonimnePodatke(req);
                     return next(); 
                 }
@@ -77,23 +85,24 @@ module.exports = (JWT_SECRET_KEY) => {
                 delete req.uporabnik.geslo; 
                 req.uporabnik.id = req.uporabnik._id;
                 
+                console.log(`DEBUG: Uporabnik ${req.uporabnik.email} uspešno avtenticiran.`);
                 next();
 
             } catch (error) {
                 // Žeton je neveljaven (potekel, napačen podpis, 'malformed')
-                console.error("Napaka JWT avtentikacije (Žeton):", error.message);
+                console.error("❌ Napaka JWT avtentikacije (Žeton):", error.message);
                 
-                // Izbrišemo neveljaven piškotek
-                res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
+                // 🚨 POPRAVEK: Izbrišemo neveljaven piškotek PRED klicem next()
+                res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0), signed: true }); 
 
-                // Nadaljujemo kot anonimni gost
+                // Nadaljujemo kot anonimni gost (in se izognemo TypeError)
                 req.uporabnik = preberiAnonimnePodatke(req);
                 next(); 
             }
         } 
         
         else {
-            // Žeton ni prisoten
+            // Žeton ni prisoten (Nadaljujemo kot anonimni gost)
             req.uporabnik = preberiAnonimnePodatke(req);
             next();
         }
@@ -108,7 +117,7 @@ module.exports = (JWT_SECRET_KEY) => {
         if (req.uporabnik && req.uporabnik.jePrijavljen === true) {
             next(); // Uporabnik je prijavljen, nadaljuj.
         } else {
-            console.log("ZAVRNJENO: Klic na zaščiteno pot brez veljavne seje/žetona. Vračam 401.");
+            console.log("❌ ZAVRNJENO: Klic na zaščiteno pot brez veljavne seje/žetona. Vračam 401.");
             // 🛑 KLJUČNO: Vrni 401 in NE kliči next(). To ustavi izvajanje.
             return res.status(401).json({ 
                 error: 'Unauthorized', 
