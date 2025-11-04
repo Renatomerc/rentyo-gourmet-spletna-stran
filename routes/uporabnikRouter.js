@@ -27,20 +27,21 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         if (!TAJNI_KLJUC) {
             throw new Error("Napaka JWT: Tajni ključ ni na voljo.");
         }
-        // Žeton za piškotek lahko damo daljšo veljavnost, saj se preverja na vsaki zahtevi
         return jwt.sign({ id: uporabnikId }, TAJNI_KLJUC, { expiresIn: '7d' }); 
     };
     
-    // ⭐ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka (DODAN path: '/')
+    // ==========================================================
+    // ✅ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka
+    // ==========================================================
     const nastaviAuthPiškotek = (res, zeton) => {
-        // Piškotek za avtentikacijo:
+        const isProduction = process.env.NODE_ENV === 'production';
         res.cookie('auth_token', zeton, {
-            httpOnly: true, // ZELO POMEMBNO: onemogoči dostop iz JavaScripta
-            signed: true,   // Uporabi COOKIE_SECRET iz server.js za podpisovanje
-            maxAge: 7 * 24 * 60 * 60 * 1000, // Veljavnost 7 dni (v milisekundah)
-            secure: true,   // KLJUČNO: Ker Render vedno uporablja HTTPS (in 'None' zahteva secure)
-            sameSite: 'None', // KLJUČNO ZA CORS: Omogoči prenos piškotkov med domenama
-            path: '/'       // ⭐ KLJUČNO: Piškotek velja za celotno domeno!
+            httpOnly: true,
+            signed: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dni
+            secure: isProduction, // ✅ HTTPS samo v produkciji
+            sameSite: isProduction ? 'None' : 'Lax', // ✅ deluje lokalno in v CORS
+            path: '/'
         });
     };
     // ==========================================================
@@ -73,7 +74,6 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             const zeton = generirajZeton(novUporabnik._id);
             nastaviAuthPiškotek(res, zeton); 
 
-            // V odgovor ne pošljemo več žetona, ampak samo podatke
             res.status(201).json({
                 _id: novUporabnik._id,
                 ime: novUporabnik.ime,
@@ -104,7 +104,6 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             const zeton = generirajZeton(uporabnik._id);
             nastaviAuthPiškotek(res, zeton); 
 
-            // V odgovor ne pošljemo več žetona, ampak samo podatke
             res.json({
                 _id: uporabnik._id,
                 ime: uporabnik.ime,
@@ -119,26 +118,18 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         }
     });
     
-    // ⭐ RUTA ZA ODJAVO (logout)
+    // Odjava
     router.post('/odjava', (req, res) => {
-        // Izbriše piškotek tako, da mu nastavi datum veljavnosti v preteklosti
         res.cookie('auth_token', '', { 
             httpOnly: true, 
             expires: new Date(0),
-            path: '/'       // ⭐ KLJUČNO: Path mora biti enak kot pri nastavitvi!
+            path: '/' 
         });
         res.status(200).json({ msg: 'Uspešno odjavljen. Piškotek izbrisan.' });
     });
 
-    // ==========================================================
-    // ⭐ ZAŠČITENA POT: /api/auth/profil
-    // ==========================================================
-    // KLJUČNO: Dodamo 'zahtevajPrijavo', da se ustavimo, če žeton ni veljaven.
+    // Zaščitena pot: /api/auth/profil
     router.get('/profil', preveriGosta, zahtevajPrijavo, (req, res) => {
-        
-        // Če klic pride sem, smo 100% prepričani, da je req.uporabnik veljaven uporabnik, ne anonimni gost.
-        
-        // Stara logika 'if (req.uporabnik && req.uporabnik.id)' je sedaj odveč.
         const uporabnikPodatki = req.uporabnik;
         
         res.json({
@@ -149,11 +140,9 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: uporabnikPodatki.email, 
                 jeLastnik: uporabnikPodatki.jeLastnik, 
                 cena: uporabnikPodatki.cena 
-                // Če želiš, lahko dodaš še druga polja, kot je telefon/naslov, če so v modelu.
             }
         });
     });
-
 
     return router; 
 };
