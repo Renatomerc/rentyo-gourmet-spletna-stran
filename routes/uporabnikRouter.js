@@ -80,7 +80,9 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: novUporabnik.email,
                 jeLastnik: novUporabnik.jeLastnik,
                 cena: novUporabnik.cena,
-                msg: "Registracija uspešna. Žeton shranjen v varnem piškotku." 
+                // 🚀 DODANO: Žeton za frontend (shranjevanje v localStorage)
+                zeton: zeton, 
+                msg: "Registracija uspešna. Žeton shranjen v varnem piškotku in JSON." 
             });
 
         } catch (err) {
@@ -110,7 +112,9 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: uporabnik.email,
                 jeLastnik: uporabnik.jeLastnik,
                 cena: uporabnik.cena,
-                msg: "Prijava uspešna. Žeton shranjen v varnem piškotku." 
+                // 🚀 DODANO: Žeton za frontend (shranjevanje v localStorage)
+                zeton: zeton, // ⬅️ KLJUČNO!
+                msg: "Prijava uspešna. Žeton shranjen v varnem piškotku in JSON." 
             });
         } catch (err) {
             console.error('❌ NAPAKA PRI PRIJAVI:', err);
