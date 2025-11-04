@@ -6,7 +6,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const cookieParser = require('cookie-parser'); // <--- NOVO: Uvoz za delo s piškotki
+const cookieParser = require('cookie-parser');
 require('dotenv').config(); 
 const path = require('path');
 const fallback = require('connect-history-api-fallback'); 
@@ -23,28 +23,21 @@ let preveriGosta;
 
 // 🟢 KLJUČNO: Preverjanje tajnih ključev
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-const COOKIE_SECRET = process.env.COOKIE_SECRET; // <--- NOVO: Preberi tajni ključ za piškotke
+const COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
 }
 if (!COOKIE_SECRET) {
-    // To je opozorilo, saj bo aplikacija delovala, a podpisovanje (signed cookies) ne.
     console.warn("⚠️ OPOZORILO: COOKIE_SECRET ni najden. Podpisovanje piškotkov ne bo delovalo! Dodajte v .env.");
 }
 
 try {
-    // 🔥 Uvoz in inicializacija Auth Middleware-a (vrne objekt { preveriGosta })
     authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
     preveriGosta = authMiddleware.preveriGosta; 
 
-    // 👇 restavracijaRoutes.js sedaj pričakuje preveriGosta kot argument!
     restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
-    
-    // 🔥 userRoutes sedaj pričakuje ključ in middleware
     userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta); 
-
-    // ✅ NOVO: Uvoz upload routerja 
     uploadRouter = require('./routes/uploadRoutes'); 
 
 } catch (e) {
@@ -55,17 +48,39 @@ try {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 5️⃣ Middleware
-app.use(cors()); 
+// ========================================
+// 🟢 5️⃣ Middleware in POPRAVLJEN CORS
+// ========================================
+
+// 🔥 Dovoljeni izvori za CORS
+const allowedOrigins = [
+    'https://www.rentyo.eu', // Tvoja primarna domena (Frontend)
+    'http://www.rentyo.eu',  // Dodan tudi HTTP (čeprav bi moralo biti HTTPS)
+    'https://rentyo-gourmet-spletna-stran.onrender.com', // Tvoj Render URL
+    'http://localhost:5000' // Za lokalni razvoj
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Omogoči klice brez 'origin' (npr. direktni testi) in dovoljene domene
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log(`❌ CORS BLOKIRAN: Neznan izvor poskuša dostopati: ${origin}`);
+            callback(new Error('Neznani izvor ni dovoljen s strani CORS politike'));
+        }
+    },
+    credentials: true // Nujno, ker uporabljate piškotke (JWT)
+})); 
+
 app.use(express.json());
 
-// 🔥 Vključitev Cookie Parserja. Uporablja COOKIE_SECRET za podpisovanje piškotkov.
-// Ta middleware mora biti pred vsemi rutami, ki piškotke berejo ali nastavljajo.
+// 🔥 Vključitev Cookie Parserja
 app.use(cookieParser(COOKIE_SECRET));
 
 
 // ========================================
-// 🔗 API POTI (PREMAKNJENO NAVZGOR) - ZELO POMEMBNO!
+// 🔗 API POTI
 // ========================================
 if (restavracijaRouter) app.use('/api/restavracije', restavracijaRouter);
 if (userRoutes) app.use('/api/auth', userRoutes); 
@@ -76,7 +91,6 @@ if (uploadRouter) app.use('/api/upload', uploadRouter);
 // 🌐 TESTNI ENDPOINT
 // ========================================
 app.get('/api/test', (req, res) => {
-  // Primer branja piškotkov:
   const nepodpisan = req.cookies.some_cookie;
   const podpisan = req.signedCookies.some_signed_cookie;
   
@@ -88,7 +102,7 @@ app.get('/api/test', (req, res) => {
 });
 
 
-// 🌟 Strežba statičnih datotek (slike, meniji, CSS, JS) - PREMAKNJENO NAVZDOL
+// 🌟 Strežba statičnih datotek (slike, meniji, CSS, JS)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 app.use(express.static(path.join(__dirname, 'Public')));
 
