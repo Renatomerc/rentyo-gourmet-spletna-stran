@@ -7,7 +7,6 @@ const UporabnikShema = require('../models/Uporabnik');
 const dbUsers = require('../dbUsers'); 
 
 // ⭐ KLJUČNO: Inicializiraj Mongoose Model enkrat, povezan s sekundarno povezavo
-// Dodajanje robustnega načina inicializacije, da se izognemo "OverwriteModelError"
 let Uporabnik;
 try {
     // Poskusimo dobiti že obstoječi model, če je bil registriran
@@ -28,6 +27,19 @@ module.exports = (JWT_SECRET_KEY) => {
          console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni bil prenesen v authMiddleware. Klic zavrnjen.");
          // Če ni ključa, se ne moremo avtenticirati.
     }
+    
+    // Pomožna funkcija za varno branje lastnosti iz req.body
+    const preberiAnonimnePodatke = (req) => {
+        // ⭐ POPRAVEK: Preverimo, ali req.body obstaja
+        const body = req.body || {}; 
+        
+        return {
+            ime: body.imeGosta || 'Anonimni gost',
+            // ⭐ POPRAVEK: Varno preverjanje za req.body.telefon
+            telefon: body.telefon || 'N/A' 
+        };
+    };
+
 
     /**
      * Middleware funkcija za preverjanje žetona (iz piškotka ali glave) in dodajanje podatkov
@@ -39,13 +51,11 @@ module.exports = (JWT_SECRET_KEY) => {
         // 1. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA (cookie-parser omogoči req.signedCookies)
         if (req.signedCookies && req.signedCookies.auth_token) {
             token = req.signedCookies.auth_token;
-            // console.log("DEBUG: Žeton najden v PIŠKOTKU.");
         }
         
         // 2. REZERVA: Poskusi branje iz glave Authorization (za združljivost/stare klice)
         else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
-            // console.log("DEBUG: Žeton najden v GLAVI.");
         }
 
 
@@ -65,12 +75,11 @@ module.exports = (JWT_SECRET_KEY) => {
                     console.log("Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
                     
                     // Nastavimo uporabnika na anonimnega
-                    req.uporabnik = { ime: 'Anonimni gost (Avt. napaka)', telefon: req.body.telefon || 'N/A' };
+                    req.uporabnik = preberiAnonimnePodatke(req);
                     return next(); 
                 }
                 
                 // USPEŠNA AVTENTIKACIJA: Shranimo podatke uporabnika
-                // ⭐ KLJUČNI POPRAVEK: Uporaba .toObject() namesto .toJSON() za čisto JS objekt
                 req.uporabnik = uporabnik.toObject(); 
                 
                 // Izbrišemo geslo in dodamo id
@@ -87,7 +96,8 @@ module.exports = (JWT_SECRET_KEY) => {
                 res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
 
                 // Nadaljujemo kot anonimni gost
-                req.uporabnik = { ime: 'Anonimni gost (Avt. napaka)', telefon: req.body.telefon || 'N/A' };
+                // ⭐ POPRAVEK: Uporaba funkcije za varno branje anonimnih podatkov
+                req.uporabnik = preberiAnonimnePodatke(req);
                 next(); 
             }
         } 
@@ -97,13 +107,8 @@ module.exports = (JWT_SECRET_KEY) => {
         // =========================================================================
         else {
             // Če žeton ni prisoten (anonimna rezervacija ali neprijavljeni uporabnik):
-            // console.log("Anonimni klic: Nadaljujem z osnovnimi podatki.");
-            
-            // Nastavimo osnovne podatke gosta iz telesa zahteve
-            req.uporabnik = {
-                ime: req.body.imeGosta || 'Anonimni gost',
-                telefon: req.body.telefon || 'N/A'
-            };
+            // ⭐ POPRAVEK: Uporaba funkcije za varno branje anonimnih podatkov
+            req.uporabnik = preberiAnonimnePodatke(req);
             next();
         }
     };
