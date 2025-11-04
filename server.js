@@ -56,6 +56,7 @@ const PORT = process.env.PORT || 5000;
 
 // 🔥 Dovoljeni izvori za CORS
 const allowedOrigins = [
+    // Opomba: Ta seznam ni več kritičen zaradi origin: true, a je ohranjen za lažjo vrnitev k varnosti.
     'https://www.rentyo.eu', // Tvoja primarna domena (Frontend)
     'http://www.rentyo.eu',  // Dodan tudi HTTP (čeprav bi moralo biti HTTPS)
     'https://rentyo-gourmet-spletna-stran.onrender.com', // Tvoj Render URL
@@ -63,15 +64,19 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        // Omogoči klice brez 'origin' (npr. direktni testi) in dovoljene domene
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.log(`❌ CORS BLOKIRAN: Neznan izvor poskuša dostopati: ${origin}`);
-            callback(new Error('Neznani izvor ni dovoljen s strani CORS politike'));
-        }
-    },
+    // 🔥 KLJUČNI POPRAVEK ZA TESTIRANJE: NASTAVIMO ORIGIN NA TRUE.
+    // To popolnoma omogoči CORS za VSE izvore, dokler ne najdemo težave.
+    origin: true,
+    
+    // Origin: (origin, callback) => {
+    //     // Omogoči klice brez 'origin' (npr. direktni testi) in dovoljene domene
+    //     if (!origin || allowedOrigins.includes(origin)) {
+    //         callback(null, true);
+    //     } else {
+    //         console.log(`❌ CORS BLOKIRAN: Neznan izvor poskuša dostopati: ${origin}`);
+    //         callback(new Error('Neznani izvor ni dovoljen s strani CORS politike'));
+    //     }
+    // },
     credentials: true // Nujno, ker uporabljate piškotke (JWT)
 })); 
 
