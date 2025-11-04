@@ -31,15 +31,15 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
         return jwt.sign({ id: uporabnikId }, TAJNI_KLJUC, { expiresIn: '7d' }); 
     };
     
-    // ⭐ NOVO: Pomožna funkcija za nastavitev piškotka
+    // ⭐ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka (Z SAME SITE: 'None')
     const nastaviAuthPiškotek = (res, zeton) => {
         // Piškotek za avtentikacijo:
         res.cookie('auth_token', zeton, {
             httpOnly: true, // ZELO POMEMBNO: onemogoči dostop iz JavaScripta
             signed: true,   // Uporabi COOKIE_SECRET iz server.js za podpisovanje
             maxAge: 7 * 24 * 60 * 60 * 1000, // Veljavnost 7 dni (v milisekundah)
-            secure: (process.env.NODE_ENV === 'production'), // Samo preko HTTPS v produkciji
-            sameSite: 'Lax' // Ali 'Strict', odvisno od potreb (Lax je dober kompromis)
+            secure: true,   // KLJUČNO: Ker Render vedno uporablja HTTPS (in 'None' zahteva secure)
+            sameSite: 'None' // KLJUČNO ZA CORS: Omogoči prenos piškotkov med domenama
         });
     };
     // ==========================================================
@@ -153,4 +153,4 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
 
 
     return router; 
-}; 
+};
