@@ -1,6 +1,6 @@
 // module.exports sedaj izvaža FUNKCIJO, ki prejme tajni ključ IN middleware.
-// 👇 KLJUČNO: SPREJMEMO DVA PARAMETRA!
-module.exports = (JWT_SECRET_KEY, preveriGosta) => { 
+// 👇 KLJUČNO: SPREJMEMO TRI PARAMETRE!
+module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => { 
 
     const express = require('express');
     const router = express.Router();
@@ -133,28 +133,25 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
     // ==========================================================
     // ⭐ ZAŠČITENA POT: /api/auth/profil
     // ==========================================================
-    router.get('/profil', preveriGosta, (req, res) => {
+    // KLJUČNO: Dodamo 'zahtevajPrijavo', da se ustavimo, če žeton ni veljaven.
+    router.get('/profil', preveriGosta, zahtevajPrijavo, (req, res) => {
         
-        // Uporabljamo asinhronost iz middleware-a, zato ni potreben 'await' tukaj.
+        // Če klic pride sem, smo 100% prepričani, da je req.uporabnik veljaven uporabnik, ne anonimni gost.
         
-        if (req.uporabnik && req.uporabnik.id) { 
-            const uporabnikPodatki = req.uporabnik;
-            
-            res.json({
-                msg: "Podatki profila uspešno pridobljeni.",
-                uporabnik: { 
-                    _id: uporabnikPodatki._id || uporabnikPodatki.id, // Varen dostop
-                    ime: uporabnikPodatki.ime, 
-                    email: uporabnikPodatki.email, 
-                    jeLastnik: uporabnikPodatki.jeLastnik, 
-                    cena: uporabnikPodatki.cena 
-                }
-            });
-            
-        } else {
-             // Če ni avtenticiran, vrnemo 401
-             res.status(401).json({ msg: "Za dostop do profila je potrebna prijava." });
-        }
+        // Stara logika 'if (req.uporabnik && req.uporabnik.id)' je sedaj odveč.
+        const uporabnikPodatki = req.uporabnik;
+        
+        res.json({
+            msg: "Podatki profila uspešno pridobljeni.",
+            uporabnik: { 
+                _id: uporabnikPodatki._id || uporabnikPodatki.id, 
+                ime: uporabnikPodatki.ime, 
+                email: uporabnikPodatki.email, 
+                jeLastnik: uporabnikPodatki.jeLastnik, 
+                cena: uporabnikPodatki.cena 
+                // Če želiš, lahko dodaš še druga polja, kot je telefon/naslov, če so v modelu.
+            }
+        });
     });
 
 

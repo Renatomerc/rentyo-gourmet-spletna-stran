@@ -20,6 +20,8 @@ let userRoutes;
 let uploadRouter; 
 let authMiddleware; 
 let preveriGosta; 
+// ⭐ NOVO: Uvozimo tudi zahtevajPrijavo
+let zahtevajPrijavo; 
 
 // 🟢 KLJUČNO: Preverjanje tajnih ključev
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -29,17 +31,16 @@ const COOKIE_SECRET = process.env.COOKIE_SECRET || 'fallback_secret_for_cookies'
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
 }
-// OPOZORILO ZDAJ NI VEČ POTREBNO, KER IMAMO FALLBACK
-// if (!COOKIE_SECRET) {
-//     console.warn("⚠️ OPOZORILO: COOKIE_SECRET ni najden. Podpisovanje piškotkov ne bo delovalo! Dodajte v .env.");
-// }
 
 try {
     authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
     preveriGosta = authMiddleware.preveriGosta; 
+    // ⭐ KLJUČNO POPRAVILO: Uvozimo zahtevajPrijavo
+    zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
 
     restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
-    userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta); 
+    // ⭐ KLJUČNO POPRAVILO: Posredujemo zahtevajPrijavo uporabnikRouterju
+    userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
     uploadRouter = require('./routes/uploadRoutes'); 
 
 } catch (e) {
@@ -65,18 +66,7 @@ const allowedOrigins = [
 
 app.use(cors({
     // 🔥 KLJUČNI POPRAVEK ZA TESTIRANJE: NASTAVIMO ORIGIN NA TRUE.
-    // To popolnoma omogoči CORS za VSE izvore, dokler ne najdemo težave.
     origin: true,
-    
-    // Origin: (origin, callback) => {
-    //     // Omogoči klice brez 'origin' (npr. direktni testi) in dovoljene domene
-    //     if (!origin || allowedOrigins.includes(origin)) {
-    //         callback(null, true);
-    //     } else {
-    //         console.log(`❌ CORS BLOKIRAN: Neznan izvor poskuša dostopati: ${origin}`);
-    //         callback(new Error('Neznani izvor ni dovoljen s strani CORS politike'));
-    //     }
-    // },
     credentials: true // Nujno, ker uporabljate piškotke (JWT)
 })); 
 

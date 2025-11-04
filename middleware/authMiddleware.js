@@ -1,5 +1,3 @@
-// V tej datoteki morate spremeniti, kako se žeton bere.
-
 const jwt = require('jsonwebtoken');
 
 // ⭐ Uvozi shemo in sekundarno povezavo
@@ -30,89 +28,95 @@ module.exports = (JWT_SECRET_KEY) => {
     
     // Pomožna funkcija za varno branje lastnosti iz req.body
     const preberiAnonimnePodatke = (req) => {
-        // ⭐ POPRAVEK: Preverimo, ali req.body obstaja
         const body = req.body || {}; 
         
         return {
             ime: body.imeGosta || 'Anonimni gost',
-            // ⭐ POPRAVEK: Varno preverjanje za req.body.telefon
-            telefon: body.telefon || 'N/A' 
+            telefon: body.telefon || 'N/A', 
+            // Dodatek: Anonimni gost NIKOLI ni prijavljen. KLJUČNO ZA zahtevajPrijavo
+            jePrijavljen: false 
         };
     };
 
 
     /**
-     * Middleware funkcija za preverjanje žetona (iz piškotka ali glave) in dodajanje podatkov
-     * uporabnika (gosta) v req.uporabnik.
+     * Middleware funkcija za preverjanje žetona in dodajanje podatkov uporabnika v req.uporabnik.
+     * Vedno kliče 'next()', ne glede na uspeh (uporabnik je bodisi prijavljen ali anonimni gost).
      */
     const preveriGosta = async (req, res, next) => {
         let token;
         
-        // 1. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA (cookie-parser omogoči req.signedCookies)
+        // 1. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA
         if (req.signedCookies && req.signedCookies.auth_token) {
             token = req.signedCookies.auth_token;
         }
         
-        // 2. REZERVA: Poskusi branje iz glave Authorization (za združljivost/stare klice)
+        // 2. REZERVA: Poskusi branje iz glave Authorization
         else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
 
 
-        // =========================================================================
-        // 3. LOGIKA ZA PREVERJANJE ŽETONA (ČE JE NAJDEN)
-        // =========================================================================
         if (token) {
             try {
-                // 🔥 Uporabimo prejeti JWT_SECRET
                 const dekodirano = jwt.verify(token, JWT_SECRET);
 
                 // Poiščemo uporabnika po ID-ju iz žetona 
                 const uporabnik = await Uporabnik.findById(dekodirano.id).select('-geslo -__v'); 
 
                 if (!uporabnik) {
-                    // Žeton veljaven, a uporabnik v DB ne obstaja več
                     console.log("Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
-                    
-                    // Nastavimo uporabnika na anonimnega
                     req.uporabnik = preberiAnonimnePodatke(req);
                     return next(); 
                 }
                 
                 // USPEŠNA AVTENTIKACIJA: Shranimo podatke uporabnika
                 req.uporabnik = uporabnik.toObject(); 
+                req.uporabnik.jePrijavljen = true; // Nastavimo status prijave!
                 
-                // Izbrišemo geslo in dodamo id
                 delete req.uporabnik.geslo; 
                 req.uporabnik.id = req.uporabnik._id;
                 
                 next();
 
             } catch (error) {
-                // Žeton je neveljaven (potekel, napačen podpis)
+                // Žeton je neveljaven (potekel, napačen podpis, 'malformed')
                 console.error("Napaka JWT avtentikacije (Žeton):", error.message);
                 
-                // NE POZABI: V primeru napake izbrišemo piškotek, če je bil uporabljen.
+                // Izbrišemo neveljaven piškotek
                 res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
 
                 // Nadaljujemo kot anonimni gost
-                // ⭐ POPRAVEK: Uporaba funkcije za varno branje anonimnih podatkov
                 req.uporabnik = preberiAnonimnePodatke(req);
                 next(); 
             }
         } 
         
-        // =========================================================================
-        // 4. LOGIKA ZA ANONIMNEGA GOSTA (ČE ŽETON NI NAJDEN)
-        // =========================================================================
         else {
-            // Če žeton ni prisoten (anonimna rezervacija ali neprijavljeni uporabnik):
-            // ⭐ POPRAVEK: Uporaba funkcije za varno branje anonimnih podatkov
+            // Žeton ni prisoten
             req.uporabnik = preberiAnonimnePodatke(req);
             next();
         }
     };
     
-    // Vrnitev middleware funkcije
-    return { preveriGosta };
+    /**
+     * NOVA FUNKCIJA: Middleware za prekinitev izvajanja, če uporabnik NI PRIJAVLJEN.
+     * To uporabimo za ZAŠČITENE poti (npr. 'Moj profil').
+     */
+    const zahtevajPrijavo = (req, res, next) => {
+        // Če req.uporabnik obstaja IN je jePrijavljen: true (kar pomeni uspešno avtentikacijo zgoraj)
+        if (req.uporabnik && req.uporabnik.jePrijavljen === true) {
+            next(); // Uporabnik je prijavljen, nadaljuj.
+        } else {
+            console.log("ZAVRNJENO: Klic na zaščiteno pot brez veljavne seje/žetona. Vračam 401.");
+            // 🛑 KLJUČNO: Vrni 401 in NE kliči next(). To ustavi izvajanje.
+            return res.status(401).json({ 
+                error: 'Unauthorized', 
+                message: 'Seja je potekla ali ste neavtorizirani. Prosimo, prijavite se ponovno.' 
+            });
+        }
+    };
+    
+    // Vrnitev middleware funkcij
+    return { preveriGosta, zahtevajPrijavo };
 };
