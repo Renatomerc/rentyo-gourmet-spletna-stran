@@ -7,7 +7,16 @@ const UporabnikShema = require('../models/Uporabnik');
 const dbUsers = require('../dbUsers'); 
 
 // ⭐ KLJUČNO: Inicializiraj Mongoose Model enkrat, povezan s sekundarno povezavo
-const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+// Dodajanje robustnega načina inicializacije, da se izognemo "OverwriteModelError"
+let Uporabnik;
+try {
+    // Poskusimo dobiti že obstoječi model, če je bil registriran
+    Uporabnik = dbUsers.model('Uporabnik');
+} catch (e) {
+    // Če model še ne obstaja, ga registriramo
+    Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+}
+
 
 // Middleware sedaj sprejme TAJNI KLJUČ kot parameter!
 module.exports = (JWT_SECRET_KEY) => {
@@ -61,7 +70,10 @@ module.exports = (JWT_SECRET_KEY) => {
                 }
                 
                 // USPEŠNA AVTENTIKACIJA: Shranimo podatke uporabnika
-                req.uporabnik = uporabnik.toJSON(); 
+                // ⭐ KLJUČNI POPRAVEK: Uporaba .toObject() namesto .toJSON() za čisto JS objekt
+                req.uporabnik = uporabnik.toObject(); 
+                
+                // Izbrišemo geslo in dodamo id
                 delete req.uporabnik.geslo; 
                 req.uporabnik.id = req.uporabnik._id;
                 
