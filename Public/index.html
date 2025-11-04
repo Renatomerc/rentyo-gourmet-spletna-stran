@@ -1,0 +1,3233 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="app.title">Iskanje Restavracij - Gourmet & Experience</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
+
+<style>
+    /*
+     * ========================================================================
+     * I. STILI ZA PASICO PIŠKOTKOV (KRITIČNI STILI - NA ZAČETKU)
+     * ========================================================================
+     */
+    
+    /* Osnovno resetiranje/stil za celotno stran - prilagojeno vašemu telesu */
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    /* Pasica za soglasje (glavni vsebnik) */
+    .cookie-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        padding: 1rem; /* p-4 */
+        transition: all 0.5s ease-in-out;
+    }
+
+    /* Stanje, ko je pasica skrita */
+    .cookie-banner.hidden {
+        display: none;
+    }
+
+    /* Kontejner vsebine pasice */
+    .banner-content {
+        max-width: 64rem; /* max-w-4xl (1024px) */
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #ffffff; /* bg-white */
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
+        border-radius: 3rem; /* rounded-lg */
+        padding: 1.25rem; /* p-5 */
+        display: flex;
+        flex-direction: column; /* flex-col */
+        align-items: center;
+        justify-content: space-between;
+        row-gap: 0.75rem; /* space-y-3 */
+        border: 2px solid #333;
+    }
+
+    /* Prilagoditev za večje zaslone (md:flex-row) */
+    @media (min-width: 768px) {
+        .banner-content {
+            flex-direction: row;
+            row-gap: 0;
+        }
+    }
+
+    /* Skupina besedila in ikone */
+    .banner-text-group {
+        display: flex;
+        align-items: center;
+        column-gap: 0.75rem; /* space-x-3 */
+        color: #4b5563; /* text-gray-700 */
+    }
+
+    /* Ikona piškotka */
+    .icon-cookie {
+        height: 1.5rem; /* h-6 */
+        width: 1.5rem; /* w-6 */
+        color: #4edaa9; /* text-emerald-500 */
+        flex-shrink: 0;
+    }
+
+    /* Sporočilo */
+    .text-message {
+        font-size: 0.875rem; /* text-sm */
+        margin: 0;
+    }
+
+    /* Povezava "Preberi več" */
+    .link-more-info {
+        color: #4edaa9; /* text-emerald-600 */
+        font-weight: 500; /* font-medium */
+        margin-left: 0.25rem; /* ml-1 */
+        text-decoration: none;
+        transition: color 150ms ease-in-out;
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .link-more-info:hover {
+        color: #4edaa9; /* hover:text-emerald-800 */
+    }
+
+    /* Skupina gumbov */
+    .banner-button-group {
+        display: flex;
+        column-gap: 0.75rem; /* space-x-3 */
+        flex-shrink: 0;
+    }
+
+    /* Osnovni stil za gumbe */
+    .banner-button-group button {
+        padding: 0.5rem 1rem; /* px-4 py-2 */
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 600; /* font-semibold */
+        border-radius: 5rem; /* rounded-lg */
+        transition: background-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
+        border: none;
+        cursor: pointer;
+        /* Odstrani moder poudarek za mobilne naprave */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    /* Gumb za zavrnitev (Decline) */
+    .btn-decline {
+        color: #4b5563; /* text-gray-600 */
+        background-color: #f3f4f6; /* bg-gray-100 */
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .btn-decline:hover {
+        background-color: #e5e7eb; /* hover:bg-gray-200 */
+    }
+
+    /* Gumb za sprejem (Accept) */
+    .btn-accept {
+        color: #ffffff; /* text-white */
+        background-color: #4edaa9; /* bg-emerald-600 */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* shadow-md */
+    }
+
+    .btn-accept:hover {
+        background-color: #27a378; /* hover:bg-emerald-700 */
+    }
+
+    /* Animacija, da se pasica elegantno pojavi (slide-in-up) */
+    .slide-in-up {
+        animation: slideInUp 0.5s ease-out forwards;
+    }
+    @keyframes slideInUp {
+        from { 
+            transform: translateY(100%); 
+            opacity: 0; 
+        }
+        to { 
+            transform: translateY(0); 
+            opacity: 1; 
+        }
+    }
+    
+    /*
+     * ========================================================================
+     * II. OSTALI STILI (MODALI, KARTICE, ITD.)
+     * ========================================================================
+     */
+
+    /* ===== MODAL ZA PRIJAVO / REGISTRACIJO (OSTANE NESPREMENJENO) ===== */
+    .login-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto; 
+    }
+
+    .login-modal.active {
+      display: flex;
+    }
+
+    .login-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      width: 350px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: fadeIn 0.3s ease;
+      margin: 50px auto; 
+    }
+
+    @media (max-width: 600px) {
+        .login-content {
+            padding: 20px;
+            margin: 20px auto;
+        }
+    }
+
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .login-tab {
+      flex: 1;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 2px solid transparent;
+      transition: 0.2s;
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .login-tab.active {
+      
+      color: #20c0bd;
+      border-bottom: 2px solid #20c0bd; /* Dodan border za aktiven tab */
+    }
+
+    .login-form {
+      display: none;
+    }
+
+    .login-form.active {
+      display: block;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      /* POPRAVEK ZA ZOOM: Nastavimo velikost pisave na 16px, da preprečimo avtomatsko povečavo */
+      font-size: 16px !important; 
+    }
+
+    /* ----------------------------------------------------------------- */
+    /* 🔥 NOVI STILI ZA POGOJE IN ONEMOGOČEN GUMB 🔥 */
+    /* ----------------------------------------------------------------- */
+
+    .form-group-checkbox {
+        display: flex;
+        align-items: flex-start; /* Poravnaj kljukico in besedilo na začetek */
+        margin-bottom: 15px; /* Dodamo malo razmika pod kljukico */
+        text-align: left;
+    }
+
+    .form-group-checkbox input[type="checkbox"] {
+        width: auto; /* Kljukica naj ne zavzame celotne širine */
+        margin-right: 8px;
+        margin-top: 3px; /* Lahka prilagoditev za vertikalno poravnavo */
+        border-radius: 4px;
+        accent-color: #20c0bd; /* Barva kljukice */
+                  /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .form-group-checkbox label {
+        font-size: 0.85rem;
+        color: #555;
+        line-height: 1.4;
+        cursor: pointer;
+                  /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .form-group-checkbox a {
+        color: #20c0bd;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.2s;
+        
+    }
+
+    .form-group-checkbox a:hover {
+        color: #169b99;
+        text-decoration: underline;
+        
+    }
+
+    .required-star {
+        color: red;
+        margin-left: 2px;
+        font-weight: bold;
+    }
+
+    /* Stil za gumb za oddajo */
+    .login-form button {
+      width: 100%; /* Nastavite širino na 100% za boljši mobilni videz */
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #20c0bd;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .login-form button:hover:not(:disabled) {
+      background-color: #169b99;
+    }
+
+    /* Poseben stil, ko je gumb onemogočen (disabled) */
+    .login-form button:disabled {
+        background-color: #cccccc; /* Svetlo siva, da je očitno onemogočeno */
+        color: #888888;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    /* ----------------------------------------------------------------- */
+    /* 🔥 KONEC NOVIH STILOV 🔥 */
+    /* ----------------------------------------------------------------- */
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #333;
+      border-radius: 50%;
+      display: flex; /* Uporabimo flexbox za centriranje X-a */
+      justify-content: center; /* Centriraj X horizontalno */
+      align-items: center; /* Centriraj X vertikalno */
+      transition: background-color 0s ease, color 0s ease;
+      z-index: 10000;
+
+      /* >>> KLJUČNE SPREMEMBE ZA CENTRIRANJE ZNAKA 'X' <<< */
+      line-height: 1; /* Pomembno: Odstranimo privzeti razmik vrstic, ki potiska X navzdol */
+      /* Če je X še vedno malo previsoko/prenizko, lahko prilagodite s tem: */
+      /* transform: translateY(-1px); */ /* Poskusi to, če je potrebno malo navzgor/navzdol */
+    }
+
+      
+        
+        /* ===== MODAL ZA TRAJANJE OBISKA (NOV STIL) ===== */
+        .duration-modal {
+          display: none;
+          position: fixed;
+          z-index: 9999;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7); /* Temnejše ozadje za opozorilo */
+          justify-content: center;
+          align-items: center;
+          overflow-y: auto;
+        }
+
+        .duration-modal.active {
+          display: flex;
+        }
+
+        .duration-content {
+          background: #fff;
+          padding: 30px;
+          border-radius: 16px;
+          width: 380px;
+          max-width: 90%;
+          text-align: left;
+          box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+          position: relative;
+          animation: fadeIn 0.3s ease;
+          margin: 50px auto;
+        }
+
+        .duration-content h3 {
+            color: #4edaa9;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .duration-content label {
+            display: block;
+            margin-bottom: 0px;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .duration-opcije {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .duration-opcija {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .duration-opcija:hover {
+            border-color: #4edaa9;
+            background-color: #ffffff;
+        }
+
+        .duration-opcija input[type="radio"] {
+            margin-right: 15px;
+            /* Skrijemo standardni radio gumb in ga stiliziramo */
+            appearance: none; 
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #aaa;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .duration-opcija input[type="radio"]:checked {
+            border-color: #333;
+        }
+        
+        .duration-opcija input[type="radio"]:checked::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: block;
+        }
+        
+        .duration-opcija.selected {
+            border-color: #4edaa9;
+            background-color: #4edaa9; /* Dodamo rahel odtenek za boljšo vidljivost izbrane opcije */
+            /* Zamenjaj barvo poudarka za lažjo berljivost */
+            border-color: #4edaa9; 
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        
+        .duration-opcija.selected input[type="radio"]:checked {
+            border-color: #333;
+        }
+
+        .duration-opcija.selected input[type="radio"]:checked::before {
+            background-color: #333;
+        }
+
+
+        .gumb-potrdi-trajanje {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4edaa9;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        .gumb-potrdi-trajanje:hover {
+            background-color: #33b688;
+        }
+        
+        /* ======================================================= */
+        /* V. CUSTOM WARNING MODAL - NOVO OBLIKOVANJE ZA OPOZORILO */
+        /* ======================================================= */
+        
+        .warning-modal {
+          display: none;
+          position: fixed;
+          z-index: 10000; /* Najvišji z-index */
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          justify-content: center;
+          align-items: center;
+          overflow-y: auto;
+          /* Dopolnitev stila za animacijo ob prikazu/skrivanju */
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .warning-modal.active {
+          display: flex;
+          opacity: 1;
+        }
+
+        .warning-content {
+          background: #fff;
+          padding: 30px;
+          border-radius: 16px;
+          width: 350px;
+          max-width: 90%;
+          text-align: center;
+          box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+          position: relative;
+          animation: fadeIn 0.3s ease;
+          margin: 50px auto;
+          /* Dopolnitev: Če je modal aktiven, se animacija izvede */
+          transform: scale(0.95);
+          transition: transform 0.3s ease;
+        }
+
+        .warning-modal.active .warning-content {
+            transform: scale(1);
+        }
+        
+        .warning-icon-wrapper {
+            margin: 0 auto 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #ffedcc; /* Svetlo rumeno/oranžno ozadje */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffcc66;
+        }
+
+        .warning-icon {
+            font-size: 32px;
+            color: #ff9900; /* Močna oranžna barva ikone (fas fa-exclamation-triangle) */
+        }
+
+        .warning-content h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .warning-content p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .gumb-razumem {
+            width: 60%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #20c0bd; /* Uporabimo glavno barvo projekta */
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .gumb-razumem:hover {
+            background-color: #169b99;
+        }
+
+        /* ===== GUMBI V GLAVI (OSTANE NESPREMENJENO) ===== */
+        .gumb-prijava, 
+        .gumb-profil, 
+        /*... ostalo oblikovanje od tu naprej ostane popolnoma nespremenjeno ...*/
+        .gumb-odjava {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 12px;
+          border-radius: 25px;
+          font-weight: bold;
+          text-decoration: none;
+          transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+          white-space: nowrap;
+          font-size: 14px;
+        }
+
+        .gumb-prijava,
+        .gumb-profil {
+          background-color: #575757;
+          color: white;
+          border: 1px solid #575757;
+        }
+
+        .gumb-prijava:hover, 
+        .gumb-profil:hover {
+          background-color: #575757;
+          border-color: #575757;
+        }
+        
+        .gumb-odjava {
+          background-color: transparent;
+          color: #575757;
+          border: 1px solid #575757;
+        }
+        
+        .gumb-odjava:hover {
+          background-color: #dadada;
+          color: #575757;
+          border-color: #575757;
+        }
+
+        .profil-ovoj {
+          display: flex;
+          align-items: center;
+          gap: 10px; 
+        }
+        
+        /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
+        .kartica {
+            border: 1px solid #9b9b9b;
+            border-radius: 10px;
+            overflow: hidden; 
+            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.00);
+            transition: transform 0.0s, box-shadow 0.0s;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        .kartica:hover {
+            transform: translateY(0px);
+            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0);
+        }
+
+        .kartica-slika {
+            width: 100%;
+            height: 150px; 
+            object-fit: cover;
+            background-color: #f5f5f5; 
+        }
+
+        .kartica-vsebina {
+            padding: 15px;
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kartica-vsebina h3 {
+            font-size: 0.9rem; 
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        /* NOVI STIL: Ovoj za oceno in oddaljenost */
+        .info-ocena-oddaljenost {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* Povečana margina za razmik od razpoložljivosti */
+            padding-bottom: 10px;
+            border-bottom: 0px solid #e0e0e0; /* Fina črta za ločitev */
+        }
+
+        .kartica-vsebina .ocena {
+            font-size: 0.8rem;
+            color: #333; 
+            margin: 0; /* Odstranimo prejšnje margine */
+            font-weight: bold;
+        }
+
+        .kartica-vsebina .ocena span.ocena-stevilka {
+            color: #333; 
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        /* Stil za navidezno oddaljenost */
+        .oddaljenost {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .oddaljenost i {
+            color: #007bff; /* Ikona v modri barvi */
+        }
+
+
+        /* Stil za polje razpoložljivosti (Ostane na dnu) */
+        .razpolozljivost-ovoj {
+            margin-top: auto; /* Pritisne ga na dno */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #f4f4f9; /* Svetlo zeleno/turkizno ozadje */
+            border: 1px solid #f4f4f9;
+        }
+
+        .razpolozljivost-ovoj strong {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .razpolozljivost-ovoj span {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #1a9e9a; /* Temnejša zelena/turkizna */
+        }
+
+        .razpolozljivost-ovoj.zasedeno {
+             background-color: #f4f4f9; /* Svetlo rdeče ozadje */
+             border: 1px solid #f4f4f9;
+        }
+
+        .razpolozljivost-ovoj.zasedeno span {
+            color: #dc3545; 
+        }
+        
+        /* Gumb rezervacija (če bi bil) */
+        .gumb-rezervacija {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            background-color: #20c0bd; 
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            margin-top: 10px; 
+            cursor: pointer;
+        }
+
+        .gumb-rezervacija:hover {
+            background-color: #1a9e9a;
+        }
+        
+       /* ======================================================= */
+    /* NOVO: KARTICA IZPOSTAVLJENO (MANJŠA KARTICA) */
+    /* ======================================================= */
+    .kartica-izpostavljeno {
+        /* Nadomesti pravila osnovne .kartica */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 10px;
+        width: 100%;
+        height: 250px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        background-color: #4edaa9; /* Svetlo ozadje */
+        transition: box-shadow 0.2s, transform 0.2s;
+        border: 0px solid #333;
+    }
+
+    .kartica-izpostavljeno:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(0px);
+        
+        
+    }
+
+    /* SPREMENJENO: Zmanjšano na 50px za še manjšo višino slike */
+    .kartica-izpostavljeno .slika-kartice {
+        width: 100%;
+        height: 220px; 
+        background-size: cover;
+        background-position: center;
+        background-color: #f5f5f5;
+    }
+
+    /* SPREMENJENO: Zmanjšan padding na 6px */
+    .kartica-izpostavljeno .vsebina-kartice-izpostavljeno {
+        padding: 10px; 
+        text-align: center;
+    }
+
+    /* SPREMENJENO: Zmanjšana velikost pisave na 0.85rem */
+    .kartica-izpostavljeno .vsebina-kartice-izpostavljeno h3 {
+        font-size: 0.9rem; 
+        font-weight: 600;
+        margin: 0;
+        color: #333;
+        white-space: nowrap; 
+        overflow: hidden;
+        text-overflow: ellipsis; 
+        
+    }
+
+    
+    /* ======================================================= */
+    /* MODAL PODROBNOSTI RESTAVRACIJE (OSTANE NESPREMENJENO) */
+    /* ======================================================= */
+    .restavracija-modal {
+        display: none; 
+        position: fixed; 
+        z-index: 9990; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto; 
+        background-color: rgba(0, 0, 0, 0.7); 
+        justify-content: center;
+        align-items: flex-start; 
+        padding: 50px 0; 
+    }
+
+    .restavracija-modal.active {
+        display: flex;
+    }
+
+    .restavracija-vsebina {
+        background-color: #fefefe;
+        margin: auto; 
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 900px; 
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: modalSlide 0.4s ease-out;
+        min-height: 400px;
+    }
+    
+    @keyframes modalSlide {
+        from { opacity: 0; transform: translateY(-50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+/* GUMB ZA ZAPIRANJE (X) */
+.gumb-zapri-restavracija {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9991; 
+    transition: background-color 0s;
+    /* >>> KLJUČNI POPRAVEK ZA CENTRIRANJE ZNAKA 'X' <<< */
+    line-height: 1; 
+    /* Opcijski mikro-popravek, če je X še vedno rahlo prenizko zaradi pisave */
+    /* Poskusite dodati to, če je potrebno: */
+    /* transform: translateY(-1px); */ 
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+.gumb-zapri-restavracija:hover {
+    background-color: transparent;
+}
+
+    .slika-glava {
+        width: 100%;
+        height: 250px;
+        background-size: cover;
+        background-position: center;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        position: relative;
+    }
+    
+    .podrobnosti-tekst {
+        padding: 25px;
+        padding-bottom: 0;
+    }
+
+    .podrobnosti-tekst h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    /* Prilagoditev velikosti naslova na mobilnem telefonu */
+    @media (max-width: 600px) {
+        .restavracija-vsebina {
+            margin: 20px 10px; 
+        }
+        .podrobnosti-tekst h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    .info-vrstica {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+        color: #666;
+        flex-wrap: wrap;
+    }
+    
+    .info-vrstica > span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .info-vrstica i {
+        color: #333;
+    }
+
+    .opis-restavracije {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .gumb-rezerviraj-modal {
+        display: block;
+        width: 60%;
+        padding: 10px;
+        margin-top: 25px;
+        text-align: center;
+        border-radius: 20px;
+        background-color: #4edaa9; 
+        color: #333;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s;
+        cursor: pointer;
+        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    .gumb-rezerviraj-modal:hover {
+        background-color: #39c292;
+    }
+
+    /* ======================================================= */
+    /* ZAVIHKE (TABS) - OSTANE NESPREMENJENO */
+    /* ======================================================= */
+    .modal-tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-top: 15px;
+        padding: 0 25px;
+        background-color: #ffffff; 
+        overflow-x: auto; 
+        -webkit-overflow-scrolling: touch; 
+    }
+    
+    .modal-tab {
+        flex-shrink: 0; 
+        padding: 10px 20px; 
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600; 
+        color: #333;
+        border-bottom: 3px solid transparent;
+        transition: color 0.0s, border-bottom-color 0.0s, background-color 0.0s;
+        margin-right: 5px; 
+        white-space: nowrap; 
+        position: relative;
+    }
+    
+    .modal-tab.active {
+        color: #333;
+        border-bottom-color: none;
+        background-color: #4edaa9;
+        border-radius: 25px;
+        margin-bottom: 0px; 
+        box-shadow: 0 0px 0px rgba(0,0,0,0.05);
+        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    
+    .modal-tab:not(.active):hover {
+        color: #333;
+        background-color: #ffff;
+    }
+
+    .modal-vsebina-ovoj {
+        padding: 25px;
+    }
+    
+    .modal-vsebina-skrol {
+        max-height: 40vh; 
+        overflow-y: auto; 
+        padding-right: 15px; 
+    }
+    
+    @media (max-width: 600px) {
+        .modal-vsebina-skrol {
+            max-height: 30vh; 
+        }
+    }
+
+
+    .tab-content {
+        display: none;
+        animation: tabFadeIn 0.3s ease;
+        padding-top: 10px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes tabFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Meni */
+    .meni-seznam ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .meni-seznam ul li {
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .meni-seznam ul li:last-child {
+        border-bottom: none;
+    }
+
+    .meni-seznam ul li strong {
+        display: block;
+        color: #333;
+    }
+
+    /* Slike in Zemljevid */
+    .galerija-slike {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .galerija-slike img {
+        width: 100%;
+        height: 100px; 
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .zemljevid-ovoj {
+        width: 100%;
+        height: 300px;
+        background-color: #eee;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .zemljevid-ovoj iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    /* PRILAGODITEV ZA MOBILNE NAPRAVE (do 480px) */
+    @media (max-width: 480px) {
+        .modal-tabs {
+            padding: 0 10px; 
+        }
+        
+        .modal-tab {
+             padding: 10px 15px; 
+        }
+        
+        .modal-vsebina-ovoj {
+            padding: 15px; 
+        }
+        
+        .podrobnosti-tekst {
+            padding: 15px 15px 0 15px;
+        }
+        
+        .slika-glava {
+            height: 180px; 
+        }
+        
+        .galerija-slike {
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 5px;
+        }
+        .galerija-slike img {
+            height: 80px;
+        }
+    }
+    
+    /* ======================================================= */
+    /* MOBILNI MENI LOGIKA ZA MOBILNI POGLED (do 768px) */
+    /* ======================================================= */
+    
+    .hamburger-gumb {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: #222222;
+        padding: 0;
+        z-index: 1000;
+    }
+    
+    .mobilni-meni {
+        display: none;
+    }
+    
+    .glava .akcije {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .glava {
+            justify-content: space-between;
+            padding: 10px 20px;
+            position: relative; 
+        }
+
+        .glava .akcije {
+            display: none; 
+        }
+
+        .hamburger-gumb {
+            display: block; 
+        }
+
+        .mobilni-meni {
+            position: absolute;
+            top: 100%; 
+            right: 0;
+            width: 60%; 
+            max-width: 200px;
+            background-color: white;
+            border-top: 0px solid #eee;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            padding: 15px;
+            flex-direction: column;
+            gap: 10px;
+            transform: translateX(100%); 
+            transition: transform 0.3s ease-out;
+            border-bottom-left-radius: 8px;
+        }
+
+        .mobilni-meni.active {
+            display: flex;
+            transform: translateX(0); 
+        }
+        
+        /* Gumbi Prijava/Odjava/Profil */
+        .mobilni-meni .gumb-prijava {
+            width: 55%;
+            justify-content: center;
+            padding: 8px 14px;
+            font-size: 12px;
+            border-radius: 20px;
+            background-color: #575757; 
+            border-color: #575757;
+            align-self: center; 
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        
+        .mobilni-meni .profil-ovoj {
+             display: flex;
+             flex-direction: column;
+             gap: 10px;
+             width: 100%;
+             align-items: center; 
+        }
+
+        .mobilni-meni .gumb-profil,
+        .mobilni-meni .gumb-odjava {
+            width: 55%; 
+            justify-content: center;
+            padding: 8px 14px;
+            font-size: 12px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            
+        }
+        
+        .mobilni-meni .gumb-profil {
+            background-color: #575757;
+            border-color: #575757;
+        }
+
+        .mobilni-meni .gumb-odjava {
+            color: #555;
+            border: 1px solid #ccc;
+        }
+
+        .mobilni-meni .gumb-odjava:hover {
+            background-color: #f5f5f5;
+            color: #333;
+            border-color: #aaa;
+        }
+
+
+        .mobilni-meni .jezik-ovoj {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            gap: 10px;
+            border-top: 1px solid #eee;
+            margin-top: 5px;
+            padding-top: 15px;
+            width: 100%;
+            justify-content: center; 
+        }
+        
+        /* POPRAVEK JEZIKA NA MOBILNEM: Manjši, brez robov */
+        .mobilni-meni .jezik-ovoj select {
+            flex-grow: 0; /* Ne raste naj, da ostane majhen */
+            width: auto;
+            min-width: 60px; /* Minimalna širina */
+            padding: 6px 8px; /* Zmanjšan padding */
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            background-color: #f7f7f7; /* Svetlo ozadje */
+            border: none; /* Odstranjen okvir */
+            border-radius: 6px; /* Majhen zaokrožen rob */
+            appearance: none; 
+            /* Uporabimo manjšo, diskretno puščico */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23555%22%20d%3D%22M287%20197.8%20L146.2%2057%20L5.4%20197.8%20L48.6%20241%20L146.2%20143.4%20L243.8%20241%20L287%20197.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 5px center;
+            background-size: 8px auto; /* Manjša puščica */
+            padding-right: 20px; /* Dodaten padding za puščico */
+            box-shadow: none;
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        
+        /* Če je izbirnik jezika premajhen, ga centraliziramo */
+        .mobilni-meni .jezik-ovoj i {
+            color: #777;
+        }
+    }
+
+    /* ========================================================= */
+    /* 🔥🔥🔥 NOVO: STILI ZA REZERVACIJSKA POLJA V MODALU 🔥🔥🔥 */
+    /* ========================================================= */
+
+    .rezervacija-vnosna-polja {
+        display: flex; /* Polja postavimo v vrsto */
+        gap: 20px;
+        margin: 20px 25px; /* Dodan razmik okoli polj (gor/dol, levo/desno) */
+        padding: 15px 0;
+        border-top: 1px solid #eee; 
+        border-bottom: 1px solid #eee;
+    }
+    
+    @media (max-width: 600px) {
+        .rezervacija-vnosna-polja {
+            flex-direction: column; /* Na mobilnem postavimo pod seboj */
+            gap: 15px;
+            margin: 15px 15px; 
+            padding: 30px 0;
+        }
+    }
+
+    .vnosno-polje {
+        flex: 1; 
+        display: flex;
+        flex-direction: column;
+        
+    }
+
+    .input-rezervacija {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: white;
+        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */ 
+    }
+
+    .vnosno-polje label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 0.9rem;
+    }
+    
+    /* Stil za kontejner, kamor se vstavijo gumbi (ure) */
+    .proste-ure-rezultati {
+        min-height: 40px; 
+        padding: 15px 25px; /* Dodan padding, da je v enakem območju kot vsebina modala */
+        text-align: center;
+    }
+    
+    @media (max-width: 600px) {
+        .proste-ure-rezultati {
+             padding: 15px 15px; 
+        }
+    }
+
+    /* Kontejner za gumbe, ko jih JavaScript ustvari */
+    .gumbi-proste-ure {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap; 
+        justify-content: center;
+        padding-top: 10px;
+    }
+
+    /* Stil za gumb ure (ključen, da se prikažejo lepi gumbi za ure) */
+    .gumb-ura {
+        background-color: #ffffff;
+        color: #333;
+        border: 1px solid #333;
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s, border-color 0.2s;
+        font-size: 14px;
+        flex-shrink: 0;
+        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .gumb-ura:hover {
+        background-color: #4edaa9;
+    
+    }
+
+    /* Stil za izbran gumb ure */
+    .gumb-ura.selected {
+        background-color: #4edaa9; /* Barva poudarka */
+        color: #333;
+        border-color: #33b688;
+        font-weight: bold;
+    }
+ /* =================================================== */
+/* GLOBALNI STILI ZA NOGO (veliki zasloni) */
+/* =================================================== */
+.noga {
+    background-color: #2c2c2c; /* Temna podlaga, kot na sliki */
+    color: #cccccc;
+    padding: 15px 5%; /* Horizontalni padding za odmik od robov */
+    font-size: 14px;
+}
+
+.noga-vsebina {
+    display: flex; /* Razporedi sekcije v vrsto na velikih zaslonih */
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #444; /* Ločilo nad plačili/avtorskimi pravicami */
+}
+
+.noga-sekcija {
+    flex: 1; /* Enaka širina za vse sekcije na velikih zaslonih */
+    padding-right: 20px;
+}
+
+.noga-naslov {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    /* Pokaže, da je klikabilen */
+    cursor: pointer; 
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+
+.noga-linki {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    /* Povezave so privzeto vidne na velikih zaslonih */
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+
+.noga-linki li {
+    margin-bottom: 8px;
+}
+
+.noga-linki a {
+    color: #cccccc;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.noga-linki a:hover {
+    color: #ffffff;
+}
+
+/* Skrijemo ikono preklopa na velikih zaslonih (če je bila prej vključena) */
+.noga-naslov:after {
+    content: none !important;
+}
+
+/* =================================================== */
+/* DODATNA INFORMACIJA (Plačila in Avtorske pravice) */
+/* =================================================== */
+.noga-dodatno-info {
+    padding-top: 20px;
+}
+
+.noga-dodatno-info p {
+    margin-bottom: 10px;
+    color: #a0a0a0;
+}
+
+.noga-avtorske-pravice {
+    text-align: center;
+    padding-top: 15px;
+    font-size: 12px;
+}
+
+.stripe-logo img {
+    height: 20px; 
+    margin-right: 5px;
+    /* Filtriramo, da so ikone bele, če so originali barvni */
+    filter: invert(80%); 
+}
+
+/* --------------------------------------------------- */
+/* MOBILNI PRIKAZ (MEDIA QUERY: do 768px) */
+/* Omogoča akordion za posamezne sekcije */
+/* --------------------------------------------------- */
+@media screen and (max-width: 768px) {
+    
+    /* 1. Gumb za preklop (tri pike) */
+    .footer-toggle-btn {
+        display: block; 
+        width: 100%;
+        background: none;
+        border: none;
+        color: white;
+        text-align: right;
+        padding: 10px 0;
+        cursor: pointer;
+        outline: none;
+        margin-bottom: 5px;
+        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    .footer-toggle-btn svg {
+        vertical-align: middle;
+        color: #cccccc; 
+        
+    }
+    
+    /* 2. Skrivanje celotne vsebine (.noga-vsebina-skrita) */
+    .noga-vsebina-skrita {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+        padding: 0;
+        border-top: none; 
+    }
+
+    /* Prikaz celotne vsebine, ko je gumb aktiven */
+    .noga-vsebina-skrita.active {
+        max-height: 2000px; 
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border-top: 1px solid #444; 
+    }
+    
+    /* 3. Preureditev vsebine znotraj skrite sekcije */
+    .noga-vsebina {
+        display: block; 
+        border-bottom: none; 
+        padding-bottom: 0;
+    }
+    
+    /* Sekcije znotraj noge naj bodo med seboj ločene */
+    .noga-sekcija {
+        border-bottom: 1px solid #444; 
+        padding: 10px 0;
+        padding-right: 0;
+    }
+    
+    /* 🛠️ POPRAVEK ZA AKORDION: Omogoči preklapljanje s pomočjo JS */
+    .noga-linki {
+        /* Sedaj mora biti privzeto skrito za akordion */
+        max-height: 0 !important; 
+        overflow: hidden !important; 
+        transition: max-height 0.3s ease-out !important;
+        padding-top: 0 !important; 
+    }
+
+    /* 🛠️ STANJE PRIKAZA: Ko JS doda razred active */
+    .noga-linki.active {
+        max-height: 500px !important; /* Dovolj visoko, da se prikaže */
+        padding-top: 10px !important; 
+    }
+
+    /* Odstranimo ikono za preklop akordiona na posameznih naslovih */
+    .noga-naslov:after {
+        content: none !important;
+    }
+    
+    /* Poskrbimo, da je prostor okoli plačil videti dobro */
+    .noga-dodatno-info {
+        border-top: 1px solid #444; 
+        padding-top: 15px;
+        padding-bottom: 5px;
+    }
+}
+
+/* 4. Skrijemo gumb na namiznem prikazu */
+@media screen and (min-width: 769px) {
+    .footer-toggle-btn {
+        display: none;
+    }
+}
+
+  </style>
+</head>
+
+<body>
+  <header class="glava">
+    <div class="logotip">
+      <a href="#">
+        <img src="Logo Rentyo gourmet.png" alt="Logotip Rentyo Gourmet" />
+      </a>
+    </div>
+    
+    <div class="akcije" id="desktopAkcije"> 
+      <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
+        <i class="fas fa-user"></i> Prijava
+      </a>
+
+      <div class="profil-ovoj" id="profilMeniDesktop" style="display: none;">
+        <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
+          <i class="fas fa-user-circle"></i> Moj Profil
+        </a>
+        <a href="#" id="gumbOdjavaDesktop" class="gumb-odjava" data-i18n="header.logout">
+          <i class="fas fa-sign-out-alt"></i> Odjava
+        </a>
+      </div>
+      <div class="jezik-ovoj" id="jezikOvojDesktop">
+        <i class="fas fa-globe"></i>
+        <select class="izbira-jezika" id="izbiraJezikaDesktop">
+          <option value="sl">SL</option>
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+          <option value="hr">HR</option>
+          <option value="it">IT</option>
+          <option value="fr">FR</option>
+        </select>
+      </div>
+    </div>
+    
+<button class="hamburger-gumb" id="hamburgerGumb">
+    <i class="fas fa-ellipsis-h"></i>
+</button>
+
+    <div class="mobilni-meni" id="mobilniMeni">
+        <a href="#" id="odpriPrijavoMobilni" class="gumb-prijava" data-i18n="header.login">
+            <i class="fas fa-user"></i> Prijava
+        </a>
+
+        <div class="profil-ovoj" id="profilMeniMobilni" style="display: none;">
+            <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
+                <i class="fas fa-user-circle"></i> Moj Profil
+            </a>
+            <a href="#" id="gumbOdjavaMobilni" class="gumb-odjava" data-i18n="header.logout">
+                <i class="fas fa-sign-out-alt"></i> Odjava
+            </a>
+        </div>
+        
+        <div class="jezik-ovoj" id="jezikOvojMobilni">
+            <i class="fas fa-globe"></i>
+            <select class="izbira-jezika" id="izbiraJezikaMobilni">
+                <option value="sl">SL</option>
+                <option value="en">EN</option>
+                <option value="de">DE</option>
+                <option value="hr">HR</option>
+                <option value="it">IT</option>
+                <option value="fr">FR</option>
+            </select>
+        </div>
+    </div>
+
+  </header>
+
+  <main>
+    <section class="naslovna-slika">
+      <h1 data-i18n="hero.title">Gourmet & Experience</h1>
+    </section>
+
+    <section class="iskalnik-sekcija">
+      <form class="iskalnik">
+        <div class="iskalnik-polje">
+          <label for="restavracija_mesto" data-i18n="search.restaurant_city_label">Restavracija ali mesto</label>
+          <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
+        </div>
+
+        <div class="iskalnik-polje">
+          <label for="datum" data-i18n="search.date_label">Datum</label>
+          <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
+        </div>
+
+        <div class="iskalnik-polje">
+          <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
+          <select id="cas">
+            <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
+          </select>
+        </div>
+
+        <div class="iskalnik-polje">
+          <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
+          <select id="stevilo_oseb">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+
+        <button type="submit" class="gumb-isci" data-i18n="search.search_button">Išči</button>
+      </form>
+    </section>
+
+  <section class="hitra-iskanja">
+    <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
+    <div class="gumbi-kategorij">
+        <a href="#" class="gumb-kategorija" data-kuhinja="Mesne" data-i18n="cuisine.meat">Mesne jedi</a>
+        <a href="#" class="gumb-kategorija" data-kuhinja="Vegi" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</a>
+        <a href="#" class="gumb-kategorija" data-kuhinja="Ribje" data-i18n="cuisine.fish">Ribje jedi</a> 
+        <a href="#" class="gumb-kategorija" data-kuhinja="Pijača" data-i18n="cuisine.drinks">Pijača</a>
+        <a href="#" class="gumb-kategorija" data-kuhinja="Brunch" data-i18n="cuisine.brunch">Brunch</a>
+    </div>
+</section>
+
+ 
+    <section class="kartice-restavracij">
+      <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
+      <div class="mreza-kartic" id="restavracije-container">
+        <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
+      </div>
+    </section>
+
+    <section class="kartice-restavracij kartice-izpostavljeno">
+        <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
+        
+        <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
+            <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
+        </div>
+    </section>
+    
+</main>
+    
+    <div id="restavracijaModal" class="restavracija-modal">
+        <div class="restavracija-vsebina">
+            <span class="gumb-zapri-restavracija" id="zapriRestavracijaModal">×</span>
+            
+            <div id="modalSlika" class="slika-glava"></div>
+            
+            <div class="podrobnosti-tekst">
+                <h2 id="modalIme">Ime Restavracije</h2>
+                
+                <div class="info-vrstica">
+                    <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
+                    <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
+                    <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
+                </div>
+                
+                <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
+            </div>
+            
+            <div class="rezervacija-vnosna-polja">
+                <div class="vnosno-polje">
+                    <label for="modalOsebe" data-i18n="modal.reservation_persons">Št. oseb:</label>
+                    <select id="modalOsebe" class="input-rezervacija">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+
+                <div class="vnosno-polje">
+                    <label for="modalDatum" data-i18n="modal.reservation_date">Datum:</label>
+                    <input type="text" id="modalDatum" class="input-rezervacija" placeholder="" readonly>
+                </div>
+
+                <input type="hidden" data-reserv-id="" value="">
+                
+                </div>
+            <div class="modal-tabs">
+                <div class="modal-tab active" data-tab="meni" data-i18n="modal.tab_menu">Meni</div>
+                <div class="modal-tab" data-tab="aktualnaPonudba" data-i18n="modal.tab_special_offer">Aktualna Ponudba</div> <div class="modal-tab" data-tab="galerija" data-i18n="modal.tab_gallery">Slike & Zemljevid</div>
+                <div class="modal-tab" data-tab="ocene" data-i18n="modal.tab_reviews">Ocene (0)</div>
+            </div>
+
+            <div class="modal-vsebina-ovoj">
+                <div class="modal-vsebina-skrol">
+                    <div id="tabMeni" class="tab-content active">
+                        <div class="meni-seznam">
+                            <ul id="modalMeni">
+                                </ul>
+                        </div>
+                    </div>
+
+                    <div id="tabAktualnaPonudba" class="tab-content">
+                        <h4 data-i18n="modal.special_offer_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Posebna ponudba restavracije</h4>
+                        <p id="modalAktualnaPonudbaOpis" data-i18n="modal.special_offer_default">
+                            Trenutno ni aktivne posebne ponudbe ali sezonskega menija.
+                        </p>
+                        </div>
+
+                    <div id="tabGalerija" class="tab-content">
+                        <h4 data-i18n="modal.gallery_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Galerija slik</h4>
+                        <div id="galerijaSlike" class="galerija-slike">
+                            </div>
+                        
+                        <h4 data-i18n="modal.map_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; margin-top: 20px;">Zemljevid Lokacije</h4>
+                        <div class="zemljevid-ovoj">
+                            <iframe id="modalZemljevid" src="about:blank" allowfullscreen="" loading="lazy" aria-label="Zemljevid lokacije restavracije"></iframe>
+                        </div>
+                    </div>
+
+                    <div id="tabOcene" class="tab-content">
+                        <p data-i18n="modal.no_reviews">Trenutno ni na voljo podrobnih ocen za prikaz.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 0 25px 25px 25px;">
+                <div id="prosteUreRezultati" class="proste-ure-rezultati" style="margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 15px; text-align: center;">
+                    <p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>
+                </div>
+                
+                <button class="gumb-rezerviraj-modal" data-i18n="modal.reserve_button">Rezerviraj mizo</button>
+            </div>
+        </div>
+    </div>
+    
+<div class="login-modal" id="loginModal">
+    <div class="login-content">
+      <span class="close-modal" id="zapriModal">×</span>
+
+      <div class="login-tabs">
+        <div class="login-tab active" id="tabPrijava" data-i18n="modal.login_tab">Prijava</div>
+        <div class="login-tab" id="tabRegistracija" data-i18n="modal.register_tab">Registracija</div>
+      </div>
+
+      <form class="login-form active" id="formPrijava">
+        <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+        <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+        <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
+      </form>
+
+      <form class="login-form" id="formRegistracija">
+        <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
+        <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+        <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+        
+        <div class="form-group-checkbox">
+            <input type="checkbox" id="pogojiStrinjanje" name="pogojiStrinjanje" required>
+            <label for="pogojiStrinjanje">
+                <span data-i18n="registration.pogoji_strinjanje">Strinjam se s </span>
+                <a href="splosni-pogoji.html" target="_blank" data-i18n="registration.splosni_pogoji_link">Splošnimi pogoji</a>
+                <span data-i18n="registration.in_politiko"> in </span>
+                <a href="politika-zasebnosti.html" target="_blank" data-i18n="registration.politika_zasebnosti_link">Politiko zasebnosti</a>.
+                <span class="required-star">*</span>
+            </label>
+        </div>
+        <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="duration-modal" id="durationModal">
+      <div class="duration-content">
+          <span class="close-modal" id="zapriDurationModal">×</span>
+          
+          <h3 data-i18n="modal.reservation_modal.title">Izberite trajanje obiska</h3>
+          
+          <label data-i18n="modal.reservation_modal.duration_label">Kako dolgo želite ostati?</label>
+          
+          <div class="duration-opcije" id="durationOpcije">
+              
+              <div class="duration-opcija" data-duration="0.5">
+                  <input type="radio" id="dur_0_5" name="duration" value="0.5">
+                  <label for="dur_0_5" data-i18n="modal.reservation_modal.duration_0_5h">Pol ure (30 min)</label>
+              </div>
+              
+              <div class="duration-opcija selected" data-duration="1.0">
+                  <input type="radio" id="dur_1" name="duration" value="1.0" checked>
+                  <label for="dur_1" data-i18n="modal.reservation_modal.duration_1h">1 ura</label>
+              </div>
+              
+              <div class="duration-opcija" data-duration="1.5">
+                  <input type="radio" id="dur_1_5" name="duration" value="1.5">
+                  <label for="dur_1_5" data-i18n="modal.reservation_modal.duration_1_5h">1 ura in pol (90 min)</label>
+              </div>
+              
+              <div class="duration-opcija" data-duration="2.0">
+                  <input type="radio" id="dur_2" name="duration" value="2.0">
+                  <label for="dur_2" data-i18n="modal.reservation_modal.duration_2h">2 uri</label>
+              </div>
+          </div>
+          
+          <button id="potrdiTrajanjeGumb" class="gumb-potrdi-trajanje" data-i18n="modal.reservation_modal.confirm_button">Potrdi trajanje in nadaljuj</button>
+      </div>
+  </div>
+
+  <div class="warning-modal" id="warningModal">
+      <div class="warning-content">
+          <div class="warning-icon-wrapper">
+              <i class="fas fa-exclamation-triangle warning-icon"></i>
+          </div>
+          
+          <h3 data-i18n="warning.title">Opozorilo</h3>
+          
+          <p id="warningMessage" data-i18n="warning.default_message">
+            Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.
+          </p>
+          
+          <button id="gumbRazumem" class="gumb-razumem" data-i18n="warning.understand_button">Razumem</button>
+      </div>
+  </div>
+
+<footer class="noga">
+    <!-- GUMB ZA PREKLOP (Vidno samo na mobilnem) -->
+    <button id="footerToggleBtn" class="footer-toggle-btn" aria-expanded="false" aria-controls="nogaVsebinaSkrita" aria-label="Prikaži/Skrij vsebino noge">
+        <!-- Ikona treh pikic (SVG) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </button>
+    
+    <!-- NOVI KONTEJNER: Vsa vsebina, ki se skrije/prikaže ob kliku na gumb -->
+    <div id="nogaVsebinaSkrita" class="noga-vsebina-skrita">
+        <div class="noga-vsebina">
+
+            <div class="noga-sekcija noga-accordion">
+                <h4 class="noga-naslov" data-target="o-rentyo-vsebina" data-i18n="footer.about_company_title">O Rentyo Gourmet</h4>
+                <ul id="o-rentyo-vsebina" class="noga-linki">
+                    <!-- POSODOBLJENO: Uporaba realnih href-ov za navigacijo v istem zavihku -->
+                    <li><a href="o-nas.html" data-i18n="footer.about_us" data-i18n-href="footer.about_us_href">O nas</a></li>
+                    <li><a href="kontakt.html" data-i18n="footer.contact" data-i18n-href="footer.contact_href">Kontakt</a></li>
+                    <li><a href="kariera.html" data-i18n="footer.career" data-i18n-href="footer.career_href">Kariera</a></li>
+                    <li><a href="mediji.html" data-i18n="footer.media_press" data-i18n-href="footer.media_press_href">Mediji / Press kotiček</a></li>
+                </ul>
+            </div>
+
+            <div class="noga-sekcija noga-accordion">
+                <h4 class="noga-naslov" data-target="pravne-info-vsebina" data-i18n="footer.legal_info_title">Pravne Informacije</h4>
+                <ul id="pravne-info-vsebina" class="noga-linki">
+                    <!-- POSODOBLJENO: Uporaba realnih href-ov -->
+                    <li><a href="politika-zasebnosti.html" data-i18n="footer.privacy_policy" data-i18n-href="footer.privacy_policy_href">Politika zasebnosti</a></li>
+                    <li><a href="politika-piskotkov.html" data-i18n="footer.cookie_policy" data-i18n-href="footer.cookie_policy_href">Politika Piškotkov</a></li>
+                    <li><a href="pogoji-uporabe.html" data-i18n="footer.terms_of_use" data-i18n-href="footer.terms_of_use_href">Pogoji Uporabe</a></li>
+                    <li><a href="pravno-obvestilo.html" data-i18n="footer.legal_notice" data-i18n-href="footer.legal_notice_href">Pravno Obvestilo</a></li>
+                    <li><a href="pravne-informacije.html" data-i18n="footer.legal_info_title" data-i18n-href="footer.legal_info_href">Pravne Informacije</a></li>
+                </ul>
+            </div>
+            
+            <div class="noga-sekcija noga-accordion">
+                <h4 class="noga-naslov" data-target="partnerstva-vsebina" data-i18n="footer.partnerships_title">Partnerstva</h4>
+                <ul id="partnerstva-vsebina" class="noga-linki">
+                    <!-- POSODOBLJENO: Uporaba realnih href-ov -->
+                    <li><a href="za-partnerje.html" data-i18n="footer.for_partners" data-i18n-href="footer.for_partners_href">Za Partnerje</a></li>
+                </ul>
+            </div>
+
+            <div class="noga-sekcija noga-accordion">
+                <h4 class="noga-naslov" data-target="social-vsebina" data-i18n="footer.connect_title">Poveži se z nami</h4>
+                <ul id="social-vsebina" class="noga-linki">
+                    <!-- Predpostavljamo, da so to zunanje povezave in bi morale odpreti nov zavihek, 
+                         če vodijo na zunanje socialne strani. Lahko dodate target="_blank", če želite, sicer pustimo standardno. -->
+                    <li><a href="https://www.facebook.com/people/Rentyo-Gourmet/61581337694663/" target="_blank">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/rentyo.gourmet/" target="_blank">Instagram</a></li>
+                    <li><a href="https://www.tiktok.com/@rentyo_travel?lang=sl" target="_blank">TikTok</a></li>
+                    <li><a href="https://linkedin.com/company/rentyogourmet" target="_blank">LinkedIn</a></li>
+                    <li><a href="https://wa.me/385989023144" target="_blank">WhatsApp</a></li>
+                    <li><a href="mailto:info@rentyo.eu">Email</a></li>
+                </ul>
+            </div>
+        </div> <!-- Konec .noga-vsebina (navigacijski stolpci) -->
+        
+<div class="noga-dodatno-info" style="text-align: center; font-size: 0.875rem; margin-bottom: 1rem;">
+            
+            <p style="margin-bottom: 0.5rem;">
+                <span data-i18n="footer.payment_info_prefix">Varno plačilo, ki ga omogoča</span>
+                <a href="" target="_blank" style="text-decoration: none; color: inherit; font-weight: bold;">Stripe</a>.
+            </p>
+            
+            <div class="stripe-logo" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                <a href="" target="_blank" aria-label="Stripe Payment Processing">
+                    <img src="Stripe.png" alt="Stripe" style="display:inline-block; height: 45px;"> 
+                </a>
+                
+                <a href="#" aria-label="Visa Card Accepted" style="cursor: default;">
+                    <img src="Visa.png" alt="Visa" style="display:inline-block; height: 24px;">
+                </a>
+                
+                <a href="#" aria-label="Mastercard Accepted" style="cursor: default;">
+                    <img src="Mastercard.png" alt="Mastercard" style="display:inline-block; height: 24px;">
+                </a>
+            </div>
+        </div>
+        
+        <div class="noga-avtorske-pravice" style="text-align: center; font-size: 0.875rem;">
+            <span data-i18n="footer.copyright_text">© 2025 Rentyo Gourmet. Vse pravice pridržane.</span>
+        </div>
+    </div>
+</footer>
+
+<div id="cookie-consent-banner" class="cookie-banner hidden">
+    <div class="banner-content">
+        
+        <div class="banner-text-group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-cookie" viewBox="0 0 20 20" fill="currentColor" width="24" height="24">
+                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" />
+            </svg>
+            
+            <p class="text-message">
+                <span data-i18n="cookieConsent.message"></span>
+                
+                <a 
+                    href="#" 
+                    class="link-more-info" 
+                    data-i18n-url="cookieConsent.moreInfoLink.url"
+                    data-i18n="cookieConsent.moreInfoLink.text">
+                </a>
+            </p>
+        </div>
+
+        <div class="banner-button-group">
+            <button id="decline-cookies" class="btn-decline" data-i18n="cookieConsent.buttons.0.text">
+                </button>
+            
+            <button id="accept-cookies" class="btn-accept" data-i18n="cookieConsent.buttons.1.text">
+                </button>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/sl.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hr.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
+  
+<script>
+// =================================================================
+// I. LOGIKA MODALNEGA OKNA, PRIJAVE IN ODJAVE 
+// =================================================================
+
+// 🚨 NOVO: DEFINICIJA API BASE URL
+const API_BASE_URL = 'http://127.0.0.1:5000/api'; 
+
+// DEFINICIJE ELEMENTOV ZA PRIJAVO/ODJAVO/MODAL
+const modal = document.getElementById("loginModal");
+const closeBtn = document.getElementById("zapriModal");
+const tabPrijava = document.getElementById("tabPrijava");
+const tabRegistracija = document.getElementById("tabRegistracija");
+const formPrijava = document.getElementById("formPrijava");
+const formRegistracija = document.getElementById("formRegistracija");
+
+// Elementi za Desktop
+const openBtnDesktop = document.getElementById("odpriPrijavoDesktop");
+const profilMeniDesktop = document.getElementById("profilMeniDesktop");
+const gumbOdjavaDesktop = document.getElementById("gumbOdjavaDesktop");
+
+// Elementi za Mobilni meni
+const openBtnMobilni = document.getElementById("odpriPrijavoMobilni");
+const profilMeniMobilni = document.getElementById("profilMeniMobilni");
+const gumbOdjavaMobilni = document.getElementById("gumbOdjavaMobilni");
+const mobilniMeni = document.getElementById('mobilniMeni'); // NOVO
+
+// NOVO: Elementi za Hamburger meni
+const hamburgerGumb = document.getElementById('hamburgerGumb');
+
+// Pomožna funkcija za prikaz sporočil (uporablja standardni 'alert')
+const prikaziSporocilo = (msg, type) => { 
+    console.log(`[Sporočilo za uporabnika] ${type}: ${msg}`);
+    // Opozorilo: Uporaba alert() v produkciji ni priporočljiva. Uporabite modalno okno.
+    alert(msg);
+};
+
+// FUNKCIJA ZA PRIJAVO/ODJAVO
+const setLoginStatus = (isLoggedIn) => {
+    // Odstrani ključa ob odjavi (KLJUČNI POPRAVEK)
+    if (!isLoggedIn) {
+        localStorage.removeItem('zeton');
+        localStorage.removeItem('jeLastnik');
+    }
+    
+    if (isLoggedIn) {
+        // Desktop
+        openBtnDesktop.style.display = "none"; 
+        profilMeniDesktop.style.display = "flex"; 
+        
+        // Mobilni
+        openBtnMobilni.style.display = "none"; 
+        profilMeniMobilni.style.display = "flex"; 
+    } else {
+        // Desktop
+        openBtnDesktop.style.display = "flex"; 
+        profilMeniDesktop.style.display = "none"; 
+        
+        // Mobilni
+        openBtnMobilni.style.display = "flex"; 
+        profilMeniMobilni.style.display = "none"; 
+    }
+};
+
+// PREVERI STANJE PRIJAVE OB NALAGANJU STRANI 
+const checkInitialLoginStatus = () => {
+    // Stanje prijave določa obstoj žetona 'zeton'
+    const isLoggedIn = localStorage.getItem('zeton') !== null;
+    setLoginStatus(isLoggedIn);
+};
+
+checkInitialLoginStatus(); 
+
+// ------------------------------------------------------------- 
+// 4. PRIJAVA / REGISTRACIJA MODAL LOGIKA IN NOVA REZERVACIJSKA LOGIKA
+// ------------------------------------------------------------- 
+document.addEventListener('DOMContentLoaded', () => { 
+    
+    // 🔥 DODANO: Deklaracija elementov, ki jih uporablja spodnja koda, a niso v opremljenem delu.
+    // To zagotavlja, da je koda znotraj tega bloka pravilno povezana z DOM elementi.
+    const modal = document.getElementById('loginModal');
+    const closeBtn = document.getElementById('zapriModal');
+    const openBtnDesktop = document.getElementById('odpriPrijavoDesktop');
+    const openBtnMobilni = document.getElementById('odpriPrijavoMobilni');
+    const formPrijava = document.getElementById('formPrijava');
+    const formRegistracija = document.getElementById('formRegistracija');
+    const tabPrijava = document.getElementById('tabPrijava');
+    const tabRegistracija = document.getElementById('tabRegistracija');
+    const gumbOdjavaDesktop = document.getElementById('gumbOdjavaDesktop');
+    const gumbOdjavaMobilni = document.getElementById('gumbOdjavaMobilni');
+    const hamburgerGumb = document.getElementById('hamburgerGumb');
+    const mobilniMeni = document.getElementById('mobilniMeni');
+    // Opomba: API_BASE_URL, setLoginStatus, prikaziSporocilo in i18next so definirani zunaj tega bloka.
+    
+    // LISTENERJI ZA MODAL (poslušajo klik na desktop in mobilni gumb)
+    const openModalListeners = [openBtnDesktop, openBtnMobilni];
+    openModalListeners.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.classList.add("active");
+            mobilniMeni.classList.remove('active'); // Zapri mobilni meni ob odprtju modala
+        });
+    });
+
+    closeBtn.addEventListener("click", () => modal.classList.remove("active"));
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("active");
+    });
+
+    // LISTENERJI ZA ZAVIHKE (OSTANE NESPREMENJENO)
+    tabPrijava.addEventListener("click", () => {
+      tabPrijava.classList.add("active");
+      tabRegistracija.classList.remove("active");
+      formPrijava.classList.add("active");
+      formRegistracija.classList.remove("active");
+    });
+
+    tabRegistracija.addEventListener("click", () => {
+      tabRegistracija.classList.add("active");
+      tabPrijava.classList.remove("active");
+      formRegistracija.classList.add("active");
+      formPrijava.classList.remove("active");
+    });
+
+    // ========================================
+    // 🔥 NOVO: LOGIKA ZA POGOJE REGISTRACIJE (Omogoči/Onemogoči gumb)
+    // ========================================
+    if (formRegistracija) {
+        const pogojiCheckbox = document.getElementById('pogojiStrinjanje');
+        // Poiščemo gumb znotraj obrazca za registracijo
+        const gumbRegistracija = formRegistracija.querySelector('button[type="submit"]');
+
+        if (pogojiCheckbox && gumbRegistracija) {
+            // 1. Nastavi začetno stanje (onemogočeno, razen če je že označeno)
+            gumbRegistracija.disabled = !pogojiCheckbox.checked;
+
+            // 2. Poslušaj spremembe na kljukici
+            pogojiCheckbox.addEventListener('change', function() {
+                // Omogoči gumb samo, če je kljukica označena
+                gumbRegistracija.disabled = !this.checked;
+            });
+        }
+    }
+    // ========================================
+    // KONEC NOVE LOGIKE
+    // ========================================
+
+
+    // ========================================
+    // LISTENERJI ZA OBRZCE (API KLICI)
+    // ========================================
+
+    // ------------------
+    // PRIJAVA
+    // ------------------
+    formPrijava.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const email = formPrijava.querySelector('input[type="email"]').value;
+        const geslo = formPrijava.querySelector('input[type="password"]').value;
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/prijava`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, geslo })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                // ✅ POPRAVLJENO: Uporabimo pravilen ključ 'zeton'
+                localStorage.setItem('zeton', data.zeton); 
+                
+                // 🔥 POPRAVEK: Standardiziramo shranjevanje statusa lastnika
+                const jeLastnik = data.zelastnik !== undefined ? data.zelastnik : data.jeLastnik; 
+                
+                localStorage.setItem('jeLastnik', jeLastnik); 
+
+                setLoginStatus(true); 
+                modal.classList.remove("active");
+                prikaziSporocilo(i18next.t('messages.login_success') || 'Uspešna prijava!', 'success');
+            } else {
+                prikaziSporocilo(data.msg || i18next.t('messages.login_failed') || 'Prijava neuspešna.', 'error');
+            }
+
+        } catch (err) {
+            console.error("Napaka pri klicu prijave:", err);
+            prikaziSporocilo(i18next.t('messages.server_error') || 'Napaka strežnika pri prijavi.', 'error');
+        }
+    });
+
+
+    // ------------------
+    // REGISTRACIJA
+    // ------------------
+    formRegistracija.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        // 🔥 DODANO: Hitra preverba kljukice ob oddaji, če gumb morda ni bil pravilno onemogočen.
+        const pogojiCheckbox = document.getElementById('pogojiStrinjanje');
+        if (!pogojiCheckbox || !pogojiCheckbox.checked) {
+            // Prepreči oddajo in prikaži napako
+            prikaziSporocilo(i18next.t('messages.pogoji_required') || 'Za registracijo morate sprejeti Splošne pogoje.', 'error');
+            return;
+        }
+
+
+        const imeInput = formRegistracija.querySelector('input[name="ime"]') || formRegistracija.querySelector('input[type="text"]');
+        const emailInput = formRegistracija.querySelector('input[type="email"]');
+        const gesloInput = formRegistracija.querySelector('input[type="password"]');
+
+        const ime = imeInput ? imeInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const geslo = gesloInput ? gesloInput.value.trim() : '';
+
+        if (!ime || !email || !geslo) {
+            prikaziSporocilo(i18next.t('messages.required_fields_missing') || 'Vnesite vsa polja!', 'error');
+            return; 
+        }
+        
+        const jeLastnik = false; 
+        const cena = 0; 
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/registracija`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ime, email, geslo, jeLastnik, cena })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                // ✅ POPRAVLJENO: Uporabimo pravilen ključ 'zeton'
+                localStorage.setItem('zeton', data.zeton); 
+                localStorage.setItem('jeLastnik', jeLastnik); // Shranimo status
+
+                setLoginStatus(true); 
+                modal.classList.remove("active");
+                prikaziSporocilo(i18next.t('messages.registration_success') || 'Uspešna registracija!', 'success');
+            } else {
+                prikaziSporocilo(data.msg || i18next.t('messages.registration_failed') || 'Registracija neuspešna.', 'error');
+            }
+
+        } catch (err) {
+            console.error("Napaka pri klicu registracije:", err);
+            prikaziSporocilo(i18next.t('messages.server_error') || 'Napaka strežnika pri registraciji.', 'error');
+        }
+    });
+        
+    // LISTENER ZA ODJAVO (posluša klik na desktop in mobilni gumb)
+    const logoutListeners = [gumbOdjavaDesktop, gumbOdjavaMobilni];
+    logoutListeners.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            // POPRAVLJENO: Odstranjevanje ključev se sedaj zgodi znotraj setLoginStatus(false)
+            setLoginStatus(false);
+            mobilniMeni.classList.remove('active'); 
+            window.location.href = 'index.html'; // Preusmeritev na index po odjavi
+        });
+    });
+        
+    // NOVO: LOGIKA HAMBURGER MENIJA (Z DODANO LOGIKO ZA NOGO)
+    const footerToggleBtn = document.getElementById('footerToggleBtn'); // Element za nogo
+    const nogaVsebinaSkrita = document.getElementById('nogaVsebinaSkrita'); // Element za nogo
+    
+    hamburgerGumb.addEventListener('click', () => {
+        mobilniMeni.classList.toggle('active');
+        
+        // Zapri nogo, če je odprta
+        if (nogaVsebinaSkrita && nogaVsebinaSkrita.classList.contains('active')) {
+            nogaVsebinaSkrita.classList.remove('active');
+            if (footerToggleBtn) {
+                footerToggleBtn.setAttribute('aria-expanded', 'false');
+                // Nastavi ikono nazaj na 3 pikice
+                footerToggleBtn.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>'; 
+            }
+        }
+        
+        const icon = hamburgerGumb.querySelector('i');
+        if (mobilniMeni.classList.contains('active')) {
+            icon.classList.remove('fa-ellipsis-h');
+            icon.classList.add('fa-times'); 
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-ellipsis-h'); 
+        }
+    });
+});
+    
+    // =================================================================
+    // 🔥 NOVI MODALNI REZERVACIJSKI ELEMENTI IN LOGIKA
+    // =================================================================
+    const modalDatumInput = document.getElementById('modalDatum');
+    const modalOsebeInput = document.getElementById('modalOsebe');
+    const prosteUreRezultati = document.getElementById('prosteUreRezultati');
+    const gumbRezervirajModal = document.querySelector('.gumb-rezerviraj-modal'); // Gumb Rezerviraj mizo
+    
+    // 1. Inicializacija Flatpickr za MODALNO polje
+    // Uporabljamo i18next.language, da zagotovimo pravilno lokalizacijo, 
+    // ki se ujema s trenutnim jezikom spletne strani.
+    const currentLang = i18next.language; // Pridobimo trenutni jezik iz i18next
+
+    if (modalDatumInput && typeof flatpickr !== "undefined") {
+        flatpickr(modalDatumInput, {
+            dateFormat: "d.m.Y", 
+            altInput: true,
+            altFormat: "d.m.Y",
+            locale: currentLang, // Uporabi dinamični jezik ('sl', 'en', 'fr' itd.)
+            minDate: "today", 
+            onChange: function(selectedDates, dateStr, instance) {
+                // Posodobimo datum v skritem polju in ponastavimo rezultate
+                modalDatumInput.setAttribute('data-reserv-datum', dateStr);
+                // Ponastavimo izbrano uro
+                globalSelectedTime = null; 
+                prosteUreRezultati.innerHTML = 
+                    '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+                updateContent();
+            }
+        });
+    }
+
+    // 2. Override gumba "Rezerviraj mizo"
+    if (gumbRezervirajModal) {
+        // Odstranimo inline 'onclick="odpriDurationModal()"' iz HTML
+        gumbRezervirajModal.onclick = null; 
+        
+        gumbRezervirajModal.addEventListener('click', () => {
+            
+            const izbranDatum = modalDatumInput.value; 
+            const steviloOseb = modalOsebeInput.value;
+
+            // Preverimo, ali smo že izbrali čas in je ta ura še vedno veljavna
+            if (globalSelectedTime) {
+                // Če je ura izbrana, gremo direktno na modal trajanja
+                odpriDurationModal();
+                return;
+            }
+
+            // POVEŽEMO Z LOKALIZACIJO (i18n)
+            
+            if (!currentRestaurantId) {
+                // 🔥 POPRAVEK za prevajanje: Uporaba i18next ključa
+                const errorMsg = i18next.t('messages.no_restaurant_selected');
+                prosteUreRezultati.innerHTML = `<p style="color: red;">${errorMsg}</p>`;
+                return;
+            }
+
+            if (!izbranDatum) {
+                // 🔥 POPRAVEK za prevajanje: Uporaba i18next ključa
+                const warningMsg = i18next.t('messages.select_reservation_date');
+                prosteUreRezultati.innerHTML = `<p style="color: red;">${warningMsg}</p>`;
+                return;
+            }
+            
+            // Če sta datum in restavracija izbrana, počistimo polje, preden se prikažejo proste ure.
+            prosteUreRezultati.innerHTML = '';
+
+                // --- SIMULACIJA API KLICA IN PRIKAZ REZULTATOV ---
+                console.log(`Preverjanje za ID: ${currentRestaurantId}, Datum: ${izbranDatum}, Osebe: ${steviloOseb}`);
+                
+                setTimeout(() => {
+                    // To simulira klic 'preveriRazpolozljivost' in prikaže gumbe
+                    prosteUreRezultati.innerHTML = `
+                        <p style="margin-bottom: 10px;" data-i18n="messages.available_times_found">Na voljo proste ure za ${izbranDatum}:</p>
+                        <div class="gumbi-proste-ure">
+                            <button type="button" class="gumb-ura" data-time="18:00">18:00</button>
+                            <button type="button" class="gumb-ura" data-time="19:30">19:30</button>
+                            <button type="button" class="gumb-ura" data-time="20:00">20:00</button>
+                        </div>
+                    `;
+                    updateContent(); // Posodobimo prevode
+                    
+                    // 3. Nastavimo poslušalce za dinamično ustvarjene gumbe z urami
+                    setupTimeSlotListeners();
+
+                }, 1000); // 1 sekunda simulacije nalaganja
+            });
+    }
+    
+    // =================================================================
+// 🔥 NOVO: LOGIKA NOGE/ACCORDIONA
+// =================================================================
+
+// Elementi za nogo so definirani zgoraj, dodamo še naslove za accordion
+const nogaNaslovi = document.querySelectorAll('.noga-naslov');
+
+if (typeof footerToggleBtn !== 'undefined' && typeof nogaVsebinaSkrita !== 'undefined') {
+    // 1. Logika Toggle Gumba (Skrij/Prikaži celotno nogo na mobilnem)
+    footerToggleBtn.addEventListener('click', () => {
+        const isExpanded = footerToggleBtn.getAttribute('aria-expanded') === 'true';
+        
+        nogaVsebinaSkrita.classList.toggle('active');
+        footerToggleBtn.setAttribute('aria-expanded', !isExpanded);
+
+        // Zamenjava ikone iz 3 pikic v X
+        const svgIcon = footerToggleBtn.querySelector('svg');
+        if (svgIcon) { // Dodana preverba, da se izognemo napaki, če SVG ne obstaja
+            if (!isExpanded) {
+                // Če se noga odpira, pokaži X ikono
+                svgIcon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+            } else {
+                // Če se noga zapira, pokaži 3 pikice ikono
+                svgIcon.innerHTML = '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>';
+            }
+        }
+        
+        // 🔥 NOVO: Zapri mobilni meni, če je odprt (potrebuje definicijo 'mobilniMeni' in 'hamburgerGumb')
+        if (typeof mobilniMeni !== 'undefined' && typeof hamburgerGumb !== 'undefined') {
+            mobilniMeni.classList.remove('active');
+            const icon = hamburgerGumb.querySelector('i');
+            if (icon) {
+                 icon.classList.remove('fa-times');
+                 icon.classList.add('fa-ellipsis-h');
+            }
+        }
+    });
+}
+
+// 2. Logika Harmonike (Accordion) za naslove
+nogaNaslovi.forEach(naslov => {
+    // 💡 POPRAVEK: Preprečimo ponovno dodajanje poslušalcev, če se koda izvede večkrat
+    if (naslov.hasAttribute('data-accordion-init')) {
+        return;
+    }
+
+    const targetId = naslov.getAttribute('data-target');
+    const targetContent = document.getElementById(targetId);
+    
+    if (targetContent) {
+        // Nastavitev ARIA in vizualnih atributov (Samo enkrat!)
+        naslov.setAttribute('role', 'button');
+        naslov.setAttribute('aria-expanded', 'false'); // Pravilno začetno stanje (zaprt)
+        naslov.setAttribute('aria-controls', targetId);
+        naslov.classList.add('accordion-trigger'); 
+
+        naslov.addEventListener('click', () => {
+            const isExpanded = naslov.getAttribute('aria-expanded') === 'true';
+            
+            // Preklopi stanje
+            naslov.setAttribute('aria-expanded', !isExpanded);
+            targetContent.classList.toggle('active'); 
+        });
+        
+        // Oznaka, da je bila inicializacija izvedena
+        naslov.setAttribute('data-accordion-init', 'true'); 
+    }
+}); 
+// =================================================================
+// II. LOGIKA SOGLASJA ZA PIŠKOTKE
+// =================================================================
+
+const CONSENT_COOKIE_NAME = 'user_consent_given';
+const BANNER_ID = 'cookie-consent-banner';
+const EXPIRATION_DAYS = 365; // Soglasje velja eno leto
+
+/**
+ * Preveri, ali piškotek soglasja že obstaja.
+ * @returns {string | null} Vrednost piškotka ali null.
+ */
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+/**
+ * Nastavi piškotek soglasja.
+ * @param {string} value 'accepted' za sprejeto, 'declined' za zavrnjeno.
+ */
+function setCookie(value) {
+    const date = new Date();
+    date.setTime(date.getTime() + (EXPIRATION_DAYS * 24 * 60 * 60 * 1000));
+    const expires = "; expires=" + date.toUTCString();
+    // Nastavi Path=/ (velja za celotno domeno) in SameSite=Lax
+    document.cookie = CONSENT_COOKIE_NAME + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+}
+
+/**
+ * Pokaže/skrije pasico in obdela odločitev.
+ */
+function initializeCookieConsent() {
+    const banner = document.getElementById(BANNER_ID);
+    const existingConsent = getCookie(CONSENT_COOKIE_NAME);
+
+    if (!banner) return console.error("Cookie banner element not found.");
+
+    if (!existingConsent) {
+        // Soglasje še ni dano - pokaži pasico z animacijo
+        banner.classList.remove('hidden');
+        
+        // Dodaj class za animacijo. V CSS-ju je definirana samo za .banner-content, zato jo dodajamo na notranji div.
+        const content = banner.querySelector('.banner-content'); 
+        if (content) {
+            content.classList.add('slide-in-up');
+        }
+
+        // Listener za SPREJEM
+        document.getElementById('accept-cookies').addEventListener('click', () => {
+            setCookie('accepted');
+            // TUKAJ NALOŽI KODE ZA ANALITIKO IN OGLAŠEVANJE (npr. Google Analytics)
+            // primer: loadGoogleAnalytics();
+            banner.classList.add('hidden');
+            console.log("Soglasje sprejeto. Piškotek nastavljen.");
+        });
+
+        // Listener za ZAVRNITEV
+        document.getElementById('decline-cookies').addEventListener('click', () => {
+            setCookie('declined');
+            // NE NALOŽI KOD ZA ANALITIKO
+            banner.classList.add('hidden');
+            console.log("Soglasje zavrnjeno. Nastavljeni so le nujni piškotki (vključno s tem).");
+        });
+
+    } else {
+        // Soglasje je že dano - če je 'accepted', naloži analitiko
+        if (existingConsent === 'accepted') {
+            // TUKAJ NALOŽI KODE ZA ANALITIKO
+            // primer: loadGoogleAnalytics();
+        }
+        // Pasica ostane skrita
+        banner.classList.add('hidden');
+    }
+}
+
+// Zaženi logiko takoj, ko se stran naloži
+window.onload = initializeCookieConsent;
+
+// =================================================================
+// KONEC: LOGIKA NOGE/ACCORDIONA
+// =================================================================
+
+// Konec DOMContentLoaded
+// =================================================================
+// KONEC: I. LOGIKA MODALNEGA OKNA, PRIJAVE IN ODJAVE 
+// =================================================================
+
+
+// =================================================================
+// II. LOKALIZACIJA, DATUM IN ČAS
+// =================================================================
+
+// 🔥 NOVO: Globalna spremenljivka, ki shranjuje izbrano uro v rezervacijskem modal
+let globalSelectedTime = null; 
+
+// 🔥 NOVO: Funkcija za nastavitev poslušalcev na dinamično ustvarjenih gumbih z urami
+function setupTimeSlotListeners() {
+    const timeButtons = document.querySelectorAll('#prosteUreRezultati .gumb-ura');
+    timeButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            
+            // Odstranimo aktivni status vsem gumbom z urami
+            timeButtons.forEach(btn => btn.classList.remove('selected'));
+            
+            // Nastavimo izbrano uro in označimo gumb
+            globalSelectedTime = e.target.getAttribute('data-time');
+            e.target.classList.add('selected');
+            
+            // Ko je ura izbrana, pokličemo naslednji modal
+            odpriDurationModal(); 
+        });
+    });
+}
+
+
+const preimenujOsebe = () => {
+    const select = document.getElementById("stevilo_oseb");
+    
+    if (select && typeof i18next !== "undefined") {
+        Array.from(select.options).forEach((option) => {
+            const count = parseInt(option.value);
+            
+            const translationKey = "search.person_singular"; 
+            
+            option.textContent = i18next.t(translationKey, { count: count });
+        });
+    }
+};
+
+// ZAGON DATE PICKERJA (OSTANE TUKAJ, KER JE GLOBALEN)
+flatpickr("#datum", {
+  dateFormat: "d. m. Y",
+  minDate: "today",
+});
+
+function generirajCasovneOpcije() {
+  const select = document.getElementById("cas");
+  for (let h = 10; h <= 23; h++) {
+    let c1 = `${h.toString().padStart(2, "0")}:00`;
+    let c2 = `${h.toString().padStart(2, "0")}:30`;
+    select.add(new Option(c1, c1));
+    if (h < 23) select.add(new Option(c2, c2));
+  }
+  select.value = "19:00";
+}
+generirajCasovneOpcije();
+
+// POSODOBITEV VSEBINE PRI PREVAJANJU
+const updateContent = () => {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    // Ta del poskrbi za prevajanje placeholderjev
+    if (key.startsWith("[placeholder]")) el.placeholder = i18next.t(key.replace("[placeholder]", ""));
+    else el.textContent = i18next.t(key);
+  });
+  document.title = i18next.t("app.title");
+  preimenujOsebe();
+};
+
+// LOGIKA ZA IZBIRO JEZIKA - Skupna funkcija za posodobitev obeh selectov
+const setupLanguageSwitcher = () => {
+  const selectDesktop = document.getElementById("izbiraJezikaDesktop");
+  const selectMobilni = document.getElementById("izbiraJezikaMobilni");
+  
+  const selects = [selectDesktop, selectMobilni].filter(s => s !== null);
+
+  if (selects.length === 0) return;
+
+  const savedLang = localStorage.getItem('i18nextLng');
+  const currentLang = savedLang || i18next.language;
+
+  selects.forEach(select => select.value = currentLang); // Nastavi začetno vrednost obema
+
+  // Skupni listener za obe polji
+  selects.forEach(select => {
+      select.addEventListener("change", (e) => {
+        const newLang = e.target.value;
+        localStorage.setItem('i18nextLng', newLang); 
+        
+        // Posodobi tudi drugo polje
+        selects.filter(s => s !== e.target).forEach(s => s.value = newLang);
+        
+        i18next.changeLanguage(newLang, (err) => {
+          if (err) return console.error(err);
+          updateContent();
+        });
+      });
+  });
+};
+
+// ZAGON i18next
+i18next.use(i18nextHttpBackend).init(
+  {
+    lng: localStorage.getItem('i18nextLng') || "sl",
+    fallbackLng: "sl",
+    backend: { loadPath: "./i18n/{{lng}}.json" },
+  },
+  (err) => {
+    if (err) console.error(err);
+    updateContent();
+    setupLanguageSwitcher();
+    loadRestavracije(); 
+    prikaziOpozoriloObZagonu(); 
+  }
+);
+
+
+// =================================================================
+// III. MOCK PODATKI in LOGIKA KARTIC RESTAVRACIJ (POSODOBLJENO)
+// =================================================================
+
+// 1. Mock Podatki 
+const MOCK_RESTAVRACIJE_RAW = [
+    { id: '66f1f3d89bf1398867f6c69c', ime: "Restavracija Lounge", kuhinja: "Mesne jedi", lokacija: "Ljubljana", ocena_povprecje: 4.5, opis: "Traditional Slovenian cuisine and pleasant ambiance.", slika: "Slika-1.png", 
+      meni: [{j: "Goveja juha s fritati", p: "6.00€"}, {j: "Dunajski zrezek s pomfrijem", p: "14.50€"}, {j: "Kremna rezina", p: "4.00€"}, {j: "Tuna steak z zelenjavo", p: "22.00€"}, {j: "Sveže pečena postrv", p: "18.50€"}],
+      // NOVO: Dodajanje ponudbe v Mock podatke
+      aktualna_ponudba: "Vsak četrtek nudimo 20% popust na vse morske jedi in brezplačno sladico. Rezervirajte hitro!",
+      galerija: ["placeholder_1_gal1.jpg", "placeholder_1_gal2.jpg"],
+      gps_lokacija: "46.056946, 14.505751", // Ljubljana
+     
+    },
+    { id: 'abc123def456ghi789jkl012', ime: "Trattoria Romana", kuhinja: "Italijanska", lokacija: "Maribor", ocena_povprecje: 4.8, opis: "Avtentične testenine in pizze na drva.", slika: "placeholder_2.jpg",
+      meni: [{j: "Pizza Margherita", p: "9.50€"}, {j: "Lasanja Bolognese", p: "12.00€"}, {j: "Tiramisu", p: "5.50€"}],
+      aktualna_ponudba: "Sezonska ponudba: Tartufi in divjačina. Posebni menu za 35€ na osebo.",
+      galerija: ["placeholder_2_gal1.jpg"],
+      gps_lokacija: "46.554650, 15.645881", // Maribor
+     
+    },
+    { id: 'def456ghi789jkl012mno345', ime: "Wok Express", kuhinja: "Azijska", lokacija: "Koper", ocena_povprecje: 4.2, opis: "Hitra in sveža azijska kuhinja s prilagodljivimi sestavinami.", slika: "placeholder_3.jpg", 
+      meni: [{j: "Chicken Pad Thai", p: "10.50€"}, {j: "Vegan Curry", p: "11.00€"}],
+      // NOVO: Prazna ponudba za testiranje
+      aktualna_ponudba: null, 
+      galerija: [], 
+      gps_lokacija: "45.546059, 13.729226", // Koper
+     
+    },
+    { id: 'ghi789jkl012mno345pqr678', ime: "Burger Heaven", kuhinja: "Mesne jedi", lokacija: "Celje", ocena_povprecje: 4.6, opis: "Najboljši gurmanski burgerji v mestu.", slika: "placeholder_4.jpg", meni: [], galerija: [], gps_lokacija: "46.233333, 15.266667", razpolozljivost_status: "available", razpolozljivost_cas: "18:00" },
+    { id: 'jkl012mno345pqr678stu901', ime: "Vegan Heaven", kuhinja: "Vegetarijanske jedi", lokacija: "Ljubljana", ocena_povprecje: 4.7, opis: "Kreativne in zdrave veganske jedi.", slika: "placeholder_5.jpg", 
+      meni: [{j: "Green Smoothie Bowl", p: "7.00€"}, {j: "Avocado Toast", p: "6.50€"}],
+      aktualna_ponudba: "Dnevna veganska malica od 11.00 do 14.00, 9.90€.",
+      galerija: ["placeholder_5_gal1.jpg"],
+      gps_lokacija: "46.056946, 14.505751",
+     
+    },
+];
+
+// ** NOVO: Ločeni podatki za 'Izpostavljeno' **
+// Uporabimo podnabor zgornjih restavracij za simulacijo
+const MOCK_IZPOSTAVLJENO_RAW = [
+    MOCK_RESTAVRACIJE_RAW[0], // Restavracija Lounge
+    MOCK_RESTAVRACIJE_RAW[1], // Trattoria Romana
+    MOCK_RESTAVRACIJE_RAW[3], // Burger Heaven
+];
+
+let allRestavracije = [];
+let currentFilterKuhinja = ''; 
+// POPRAVLJENO: Uporaba pravilnega ID-ja za Priljubljeno sekcijo
+const mrezaKarticDiv = document.getElementById('restavracije-container'); 
+const statusKarticeDiv = document.getElementById('statusKartice');
+const gumbiKategorijDiv = document.querySelector('.gumbi-kategorij');
+
+// ** NOVO: Elementi za Izpostavljeno sekcijo **
+const mrezaIzpostavljenoKarticDiv = document.getElementById('mrezaIzpostavljenoKartic');
+const statusIzpostavljenoKarticeDiv = document.getElementById('statusIzpostavljenoKartice');
+
+
+// Elementi vsebine modala
+const restavracijaModal = document.getElementById('restavracijaModal');
+const zapriRestavracijaModal = document.getElementById('zapriRestavracijaModal');
+const modalSlika = document.getElementById('modalSlika');
+const modalIme = document.getElementById('modalIme');
+const modalKuhinja = document.getElementById('modalKuhinja');
+const modalLokacija = document.getElementById('modalLokacija');
+const modalOcena = document.getElementById('modalOcena');
+const modalOpis = document.getElementById('modalOpis');
+
+// Novi elementi za zavihke
+const modalTabs = document.querySelectorAll('.modal-tab');
+const modalMeni = document.getElementById('modalMeni');
+const galerijaSlikeDiv = document.getElementById('galerijaSlike');
+const modalZemljevid = document.getElementById('modalZemljevid');
+
+// 🔥 NOVO: Element za aktualno ponudbo
+const modalAktualnaPonudbaOpis = document.getElementById('modalAktualnaPonudbaOpis');
+
+// ** NOVO: Globalna spremenljivka za shranjevanje ID-ja restavracije **
+let currentRestaurantId = null;
+
+
+// Pomožna funkcija za zvezdice (OSTANE NESPREMENJENO)
+function generateStarsHTML(rating) {
+    const fullStar = '★'; 
+    const maxStars = 5;
+    const roundedRating = Math.round(rating);
+
+    let starsHTML = '';
+    for (let i = 1; i <= maxStars; i++) {
+        if (i <= roundedRating) {
+            starsHTML += `<span style="color: #ff9900;">${fullStar}</span>`;
+        } else {
+            starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
+        }
+    }
+    return starsHTML;
+}
+
+// FUNKCIJA ZA LOGIKO ZAVIHKOV (OSTANE NESPREMENJENO)
+modalTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        
+        // Odstrani 'active' iz vseh zavihkov
+        modalTabs.forEach(t => t.classList.remove('active'));
+        // Dodaj 'active' trenutnemu zavihku
+        tab.classList.add('active');
+        
+        // Skrij vso vsebino
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Prikaži ciljno vsebino
+        // Imena zavihkov so Meni, Galerija, Ocene, AktualnaPonudba
+        const targetElementId = `tab${targetTab.charAt(0).toUpperCase() + targetTab.slice(1)}`;
+        document.getElementById(targetElementId).classList.add('active');
+    });
+});
+
+// Funkcija, ki napolni modal s podatki in ga odpre (POSODOBLJENO)
+function prikaziPodrobnosti(restavracija) {
+    
+    // ** KLJUČNA SPREMEMBA: Shranimo ID izbrane restavracije **
+    currentRestaurantId = restavracija.id;
+    
+    // Dodamo ID restavracije v skrito polje (če je potrebno za API)
+    document.querySelector('[data-reserv-id]').value = restavracija.id; 
+
+    // 1. Polnjenje Glavnih podrobnosti
+    modalSlika.style.backgroundImage = `url(${restavracija.slika})`;
+    modalIme.textContent = restavracija.ime;
+    modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${restavracija.kuhinja}`;
+    modalLokacija.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${restavracija.lokacija}`;
+    modalOcena.innerHTML = `<i class="fas fa-star"></i> ${restavracija.ocena_povprecje.toFixed(1)}`;
+    modalOpis.textContent = restavracija.opis;
+
+    // 2. Generiranje Menija (Zavihek Meni)
+    modalMeni.innerHTML = '';
+    if (restavracija.meni && restavracija.meni.length > 0) {
+        restavracija.meni.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.j}</strong> <span>${item.p}</span>`;
+            modalMeni.appendChild(li);
+        });
+    } else {
+        modalMeni.innerHTML = '<li class="text-gray-500"><span data-i18n="modal.no_menu">Meni še ni na voljo.</span></li>';
+    }
+    
+    // 🔥 NOVO: Polnjenje zavihka Aktualna Ponudba
+    if (restavracija.aktualna_ponudba) {
+        modalAktualnaPonudbaOpis.textContent = restavracija.aktualna_ponudba;
+        modalAktualnaPonudbaOpis.style.fontStyle = 'normal';
+    } else {
+        modalAktualnaPonudbaOpis.textContent = i18next.t('modal.special_offer_default');
+        modalAktualnaPonudbaOpis.style.fontStyle = 'italic';
+    }
+    
+    // 3. Generiranje Galerije in Zemljevida (Zavihek Slike & Zemljevid)
+    galerijaSlikeDiv.innerHTML = '';
+    if (restavracija.galerija && restavracija.galerija.length > 0) {
+        restavracija.galerija.forEach(slika => {
+            const img = document.createElement('img');
+            img.src = slika; 
+            img.alt = restavracija.ime;
+            galerijaSlikeDiv.appendChild(img);
+        });
+    } else {
+        galerijaSlikeDiv.innerHTML = '<p class="text-gray-500">Ni dodatnih slik za prikaz.</p>';
+    }
+
+    // Vdelan Zemljevid (Google Maps Embed API)
+    if (restavracija.gps_lokacija) {
+        // Opomba: Ta URL za Google Maps Embed API ni popoln in bo ustvaril neveljaven zemljevid. 
+        // Vendar ga ohranjam, ker je bil v vašem originalu:
+        const mapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d34604.28892301824!2d$$${restavracija.gps_lokacija.split(',')[1]}!3d${restavracija.gps_lokacija.split(',')[0]}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNjbCsDM2JzMzLjciTiAxNMKwMDAnMjUuNCJF!5e0!3m2!1ssl!2ssi!4v1700000000000&z=14`;
+        modalZemljevid.src = mapUrl;
+    } else {
+        modalZemljevid.src = 'about:blank';
+    }
+    
+    // 4. Resetiraj prikaz prostih ur ob odprtju nove restavracije
+    document.getElementById('prosteUreRezultati').innerHTML = 
+        '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+    globalSelectedTime = null; // Ponastavimo izbrano uro
+    
+    // 5. Resetiraj na prvi zavihek (Meni) ob odpiranju in ga aktiviraj
+    document.querySelector('.modal-tab[data-tab="meni"]').click();
+
+    // 6. Odpri modal
+    restavracijaModal.classList.add('active');
+    updateContent(); // Posodobi prevode znotraj modala
+}
+
+// Zapiranje modala (listenerji) (OSTANE NESPREMENJENO)
+zapriRestavracijaModal.addEventListener('click', () => {
+    restavracijaModal.classList.remove('active');
+    modalZemljevid.src = 'about:blank';
+    currentRestaurantId = null; // Resetiramo ID
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === restavracijaModal) {
+        restavracijaModal.classList.remove('active');
+        modalZemljevid.src = 'about:blank';
+        currentRestaurantId = null; // Resetiramo ID
+    }
+});
+
+// 2. Renderiranje Ene Kartice (ZA PRILJUBLJENO - POPOLNA KARTICA)
+function renderCard(restavracija) {
+    const card = document.createElement('div');
+    card.className = 'kartica';
+    card.setAttribute('data-id', restavracija.id);
+
+    const ratingDisplay = `${generateStarsHTML(restavracija.ocena_povprecje)} <span class="ocena-stevilka">(${restavracija.ocena_povprecje.toFixed(1)})</span>`;
+    
+    // Generiranje naključne oddaljenosti med 1.0 km in 15.0 km
+    const oddaljenostKm = (Math.random() * 14 + 1).toFixed(1); 
+    
+    const status = restavracija.razpolozljivost_status;
+    const cas = restavracija.razpolozljivost_cas;
+    
+    let razpolozljivostTextKey;
+    let isAvailable = true;
+    
+    if (status === 'available') {
+        razpolozljivostTextKey = i18next.t('results.available_today', { time: cas });
+    } else if (status === 'tomorrow') {
+        razpolozljivostTextKey = i18next.t('results.available_tomorrow', { time: cas });
+    } else {
+        razpolozljivostTextKey = i18next.t('results.unavailable');
+        isAvailable = false;
+    }
+
+    const razpolozljivostHTML = `
+        <div class="razpolozljivost-ovoj ${!isAvailable ? 'zasedeno' : ''}">
+            
+        </div>
+    `;
+
+    card.innerHTML = `
+        <img src="${restavracija.slika}" alt="${restavracija.ime}" class="kartica-slika">
+        <div class="kartica-vsebina">
+            <h3>${restavracija.ime}</h3>
+            
+            <div class="info-ocena-oddaljenost">
+                <p class="ocena">${ratingDisplay}</p>
+                <span class="oddaljenost"><i class="fas fa-location-arrow"></i> ${oddaljenostKm} km</span>
+            </div>
+            
+            ${razpolozljivostHTML} 
+        </div>
+    `;
+    
+    // Listener za celotno kartico
+    card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('gumb-rezervacija')) {
+             return;
+        }
+        prikaziPodrobnosti(restavracija);
+    });
+    
+    return card;
+}
+
+// ** NOVO: Renderiranje Ene Kartice (ZA IZPOSTAVLJENO - POENOSTAVLJENA KARTICA) **
+function renderFeaturedCard(restavracija) {
+    const card = document.createElement('div');
+    card.className = 'kartica kartica-izpostavljeno';
+    card.setAttribute('data-id', restavracija.id);
+    
+    // Listener za celotno kartico
+    card.addEventListener('click', () => prikaziPodrobnosti(restavracija));
+
+    card.innerHTML = `
+        <div class="slika-kartice" style="background-image: url('${restavracija.slika}')"></div>
+        <div class="vsebina-kartice-izpostavljeno">
+            <h3>${restavracija.ime}</h3>
+        </div>
+    `;
+    
+    return card;
+}
+
+// 3. Filtriranje in Prikaz (PRILJUBLJENO)
+function filterAndRenderRestavracije() {
+    const filtered = allRestavracije.filter(r => {
+        if (currentFilterKuhinja === '') return true; 
+        return r.kuhinja === currentFilterKuhinja;
+    });
+
+    mrezaKarticDiv.innerHTML = '';
+    statusKarticeDiv.textContent = '';
+    
+    if (filtered.length === 0) {
+        statusKarticeDiv.textContent = i18next.t('messages.no_restaurants_found'); 
+        return;
+    }
+
+    filtered.forEach(restavracija => {
+        mrezaKarticDiv.appendChild(renderCard(restavracija));
+    });
+    
+    // Posodobimo prevode statusov v karticah po renderju
+    updateContent(); 
+}
+
+// ** NOVO: Prikaz Izpostavljenih Restavracij **
+function renderFeaturedRestavracije() {
+    mrezaIzpostavljenoKarticDiv.innerHTML = '';
+    statusIzpostavljenoKarticeDiv.style.display = 'none';
+
+    if (MOCK_IZPOSTAVLJENO_RAW.length === 0) {
+        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + i18next.t('messages.no_restaurants_found') + '</div>'; 
+        return;
+    }
+    
+    MOCK_IZPOSTAVLJENO_RAW.forEach(restavracija => {
+        mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
+    });
+    
+    updateContent();
+}
+
+// 4. Nastavitev Gumbov za Hitro Iskanje Listenerji (OSTANE NESPREMENJENO)
+function setupKuhinjaFiltersListeners() {
+    document.querySelectorAll('.gumb-kategorija').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            document.querySelectorAll('.gumb-kategorija').forEach(b => b.classList.remove('active'));
+            
+            const novaKuhinja = btn.getAttribute('data-kuhinja');
+            if (currentFilterKuhinja === novaKuhinja) {
+                currentFilterKuhinja = ''; 
+            } else {
+                btn.classList.add('active'); 
+                currentFilterKuhinja = novaKuhinja;
+            }
+            
+            filterAndRenderRestavracije();
+        });
+    });
+}
+
+// 5. Glavna funkcija za nalaganje (simulacija fetch) - DODAN KLIC ZA IZPOSTAVLJENO
+async function loadRestavracije() {
+    statusKarticeDiv.textContent = i18next.t('messages.searching', { criteria: '...' }); 
+    
+    // Prikaz statusa za izpostavljene
+    statusIzpostavljenoKarticeDiv.textContent = i18next.t('messages.searching', { criteria: '...' });
+    
+    await new Promise(resolve => setTimeout(resolve, 500)); 
+    
+    try {
+        allRestavracije = MOCK_RESTAVRACIJE_RAW;
+        
+        setupKuhinjaFiltersListeners();
+        filterAndRenderRestavracije();
+        // ** KLJUČNO: Nalaganje izpostavljenih restavracij **
+        renderFeaturedRestavracije(); 
+
+    } catch (error) {
+        console.error("Napaka pri nalaganju restavracij:", error);
+        statusKarticeDiv.textContent = i18next.t('messages.search_error'); 
+        statusIzpostavljenoKarticeDiv.textContent = i18next.t('messages.search_error'); 
+    }
+}
+
+document.querySelector('.iskalnik').addEventListener('submit', (e) => {
+    e.preventDefault();
+    filterAndRenderRestavracije();
+});
+
+
+// =================================================================
+// IV. LOGIKA REZERVACIJE IN TRAJANJA (POPRAVLJENO)
+// =================================================================
+
+const durationModal = document.getElementById("durationModal");
+const zapriDurationModal = document.getElementById("zapriDurationModal");
+const durationOpcije = document.getElementById("durationOpcije");
+const potrdiTrajanjeGumb = document.getElementById("potrdiTrajanjeGumb");
+
+// Odpre modal za izbiro trajanja in zapre modal podrobnosti
+window.odpriDurationModal = () => {
+    // Preverimo, ali je izbrana restavracija (npr. s klikom na kartico)
+    if (!currentRestaurantId || !globalSelectedTime) {
+        console.error("Napaka: Ni izbrane restavracije ali časa za rezervacijo.");
+        alert("Napaka: Prosimo, izberite čas rezervacije.");
+        // Če ni izbrane ure, gremo nazaj na restavracijski modal
+        restavracijaModal.classList.add('active'); 
+        return;
+    }
+
+    // Skrij modal podrobnosti
+    restavracijaModal.classList.remove('active');
+    // Prikaži modal za trajanje
+    durationModal.classList.add('active');
+}
+
+// Zapre modal za izbiro trajanja
+zapriDurationModal.addEventListener('click', () => {
+    durationModal.classList.remove('active');
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === durationModal) durationModal.classList.remove("active");
+});
+
+// Vizualno označevanje izbrane opcije in izbira radio gumba
+durationOpcije.querySelectorAll('.duration-opcija').forEach(opcijaDiv => {
+    opcijaDiv.addEventListener('click', () => {
+        // Odstrani 'selected' razred iz vseh
+        durationOpcije.querySelectorAll('.duration-opcija').forEach(d => d.classList.remove('selected'));
+        // Dodaj 'selected' trenutnemu
+        opcijaDiv.classList.add('selected');
+        // Poskrbi, da se res izbere radio gumb znotraj div-a
+        const radio = opcijaDiv.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    });
+});
+
+// Funkcija za potrditev rezervacije
+const potrdiRezervacijo = () => {
+    // 🔥 POPRAVEK: Uporabimo nove elemente in globalSelectedTime
+    const datum = document.getElementById('modalDatum').value; 
+    const steviloOseb = document.getElementById('modalOsebe').value; 
+    const cas = globalSelectedTime; // Uporabi globalno izbrano uro
+    
+    const izbranoTrajanjeElement = durationModal.querySelector('input[name="duration"]:checked');
+    
+    const trajanje = izbranoTrajanjeElement ? izbranoTrajanjeElement.value : '1.0'; // Privzeta 1 ura
+    
+    // Najdi podatke o restavraciji
+    const restavracija = allRestavracije.find(r => r.id === currentRestaurantId) || MOCK_IZPOSTAVLJENO_RAW.find(r => r.id === currentRestaurantId);
+
+    if (!restavracija) {
+        alert("Napaka: Restavracija ni izbrana ali ni v podatkih!");
+        return;
+    }
+
+    if (!datum || !cas || !steviloOseb) {
+        alert(i18next.t('messages.required_fields_missing'));
+        return;
+    }
+    
+    // ZAPRI VSE MODALE
+    durationModal.classList.remove('active');
+    
+    // IZVEDBA REZERVACIJE (SIMULACIJA)
+    console.log("=========================================");
+    console.log(i18next.t('messages.reserving', { stevilo: steviloOseb, cas: cas }));
+    console.log("=========================================");
+    
+    // Simulacija API klica s success/fail
+    setTimeout(() => {
+        const reservationSuccess = Math.random() > 0.1; // 90% uspeh
+
+        if (reservationSuccess) {
+            
+            // 🔥 KLJUČNI POPRAVEK: Omejitev mize na 18 (za Lounge Vienna ali katero koli restavracijo v simulaciji)
+            const maxMize = 18; 
+            const miza = Math.floor(Math.random() * maxMize) + 1; // Naključna miza med 1 in 18
+            
+            const trajanjeMin = parseFloat(trajanje) * 60 + ' min';
+            
+            alert(i18next.t('messages.reservation_success', { miza: miza, trajanje: trajanjeMin }));
+            // Prikaz obvestila o uspehu v konzolo
+            console.log(i18next.t('messages.reservation_success', { miza: miza, trajanje: trajanjeMin }));
+        } else {
+             alert(i18next.t('messages.reservation_failed'));
+             // Prikaz obvestila o napaki v konzolo
+             console.error(i18next.t('messages.reservation_failed'));
+        }
+        
+        // Počisti globalne podatke, ne glede na uspeh
+        currentRestaurantId = null;
+        globalSelectedTime = null; // Ponastavimo izbrano uro
+    }, 1000); // 1 sekunda simulacije nalaganja
+}
+
+// Listener za gumb Potrdi trajanje in nadaljuj
+potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
+
+
+// =================================================================
+// V. LOGIKA OPOZORILNEGA OKNA (NOVO)
+// =================================================================
+
+const warningModal = document.getElementById("warningModal");
+const gumbRazumem = document.getElementById("gumbRazumem");
+
+/**
+ * Prikaže opozorilno okno, če ga uporabnik še ni videl in shranil v localStorage.
+ */
+function prikaziOpozoriloObZagonu() {
+    const warningSeen = localStorage.getItem('warningSeen');
+
+    if (warningSeen !== 'true') {
+        warningModal.classList.add('active');
+    }
+    
+    // Listener za gumb "Razumem"
+    gumbRazumem.addEventListener('click', () => {
+        // Skrij modal
+        warningModal.classList.remove('active');
+        // Shrani v localStorage, da se ob naslednjem obisku ne prikaže
+        localStorage.setItem('warningSeen', 'true');
+    });
+    
+    // Dodamo tudi listener za klik izven modala za zapiranje (opcijsko)
+    window.addEventListener("click", (e) => {
+        if (e.target === warningModal) {
+            // To omogoča, da se modal zapre tudi s klikom na ozadje, 
+            // vendar se stanje 'warningSeen' shrani samo ob kliku na 'Razumem'.
+            warningModal.classList.remove("active");
+        }
+    });
+}
+    
+</script>
+</body>
+</html>

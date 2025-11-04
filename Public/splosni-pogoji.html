@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Terms and Conditions of Use</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <!-- VSEBINA V ANGLEŠČINI (PRIVZETO) -->
+        <div class="vsebina-jezik" id="content-en" lang="en">
+            <h1>General Terms and Conditions of Use upon User Registration</h1>
+            <p>(For display upon creation of a user account on the Rentyo Gourmet site)</p>
+
+            <h2>1. Introductory Provisions</h2>
+            <p>By registering a user account on the Rentyo Gourmet platform (hereinafter: "the platform"), the user confirms that they have read, understood, and accepted these General Terms and Conditions of Use, the Privacy Policy, and the Cookie Policy.</p>
+            <h3>Platform Operator:</h3>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Croatia</p>
+            <p>OIB: 85972870674</p>
+            <p>IBAN: LT31 3250 0588 1111 4934 (Revolut)</p>
+            <p>SWIFT: REVOLT21</p>
+            <p>Competent Court: Zagreb, Croatia</p>
+
+            <h2>2. Purpose and Use of Services</h2>
+            <p>The Rentyo Gourmet platform provides users with free online table reservation services at restaurants.</p>
+            <p>By confirming registration, the user acknowledges that Rentyo Gourmet:</p>
+            <ul>
+                <li>does not sell food or beverages,</li>
+                <li>does not perform catering activities,</li>
+                <li>acts as a technological intermediary between users and restaurants.</li>
+            </ul>
+
+            <h2>3. User Obligations</h2>
+            <p>The user undertakes to:</p>
+            <ul>
+                <li>enter accurate and truthful information upon registration,</li>
+                <li>use their account only for their own needs,</li>
+                <li>respect reservation etiquette (e.g., timely cancellation).</li>
+            </ul>
+            <p>The Operator reserves the right to block or delete a user account if there is abuse or misuse of the platform.</p>
+
+            <h2>4. Communication and Notices</h2>
+            <p>By registering, the user allows Rentyo Gourmet to:</p>
+            <ul>
+                <li>send notices related to reservations, including confirmations, changes, or cancellations of appointments,</li>
+                <li>send system messages essential for account operation (e.g., updates or security changes),</li>
+                <li>send promotional notices, such as special restaurant offers, news, and recommendations, if the user explicitly agrees during registration (e.g., by checking the confirmation box).</li>
+            </ul>
+            <p>The user can cancel the receipt of promotional notices at any time and free of charge in their user profile or via a link in the individual message.</p>
+
+            <h2>5. Personal Data Protection</h2>
+            <p>All user personal data is processed in accordance with:</p>
+            <ul>
+                <li>Regulation (EU) 2016/679 (GDPR) and</li>
+                <li>The Personal Data Protection Act of the Republic of Croatia.</li>
+            </ul>
+            <p>Details on the processing, storage, and protection of personal data are provided in the <a href="privacy-policy.html">Privacy Policy</a>.</p>
+
+            <h2>6. Liability</h2>
+            <p>Rentyo Gourmet is not responsible for:</p>
+            <ul>
+                <li>the availability of appointments,</li>
+                <li>changes to restaurant schedules or conditions,</li>
+                <li>the quality of catering services provided by the restaurant.</li>
+            </ul>
+            <p>The platform provides technical support and smooth transfer of information between the user and the restaurant.</p>
+
+            <h2>7. Changes to Terms</h2>
+            <p>The Operator reserves the right to change these terms.</p>
+            <p>All changes will be published on the Rentyo Gourmet website and become effective on the date of publication.</p>
+
+            <h2>8. Governing Law and Dispute Resolution</h2>
+            <p>The law of the Republic of Croatia applies to this document and all legal relationships between the user and the operator.</p>
+            <p>The competent court for dispute resolution is Zagreb, Croatia.</p>
+
+            <h2>9. Declaration of Acceptance</h2>
+            <p>By clicking the "Register" button, the user confirms that they:</p>
+            <ul>
+                <li>☑ have read and agree to these terms of use,</li>
+                <li>☑ allow the processing of their personal data for reservation purposes,</li>
+                <li>☑ voluntarily agree to receive promotional notices until consent is revoked.</li>
+            </ul>
+        </div>
+
+        <!-- VSEBINA V SLOVENŠČINI -->
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Splošni pogoji uporabe ob registraciji uporabnika</h1>
+            <p>(Za prikaz ob ustvarjanju uporabniškega računa na strani Rentyo Gourmet)</p>
+
+            <h2>1. Uvodne določbe</h2>
+            <p>S registracijo uporabniškega računa na platformi Rentyo Gourmet (v nadaljevanju: »platforma«) uporabnik potrjuje, da je prebral, razumel in sprejel te Splošne pogoje uporabe, Politiko zasebnosti ter Politiko piškotkov.</p>
+
+            <h3>Upravljavec platforme je družba:</h3>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</p>
+            <p>OIB: 85972870674</p>
+            <p>IBAN: LT31 3250 0588 1111 4934 (Revolut)</p>
+            <p>SWIFT: REVOLT21</p>
+            <p>Pristojno sodišče: Zagreb, Hrvaška</p>
+
+            <h2>2. Namen in uporaba storitev</h2>
+            <p>Platforma Rentyo Gourmet uporabnikom omogoča brezplačno spletno rezervacijo miz v restavracijah.</p>
+            <p>Uporabnik s potrditvijo registracije potrjuje, da razume, da Rentyo Gourmet:</p>
+            <ul>
+                <li>ne prodaja hrane ali pijače,</li>
+                <li>ne izvaja gostinske dejavnosti,</li>
+                <li>deluje kot tehnološki posrednik med uporabniki in restavracijami.</li>
+            </ul>
+
+            <h2>3. Obveznosti uporabnika</h2>
+            <p>Uporabnik se zavezuje, da bo:</p>
+            <ul>
+                <li>ob registraciji vnesel točne in resnične podatke,</li>
+                <li>svoj račun uporabljal le za lastne potrebe,</li>
+                <li>spoštoval bonton pri rezervacijah (npr. pravočasna odpoved).</li>
+            </ul>
+            <p>Upravljavec si pridržuje pravico do blokade ali izbrisa uporabniškega računa, če pride do zlorabe ali napačne uporabe platforme.</p>
+
+            <h2>4. Komunikacija in obvestila</h2>
+            <p>Z registracijo uporabnik dovoljuje, da mu Rentyo Gourmet:</p>
+            <ul>
+                <li>pošilja obvestila, povezana z rezervacijami, vključno s potrditvami, spremembami ali preklici terminov,</li>
+                <li>pošilja sistemska sporočila, ki so nujna za delovanje računa (npr. obvestila o posodobitvah ali varnostnih spremembah),</li>
+                <li>pošilja promocijska obvestila, kot so posebne ponudbe restavracij, novosti in priporočila, če uporabnik temu izrecno pritrdi ob registraciji (npr. z označitvijo potrditvenega polja).</li>
+            </ul>
+            <p>Uporabnik lahko kadarkoli in brezplačno prekliče prejem promocijskih obvestil v svojem uporabniškem profilu ali prek povezave v posameznem sporočilu.</p>
+
+            <h2>5. Varstvo osebnih podatkov</h2>
+            <p>Vsi osebni podatki uporabnikov se obdelujejo skladno z:</p>
+            <ul>
+                <li>Uredbo (EU) 2016/679 (GDPR) in</li>
+                <li>Zakonom o varstvu osebnih podatkov Republike Hrvaške.</li>
+            </ul>
+            <p>Podrobnosti o obdelavi, shranjevanju in varstvu osebnih podatkov so navedene v <a href="politika-zasebnosti.html">Politiki zasebnosti</a>.</p>
+
+            <h2>6. Odgovornost</h2>
+            <p>Rentyo Gourmet ne odgovarja za:</p>
+            <ul>
+                <li>razpoložljivost terminov,</li>
+                <li>spremembe urnikov ali pogojev restavracij,</li>
+                <li>kakovost gostinskih storitev, ki jih zagotavlja restavracija.</li>
+            </ul>
+            <p>Platforma zagotavlja tehnično podporo in nemoten prenos informacij med uporabnikom in restavracijo.</p>
+
+            <h2>7. Spremembe pogojev</h2>
+            <p>Upravljavec si pridržuje pravico do spremembe teh pogojev.</p>
+            <p>Vse spremembe bodo objavljene na spletni strani Rentyo Gourmet in začnejo veljati z dnem objave.</p>
+
+            <h2>8. Pristojno pravo in reševanje sporov</h2>
+            <p>Za ta dokument in vse pravne odnose med uporabnikom in upravljavcem se uporablja pravo Republike Hrvaške.</p>
+            <p>Za reševanje sporov je pristojno sodišče v Zagrebu, Hrvaška.</p>
+
+            <h2>9. Izjava o sprejemu</h2>
+            <p>S potrditvijo gumba »Registriraj se« uporabnik potrjuje, da:</p>
+            <ul>
+                <li>☑ je prebral in soglaša s temi pogoji uporabe,</li>
+                <li>☑ dovoljuje obdelavo svojih osebnih podatkov za namene rezervacij,</li>
+                <li>☑ prostovoljno soglaša s prejemanjem promocijskih obvestil, dokler soglasja ne prekliče.</li>
+            </ul>
+        </div>
+        
+        <!-- Prazni razdelki za druge jezike (HR, DE, FR, IT) za ohranjanje funkcionalnosti preklopa jezika -->
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Opći uvjeti korištenja pri registraciji korisnika</h1>
+            <p>Sadržaj nije dostupan. Odaberite drugi jezik ili pogledajte <a href="#content-en">englesku verziju</a>.</p>
+        </div>
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Allgemeine Nutzungsbedingungen bei der Registrierung</h1>
+            <p>Der Inhalt ist nicht verfügbar. Bitte wählen Sie eine andere Sprache oder sehen Sie sich die <a href="#content-en">englische Version</a> an.</p>
+        </div>
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Conditions générales d'utilisation lors de l'inscription</h1>
+            <p>Le contenu n'est pas disponible. Veuillez sélectionner une autre langue ou consulter la <a href="#content-en">version anglaise</a>.</p>
+        </div>
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Termini e condizioni generali d'uso per la registrazione</h1>
+            <p>Il contenuto non è disponibile. Si prega di selezionare un'altra lingua o visualizzare la <a href="#content-en">versione inglese</a>.</p>
+        </div>
+        <!-- Konec praznih razdelkov -->
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino in posodobi <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina), kot je zahtevano
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

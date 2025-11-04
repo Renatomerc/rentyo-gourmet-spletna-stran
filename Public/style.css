@@ -1,0 +1,729 @@
+/* ========================================================================= */
+/* OSNOVNI STILI IN RESET                        */
+/* ========================================================================= */
+
+/* Ponastavitev osnovnih brskalniških stilov */
+* {
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+}
+
+/* Osnovna tipografija in barva ozadja telesa */
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Dopolnjena pisava */
+    color: #333; 
+    background-color: #f4f4f9; 
+    line-height: 1.6;
+}
+
+/* Osnovna stilizacija povezav */
+a {
+    color: #0070cc;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #ffffff;
+}
+
+
+/* ========================================================================= */
+/* GLAVA (HEADER)                              */
+/* ========================================================================= */
+
+.glava {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 5%; /* Uporaba odstotkov za boljšo odzivnost */
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.logotip img {
+    max-height: 35px; 
+    width: auto;     
+    display: block;  
+}
+
+.akcije {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+}
+
+.gumb-prijava {
+    text-decoration: none;
+    color: #0070cc;
+    background-color: #ffffff; /* Uporabite poudarjeno barvo za prijavo */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+    font-weight: bold;
+}
+
+.gumb-prijava:hover {
+    background-color: #0070cc;
+}
+
+.jezik-ovoj {
+    display: flex;
+    align-items: center;
+    border: 0px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 5px;
+}
+
+.jezik-ovoj i {
+    color: #575757;
+    margin-right: 5px;
+}
+
+.izbira-jezika {
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1em;
+    color: #333;
+              /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+
+
+/* ========================================================================= */
+/* NASLOVNA SLIKA (HERO) (ODZIVNOST)         */
+/* ========================================================================= */
+
+.naslovna-slika {
+    /* PRIVZETA SLIKA ZA NAMIZNI POGLED (desktop first) */
+    background-image: url('Naslovna-slika-mobilna.png'); 
+    background-size: cover;
+    background-position: center;
+    height: 350px; /* Malo zvišana višina */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden; /* Skrijemo morebitne prelome ozadja */
+}
+
+/* Prekrivni sloj za zatemnitev in boljšo berljivost besedila */
+.naslovna-slika::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.15); /* Malo močnejša zatemnitev */
+    z-index: 1;
+}
+
+.naslovna-slika h1 {
+    font-size: 1.6em; /* Povečan naslov */
+    z-index: 10; 
+    padding: 0 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Močnejša senca za boljšo berljivost */
+}
+
+/* ========================================================================= */
+/* ISKALNIK (FORM) (NESPREMENJENO)             */
+/* ========================================================================= */
+
+.iskalnik-sekcija {
+    padding: 20px;
+    background-color: #fff;
+    border: 3px solid #333;
+    box-shadow: 0 0px 0px rgba(0,0,0,0.15); /* Bolj izrazita senca */
+    margin: -70px 5% 40px 5%; /* Negativen rob in širina z % */
+    border-radius: 10px;
+    z-index: 20;
+    position: relative;
+}
+
+/* Postavitev elementov obrazca (vertikalno na mobilnem) */
+.iskalnik {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px;
+}
+
+.iskalnik-polje {
+    display: flex;
+    flex-direction: column;
+}
+
+.iskalnik-polje label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.8em;
+}
+
+.iskalnik input, 
+.iskalnik select {
+    padding: 10px; /* Večji padding */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #fff;
+    width: 100%;
+    
+    
+    /* DODANO: Odstranimo privzeti videz brskalnika za vse inpute */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.iskalnik select {
+    /* Za select ohranjamo prvotni stil, ki vključuje puščico */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Centriraj puščico */
+    background-size: 14px auto; /* Večja puščica */
+    padding-right: 30px;
+}
+
+/* -------------------- STILI ZA DATUM in ČAS (Flatpickr) -------------------- */
+
+/* Skupen stil za polja z ikono */
+.iskalnik-polje:has(#datum), .iskalnik-polje:has(#cas) {
+    position: relative;
+}
+
+/* Stil za polja - ODSTRANJENA IKONA, vrnjen osnovni padding */
+.iskalnik input#datum, .iskalnik input#cas {
+    padding-right: 12px; 
+}
+
+/* STILIZACIJA ODPRTEGA KOLEDARJA (Flatpickr) - ostane enaka */
+
+.flatpickr-calendar {
+    border-radius: 8px !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2) !important;
+    border-color: #ddd !important;
+    z-index: 9999; 
+}
+
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange, 
+.flatpickr-day.selected.inRange, 
+.flatpickr-day.startRange.inRange, 
+.flatpickr-day.endRange.inRange, 
+.flatpickr-day:hover, 
+.flatpickr-day.prevMonthDay:hover, 
+.flatpickr-day.nextMonthDay:hover, 
+.flatpickr-day.today {
+    background: #000000!important; 
+    border-color: #000000!important;
+    color: white !important;
+}
+
+.flatpickr-day.today:hover {
+    background: #000000 !important;
+    border-color: #000000 !important;
+}
+
+/* -------------------- GUMB ISCI -------------------- */
+
+.gumb-isci {
+    padding: 10px;
+    background-color: #20c0bd;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Majhen razmik na mobilnem */
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+
+.gumb-isci:hover {
+    background-color: #169b99;
+}
+
+/* ========================================================================= */
+/* HITRE KATEGORIJE (GUMBI) (NESPREMENJENO)      */
+/* ========================================================================= */
+
+.hitra-iskanja {
+    padding: 15px 5%;
+    text-align: center;
+}
+
+.hitra-iskanja h2 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+}
+
+/* Postavitev mreže gumbov */
+.gumbi-kategorij {
+    display: flex; /* Flexbox za postavitev v vrsto */
+    flex-wrap: wrap; /* Omogoči prelom vrstice na manjših zaslonih */
+    justify-content: center; /* Centriraj gumbe */
+    gap: 10px; /* Razmik med gumbi */
+    max-width: 1000px; 
+    margin: 0 auto;
+}
+
+/* Stil za posamezni GUMB KATEGORIJE */
+.gumb-kategorija {
+    display: inline-block;
+    padding: 8px 10px; /* Zmeren padding za gumb */
+    border: 1px solid #333; /* Rdeč rob kot poudarek */
+    border-radius: 25px; /* Zaobljeni robovi */
+    background-color: #fff;
+    color: #333;
+    font-weight: bold;
+    font-size: 0.9em;
+    text-decoration: none;
+    white-space: nowrap; /* Prepreči prelom besedila v gumbu */
+    
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
+
+/* Efekt ob premiku miške */
+.gumb-kategorija:hover {
+    background-color: #4edaa9;
+    color: #444444;
+    transform: translateY(0px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Odzivnost - na večjih zaslonih povečaj razmik */
+@media (min-width: 768px) {
+    .gumbi-kategorij {
+        gap: 15px;
+    }
+}
+
+
+/* ========================================================================= */
+/* KARTICE RESTAVRACIJ (POPRAVLJENO)             */
+/* ========================================================================= */
+
+.kartice-restavracij {
+    padding: 30px 5%;
+    text-align: center;
+    position: relative; /* Potrebno za absolutno pozicioniranje ločilne črte */
+    
+}
+
+.kartice-restavracij h2 {
+    margin-bottom: 25px;
+    font-size: 1.5em;
+}
+.kartice-restavracij h3 {
+    margin-bottom: 40px;
+    font-size: 2em;
+    color: #4edaa9
+}
+
+/* LOČILNA ČRTA (DODANO) */
+.locilna-crta {
+    border-bottom: 1px solid #ddd;
+    margin: 30px 0 0 0; 
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px; /* Dodan prostor pod karticami */
+}
+
+.mreza-kartic {
+    display: grid;
+    /* Trenutna postavitev za mobilni in namizni prelom (bo spremenjena v @media) */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.kartica {
+    background-color: #fff;
+    border: 0px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: left;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s;
+    
+    display: flex;
+    flex-direction: column;
+    /* Prilagojena višina za bolj pravokoten videz na namizju */
+    height: 300px; 
+}
+
+.kartica:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.kartica img {
+    width: 100%;
+    /* Zmanjšana višina slike */
+    height: 140px; 
+    object-fit: cover;
+}
+
+.kartica h3 {
+    /* Zmanjšana velikost in padding */
+    padding: 10px 10px 3px; 
+    font-size: 1.15em; /* Zmanjšan naslov */
+    color: #cc0000;
+}
+
+.kartica p {
+    /* Zmanjšan padding */
+    padding: 0 3px; 
+    font-size: 0.9em; /* Zmanjšan opis */
+    margin-bottom: 3px; 
+}
+
+.kartica .opis-kratko {
+    font-style: italic;
+    color: #666;
+}
+
+.kartica .ocena {
+    font-weight: bold;
+    color: #373737; 
+    /* Zmanjšan padding */
+    padding-bottom: 1px; 
+    margin-top: auto; /* Potisne gumb rezervacija dol */
+}
+
+.gumb-rezervacija {
+    display: block;
+    text-align: center;
+    /* Zmanjšan padding */
+    padding: 8px; 
+    background-color: #ffffff;
+    color: rgb(43, 43, 43);
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    
+    margin-top: auto;
+    font-size: 0.95em;
+}
+
+.gumb-rezervacija:hover {
+    background-color: #0070cc;
+    color: white; /* Da barva ostane bela ob hoverju */
+}
+
+
+/* ========================================================================= */
+/* NOGA (FOOTER) (NESPREMENJENO)                               */
+/* ========================================================================= */
+
+.noga {
+    /* Ohranimo osnovne lastnosti noge */
+    background-color: #333;
+    color: #ffffff;
+    margin-top: 50px;
+    padding: 40px 5%; /* Povečan padding in uporaba odstotkov za robove */
+    font-size: 0.9em;
+}
+
+/* Stil za kontejner, ki bo držal stolpce */
+.noga-vsebina {
+    display: flex; /* Uporaba flexboxa za postavitev stolpcev */
+    justify-content: space-around; /* Enakomerna porazdelitev prostora med stolpci */
+    align-items: flex-start; /* Poravnava vsebine stolpcev na vrh */
+    max-width: 1200px; /* Omejitev širine, da ne gre predaleč narazen */
+    margin: 0 auto; /* Centriranje vsebine noge */
+    flex-wrap: wrap; /* Omogoči prelom v mobilnem pogledu */
+    text-align: left; /* Postavimo besedilo nazaj na levo */
+}
+
+/* Stil za posamezni stolpec */
+.noga-stolpec {
+    padding: 0 15px; /* Manjši razmik med stolpci */
+    flex: 1; /* Stolpci se enakomerno raztezajo */
+    min-width: 150px; /* Minimalna širina stolpca, da se ne zruši */
+    margin-bottom: 20px; /* Rob na dnu za mobilni prikaz */
+}
+
+.noga-stolpec h4 {
+    color: #f4f4f9; /* Barva za naslove stolpcev */
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.noga-stolpec a {
+    color: #a0a0a0; /* Svetlejša barva za povezave */
+    display: block; /* Povezave so vsaka v svoji vrsti */
+    margin-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.noga-stolpec a:hover {
+    color: #0070cc; /* Poudarek ob premiku miške */
+}
+
+/* Stil za besedilo o avtorskih pravicah, ki bo ostal centriran na dnu */
+.noga-avtorske-pravice {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #555; /* Ločnica */
+    margin-top: 20px;
+    clear: both; /* Poskrbi, da je pod stolpci */
+}
+
+/* Odzivnost: Na manjših zaslonih se stolpci naložijo vertikalno */
+@media (max-width: 768px) {
+    
+    /* === NOVA MOBILNA NASLOVNA SLIKA === */
+    .naslovna-slika {
+        background-image: url('Naslovna-slika-mobilna.png'); 
+        background-position: center top; /* Lahko prilagodite, kateri del slike je viden */
+        height: 210px; /* Zmanjšana višina za mobilni pogled */
+    }
+    /* ==================================== */
+
+    .noga-vsebina {
+        flex-direction: column;
+        align-items: center;
+        text-align: center; /* Vsebina na mobilnem centrirana */
+    }
+    
+    .noga-stolpec {
+        min-width: 80%;
+        margin-bottom: 25px;
+    }
+    
+    /* Pravilo, ki vsa polja v iskalniku prisili na 100% širine. */
+     .iskalnik input, 
+     .iskalnik select,
+     .gumb-isci {
+         width: 100%;
+     }
+
+    /* KLJUČNA POPRAVKA ZA DATUM/ČAS (iOS) */
+    .iskalnik input#datum, 
+    .iskalnik input#cas {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        
+        width: 100% !important; 
+        min-width: 100%;
+    }
+    
+    .iskalnik input[type="date"]::-webkit-inner-spin-button,
+    .iskalnik input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    /* ---------------------------------------------------- */
+    /* NOVI STILI ZA POLJE 'ŠT. LJUDI' IN GUMB 'IŠČI'       */
+    /* ---------------------------------------------------- */
+    
+    .iskalnik {
+         /* Prepis: Celoten iskalnik sedaj podpira zlaganje v vrstice */
+         flex-direction: row; 
+         flex-wrap: wrap; 
+         /* Uporaba obstoječega gap-a 15px */
+    }
+    
+    /* Vsa polja razen zadnjih dveh (ki sta 50%) naj bodo še vedno 100% */
+    .iskalnik-polje:not(:nth-last-child(2)) {
+        width: 100% !important;
+    }
+
+    /* Polje za število ljudi (predzadnji iskalnik-polje) in gumb Išči (zadnji) naj bosta 50% */
+    .iskalnik-polje:nth-last-child(2),
+    .gumb-isci {
+        /* Uporabimo calc, da od 50% odštejemo polovico razmika (15px / 2) */
+        width: calc(50% - 7.5px) !important; 
+        margin-top: 0 !important; /* Odstranimo rob zgoraj, da se poravnata */
+    }
+    
+    .gumb-isci {
+        /* Ključno: Gumb poravnamo na dno, da se ujema z višino select polja */
+        align-self: flex-end; 
+    }
+    
+    /* ---------------------------------------------------- */
+    
+    
+    /* ================================================= */
+    /* MOBILNI POGLED KARTICE: HORIZONTALNO SCROLANJE (POPRAVEK) */
+    /* ================================================= */
+    
+    .kartice-restavracij {
+        /* Odstranimo Padding 5%, saj ga bomo ponastavili na mrezi kartic */
+        padding-left: 0;
+        padding-right: 0;
+        
+    }
+
+    /* 1. KARTICE SE ZLOŽIJO V HORIZONTALNO VRSTO Z SCROLLOM */
+    .mreza-kartic {
+        display: flex; /* Ključen premik iz mreže v flex */
+        overflow-x: auto; /* Omogoči vodoravno pomikanje */
+        flex-wrap: nowrap; /* Prepreči zlaganje kartic v novo vrstico */
+        gap: 15px; /* Manjši razmik na mobilnem */
+        padding-bottom: 15px; 
+        
+        /* Začnemo in končamo na robovih strani: */
+        margin: 0 0 0 5%; /* Levi rob je 5% (kot je bil padding prej) */
+        padding-right: 5%; /* Desni rob je 5% */
+        width: 95%; /* Da omogočimo "peek" naslednje kartice, vendar mora vsebnik biti dovolj širok */
+        max-width: none; /* Odstranimo max-width omejitev */
+        
+        /* Skrijemo standardni drsnik */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        scroll-snap-type: x mandatory; /* Izboljša izkušnjo dotika */
+    }
+    
+    .mreza-kartic::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 2. ZMANJŠANJE VELIKOSTI KARTIC ZA MOBILNI PRIKAZ */
+    .kartica {
+        /* Kartica zavzame 80% širine zaslona, da se naslednja pokaže */
+        flex: 0 0 80%; 
+        min-width: 55%;
+        max-width: 60%;
+        height: 280px; /* Še bolj kompaktna višina na mobilnem */
+        
+        scroll-snap-align: start; 
+    }
+    
+    .kartica img {
+        height: 150px; /* Še manjša slika */
+    }
+    
+    .kartica h3 {
+        font-size: 0.9em; /* Še manjši naslov */
+        padding: 8px 10px 3px; 
+    }
+    
+    .kartica p {
+        font-size: 0.85em; 
+    }
+    
+    .gumb-rezervacija {
+        padding: 6px;
+        font-size: 0.85em;
+    }
+
+}
+
+
+/* ========================================================================= */
+/* ODZIVNOST (MEDIA QUERIES) (NESPREMENJENO)    */
+/* ========================================================================= */
+
+/* Stili za zaslone širše od 768px (tablice in namizni računalniki) */
+@media (min-width: 768px) {
+    
+    /* Glava */
+    .glava {
+        padding: 20px 5%;
+    }
+    
+    /* Hero slika */
+    .naslovna-slika {
+        height: 450px;
+    }
+    .naslovna-slika h1 {
+        font-size: 2.5em;
+    }
+
+    /* Iskalnik - namizni pogled */
+    .iskalnik-sekcija {
+        margin: -150px auto 50px auto; 
+        max-width: 1000px; 
+        padding: 15px;
+    }
+
+    .iskalnik {
+        flex-direction: row; 
+        gap: 15px;
+        align-items: flex-end;
+    }
+    
+    .iskalnik-polje {
+        flex: 1; 
+    }
+    
+    .gumb-isci {
+        flex: 0 0 150px; 
+        align-self: flex-end; 
+        padding: 10px 20px;
+        margin-top: 0;
+    }
+    
+    /* Kategorije - namizni pogled */
+    .gumbi-kategorij {
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 20px;
+    }
+    
+    /* Kartice restavracij - na tablicah/manjših računalnikih 3 v sirino (GRID) */
+    .mreza-kartic {
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 15px;
+        /* Ponastavitev, če so bile v horizontalnem pogledu */
+        display: grid; 
+        margin: 0 auto;
+        padding: 0;
+        width: auto;
+    }
+    
+    .kartica img {
+        height: 200px; 
+    }
+}
+
+/* Veliki zasloni (namizni računalniki) - 5 kartic v sirino */
+@media (min-width: 1200px) {
+    .naslovna-slika {
+        height: 400px;
+    }
+    
+    .iskalnik-sekcija {
+        max-width: 1000px;
+    }
+    
+    .iskalnik {
+        gap: 20px;
+    }
+    
+    .mreza-kartic {
+        grid-template-columns: repeat(5, 1fr); 
+    }
+}

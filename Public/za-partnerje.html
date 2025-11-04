@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Rentyo Gourmet Partner Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Back to main page">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Rentyo Gourmet Partner Platform</h1>
+            <p><strong>Grow your business by optimizing reservations and reducing 'no-shows'.</strong></p>
+
+            <h2>1. Join the Rentyo Gourmet Community</h2>
+            <p>Rentyo Gourmet is a premium platform dedicated to simplifying and digitizing reservations in the high-end gastronomy sector. We are looking for partners who share our vision of excellence and commitment to providing the best culinary experiences.</p>
+
+            <h3>Who can join us?</h3>
+            <ul>
+                <li><strong>Restaurants:</strong> Optimize reservations and improve table occupancy.</li>
+                <li><strong>Bars and Lounges:</strong> Efficiently manage your spaces and events.</li>
+                <li><strong>Wineries and Tasting Rooms:</strong> Simplify bookings for guided tastings and events.</li>
+            </ul>
+
+            <h2>2. Why Partner with Rentyo Gourmet?</h2>
+            <h3>Key Partnership Benefits</h3>
+            <ul>
+                <li><strong>Increased Reach to Premium Customers:</strong> Access a growing base of customers and gastronomy lovers actively seeking high-end culinary experiences.</li>
+                <li><strong>Occupancy Optimization Tools:</strong> Use our advanced tools to optimize occupancy and automate communication with customers.</li>
+                <li><strong>Reservation Security (Credit Card):</strong> As a partner, you may request the guest's credit card information as security upon booking. Services must not be charged in advance; the card serves exclusively as a guarantee in case of 'no-show' or cancellation outside your terms.</li>
+                <li><strong>Zero Tolerance for 'No-Show':</strong> Our platform enforces zero tolerance for 'No-Show'. Any user who books twice and fails to cancel or show up is <strong>permanently removed from the application</strong> after the second warning. This ensures greater reliability for your bookings.</li>
+            </ul>
+
+            <h2>3. How to Get Started (The Process)</h2>
+            <h3>Simple Steps to Success</h3>
+            <ol>
+                <li><strong>Registration and Package Selection:</strong> Simply register on our website at <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, choose your preferred package (monthly or annual), and complete the purchase.</li>
+                <li><strong>Profile Setup:</strong> Afterwards, in the Reservation Menu, select 'My Profile', where you can upload your details, images, menus, pricing, and the description you wish to appear in our application. Please arrange this in your profile.</li>
+                <li><strong>Launching:</strong> Once your profile is complete, start receiving optimized and reliable reservations.</li>
+            </ol>
+
+            <h2>4. Contact for Additional Questions</h2>
+            <p>For any partnership-related inquiries that are not covered by the registration process, please contact us directly.</p>
+
+            <h3>Contact Details</h3>
+            <p><strong>Department:</strong> Rentyo Gourmet Partnerships</p>
+            <p><strong>Email:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Phone (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Company Headquarters:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Croatia</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Platforma za partnerje Rentyo Gourmet</h1>
+            <p><strong>Razvijte svoje poslovanje z optimizacijo rezervacij in zmanjšanjem 'no-show' odsotnosti.</strong></p>
+
+            <h2>1. Pridružite se skupnosti Rentyo Gourmet</h2>
+            <p>Rentyo Gourmet je premium platforma, namenjena poenostavitvi in digitalizaciji rezervacij v sektorju vrhunske gastronomije. Iščemo partnerje, ki delijo našo vizijo odličnosti in zavezanosti k zagotavljanju najboljših kulinaričnih izkušenj.</p>
+
+            <h3>Kdo se nam lahko pridruži?</h3>
+            <ul>
+                <li><strong>Restavracije:</strong> Optimizirajte rezervacije in izboljšajte zasedenost miz.</li>
+                <li><strong>Bari in saloni:</strong> Učinkovito upravljajte svoje prostore in dogodke.</li>
+                <li><strong>Vinarne in degustacijske sobe:</strong> Poenostavite rezervacije za vodene degustacije in dogodke.</li>
+            </ul>
+
+            <h2>2. Zakaj partnerstvo z Rentyo Gourmet?</h2>
+            <h3>Ključne prednosti partnerstva</h3>
+            <ul>
+                <li><strong>Večji doseg do premium strank:</strong> Dostop do rastoče baze strank in ljubiteljev gastronomije, ki aktivno iščejo vrhunske kulinarične izkušnje.</li>
+                <li><strong>Orodja za optimizacijo zasedenosti:</strong> Uporabite naša napredna orodja za optimizacijo zasedenosti in avtomatizacijo komunikacije s strankami.</li>
+                <li><strong>Varnost rezervacij (kreditna kartica):</strong> Kot partner lahko zahtevate podatke o kreditni kartici gosta kot jamstvo ob rezervaciji. Storitve se ne smejo zaračunati vnaprej; kartica služi izključno kot garancija v primeru 'no-show' ali odpovedi izven vaših pogojev.</li>
+                <li><strong>Ničelna toleranca za 'No-Show':</strong> Naša platforma uveljavlja ničelno toleranco za 'No-Show'. Vsak uporabnik, ki rezervira dvakrat in rezervacije ne odpove ali se ne pojavi, je po drugem opozorilu <strong>trajno odstranjen iz aplikacije</strong>. To zagotavlja večjo zanesljivost vaših rezervacij.</li>
+            </ul>
+
+            <h2>3. Kako začeti (Postopek)</h2>
+            <h3>Preprosti koraki do uspeha</h3>
+            <ol>
+                <li><strong>Registracija in izbira paketa:</strong> Preprosto se registrirajte na naši spletni strani na <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, izberite želeni paket (mesečni ali letni) in dokončajte nakup.</li>
+                <li><strong>Nastavitev profila:</strong> Nato v meniju za rezervacije izberite 'Moj profil', kjer lahko naložite svoje podatke, slike, menije, cene in opis, ki se naj prikaže v naši aplikaciji. Prosimo, uredite to v svojem profilu.</li>
+                <li><strong>Zagon:</strong> Ko je vaš profil dokončan, začnite prejemati optimizirane in zanesljive rezervacije.</li>
+            </ol>
+
+            <h2>4. Kontakt za dodatna vprašanja</h2>
+            <p>Za vsa vprašanja v zvezi s partnerstvom, ki niso zajeta v postopku registracije, nas kontaktirajte neposredno.</p>
+
+            <h3>Kontaktni podatki</h3>
+            <p><strong>Oddelek:</strong> Rentyo Gourmet Partnerstva</p>
+            <p><strong>E-pošta:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Telefon (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Sedež podjetja:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Rentyo Gourmet Partnerska Platforma</h1>
+            <p><strong>Unaprijedite svoje poslovanje optimizacijom rezervacija i smanjenjem 'no-show' izostanaka.</strong></p>
+
+            <h2>1. Pridružite se Rentyo Gourmet Zajednici</h2>
+            <p>Rentyo Gourmet je premium platforma posvećena pojednostavljenju i digitalizaciji rezervacija u sektoru vrhunske gastronomije. Tražimo partnere koji dijele našu viziju izvrsnosti i predanost pružanju najboljih kulinarskih iskustava.</p>
+
+            <h3>Tko nam se može pridružiti?</h3>
+            <ul>
+                <li><strong>Restorani:</strong> Optimizirajte rezervacije i poboljšajte popunjenost stolova.</li>
+                <li><strong>Barovi i saloni:</strong> Učinkovito upravljajte svojim prostorima i događajima.</li>
+                <li><strong>Vinarije i kušaonice:</strong> Pojednostavite rezervacije za vođene degustacije i događaje.</li>
+            </ul>
+
+            <h2>2. Zašto Partnerstvo s Rentyo Gourmet?</h2>
+            <h3>Ključne prednosti partnerstva</h3>
+            <ul>
+                <li><strong>Povećani doseg do Premium Klijenata:</strong> Pristup rastućoj bazi klijenata i ljubitelja gastronomije koji aktivno traže vrhunska kulinarska iskustva.</li>
+                <li><strong>Alati za Optimizaciju Popunjenosti:</strong> Koristite naše napredne alate za optimizaciju popunjenosti i automatizaciju komunikacije s klijentima.</li>
+                <li><strong>Sigurnost Rezervacije (Kreditna kartica):</strong> Kao partner, možete zahtijevati podatke o kreditnoj kartici gosta kao jamstvo prilikom rezervacije. Usluge se ne smiju naplaćivati unaprijed; kartica služi isključivo kao garancija u slučaju 'no-show' ili otkazivanja izvan vaših uvjeta.</li>
+                <li><strong>Nulta Tolerancija za 'No-Show':</strong> Naša platforma provodi nultu toleranciju za 'No-Show'. Svaki korisnik koji rezervira dva puta i ne otkaže ili se ne pojavi <strong>trajno se uklanja iz aplikacije</strong> nakon drugog upozorenja. To osigurava veću pouzdanost vaših rezervacija.</li>
+            </ul>
+
+            <h2>3. Kako Započeti (Proces)</h2>
+            <h3>Jednostavni koraci do uspjeha</h3>
+            <ol>
+                <li><strong>Registracija i Odabir Paketa:</strong> Jednostavno se registrirajte na našoj web stranici na <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, odaberite željeni paket (mjesečni ili godišnji) i dovršite kupnju.</li>
+                <li><strong>Postavljanje Profila:</strong> Zatim u izborniku za rezervacije odaberite 'Moj profil', gdje možete prenijeti svoje podatke, slike, jelovnike, cijene i opis koji želite da se pojavi u našoj aplikaciji. Molimo, uredite to u svom profilu.</li>
+                <li><strong>Pokretanje:</strong> Nakon što je vaš profil završen, počnite primati optimizirane i pouzdane rezervacije.</li>
+            </ol>
+
+            <h2>4. Kontakt za Dodatna Pitanja</h2>
+            <p>Za sva pitanja vezana uz partnerstvo koja nisu obuhvaćena postupkom registracije, obratite nam se izravno.</p>
+
+            <h3>Podaci za Kontakt</h3>
+            <p><strong>Odjel:</strong> Rentyo Gourmet Partnerstva</p>
+            <p><strong>E-pošta:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Telefon (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Sjedište tvrtke:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvatska</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Rentyo Gourmet Partner-Plattform</h1>
+            <p><strong>Steigern Sie Ihr Geschäft durch die Optimierung von Reservierungen und die Reduzierung von 'No-Shows'.</strong></p>
+
+            <h2>1. Treten Sie der Rentyo Gourmet Community bei</h2>
+            <p>Rentyo Gourmet ist eine Premium-Plattform, die sich der Vereinfachung und Digitalisierung von Reservierungen im gehobenen Gastronomiebereich widmet. Wir suchen Partner, die unsere Vision von Exzellenz und Engagement für die besten kulinarischen Erlebnisse teilen.</p>
+
+            <h3>Wer kann uns beitreten?</h3>
+            <ul>
+                <li><strong>Restaurants:</strong> Optimieren Sie Reservierungen und verbessern Sie die Tischauslastung.</li>
+                <li><strong>Bars und Lounges:</strong> Verwalten Sie Ihre Räume und Veranstaltungen effizient.</li>
+                <li><strong>Weingüter und Probierstuben:</strong> Vereinfachen Sie Buchungen für geführte Verkostungen und Veranstaltungen.</li>
+            </ul>
+
+            <h2>2. Warum Partner von Rentyo Gourmet werden?</h2>
+            <h3>Wesentliche Vorteile der Partnerschaft</h3>
+            <ul>
+                <li><strong>Erhöhte Reichweite zu Premium-Kunden:</strong> Zugang zu einer wachsenden Basis von Kunden und Gastronomie-Liebhabern, die aktiv nach hochwertigen kulinarischen Erlebnissen suchen.</li>
+                <li><strong>Tools zur Optimierung der Auslastung:</strong> Nutzen Sie unsere fortschrittlichen Tools zur Optimierung der Auslastung und zur Automatisierung der Kundenkommunikation.</li>
+                <li><strong>Reservierungssicherheit (Kreditkarte):</strong> Als Partner können Sie die Kreditkarteninformationen des Gastes als Sicherheit bei der Buchung anfordern. Dienstleistungen dürfen nicht im Voraus berechnet werden; die Karte dient ausschließlich als Garantie im Falle eines 'No-Show' oder einer Stornierung außerhalb Ihrer Bedingungen.</li>
+                <li><strong>Null-Toleranz für 'No-Show':</strong> Unsere Plattform setzt eine Null-Toleranz für 'No-Show' durch. Jeder Benutzer, der zweimal bucht und die Reservierung nicht storniert oder nicht erscheint, wird nach der zweiten Warnung <strong>dauerhaft von der Anwendung entfernt</strong>. Dies gewährleistet eine größere Zuverlässigkeit Ihrer Buchungen.</li>
+            </ul>
+
+            <h2>3. So starten Sie (Der Prozess)</h2>
+            <h3>Einfache Schritte zum Erfolg</h3>
+            <ol>
+                <li><strong>Registrierung und Paketauswahl:</strong> Registrieren Sie sich einfach auf unserer Website unter <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, wählen Sie Ihr bevorzugtes Paket (monatlich oder jährlich) und schließen Sie den Kauf ab.</li>
+                <li><strong>Profileinrichtung:</strong> Wählen Sie anschließend im Reservierungsmenü 'Mein Profil', wo Sie Ihre Details, Bilder, Menüs, Preise und die Beschreibung hochladen können, die in unserer Anwendung erscheinen soll. Bitte richten Sie dies in Ihrem Profil ein.</li>
+                <li><strong>Start:</strong> Sobald Ihr Profil vollständig ist, beginnen Sie mit dem Empfang optimierter und zuverlässiger Reservierungen.</li>
+            </ol>
+
+            <h2>4. Kontakt für weitere Fragen</h2>
+            <p>Für alle partnerschaftsbezogenen Anfragen, die nicht durch den Registrierungsprozess abgedeckt sind, kontaktieren Sie uns bitte direkt.</p>
+
+            <h3>Kontaktdaten</h3>
+            <p><strong>Abteilung:</strong> Rentyo Gourmet Partnerschaften</p>
+            <p><strong>E-Mail:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Telefon (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Firmensitz:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Kroatien</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Plateforme Partenaires Rentyo Gourmet</h1>
+            <p><strong>Développez votre entreprise en optimisant les réservations et en réduisant les 'no-shows'.</strong></p>
+
+            <h2>1. Rejoignez la Communauté Rentyo Gourmet</h2>
+            <p>Rentyo Gourmet est une plateforme premium dédiée à la simplification et à la numérisation des réservations dans le secteur de la haute gastronomie. Nous recherchons des partenaires qui partagent notre vision d'excellence et notre engagement à offrir les meilleures expériences culinaires.</p>
+
+            <h3>Qui peut nous rejoindre?</h3>
+            <ul>
+                <li><strong>Restaurants:</strong> Optimisez les réservations et améliorez l'occupation des tables.</li>
+                <li><strong>Bars et Lounges:</strong> Gérez efficacement vos espaces et événements.</li>
+                <li><strong>Domaines viticoles et Salles de dégustation:</strong> Simplifiez les réservations pour les dégustations guidées et les événements.</li>
+            </ul>
+
+            <h2>2. Pourquoi devenir Partenaire Rentyo Gourmet?</h2>
+            <h3>Avantages Clés du Partenariat</h3>
+            <ul>
+                <li><strong>Portée Accrue auprès des Clients Premium:</strong> Accédez à une base croissante de clients et d'amateurs de gastronomie recherchant activement des expériences culinaires haut de gamme.</li>
+                <li><strong>Outils d'Optimisation de l'Occupation:</strong> Utilisez nos outils avancés pour optimiser l'occupation et automatiser la communication avec les clients.</li>
+                <li><strong>Sécurité des Réservations (Carte de Crédit):</strong> En tant que partenaire, vous pouvez demander les informations de carte de crédit du client comme garantie lors de la réservation. Les services ne doivent pas être facturés à l'avance ; la carte sert exclusivement de garantie en cas de 'no-show' ou d'annulation en dehors de vos conditions.</li>
+                <li><strong>Tolérance Zéro pour les 'No-Show':</strong> Notre plateforme applique une tolérance zéro pour les 'No-Show'. Tout utilisateur qui réserve deux fois et ne parvient pas à annuler ou à se présenter est <strong>définitivement retiré de l'application</strong> après le deuxième avertissement. Cela garantit une plus grande fiabilité de vos réservations.</li>
+            </ul>
+
+            <h2>3. Comment Commencer (Le Processus)</h2>
+            <h3>Étapes Simples vers le Succès</h3>
+            <ol>
+                <li><strong>Inscription et Sélection de Forfait:</strong> Inscrivez-vous simplement sur notre site web à <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, choisissez votre forfait préféré (mensuel ou annuel) et complétez l'achat.</li>
+                <li><strong>Configuration du Profil:</strong> Ensuite, dans le menu de réservation, sélectionnez 'Mon Profil', où vous pouvez télécharger vos détails, images, menus, prix et la description que vous souhaitez voir apparaître dans notre application. Veuillez organiser cela dans votre profil.</li>
+                <li><strong>Lancement:</strong> Une fois votre profil complet, commencez à recevoir des réservations optimisées et fiables.</li>
+            </ol>
+
+            <h2>4. Contact pour Questions Supplémentaires</h2>
+            <p>Pour toute question liée au partenariat qui n'est pas couverte par le processus d'inscription, veuillez nous contacter directement.</p>
+
+            <h3>Coordonnées</h3>
+            <p><strong>Département:</strong> Partenariats Rentyo Gourmet</p>
+            <p><strong>E-mail:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Téléphone (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Siège social de l'entreprise:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Croatie</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Piattaforma Partner Rentyo Gourmet</h1>
+            <p><strong>Fai crescere la tua attività ottimizzando le prenotazioni e riducendo i 'no-show'.</strong></p>
+
+            <h2>1. Unisciti alla Comunità Rentyo Gourmet</h2>
+            <p>Rentyo Gourmet è una piattaforma premium dedicata alla semplificazione e alla digitalizzazione delle prenotazioni nel settore dell'alta gastronomia. Cerchiamo partner che condividano la nostra visione di eccellenza e l'impegno a fornire le migliori esperienze culinarie.</p>
+
+            <h3>Chi può unirsi a noi?</h3>
+            <ul>
+                <li><strong>Ristoranti:</strong> Ottimizza le prenotazioni e migliora l'occupazione dei tavoli.</li>
+                <li><strong>Bar e Lounge:</strong> Gestisci in modo efficiente i tuoi spazi ed eventi.</li>
+                <li><strong>Cantine e Sale di Degustazione:</strong> Semplifica le prenotazioni per degustazioni guidate ed eventi.</li>
+            </ul>
+
+            <h2>2. Perché Collaborare con Rentyo Gourmet?</h2>
+            <h3>Principali Vantaggi della Partnership</h3>
+            <ul>
+                <li><strong>Maggiore Raggiungimento di Clienti Premium:</strong> Accesso a una base crescente di clienti e amanti della gastronomia che cercano attivamente esperienze culinarie di alta gamma.</li>
+                <li><strong>Strumenti di Ottimizzazione dell'Occupazione:</strong> Utilizza i nostri strumenti avanzati per ottimizzare l'occupazione e automatizzare la comunicazione con i clienti.</li>
+                <li><strong>Sicurezza delle Prenotazioni (Carta di Credito):</strong> Come partner, puoi richiedere le informazioni della carta di credito dell'ospite come garanzia al momento della prenotazione. I servizi non devono essere addebitati in anticipo; la carta serve esclusivamente come garanzia in caso di 'no-show' o cancellazione al di fuori dei tuoi termini.</li>
+                <li><strong>Tolleranza Zero per i 'No-Show':</strong> La nostra piattaforma applica una tolleranza zero per i 'No-Show'. Qualsiasi utente che prenota due volte e non annulla o non si presenta viene <strong>rimosso in modo permanente dall'applicazione</strong> dopo il secondo avviso. Ciò garantisce una maggiore affidabilità per le tue prenotazioni.</li>
+            </ul>
+
+            <h2>3. Come Iniziare (Il Processo)</h2>
+            <h3>Semplici Passaggi per il Successo</h3>
+            <ol>
+                <li><strong>Registrazione e Selezione del Pacchetto:</strong> Registrati semplicemente sul nostro sito web all'indirizzo <a href="https://www.gourmet.rentyo.eu">https://www.gourmet.rentyo.eu</a>, scegli il tuo pacchetto preferito (mensile o annuale) e completa l'acquisto.</li>
+                <li><strong>Configurazione del Profilo:</strong> Successivamente, nel Menu Prenotazioni, seleziona 'Il Mio Profilo', dove puoi caricare i tuoi dettagli, immagini, menu, prezzi e la descrizione che desideri appaia nella nostra applicazione. Ti preghiamo di organizzare questo nel tuo profilo.</li>
+                <li><strong>Lancio:</strong> Una volta completato il tuo profilo, inizia a ricevere prenotazioni ottimizzate e affidabili.</li>
+            </ol>
+
+            <h2>4. Contatto per Domande Aggiuntive</h2>
+            <p>Per qualsiasi domanda relativa alla partnership che non sia coperta dal processo di registrazione, ti preghiamo di contattarci direttamente.</p>
+
+            <h3>Dettagli di Contatto</h3>
+            <p><strong>Reparto:</strong> Partnership Rentyo Gourmet</p>
+            <p><strong>Email:</strong> <a href="mailto:partners@rentyo.eu">partners@rentyo.eu</a></p>
+            <p><strong>Telefono (WhatsApp):</strong> +385 98 902 3144</p>
+            <p><strong>Sede Legale dell'Azienda:</strong> Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagabria, Croazia</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to switch language
+        function switchLanguage(lang) {
+            // 1. Save the selection to Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Hide all content
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Show the corresponding content, update the page title and <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Update the 'lang' attribute on <html>
+
+                // Update the Page Title
+                const titles = {
+                    en: 'Rentyo Gourmet Partner Platform', 
+                    sl: 'Platforma za partnerje Rentyo Gourmet', 
+                    hr: 'Rentyo Gourmet Partnerska Platforma', 
+                    de: 'Rentyo Gourmet Partner-Plattform', 
+                    fr: 'Plateforme Partenaires Rentyo Gourmet', 
+                    it: 'Piattaforma Partner Rentyo Gourmet'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Rentyo Gourmet Partner Platform';
+            }
+            
+            // Update the selected value in the dropdown menu
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Event: switch language when the dropdown value changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Listen for changes in the dropdown menu
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Check saved language on page load
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Determine the default language: If none is saved, use 'en' (English)
+            const defaultLang = savedLang || 'en';
+
+            // Run the language switch on startup
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

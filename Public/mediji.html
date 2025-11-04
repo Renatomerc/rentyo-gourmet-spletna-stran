@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ID 'page-title' je dodan, da ga lahko JavaScript posodobi -->
+    <title id="page-title">Media</title>
+    <!-- Font Awesome za ikono puščice -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Gumb za nazaj -->
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <!-- Spustni meni za izbiro jezika -->
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <!-- ========================================================================= -->
+        <!-- 1. ANGLEŠKA VSEBINA (EN) - PRIVZETO AKTIVNA -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Welcome to the Rentyo Gourmet Press Corner.</h1>
+            <p>Here, media and journalists can find basic information about our platform, vision, and contact details for statements.</p>
+
+            <h2>Press Contact:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>We provide:</h2>
+            <ul>
+                <li>official logos (in various formats),</li>
+                <li>basic company presentation,</li>
+                <li>presentation photos (upon agreement),</li>
+                <li>current press releases.</li>
+            </ul>
+
+            <p>The use of our materials is permitted with source citation: “Rentyo Gourmet – www.rentyo.eu”</p>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- 2. SLOVENSKA VSEBINA (SL) -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Dobrodošli v press kotičku Rentyo Gourmet.</h1>
+            <p>Tukaj lahko mediji in novinarji najdete osnovne informacije o naši platformi, viziji in kontakt za izjave.</p>
+
+            <h2>Press kontakt:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>Na voljo imamo:</h2>
+            <ul>
+                <li>uradne logotipe (v različnih formatih),</li>
+                <li>osnovno predstavitev podjetja,</li>
+                <li>predstavitvene fotografije (po dogovoru),</li>
+                <li>aktualna sporočila za javnost.</li>
+            </ul>
+
+            <p>Uporaba naših gradiv je dovoljena z navedbo vira: “Rentyo Gourmet – www.rentyo.eu”</p>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- 3. HRVAŠKA VSEBINA (HR) -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Dobrodošli u press kutak Rentyo Gourmeta.</h1>
+            <p>Ovdje mediji i novinari mogu pronaći osnovne informacije o našoj platformi, viziji i kontakt za izjave.</p>
+
+            <h2>Press kontakt:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>Nudimo:</h2>
+            <ul>
+                <li>službene logotipe (u različitim formatima),</li>
+                <li>osnovnu prezentaciju tvrtke,</li>
+                <li>prezentacijske fotografije (po dogovoru),</li>
+                <li>aktualna priopćenja za javnost.</li>
+            </ul>
+
+            <p>Korištenje naših materijala dopušteno je uz navođenje izvora: “Rentyo Gourmet – www.rentyo.eu”</p>
+        </div>
+        
+        <!-- ========================================================================= -->
+        <!-- 4. NEMŠKA VSEBINA (DE) -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Willkommen in der Rentyo Gourmet Presse-Ecke.</h1>
+            <p>Hier finden Medien und Journalisten grundlegende Informationen zu unserer Plattform, unserer Vision und Kontaktinformationen für Stellungnahmen.</p>
+
+            <h2>Pressekontakt:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>Wir stellen zur Verfügung:</h2>
+            <ul>
+                <li>offizielle Logos (in verschiedenen Formaten),</li>
+                <li>grundlegende Unternehmenspräsentation,</li>
+                <li>Präsentationsfotos (nach Absprache),</li>
+                <li>aktuelle Pressemitteilungen.</li>
+            </ul>
+
+            <p>Die Verwendung unserer Materialien ist unter Angabe der Quelle gestattet: „Rentyo Gourmet – www.rentyo.eu“</p>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- 5. FRANCOSKA VSEBINA (FR) -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Bienvenue dans l'espace presse de Rentyo Gourmet.</h1>
+            <p>Ici, les médias et les journalistes peuvent trouver des informations de base sur notre plateforme, notre vision et le contact pour les déclarations.</p>
+
+            <h2>Contact Presse:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>Nous fournissons:</h2>
+            <ul>
+                <li>logos officiels (dans divers formats),</li>
+                <li>présentation de base de l'entreprise,</li>
+                <li>photos de présentation (sur accord),</li>
+                <li>communiqués de presse actuels.</li>
+            </ul>
+
+            <p>L'utilisation de nos matériaux est autorisée avec mention de la source : « Rentyo Gourmet – www.rentyo.eu »</p>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- 6. ITALIJANSKA VSEBINA (IT) -->
+        <!-- ========================================================================= -->
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Benvenuti nell'angolo stampa di Rentyo Gourmet.</h1>
+            <p>Qui, media e giornalisti possono trovare informazioni di base sulla nostra piattaforma, visione e contatti per dichiarazioni.</p>
+
+            <h2>Contatto Stampa:</h2>
+            <p><a href="mailto:press@rentyo.eu" style="color: #333;">press@rentyo.eu</a></p>
+
+            <h2>Mettiamo a disposizione:</h2>
+            <ul>
+                <li>loghi ufficiali (in vari formati),</li>
+                <li>presentazione aziendale di base,</li>
+                <li>foto di presentazione (su accordo),</li>
+                <li>comunicati stampa attuali.</li>
+            </ul>
+
+            <p>L'uso dei nostri materiali è consentito con citazione della fonte: "Rentyo Gourmet – www.rentyo.eu"</p>
+        </div>
+
+    </div>
+
+    <!-- JavaScript za preklop jezika in shranjevanje izbire v Local Storage -->
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Media', sl: 'Mediji', hr: 'Mediji', de: 'Medien', fr: 'Médias', it: 'Media'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Media';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

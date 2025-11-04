@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Career</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Join the team that is changing the way we book!</h1>
+            <p>At Rentyo Gourmet, we are building a modern and user-friendly platform that connects people with restaurants across Europe. If you are passionate about hospitality, technology, and great user experience, we want to meet you.</p>
+
+            <h2>What We Offer:</h2>
+            <ul>
+                <li>Collaboration in an international team</li>
+                <li>Option for remote work</li>
+                <li>Creative environment and open communication</li>
+                <li>Opportunities for growth and learning</li>
+            </ul>
+
+            <h2>How to Apply:</h2>
+            <p>Send your CV and a brief introduction to <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Even if we don't currently have open positions, we will keep your application for future opportunities.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Postani del ekipe, ki spreminja način rezerviranja!</h1>
+            <p>V Rentyo Gourmet gradimo sodobno in prijazno platformo, ki povezuje ljudi z restavracijami po vsej Evropi. Če te navdušuje gostinstvo, tehnologija in dobra uporabniška izkušnja, te želimo spoznati.</p>
+
+            <h2>Kaj ponujamo:</h2>
+            <ul>
+                <li>Sodelovanje v mednarodni ekipi</li>
+                <li>Možnost dela na daljavo</li>
+                <li>Ustvarjalno okolje in odprto komunikacijo</li>
+                <li>Priložnost za rast in učenje</li>
+            </ul>
+
+            <h2>Kako se prijaviš:</h2>
+            <p>Pošlji svoj življenjepis in kratko predstavitev na <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Tudi če trenutno nimamo odprtih mest, bomo tvojo prijavo shranili za prihodnje priložnosti.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Postanite dio tima koji mijenja način rezerviranja!</h1>
+            <p>U Rentyo Gourmetu gradimo modernu i prijateljsku platformu koja povezuje ljude s restoranima diljem Europe. Ako vas oduševljava ugostiteljstvo, tehnologija i dobro korisničko iskustvo, želimo vas upoznati.</p>
+
+            <h2>Što nudimo:</h2>
+            <ul>
+                <li>Suradnju u međunarodnom timu</li>
+                <li>Mogućnost rada na daljinu</li>
+                <li>Kreativno okruženje i otvorena komunikacija</li>
+                <li>Prilika za rast i učenje</li>
+            </ul>
+
+            <h2>Kako se prijaviti:</h2>
+            <p>Pošaljite svoj životopis i kratko predstavljanje na <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Čak i ako trenutno nemamo otvorenih pozicija, zadržat ćemo vašu prijavu za buduće prilike.</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Werden Sie Teil des Teams, das die Art der Reservierung verändert!</h1>
+            <p>Bei Rentyo Gourmet bauen wir eine moderne und benutzerfreundliche Plattform auf, die Menschen mit Restaurants in ganz Europa verbindet. Wenn Sie sich für Gastronomie, Technologie und ein großartiges Benutzererlebnis begeistern, möchten wir Sie kennenlernen.</p>
+
+            <h2>Was wir anbieten:</h2>
+            <ul>
+                <li>Zusammenarbeit in einem internationalen Team</li>
+                <li>Möglichkeit der Fernarbeit</li>
+                <li>Kreatives Umfeld und offene Kommunikation</li>
+                <li>Möglichkeiten für Wachstum und Lernen</li>
+            </ul>
+
+            <h2>So bewerben Sie sich:</h2>
+            <p>Senden Sie Ihren Lebenslauf und eine kurze Vorstellung an <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Auch wenn wir derzeit keine offenen Stellen haben, werden wir Ihre Bewerbung für zukünftige Gelegenheiten speichern.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Rejoignez l'équipe qui change la façon de réserver!</h1>
+            <p>Chez Rentyo Gourmet, nous construisons une plateforme moderne et conviviale qui relie les gens aux restaurants à travers l'Europe. Si vous êtes passionné par l'hôtellerie, la technologie et une excellente expérience utilisateur, nous souhaitons vous rencontrer.</p>
+
+            <h2>Ce que nous offrons:</h2>
+            <ul>
+                <li>Collaboration au sein d'une équipe internationale</li>
+                <li>Option de travail à distance</li>
+                <li>Environnement créatif et communication ouverte</li>
+                <li>Opportunités de croissance et d'apprentissage</li>
+            </ul>
+
+            <h2>Comment postuler:</h2>
+            <p>Envoyez votre CV et une brève introduction à <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Même si nous n'avons pas d'offres d'emploi ouvertes actuellement, nous conserverons votre candidature pour de futures opportunités.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Unisciti al team che sta cambiando il modo di prenotare!</h1>
+            <p>In Rentyo Gourmet, stiamo costruendo una piattaforma moderna e intuitiva che collega le persone con i ristoranti in tutta Europa. Se sei appassionato di ospitalità, tecnologia e un'ottima esperienza utente, vogliamo conoscerti.</p>
+
+            <h2>Cosa offriamo:</h2>
+            <ul>
+                <li>Collaborazione in un team internazionale</li>
+                <li>Opzione per il lavoro a distanza</li>
+                <li>Ambiente creativo e comunicazione aperta</li>
+                <li>Opportunità di crescita e apprendimento</li>
+            </ul>
+
+            <h2>Come candidarsi:</h2>
+            <p>Invia il tuo CV e una breve presentazione a <a href="mailto:careers@rentyo-gourmet.com" style="color: #333;">careers@rentyo-gourmet.com</a></p>
+
+            <p>Anche se al momento non abbiamo posizioni aperte, conserveremo la tua candidatura per opportunità future.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Career', sl: 'Kariera', hr: 'Karijera', de: 'Karriere', fr: 'Carrière', it: 'Carriera'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Career';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

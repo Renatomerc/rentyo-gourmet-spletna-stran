@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Terms of Use</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Terms of Use</h1>
+            <p>By using the Rentyo Gourmet website, you agree to the following terms.</p>
+
+            <h2>1. What We Offer</h2>
+            <p>Rentyo Gourmet allows users to reserve tables in restaurants free of charge.</p>
+            <ul>
+                <li>We do not sell food, drinks, or other hospitality services.</li>
+            </ul>
+
+            <h2>2. How It Works</h2>
+            <p>A reservation through the platform means you have expressed interest in a specific time slot at a restaurant.</p>
+            <ul>
+                <li>You will receive confirmation of your reservation by email or within the website.</li>
+            </ul>
+
+            <h2>3. Responsibility</h2>
+            <p>Rentyo Gourmet is not responsible for the actual services performed by the restaurant (e.g., quality of food or service).</p>
+            <ul>
+                <li>In case of issues, the user contacts the restaurant directly.</li>
+            </ul>
+
+            <h2>4. Reservation Cancellation</h2>
+            <p>If you wish to cancel or change a reservation, do so via the link in the confirmation email or simply cancel it within your user account.</p>
+            <ul>
+                <li>The restaurant may have its own cancellation policy, which is displayed upon reservation.</li>
+            </ul>
+
+            <h2>5. Security and Fair Use</h2>
+            <p>The user commits to using the reservation system fairly.</p>
+            <ul>
+                <li>System abuse (e.g., repeated fake reservations) may lead to account blockage.</li>
+            </ul>
+
+            <h2>6. Law and Jurisdiction</h2>
+            <p>Croatian law applies to the use of the site and the resolution of disputes.</p>
+            <p>The competent court is in Zagreb, Croatia.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Pogoji Uporabe</h1>
+            <p>Z uporabo spletne strani Rentyo Gourmet se strinjate s spodnjimi pogoji.</p>
+
+            <h2>1. Kaj ponujamo</h2>
+            <p>Rentyo Gourmet omogoča uporabnikom brezplačno rezervacijo miz v restavracijah.</p>
+            <ul>
+                <li>Ne prodajamo hrane, pijače ali drugih gostinskih storitev.</li>
+            </ul>
+
+            <h2>2. Kako deluje</h2>
+            <p>Rezervacija prek platforme pomeni, da ste izrazili interes za določen termin v restavraciji.</p>
+            <ul>
+                <li>Potrditev rezervacije prejmete po e-pošti ali znotraj spletne strani.</li>
+            </ul>
+
+            <h2>3. Odgovornost</h2>
+            <p>Rentyo Gourmet ni odgovoren za dejanske storitve, ki jih opravi restavracija (npr. kakovost hrane ali postrežbe).</p>
+            <ul>
+                <li>V primeru težav se uporabnik obrne neposredno na restavracijo.</li>
+            </ul>
+
+            <h2>4. Odpoved rezervacije</h2>
+            <p>Če želite rezervacijo odpovedati ali spremeniti, to storite prek povezave v potrditvenem e-sporočilu ali jo enostavno prekličete znotraj vašega uporabniškga računa.</p>
+            <ul>
+                <li>Restavracija ima lahko svojo politiko odpovedi, ki se prikaže ob rezervaciji.</li>
+            </ul>
+
+            <h2>5. Varnost in poštena uporaba</h2>
+            <p>Uporabnik se zavezuje, da bo rezervacije uporabljal pošteno.</p>
+            <ul>
+                <li>Zloraba sistema (npr. ponavljajoče se lažne rezervacije) lahko privede do blokade računa.</li>
+            </ul>
+
+            <h2>6. Pravo in pristojnost</h2>
+            <p>Za uporabo strani in razreševanje sporov velja hrvaško pravo.</p>
+            <p>Pristojno sodišče je v Zagrebu, Hrvaška.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Uvjeti Korištenja</h1>
+            <p>Korištenjem web stranice Rentyo Gourmet pristajete na sljedeće uvjete.</p>
+
+            <h2>1. Što nudimo</h2>
+            <p>Rentyo Gourmet korisnicima omogućuje besplatnu rezervaciju stolova u restoranima.</p>
+            <ul>
+                <li>Ne prodajemo hranu, pića niti druge ugostiteljske usluge.</li>
+            </ul>
+
+            <h2>2. Kako funkcionira</h2>
+            <p>Rezervacija putem platforme znači da ste izrazili interes za određeni termin u restoranu.</p>
+            <ul>
+                <li>Potvrdu rezervacije primit ćete e-poštom ili unutar web stranice.</li>
+            </ul>
+
+            <h2>3. Odgovornost</h2>
+            <p>Rentyo Gourmet nije odgovoran za stvarne usluge koje pruža restoran (npr. kvaliteta hrane ili usluge).</p>
+            <ul>
+                <li>U slučaju problema, korisnik se obraća izravno restoranu.</li>
+            </ul>
+
+            <h2>4. Otkazivanje rezervacije</h2>
+            <p>Ako želite otkazati ili promijeniti rezervaciju, učinite to putem poveznice u e-pošti za potvrdu ili je jednostavno otkažite unutar svog korisničkog računa.</p>
+            <ul>
+                <li>Restoran može imati vlastitu politiku otkazivanja, koja je prikazana prilikom rezervacije.</li>
+            </ul>
+
+            <h2>5. Sigurnost i Pošteno Korištenje</h2>
+            <p>Korisnik se obvezuje koristiti rezervacije pošteno.</p>
+            <ul>
+                <li>Zlouporaba sustava (npr. ponavljane lažne rezervacije) može dovesti do blokade računa.</li>
+            </ul>
+
+            <h2>6. Pravo i Nadležnost</h2>
+            <p>Za korištenje stranice i rješavanje sporova primjenjuje se hrvatsko pravo.</p>
+            <p>Nadležan sud je u Zagrebu, Hrvatska.</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Nutzungsbedingungen</h1>
+            <p>Durch die Nutzung der Rentyo Gourmet-Website stimmen Sie den folgenden Bedingungen zu.</p>
+
+            <h2>1. Was wir anbieten</h2>
+            <p>Rentyo Gourmet ermöglicht es Nutzern, kostenlos Tische in Restaurants zu reservieren.</p>
+            <ul>
+                <li>Wir verkaufen keine Speisen, Getränke oder andere Gastronomie-Dienstleistungen.</li>
+            </ul>
+
+            <h2>2. Funktionsweise</h2>
+            <p>Eine Reservierung über die Plattform bedeutet, dass Sie Interesse an einem bestimmten Zeitpunkt in einem Restaurant bekundet haben.</p>
+            <ul>
+                <li>Sie erhalten eine Bestätigung Ihrer Reservierung per E-Mail oder auf der Website.</li>
+            </ul>
+
+            <h2>3. Haftung</h2>
+            <p>Rentyo Gourmet ist nicht verantwortlich für die tatsächlichen Dienstleistungen des Restaurants (z. B. Qualität der Speisen oder des Services).</p>
+            <ul>
+                <li>Im Falle von Problemen wendet sich der Nutzer direkt an das Restaurant.</li>
+            </ul>
+
+            <h2>4. Stornierung der Reservierung</h2>
+            <p>Wenn Sie eine Reservierung stornieren oder ändern möchten, tun Sie dies über den Link in der Bestätigungs-E-Mail oder stornieren Sie sie einfach in Ihrem Benutzerkonto.</p>
+            <ul>
+                <li>Das Restaurant kann eigene Stornierungsrichtlinien haben, die bei der Reservierung angezeigt werden.</li>
+            </ul>
+
+            <h2>5. Sicherheit und faire Nutzung</h2>
+            <p>Der Nutzer verpflichtet sich zur fairen Nutzung des Reservierungssystems.</p>
+            <ul>
+                <li>Missbrauch des Systems (z. B. wiederholte gefälschte Reservierungen) kann zur Sperrung des Kontos führen.</li>
+            </ul>
+
+            <h2>6. Recht und Gerichtsbarkeit</h2>
+            <p>Für die Nutzung der Seite und die Beilegung von Streitigkeiten gilt kroatisches Recht.</p>
+            <p>Das zuständige Gericht ist in Zagreb, Kroatien.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Conditions d'Utilisation</h1>
+            <p>En utilisant le site web Rentyo Gourmet, vous acceptez les conditions ci-dessous.</p>
+
+            <h2>1. Ce que nous proposons</h2>
+            <p>Rentyo Gourmet permet aux utilisateurs de réserver gratuitement des tables dans des restaurants.</p>
+            <ul>
+                <li>Nous ne vendons pas de nourriture, de boissons ou d'autres services de restauration.</li>
+            </ul>
+
+            <h2>2. Comment ça marche</h2>
+            <p>Une réservation via la plateforme signifie que vous avez exprimé votre intérêt pour un créneau horaire spécifique dans un restaurant.</p>
+            <ul>
+                <li>Vous recevrez la confirmation de votre réservation par e-mail ou sur le site web.</li>
+            </ul>
+
+            <h2>3. Responsabilité</h2>
+            <p>Rentyo Gourmet n'est pas responsable des services réels fournis par le restaurant (par exemple, la qualité de la nourriture ou du service).</p>
+            <ul>
+                <li>En cas de problème, l'utilisateur contacte directement le restaurant.</li>
+            </ul>
+
+            <h2>4. Annulation de la réservation</h2>
+            <p>Si vous souhaitez annuler ou modifier une réservation, faites-le via le lien dans l'e-mail de confirmation ou annulez-la simplement dans votre compte utilisateur.</p>
+            <ul>
+                <li>Le restaurant peut avoir sa propre politique d'annulation, qui est affichée lors de la réservation.</li>
+            </ul>
+
+            <h2>5. Sécurité et utilisation équitable</h2>
+            <p>L'utilisateur s'engage à utiliser le système de réservation équitablement.</p>
+            <ul>
+                <li>L'abus du système (par exemple, des réservations fausses répétées) peut entraîner le blocage du compte.</li>
+            </ul>
+
+            <h2>6. Droit et Juridiction</h2>
+            <p>Le droit croate s'applique à l'utilisation du site et à la résolution des litiges.</p>
+            <p>Le tribunal compétent est à Zagreb, Croatie.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Termini di Utilizzo</h1>
+            <p>Utilizzando il sito web Rentyo Gourmet, accetti i seguenti termini.</p>
+
+            <h2>1. Cosa Offriamo</h2>
+            <p>Rentyo Gourmet consente agli utenti di prenotare tavoli nei ristoranti gratuitamente.</p>
+            <ul>
+                <li>Non vendiamo cibo, bevande o altri servizi di ristorazione.</li>
+            </ul>
+
+            <h2>2. Come Funziona</h2>
+            <p>Una prenotazione tramite la piattaforma significa che hai espresso interesse per una specifica fascia oraria presso un ristorante.</p>
+            <ul>
+                <li>Riceverai la conferma della tua prenotazione via e-mail o all'interno del sito web.</li>
+            </ul>
+
+            <h2>3. Responsabilità</h2>
+            <p>Rentyo Gourmet non è responsabile per i servizi effettivi forniti dal ristorante (ad esempio, qualità del cibo o del servizio).</p>
+            <ul>
+                <li>In caso di problemi, l'utente contatta direttamente il ristorante.</li>
+            </ul>
+
+            <h2>4. Cancellazione della Prenotazione</h2>
+            <p>Se desideri cancellare o modificare una prenotazione, fallo tramite il link nell'e-mail di conferma o semplicemente annullala all'interno del tuo account utente.</p>
+            <ul>
+                <li>Il ristorante potrebbe avere una propria politica di cancellazione, visualizzata al momento della prenotazione.</li>
+            </ul>
+
+            <h2>5. Sicurezza e Uso Corretto</h2>
+            <p>L'utente si impegna a utilizzare il sistema di prenotazione in modo corretto.</p>
+            <ul>
+                <li>L'abuso del sistema (ad esempio, prenotazioni false ripetute) può portare al blocco dell'account.</li>
+            </ul>
+
+            <h2>6. Legge e Giurisdizione</h2>
+            <p>Per l'uso del sito e la risoluzione delle controversie si applica la legge croata.</p>
+            <p>Il tribunale competente è a Zagabria, Croazia.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Terms of Use', sl: 'Pogoji Uporabe', hr: 'Uvjeti Korištenja', de: 'Nutzungsbedingungen', fr: 'Conditions d\'Utilisation', it: 'Termini di Utilizzo'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Terms of Use';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

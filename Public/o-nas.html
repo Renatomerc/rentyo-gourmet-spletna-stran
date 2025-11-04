@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Rentyo Gourmet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik" id="content-en" lang="en">
+            <h1>About Rentyo Gourmet</h1>
+            <p><strong>Table reservation – fast, easy, and without a call.</strong></p>
+            <p>Rentyo Gourmet is a European online platform that allows fast and reliable table reservation in selected restaurants. In one place, you can search for restaurants by location, cuisine, or date and book your table in a few clicks.</p>
+            <p>Our mission is to simplify the reservation experience for you – without waiting for phone calls or unnecessary delays. We ensure that your reservation safely reaches the restaurant and that you are informed about its status in real-time.</p>
+            <h2>Why Rentyo Gourmet?</h2>
+            <ul>
+                <li>Simple reservation 24/7</li>
+                <li>No additional costs for users</li>
+                <li>Reliable reservation confirmation</li>
+                <li>Secure usage and protection of your data</li>
+            </ul>
+            <h2>Who is behind Rentyo Gourmet?</h2>
+            <p>Rentyo Gourmet is developed and managed by Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., based in Zagreb, Croatia.</p>
+            <p>Our team believes that table reservation should be as easy as buying an airline ticket. We operate across Europe and cooperate directly with restaurants.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>O Rentyo Gourmet</h1>
+            <p><strong>Rezervacija mize – hitro, enostavno in brez klica.</strong></p>
+            <p>Rentyo Gourmet je evropska spletna platforma, ki omogoča hitro in zanesljivo rezervacijo miz v izbranih restavracijah. Na enem mestu lahko poiščete restavracije po lokaciji, kuhinji ali datumu ter v nekaj klikih rezervirate svojo mizo.</p>
+            <p>Naša naloga je, da vam olajšamo izkušnjo rezervacije – brez čakanja na telefonske klice ali nepotrebnih zamud. Mi poskrbimo, da vaša rezervacija varno prispe do restavracije in da ste o njenem statusu obveščeni v realnem času.</p>
+            <h2>Zakaj Rentyo Gourmet?</h2>
+            <ul>
+                <li>Preprosta rezervacija 24/7</li>
+                <li>Brez dodatnih stroškov za uporabnike</li>
+                <li>Zanesljivo potrjevanje rezervacij</li>
+                <li>Varna uporaba in zaščita vaših podatkov</li>
+            </ul>
+            <h2>Kdo stoji za Rentyo Gourmet?</h2>
+            <p>Rentyo Gourmet razvija in upravlja podjetje Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., s sedežem v Zagrebu, Hrvaška.</p>
+            <p>Naša ekipa verjame, da mora biti rezervacija mize tako enostavna, kot je nakup letalske vozovnice. Delujemo po celotni Evropi in sodelujemo neposredno z restavracijami.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>O Rentyo Gourmetu</h1>
+            <p><strong>Rezervacija stola – brzo, jednostavno i bez poziva.</strong></p>
+            <p>Rentyo Gourmet je europska internetska platforma koja omogućuje brzu i pouzdanu rezervaciju stolova u odabranim restoranima. Na jednom mjestu možete pretraživati restorane prema lokaciji, kuhinji ili datumu i rezervirati svoj stol u nekoliko klikova.</p>
+            <p>Naša misija je olakšati vam iskustvo rezervacije – bez čekanja na telefonske pozive ili nepotrebnih odgoda. Osiguravamo da vaša rezervacija sigurno stigne do restorana i da ste obaviješteni o njenom statusu u stvarnom vremenu.</p>
+            <h2>Zašto Rentyo Gourmet?</h2>
+            <ul>
+                <li>Jednostavna rezervacija 24/7</li>
+                <li>Bez dodatnih troškova za korisnike</li>
+                <li>Pouzdana potvrda rezervacija</li>
+                <li>Sigurna uporaba i zaštita vaših podataka</li>
+            </ul>
+            <h2>Tko stoji iza Rentyo Gourmeta?</h2>
+            <p>Rentyo Gourmet razvija i upravlja tvrtka Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., sa sjedištem u Zagrebu, Hrvatska.</p>
+            <p>Naš tim vjeruje da bi rezervacija stola trebala biti jednostavna kao kupnja avionske karte. Djelujemo diljem Europe i surađujemo izravno s restoranima.</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Über Rentyo Gourmet</h1>
+            <p><strong>Tischreservierung – schnell, einfach und ohne Anruf.</strong></p>
+            <p>Rentyo Gourmet ist eine europäische Online-Plattform, die eine schnelle und zuverlässige Tischreservierung in ausgewählten Restaurants ermöglicht. An einem Ort können Sie Restaurants nach Standort, Küche oder Datum suchen und Ihren Tisch mit wenigen Klicks buchen.</p>
+            <p>Unsere Mission ist es, Ihnen die Reservierungserfahrung zu erleichtern – ohne auf Anrufe oder unnötige Verzögerungen warten zu müssen. Wir stellen sicher, dass Ihre Reservierung sicher im Restaurant ankommt und Sie in Echtzeit über ihren Status informiert werden.</p>
+            <h2>Warum Rentyo Gourmet?</h2>
+            <ul>
+                <li>Einfache Reservierung 24/7</li>
+                <li>Keine zusätzlichen Kosten für Benutzer</li>
+                <li>Zuverlässige Reservierungsbestätigung</li>
+                <li>Sichere Nutzung und Datenschutz</li>
+            </ul>
+            <h2>Wer steckt hinter Rentyo Gourmet?</h2>
+            <p>Rentyo Gourmet wird entwickelt und verwaltet von der Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o. mit Sitz in Zagreb, Kroatien.</p>
+            <p>Unser Team ist davon überzeugt, dass eine Tischreservierung so einfach sein sollte wie der Kauf eines Flugtickets. Wir sind europaweit tätig und arbeiten direkt mit Restaurants zusammen.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>À propos de Rentyo Gourmet</h1>
+            <p><strong>Réservation de table – rapide, facile et sans appel.</strong></p>
+            <p>Rentyo Gourmet est une plateforme en ligne européenne qui permet une réservation de table rapide et fiable dans des restaurants sélectionnés. En un seul endroit, vous pouvez rechercher des restaurants par lieu, cuisine ou date et réserver votre table en quelques clics.</p>
+            <p>Notre mission est de simplifier votre expérience de réservation – sans attendre des appels téléphoniques ou des retards inutiles. Nous veillons à ce que votre réservation arrive en toute sécurité au restaurant et que vous soyez informé de son statut en temps réel.</p>
+            <h2>Pourquoi Rentyo Gourmet ?</h2>
+            <ul>
+                <li>Réservation simple 24/7</li>
+                <li>Pas de coûts supplémentaires pour les utilisateurs</li>
+                <li>Confirmation de réservation fiable</li>
+                <li>Utilisation sécurisée et protection de vos données</li>
+            </ul>
+            <h2>Qui est derrière Rentyo Gourmet ?</h2>
+            <p>Rentyo Gourmet est développé et géré par Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., basée à Zagreb, Croatie.</p>
+            <p>Notre équipe croit que la réservation de table devrait être aussi simple que l'achat d'un billet d'avion. Nous opérons dans toute l'Europe in in coopérons directement avec les restaurants.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Informazioni su Rentyo Gourmet</h1>
+            <p><strong>Prenotazione del tavolo – veloce, facile e senza chiamate.</strong></p>
+            <p>Rentyo Gourmet è una piattaforma online europea che consente la prenotazione rapida e affidabile di tavoli in ristoranti selezionati. In un unico luogo, puoi cercare ristoranti per posizione, cucina o data e prenotare il tuo tavolo in pochi clic.</p>
+            <p>La nostra missione è semplificare la tua esperienza di prenotazione – senza aspettare telefonate o ritardi inutili. Ci assicuriamo che la tua prenotazione arrivi in sicurezza al ristorante e che tu sia informato sul suo stato in tempo reale.</p>
+            <h2>Perché Rentyo Gourmet?</h2>
+            <ul>
+                <li>Prenotazione semplice 24/7</li>
+                <li>Nessun costo aggiuntivo per gli utenti</li>
+                <li>Conferma di prenotazione affidabile</li>
+                <li>Uso sicuro e protezione dei tuoi dati</li>
+            </ul>
+            <h2>Chi c'è dietro Rentyo Gourmet?</h2>
+            <p>Rentyo Gourmet è sviluppato e gestito da Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., con sede a Zagabria, Croazia.</p>
+            <p>Il nostro team crede che la prenotazione di un tavolo debba essere facile come l'acquisto di un biglietto aereo. Operiamo in tutta Europa e collaboriamo direttamente con i ristoranti.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino in posodobi <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

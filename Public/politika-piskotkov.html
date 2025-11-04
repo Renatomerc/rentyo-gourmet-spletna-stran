@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Cookie Policy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Cookie Policy</h1>
+            <p>Our website uses cookies for proper functioning and to improve the user experience.</p>
+
+            <h2>What are Cookies?</h2>
+            <p>Cookies are small files that the browser saves on your device.</p>
+            <ul>
+                <li>They allow the page to remember your settings and operate faster.</li>
+            </ul>
+
+            <h2>Types of Cookies We Use</h2>
+            <ul>
+                <li><strong>Essential Cookies:</strong> enable the basic functioning of the website (e.g., login, reservation).</li>
+                <li><strong>Analytical Cookies:</strong> help understand how users use the site so we can improve it.</li>
+                <li><strong>Functional Cookies:</strong> remember your settings (language, location).</li>
+                <li><strong>Marketing Cookies (by consent):</strong> used for personalized content or advertising.</li>
+            </ul>
+
+            <p>Upon your first visit, you can choose which cookies to allow. You can change your settings at any time in the lower part of the page (“Cookie Settings”).</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Politika Piškotkov</h1>
+            <p>Naša spletna stran uporablja piškotke za pravilno delovanje in izboljšanje uporabniške izkušnje.</p>
+
+            <h2>Kaj so piškotki?</h2>
+            <p>Piškotki so majhne datoteke, ki jih brskalnik shrani na vašo napravo.</p>
+            <ul>
+                <li>Omogočajo, da si stran zapomni vaše nastavitve in deluje hitreje.</li>
+            </ul>
+
+            <h2>Vrste piškotkov, ki jih uporabljamo</h2>
+            <ul>
+                <li><strong>Nujni piškotki:</strong> omogočajo osnovno delovanje spletne strani (npr. prijava, rezervacija).</li>
+                <li><strong>Analitični piškotki:</strong> pomagajo razumeti, kako uporabniki uporabljajo stran, da jo lahko izboljšamo.</li>
+                <li><strong>Funkcionalni piškotki:</strong> si zapomnijo vaše nastavitve (jezik, lokacijo).</li>
+                <li><strong>Marketinški piškotki (po soglasju):</strong> uporabljeni za personalizirano vsebino ali oglaševanje.</li>
+            </ul>
+
+            <p>Ob prvem obisku lahko izberete, katere piškotke dovolite. Nastavitve lahko kadar koli spremenite v spodnjem delu strani (“Nastavitve piškotkov”).</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Pravila o Kolačićima</h1>
+            <p>Naša web stranica koristi kolačiće za ispravan rad i poboljšanje korisničkog iskustva.</p>
+
+            <h2>Što su kolačići?</h2>
+            <p>Kolačići su male datoteke koje preglednik sprema na vaš uređaj.</p>
+            <ul>
+                <li>Omogućuju da stranica zapamti vaše postavke i radi brže.</li>
+            </ul>
+
+            <h2>Vrste kolačića koje koristimo</h2>
+            <ul>
+                <li><strong>Nužni kolačići:</strong> omogućuju osnovno funkcioniranje web stranice (npr. prijava, rezervacija).</li>
+                <li><strong>Analitički kolačići:</strong> pomažu razumjeti kako korisnici koriste stranicu kako bismo je mogli poboljšati.</li>
+                <li><strong>Funkcionalni kolačići:</strong> pamte vaše postavke (jezik, lokaciju).</li>
+                <li><strong>Marketinški kolačići (uz pristanak):</strong> koriste se za personalizirani sadržaj ili oglašavanje.</li>
+            </ul>
+
+            <p>Pri prvom posjetu možete odabrati koje kolačiće dopuštate. Postavke možete promijeniti u bilo kojem trenutku u donjem dijelu stranice ("Postavke kolačića").</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Cookie-Richtlinie</h1>
+            <p>Unsere Website verwendet Cookies für die ordnungsgemäße Funktion und zur Verbesserung des Benutzererlebnisses.</p>
+
+            <h2>Was sind Cookies?</h2>
+            <p>Cookies sind kleine Dateien, die der Browser auf Ihrem Gerät speichert.</p>
+            <ul>
+                <li>Sie ermöglichen es der Seite, sich Ihre Einstellungen zu merken und schneller zu funktionieren.</li>
+            </ul>
+
+            <h2>Arten von Cookies, die wir verwenden</h2>
+            <ul>
+                <li><strong>Notwendige Cookies:</strong> ermöglichen die grundlegende Funktion der Website (z. B. Anmeldung, Reservierung).</li>
+                <li><strong>Analyse-Cookies:</strong> helfen zu verstehen, wie Benutzer die Seite nutzen, damit wir sie verbessern können.</li>
+                <li><strong>Funktionale Cookies:</strong> merken sich Ihre Einstellungen (Sprache, Standort).</li>
+                <li><strong>Marketing-Cookies (nach Zustimmung):</strong> werden für personalisierte Inhalte oder Werbung verwendet.</li>
+            </ul>
+
+            <p>Bei Ihrem ersten Besuch können Sie auswählen, welche Cookies Sie zulassen möchten. Sie können Ihre Einstellungen jederzeit im unteren Bereich der Seite ändern („Cookie-Einstellungen“).</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Politique de Cookies</h1>
+            <p>Notre site web utilise des cookies pour son bon fonctionnement et pour améliorer l'expérience utilisateur.</p>
+
+            <h2>Que sont les cookies ?</h2>
+            <p>Les cookies sont de petits fichiers que le navigateur enregistre sur votre appareil.</p>
+            <ul>
+                <li>Ils permettent à la page de mémoriser vos paramètres et de fonctionner plus rapidement.</li>
+            </ul>
+
+            <h2>Types de cookies que nous utilisons</h2>
+            <ul>
+                <li><strong>Cookies essentiels :</strong> permettent le fonctionnement de base du site web (par exemple, connexion, réservation).</li>
+                <li><strong>Cookies analytiques :</strong> aident à comprendre comment les utilisateurs utilisent le site afin que nous puissions l'améliorer.</li>
+                <li><strong>Cookies fonctionnels :</strong> mémorisent vos paramètres (langue, emplacement).</li>
+                <li><strong>Cookies marketing (avec consentement) :</strong> utilisés pour le contenu personnalisé ou la publicité.</li>
+            </ul>
+
+            <p>Lors de votre première visite, vous pouvez choisir les cookies que vous autorisez. Vous pouvez modifier vos paramètres à tout moment dans la partie inférieure de la page (« Paramètres des cookies »).</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Politica sui Cookie</h1>
+            <p>Il nostro sito web utilizza i cookie per il corretto funzionamento e per migliorare l'esperienza utente.</p>
+
+            <h2>Cosa sono i cookie?</h2>
+            <p>I cookie sono piccoli file che il browser salva sul tuo dispositivo.</p>
+            <ul>
+                <li>Consentono alla pagina di ricordare le tue impostazioni e di funzionare più velocemente.</li>
+            </ul>
+
+            <h2>Tipi di cookie che utilizziamo</h2>
+            <ul>
+                <li><strong>Cookie essenziali:</strong> consentono il funzionamento di base del sito web (ad esempio, accesso, prenotazione).</li>
+                <li><strong>Cookie analitici:</strong> aiutano a capire come gli utenti utilizzano il sito in modo da poterlo migliorare.</li>
+                <li><strong>Cookie funzionali:</strong> ricordano le tue impostazioni (lingua, posizione).</li>
+                <li><strong>Cookie di marketing (con consenso):</strong> utilizzati per contenuti personalizzati o pubblicità.</li>
+            </ul>
+
+            <p>Al primo accesso è possibile scegliere quali cookie consentire. È possibile modificare le impostazioni in qualsiasi momento nella parte inferiore della pagina ("Impostazioni cookie").</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Cookie Policy', sl: 'Politika Piškotkov', hr: 'Pravila o Kolačićima', de: 'Cookie-Richtlinie', fr: 'Politique de Cookies', it: 'Politica sui Cookie'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Cookie Policy';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Contact</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Need help with a reservation or have a question?</h1>
+            <p>We are happy to help! Our user support is available through the following channels:</p>
+
+            <h2>Email:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / Messages:</h2>
+            <p>Click on the icon in the bottom right corner of the page.</p>
+
+            <h2>Company Headquarters:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Croatia</p>
+
+            <h2>Support Hours:</h2>
+            <p>Monday – Friday: 9:00 AM – 5:00 PM (CET)</p>
+
+            <p>For questions about privacy or data deletion, please email us at: <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Potrebujete pomoč pri rezervaciji ali imate vprašanje?</h1>
+            <p>Z veseljem pomagamo! Naša podpora za uporabnike vam je na voljo prek naslednjih kanalov:</p>
+
+            <h2>E-pošta:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / sporočila:</h2>
+            <p>Kliknite na ikono v spodnjem desnem kotu strani.</p>
+
+            <h2>Sedež podjetja:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</p>
+
+            <h2>Delovni čas podpore:</h2>
+            <p>ponedeljek – petek: 9:00–17:00 (CET)</p>
+
+            <p>Za vprašanja o zasebnosti ali izbrisu podatkov nam pišite na: <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Trebate pomoć s rezervacijom ili imate pitanje?</h1>
+            <p>Rado pomažemo! Naša korisnička podrška dostupna vam je putem sljedećih kanala:</p>
+
+            <h2>E-mail:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / Poruke:</h2>
+            <p>Kliknite na ikonu u donjem desnom kutu stranice.</p>
+
+            <h2>Sjedište tvrtke:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Hrvatska</p>
+
+            <h2>Radno vrijeme podrške:</h2>
+            <p>Ponedjeljak – Petak: 9:00–17:00 (CET)</p>
+
+            <p>Za pitanja o privatnosti ili brisanju podataka, pišite nam na: <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Brauchen Sie Hilfe bei einer Reservierung oder haben Sie Fragen?</h1>
+            <p>Wir helfen Ihnen gerne weiter! Unser Benutzersupport steht Ihnen über folgende Kanäle zur Verfügung:</p>
+
+            <h2>E-Mail:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / Nachrichten:</h2>
+            <p>Klicken Sie auf das Symbol in der unteren rechten Ecke der Seite.</p>
+
+            <h2>Firmensitz:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Kroatien</p>
+
+            <h2>Support-Zeiten:</h2>
+            <p>Montag – Freitag: 9:00–17:00 Uhr (CET)</p>
+
+            <p>Für Fragen zum Datenschutz oder zur Datenlöschung senden Sie uns bitte eine E-Mail an: <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Besoin d'aide avec une réservation ou avez-vous une question ?</h1>
+            <p>Nous sommes heureux de vous aider ! Notre support utilisateur est disponible via les canaux suivants :</p>
+
+            <h2>E-mail:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / Messages:</h2>
+            <p>Cliquez sur l'icône dans le coin inférieur droit de la page.</p>
+
+            <h2>Siège social de l'entreprise:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Croatie</p>
+
+            <h2>Heures de support:</h2>
+            <p>Lundi – Vendredi: 9h00–17h00 (CET)</p>
+
+            <p>Pour les questions concernant la confidentialité ou la suppression de données, veuillez nous envoyer un courriel à : <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Hai bisogno di aiuto con una prenotazione o hai una domanda?</h1>
+            <p>Siamo lieti di aiutare! Il nostro supporto utente è disponibile tramite i seguenti canali:</p>
+
+            <h2>E-mail:</h2>
+            <p><a href="mailto:info@rentyo.eu" style="color: #333;">info@rentyo.eu</a></p>
+
+            <h2>📱 WhatsApp / Messaggi:</h2>
+            <p>Clicca sull'icona nell'angolo in basso a destra della pagina.</p>
+
+            <h2>Sede aziendale:</h2>
+            <p>Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</p>
+            <p>Ulica grada Vukovara 271, 10000 Zagreb, Croazia</p>
+
+            <h2>Orari di supporto:</h2>
+            <p>Lunedì – Venerdì: 9:00–17:00 (CET)</p>
+
+            <p>Per domande sulla privacy o la cancellazione dei dati, scriveteci a: <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a></p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Contact', sl: 'Kontakt', hr: 'Kontakt', de: 'Kontakt', fr: 'Contact', it: 'Contatto'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Contact';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Privacy Policy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Privacy Policy</h1>
+            <p><strong>Your privacy is very important to us.</strong></p>
+            <p>Rentyo Gourmet, managed by Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., processes users' personal data in accordance with EU legislation (GDPR) and the Croatian Personal Data Protection Act.</p>
+
+            <h2>What Data We Collect</h2>
+            <ul>
+                <li>Name and Surname</li>
+                <li>Email address</li>
+                <li>Date, time, and number of people for the reservation</li>
+                <li>Website usage data (via cookies)</li>
+            </ul>
+
+            <h2>Why We Collect It</h2>
+            <ul>
+                <li>for confirming and notifying about reservations,</li>
+                <li>for providing user support,</li>
+                <li>for improving the user experience,</li>
+                <li>only with your consent: for occasional notifications about news or promotions.</li>
+            </ul>
+
+            <h2>Data Sharing</h2>
+            <p>We share your data exclusively with the restaurant where you made the reservation, and only to the extent necessary to perform the service.</p>
+            <p>Data is not sold or shared with third parties for advertising.</p>
+
+            <h2>Data Retention</h2>
+            <p>We store data for as long as necessary for the purpose of the reservation and in accordance with the law.</p>
+            <p>Users can request the deletion of their data at any time via <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+
+            <h2>Your Rights</h2>
+            <p>You have the right to access, rectify, delete, and restrict the processing of personal data.</p>
+            <p>For all privacy requests, contact us via <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Politika Zasebnosti</h1>
+            <p><strong>Vaša zasebnost nam veliko pomeni.</strong></p>
+            <p>Rentyo Gourmet, ki ga upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obdeluje osebne podatke uporabnikov v skladu z zakonodajo EU (GDPR) in hrvaškim Zakonom o varstvu osebnih podatkov.</p>
+
+            <h2>Katere podatke zbiramo</h2>
+            <ul>
+                <li>Ime in priimek</li>
+                <li>E-poštni naslov</li>
+                <li>Datum, ura in število oseb za rezervacijo</li>
+                <li>Podatki o uporabi spletne strani (prek piškotkov)</li>
+            </ul>
+
+            <h2>Zakaj jih zbiramo</h2>
+            <ul>
+                <li>za potrjevanje in obveščanje o rezervacijah,</li>
+                <li>za zagotavljanje podpore uporabnikom,</li>
+                <li>za izboljšanje uporabniške izkušnje,</li>
+                <li>le ob vašem soglasju: za občasna obvestila o novostih ali promocijah.</li>
+            </ul>
+
+            <h2>Deljenje podatkov</h2>
+            <p>Vaše podatke delimo izključno z restavracijo, pri kateri ste opravili rezervacijo, in le v obsegu, ki je potreben za izvedbo storitve.</p>
+            <p>Podatki niso prodajani ali deljeni tretjim osebam za oglaševanje.</p>
+
+            <h2>Hramba podatkov</h2>
+            <p>Podatke hranimo toliko časa, kolikor je potrebno za namen rezervacije in skladno z zakonodajo.</p>
+            <p>Uporabniki lahko kadarkoli zahtevajo izbris svojih podatkov na <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+
+            <h2>Vaše pravice</h2>
+            <p>Imate pravico do dostopa, popravka, izbrisa in omejitve obdelave osebnih podatkov.</p>
+            <p>Za vse zahteve glede zasebnosti nas kontaktirajte prek <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Politika Privatnosti</h1>
+            <p><strong>Vaša privatnost nam je jako važna.</strong></p>
+            <p>Rentyo Gourmet, kojim upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obrađuje osobne podatke korisnika u skladu sa zakonodavstvom EU (GDPR) i hrvatskim Zakonom o zaštiti osobnih podataka.</p>
+
+            <h2>Koje podatke prikupljamo</h2>
+            <ul>
+                <li>Ime i prezime</li>
+                <li>E-mail adresa</li>
+                <li>Datum, vrijeme i broj osoba za rezervaciju</li>
+                <li>Podaci o korištenju web stranice (putem kolačića)</li>
+            </ul>
+
+            <h2>Zašto ih prikupljamo</h2>
+            <ul>
+                <li>za potvrđivanje i obavještavanje o rezervacijama,</li>
+                <li>za pružanje korisničke podrške,</li>
+                <li>za poboljšanje korisničkog iskustva,</li>
+                <li>samo uz vaš pristanak: za povremene obavijesti o novostima ili promocijama.</li>
+            </ul>
+
+            <h2>Dijeljenje podataka</h2>
+            <p>Vaše podatke dijelimo isključivo s restoranom kod kojeg ste izvršili rezervaciju, i to samo u mjeri potrebnoj za izvršenje usluge.</p>
+            <p>Podaci se ne prodaju niti dijele trećim stranama u svrhu oglašavanja.</p>
+
+            <h2>Pohrana podataka</h2>
+            <p>Podatke pohranjujemo onoliko dugo koliko je potrebno za svrhu rezervacije i u skladu sa zakonom.</p>
+            <p>Korisnici mogu u bilo kojem trenutku zatražiti brisanje svojih podataka na <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+
+            <h2>Vaša prava</h2>
+            <p>Imate pravo na pristup, ispravak, brisanje i ograničavanje obrade osobnih podataka.</p>
+            <p>Za sve zahtjeve u vezi s privatnošću kontaktirajte nas putem <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Datenschutzerklärung</h1>
+            <p><strong>Ihre Privatsphäre ist uns sehr wichtig.</strong></p>
+            <p>Rentyo Gourmet, verwaltet von Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., verarbeitet personenbezogene Daten der Nutzer gemäß der EU-Gesetzgebung (DSGVO) und dem kroatischen Gesetz zum Schutz personenbezogener Daten.</p>
+
+            <h2>Welche Daten wir sammeln</h2>
+            <ul>
+                <li>Name und Nachname</li>
+                <li>E-Mail-Adresse</li>
+                <li>Datum, Uhrzeit und Personenanzahl für die Reservierung</li>
+                <li>Daten zur Nutzung der Website (über Cookies)</li>
+            </ul>
+
+            <h2>Warum wir sie sammeln</h2>
+            <ul>
+                <li>zur Bestätigung und Benachrichtigung über Reservierungen,</li>
+                <li>zur Bereitstellung von Benutzer-Support,</li>
+                <li>zur Verbesserung des Benutzererlebnisses,</li>
+                <li>nur mit Ihrer Zustimmung: für gelegentliche Benachrichtigungen über Neuigkeiten oder Werbeaktionen.</li>
+            </ul>
+
+            <h2>Datenweitergabe</h2>
+            <p>Wir geben Ihre Daten ausschließlich an das Restaurant weiter, bei dem Sie die Reservierung vorgenommen haben, und nur in dem Umfang, der zur Erbringung der Dienstleistung erforderlich ist.</p>
+            <p>Daten werden nicht an Dritte für Werbezwecke verkauft oder weitergegeben.</p>
+
+            <h2>Datenaufbewahrung</h2>
+            <p>Wir speichern die Daten so lange, wie es für den Zweck der Reservierung und in Übereinstimmung mit dem Gesetz erforderlich ist.</p>
+            <p>Nutzer können jederzeit die Löschung ihrer Daten unter <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a> beantragen.</p>
+
+            <h2>Ihre Rechte</h2>
+            <p>Sie haben das Recht auf Zugang, Berichtigung, Löschung und Einschränkung der Verarbeitung personenbezogener Daten.</p>
+            <p>Für alle Datenschutzanfragen kontaktieren Sie uns bitte über <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Politique de Confidentialité</h1>
+            <p><strong>Votre confidentialité est très importante pour nous.</strong></p>
+            <p>Rentyo Gourmet, géré par Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., traite les données personnelles des utilisateurs conformément à la législation de l'UE (RGPD) et à la loi croate sur la protection des données personnelles.</p>
+
+            <h2>Quelles données nous collectons</h2>
+            <ul>
+                <li>Nom et prénom</li>
+                <li>Adresse e-mail</li>
+                <li>Date, heure et nombre de personnes pour la réservation</li>
+                <li>Données d'utilisation du site web (via cookies)</li>
+            </ul>
+
+            <h2>Pourquoi nous les collectons</h2>
+            <ul>
+                <li>pour la confirmation et la notification des réservations,</li>
+                <li>pour fournir un support utilisateur,</li>
+                <li>pour améliorer l'expérience utilisateur,</li>
+                <li>uniquement avec votre consentement : pour des notifications occasionnelles sur les nouveautés ou les promotions.</li>
+            </ul>
+
+            <h2>Partage des données</h2>
+            <p>Nous partageons vos données exclusivement avec le restaurant auprès duquel vous avez effectué la réservation, et uniquement dans la mesure nécessaire à l'exécution du service.</p>
+            <p>Les données ne sont ni vendues ni partagées avec des tiers à des fins publicitaires.</p>
+
+            <h2>Conservation des données</h2>
+            <p>Nous conservons les données aussi longtemps que nécessaire aux fins de la réservation et conformément à la législation.</p>
+            <p>Les utilisateurs peuvent demander la suppression de leurs données à tout moment via <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+
+            <h2>Vos droits</h2>
+            <p>Vous avez le droit d'accéder, de rectifier, de supprimer et de limiter le traitement des données personnelles.</p>
+            <p>Pour toutes les demandes de confidentialité, contactez-nous via <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Informativa sulla Privacy</h1>
+            <p><strong>La tua privacy è molto importante per noi.</strong></p>
+            <p>Rentyo Gourmet, gestito da Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., elabora i dati personali degli utenti in conformità con la legislazione UE (GDPR) e la legge croata sulla protezione dei dati personali.</p>
+
+            <h2>Quali dati raccogliamo</h2>
+            <ul>
+                <li>Nome e cognome</li>
+                <li>Indirizzo email</li>
+                <li>Data, ora e numero di persone per la prenotazione</li>
+                <li>Dati sull'utilizzo del sito web (tramite cookie)</li>
+            </ul>
+
+            <h2>Perché li raccogliamo</h2>
+            <ul>
+                <li>per la conferma e la notifica delle prenotazioni,</li>
+                <li>per fornire supporto agli utenti,</li>
+                <li>per migliorare l'esperienza utente,</li>
+                <li>solo con il tuo consenso: per notifiche occasionali su novità o promozioni.</li>
+            </ul>
+
+            <h2>Condivisione dei dati</h2>
+            <p>Condividiamo i tuoi dati esclusivamente con il ristorante presso il quale hai effettuato la prenotazione, e solo nella misura necessaria per l'esecuzione del servizio.</p>
+            <p>I dati non vengono venduti o condivisi con terze parti per la pubblicità.</p>
+
+            <h2>Conservazione dei dati</h2>
+            <p>Conserviamo i dati per il tempo necessario allo scopo della prenotazione e in conformità con la legge.</p>
+            <p>Gli utenti possono richiedere la cancellazione dei propri dati in qualsiasi momento tramite <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+
+            <h2>I tuoi diritti</h2>
+            <p>Hai il diritto di accesso, rettifica, cancellazione e limitazione del trattamento dei dati personali.</p>
+            <p>Per tutte le richieste sulla privacy, contattaci tramite <a href="mailto:privacy@rentyo.eu" style="color: #333;">privacy@rentyo.eu</a>.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Privacy Policy', sl: 'Politika Zasebnosti', hr: 'Politika Privatnosti', de: 'Datenschutzerklärung', fr: 'Politique de Confidentialité', it: 'Informativa sulla Privacy'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Privacy Policy';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

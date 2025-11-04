@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Legal Notice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: sans-serif, Arial, Helvetica;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            position: relative; 
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            /* Prilagodimo rob, da je prostor za spustni meni */
+            margin-top: 60px; 
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        p, ul, li {
+            font-size: 16px;
+            color: #333;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        
+        /* Stajling gumba Nazaj (levo) */
+        .nazaj-gumb {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; 
+            height: 40px;
+            background-color: #000;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            z-index: 10;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        .nazaj-gumb:hover {
+            background-color: #555;
+        }
+        .nazaj-gumb i {
+            font-size: 1.2rem;
+        }
+
+        /* POSODOBLJEN CSS za spustni meni (desno) */
+        .jezik-preklopnik {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            
+        }
+        .jezik-preklopnik select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none; /* Odstrani privzeti stil brskalnika */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23333" d="M7 10l5 5 5-5z"/></svg>'); /* Dodaj puščico */
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 25px;
+            /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+
+        /* Skrivanje/Prikazovanje vsebine glede na jezik */
+        .vsebina-jezik {
+            display: none;
+        }
+        .vsebina-jezik.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nazaj-gumb" aria-label="Nazaj na glavno stran">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="jezik-preklopnik">
+        <select id="language-switcher">
+            <option value="en">English (EN)</option>
+            <option value="sl">Slovenščina (SL)</option>
+            <option value="hr">Hrvatski (HR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="it">Italiano (IT)</option>
+        </select>
+    </div>
+
+    <div class="container">
+        
+        <div class="vsebina-jezik active" id="content-en" lang="en">
+            <h1>Legal Notice</h1>
+            <p>All information on the Rentyo Gourmet website is for informational purposes and is intended for users who wish to make a reservation.</p>
+
+            <p>Rentyo Gourmet assumes no responsibility for errors or inaccuracies in the restaurant descriptions provided by the providers themselves.</p>
+            <p>Use of the site is at your own risk.</p>
+
+            <p>The website is regularly updated, but Rentyo Gourmet does not guarantee uninterrupted operation or complete accuracy of all data.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-sl" lang="sl">
+            <h1>Pravno Obvestilo</h1>
+            <p>Vse informacije na strani Rentyo Gourmet so informativne narave in namenjene uporabnikom, ki želijo opraviti rezervacijo.</p>
+
+            <p>Rentyo Gourmet ne prevzema odgovornosti za napake ali netočnosti v opisu restavracij, ki jih posredujejo sami ponudniki.</p>
+            <p>Uporaba strani je na lastno odgovornost.</p>
+
+            <p>Spletna stran se redno posodablja, vendar Rentyo Gourmet ne jamči za neprekinjeno delovanje ali popolno točnost vseh podatkov.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-hr" lang="hr">
+            <h1>Pravna Obavijest</h1>
+            <p>Sve informacije na web stranici Rentyo Gourmet su informativne prirode i namijenjene su korisnicima koji žele izvršiti rezervaciju.</p>
+
+            <p>Rentyo Gourmet ne preuzima odgovornost za pogreške ili netočnosti u opisu restorana koje dostavljaju sami pružatelji usluga.</p>
+            <p>Korištenje stranice je na vlastitu odgovornost.</p>
+
+            <p>Web stranica se redovito ažurira, ali Rentyo Gourmet ne jamči neprekidan rad ili potpunu točnost svih podataka.</p>
+        </div>
+        
+        <div class="vsebina-jezik" id="content-de" lang="de">
+            <h1>Rechtlicher Hinweis</h1>
+            <p>Alle Informationen auf der Rentyo Gourmet-Website dienen zu Informationszwecken und richten sich an Benutzer, die eine Reservierung vornehmen möchten.</p>
+
+            <p>Rentyo Gourmet übernimmt keine Verantwortung für Fehler oder Ungenauigkeiten in den Beschreibungen der Restaurants, die von den Anbietern selbst bereitgestellt werden.</p>
+            <p>Die Nutzung der Website erfolgt auf eigene Gefahr.</p>
+
+            <p>Die Website wird regelmäßig aktualisiert, Rentyo Gourmet garantiert jedoch weder einen unterbrechungsfreien Betrieb noch die vollständige Richtigkeit aller Daten.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-fr" lang="fr">
+            <h1>Mentions Légales</h1>
+            <p>Toutes les informations sur le site web Rentyo Gourmet sont de nature informative et destinées aux utilisateurs souhaitant effectuer une réservation.</p>
+
+            <p>Rentyo Gourmet n'assume aucune responsabilité pour les erreurs ou inexactitudes dans la description des restaurants fournies par les prestataires eux-mêmes.</p>
+            <p>L'utilisation du site se fait à vos propres risques.</p>
+
+            <p>Le site est régulièrement mis à jour, mais Rentyo Gourmet ne garantit pas un fonctionnement ininterrompu ni l'exactitude complète de toutes les données.</p>
+        </div>
+
+        <div class="vsebina-jezik" id="content-it" lang="it">
+            <h1>Avviso Legale</h1>
+            <p>Tutte le informazioni sul sito web Rentyo Gourmet sono a scopo informativo e destinate agli utenti che desiderano effettuare una prenotazione.</p>
+
+            <p>Rentyo Gourmet non si assume alcuna responsabilità per errori o inesattezze nella descrizione dei ristoranti fornite dai fornitori stessi.</p>
+            <p>L'utilizzo del sito è a proprio rischio.</p>
+
+            <p>Il sito web viene regolarmente aggiornato, ma Rentyo Gourmet non garantisce un funzionamento ininterrotto o la completa accuratezza di tutti i dati.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Funkcija za preklop jezika
+        function switchLanguage(lang) {
+            // 1. Shrani izbiro v Local Storage
+            localStorage.setItem('userLanguage', lang);
+
+            // 2. Skrij vso vsebino
+            document.querySelectorAll('.vsebina-jezik').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 3. Prikaži ustrezno vsebino, posodobi naslov strani in <select>
+            const activeContent = document.getElementById(`content-${lang}`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+                document.documentElement.lang = lang; // Posodobi 'lang' atribut na <html>
+
+                // Posodobi naslov strani (Page Title)
+                const titles = {
+                    en: 'Legal Notice', sl: 'Pravno Obvestilo', hr: 'Pravna Obavijest', de: 'Rechtlicher Hinweis', fr: 'Mentions Légales', it: 'Avviso Legale'
+                };
+                document.getElementById('page-title').textContent = titles[lang] || 'Legal Notice';
+            }
+            
+            // Posodobi izbrano vrednost v spustnem meniju
+            const switcher = document.getElementById('language-switcher');
+            if (switcher) {
+                switcher.value = lang;
+            }
+        }
+
+        // Dogodek: ob spremembi vrednosti v spustnem meniju preklopi jezik
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcher = document.getElementById('language-switcher');
+            
+            // Poslušaj spremembo v spustnem meniju
+            if (switcher) {
+                switcher.addEventListener('change', (event) => {
+                    const lang = event.target.value;
+                    switchLanguage(lang);
+                });
+            }
+
+            // 4. Preveri shranjen jezik ob nalaganju strani
+            const savedLang = localStorage.getItem('userLanguage');
+            
+            // Določi privzeti jezik: Če ni shranjen, uporabimo 'en' (angleščina)
+            const defaultLang = savedLang || 'en';
+
+            // Poženi preklop jezika ob zagonu
+            switchLanguage(defaultLang);
+        });
+    </script>
+</body>
+</html>

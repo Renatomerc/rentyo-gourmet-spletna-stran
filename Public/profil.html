@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="app.profile_title">Moj Profil - Gourmet & Experience</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
+<style>
+    /* SPECIFIČEN CSS ZA PROFIL */
+    .profil-sekcija {
+      padding: 40px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ===== GLAVA IN SKRIVANJE ELEMENTOV ===== */
+    .logotip {
+        display: none !important; /* SKRIJ LOGOTIP NA VSEH NAPRAVAH */
+    }
+    .jezik-ovoj {
+        display: none !important; /* SKRIJ IZBIRNIK JEZIKA NA VSEH NAPRAVAH */
+    }
+    
+    /* 🆕 NOVI STIL: Skrije element, privzeto za formular kartice */
+    .skrij-formular {
+        display: none;
+    }
+
+
+    /* ===== STIIL ZA GUMBE V GLAVI (HEADER) IN RAZMIKE (PRENESENO Z INDEX.HTML) ===== */
+    
+    /* Skupni stil za gumbe (Nazaj, Profil, Odjava) */
+    .gumb-prijava, 
+    .gumb-profil, 
+    .gumb-odjava, /* DODAN TUDI GUMB ODJAVA, čeprav je zdaj v vsebini */
+    .kartica-podatkov button { /* STIL ZA VSE GUMBE V KARTICAH */
+      display: inline-flex;
+      align-items: center;
+      gap: 5px; 
+      padding: 8px 15px; /* Povečan padding za gumbe v vsebini */
+      border-radius: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      font-size: 14px;
+      cursor: pointer; /* Dodan kazalec */
+      margin-top: 15px; /* Dodan razmik od prejšnjih elementov v kartici */
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    /* Stil za "Prijava" in "Moj Profil" (Primarni gumb) */
+    .gumb-prijava,
+    .gumb-profil,
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici) /* Vsi gumbi razen odjava IN prekliči */ {
+      background-color: #575757;
+      color: white;
+      border: 1px solid #575757;
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+
+    .gumb-prijava:hover, 
+    .gumb-profil:hover,
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):hover {
+      background-color: #787878;
+      border-color: #787878;
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    
+    /* Stil za "Odjava" (Sekundarni/Outline gumb) */
+    .gumb-odjava {
+      background-color: transparent; 
+      color: #3e3e3e; /* Rdeča barva za odjavo */
+      border: 1px solid #3e3e3e;
+      margin-left: 10px; /* Razmik, če je zraven drugega gumba */
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    
+    .gumb-odjava:hover {
+      background-color: #d3d3d3; /* Svetlo rdeča podlaga */
+      color: #424242;
+      border-color: #424242;
+    }
+
+    /* 🆕 NOVI STIL: Gumb za Preklic (Poudarjena rdeča za nevarnost) */
+    .gumb-preklici {
+      background-color: #e74c3c; /* Močna rdeča barva za nevarnost/preklic */
+      color: white;
+      font-size: 14px;
+      border: 1px solid #e74c3c;
+      padding: 8px 15px; /* Povečan padding za gumbe v vsebini */
+      border-radius: 20px;
+      margin-left: 10px; /* Razmik od prejšnjih elementov */
+      /* Prekrije margin-top iz generičnega stila, da je poravnan z besedilom */
+      margin-top: 0; 
+      align-self: flex-start; /* Za poravnavo v liniji s textom, če je v flex kontejnerju */
+      cursor: pointer; /* Dodan kazalec */
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    
+    .gumb-preklici:hover {
+      background-color: #c0392b;
+      border-color: #c0392b;
+    }
+
+    /* OVOJ ZA PROFIL: Poskrbi za poravnavo in razmik (dihanje) */
+    .profil-ovoj {
+        display: flex; 
+        align-items: center;
+        gap: 10px; 
+    }
+
+    /* ===== STYLING ZA GUMB NAZAJ (NI SPREMENJENO) ===== */
+    .gumb-nazaj {
+      text-decoration: none;
+      color: white;
+      background-color: #333;
+      border-radius: 50%; /* Oblika kroga */
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-right: 15px;
+      transition: background-color 0.2s;
+                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    }
+    
+    .gumb-nazaj:hover {
+        background-color: #787878
+    }
+
+    /* ================================== */
+    /* ===== NAMIZNI POGLED: ZAVIHKA V VRSTO (Nad 768px) ===== */
+    /* ================================== */
+
+    .profil-menu {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #ccc;
+      overflow-x: auto; 
+      white-space: nowrap;
+      flex-direction: row; /* Poskrbimo, da je horizontalno na namizju */
+    }
+
+    .profil-zavihek {
+      padding: 15px 25px;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 3px solid transparent; /* Aktivna črta spodaj */
+      transition: 0.2s;
+      text-align: center; /* Vsebina v zavihku na sredini */
+      border-left: none; /* Odstrani morebitno levi rob iz mobilnega */
+      border-right: none;
+    }
+
+    .profil-zavihek.active {
+      border-bottom-color:none ; /* Aktivna barva za spodnji rob */
+      color: #20c0bd;
+    }
+
+    .vsebina-zavihek {
+      display: none;
+    }
+
+    .vsebina-zavihek.active {
+      display: block;
+    }
+
+    /* Dodajte stajling za obliko vsebine, kartic, formularjev itd. */
+    .kartica-podatkov {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Stilizacija elementov formularja za lepši videz */
+    .kartica-formular label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .kartica-formular input[type="text"],
+    .kartica-formular input[type="month"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box; /* Ključno za padding! */
+    }
+
+    .flex-vrsta {
+        display: flex;
+        gap: 20px;
+    }
+
+    .flex-vrsta > div {
+        flex: 1;
+    }
+    
+    /* ================================== */
+    /* ===== PRAVILA ZA MOBILNE NAPRAVE (do 768px) ===== */
+    /* ================================== */
+    
+    @media (max-width: 768px) {
+        
+        /* 1. GLAVA (HEADER) */
+        .glava {
+            justify-content: space-between; 
+            flex-direction: row; 
+            align-items: center; 
+            padding: 10px 20px;
+        }
+
+        .gumb-nazaj {
+            margin-right: 0;
+        }
+
+        /* 2. MENU ZAVIHKA (Vertikalno na mobilnem) */
+        .profil-menu {
+            flex-direction: column; /* Ključno: zavihki vertikalno */
+            margin-bottom: 0; /* Odstranimo spodnji rob */
+            border-bottom: none; /* Odstranimo spodnjo črto */
+            /* Stil menija kot kontejnerja */
+            background-color: #f4f4f9;
+            border: 1px solid #f4f4f9; /* Lahek rob okoli celotnega menija */
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden; /* Odstrani scrollbar */
+        }
+
+        .profil-zavihek {
+            width: 45%;
+            padding: 5px 20px; /* Malo večji padding za boljše tapkanje */
+            border-radius: 25px;
+            text-align: left;
+            border-bottom: 1px solid #f4f4f9; /* Ločilna črta med zavihki */
+            border-right: none; 
+            border-left: 3px solid transparent; /* Priprava za aktivni levi rob */
+            font-weight: normal; /* Manj poudarjen font na mobilnem */
+        }
+        
+        /* Odstranimo zadnjo ločilno črto */
+        .profil-zavihek:last-child {
+            border-bottom: none;
+        }
+        
+        /* Aktivni zavihek (Mobilni) */
+        .profil-zavihek.active {
+            border-left-color: #4edaa9; /* Aktivna barva na levi */
+            color: #333;
+            border-radius: 25px;
+            background-color: #4edaa9;
+            border-bottom-color: #4edaa9; /* Da skrije spodnjo črto pod sabo */
+                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        }
+        
+        /* 4. SKRIJEMO NASLOV, da ne pride do podvajanja, če je vsebina zavihka očitna */
+        .vsebina-zavihek h3 {
+             display: none; 
+        }
+
+        /* Prilagoditev za mobilne naprave */
+        .flex-vrsta {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .kartica-formular input[type="text"],
+        .kartica-formular input[type="month"] {
+             margin-bottom: 5px; /* Manj razmika na mobilnem */
+        }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="glava">
+    
+    <a href="index.html" class="gumb-nazaj">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="akcije">
+        </div>
+  </header>
+
+  <main>
+    <section class="profil-sekcija">
+      <h2 data-i18n="profile.title">Moj Uporabniški Profil</h2>
+      
+      <div class="profil-menu">
+        <div class="profil-zavihek active" data-target="osnovni-podatki" data-i18n="profile.tab_data">Osebni Podatki</div>
+        <div class="profil-zavihek" data-target="aktualne-rezervacije" data-i18n="profile.tab_current">Aktualne Rezervacije</div>
+        <div class="profil-zavihek" data-target="zgodovina" data-i18n="profile.tab_history">Zgodovina Rezervacij</div>
+        <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
+        <div class="profil-zavihek" data-target="obvestila" data-i18n="profile.tab_notifications">Obvestila</div>
+      </div>
+
+      <div class="vsebina-zavihek active" id="osnovni-podatki">
+        <h3 data-i18n="profile.data_subtitle">Vaši podatki</h3>
+        <div class="kartica-podatkov">
+            <p id="profil-ime"><strong data-i18n="profile.name_label">Ime in priimek:</strong> <span class="placeholder-text">Nalaganje...</span></p>
+            <p id="profil-email"><strong data-i18n="profile.email_label">E-pošta:</strong> <span class="placeholder-text">Nalaganje...</span></p>
+            <button data-i18n="profile.edit_button">Uredi podatke</button>
+            
+            <button class="gumb-odjava" id="gumb-odjava" data-i18n="header.logout">
+                <i class="fas fa-sign-out-alt"></i> 
+                Odjava
+            </button>
+        </div>
+      </div>
+
+      <div class="vsebina-zavihek" id="aktualne-rezervacije">
+        <h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>
+        <p>Restavracija Pri Mariji, 27. 11. 2025 ob 19:00 (2 osebi) <button class="gumb-preklici" data-i18n="profile.cancel_button">Prekliči</button></p>
+      </div>
+
+      <div class="vsebina-zavihek" id="zgodovina">
+        <h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>
+        <p>Restavracija XXX, 1. 10. 2025 ob 18:30 (4 osebe)</p>
+        <p>Restavracija YYY, 15. 9. 2025 ob 20:00 (2 osebi)</p>
+      </div>
+
+      <div class="vsebina-zavihek" id="tocke-kartica">
+        <h3 data-i18n="profile.points_payment_subtitle">Točke in Plačilna sredstva</h3>
+        <div class="kartica-podatkov">
+            <h4 data-i18n="profile.points_title">Vaše zbrane točke</h4>
+            <p data-i18n="profile.points_status">Trenutno stanje: <strong>450 točk</strong> (Dovolj za 10€ popusta)</p>
+        </div>
+
+        <div class="kartica-podatkov">
+            <h4 data-i18n="profile.card_title">Shranjena kreditna kartica</h4>
+            <p id="kartica-info" data-i18n="profile.card_info">Visa končnica: **** 1234</p>
+            <button id="gumb-dodaj-kartico" data-i18n="profile.add_card_button">Dodaj/Posodobi kartico</button>
+            
+            <div id="kartica-formular" class="kartica-formular skrij-formular">
+                <hr style="margin-top: 20px; border: 0; border-top: 1px solid #ccc;">
+                <form id="formular-kartice">
+                    <div>
+                        <label for="stevilka-kartice">Številka kartice:</label>
+                        <input type="text" id="stevilka-kartice" name="stevilka-kartice" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+
+                    <div>
+                        <label for="ime-na-kartici">Ime na kartici:</label>
+                        <input type="text" id="ime-na-kartici" name="ime-na-kartici" placeholder="Ime in Priimek" required>
+                    </div>
+
+                    <div class="flex-vrsta">
+                        <div>
+                            <label for="veljavnost-kartice">Veljavnost (MM/LL):</label>
+                            <input type="month" id="veljavnost-kartice" name="veljavnost-kartice" required>
+                        </div>
+                        <div>
+                            <label for="cvv-kartice">CVV:</label>
+                            <input type="text" id="cvv-kartice" name="cvv-kartice" placeholder="XXX" required pattern="\d{3,4}" title="CVV mora biti 3 ali 4 mestna številka">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <button type="submit" data-i18n="profile.save_card_button">Shrani kartico</button>
+                        <button type="button" class="gumb-odjava gumb-preklici" id="gumb-preklici-kartico" data-i18n="profile.cancel_button">Prekliči</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+      </div>
+      
+      <div class="vsebina-zavihek" id="obvestila">
+        <h3 data-i18n="profile.notifications_subtitle">Vaša obvestila</h3>
+        <p>Tukaj se bodo prikazovala vaša sistemska obvestila (npr. potrditve in opomini rezervacij).</p>
+      </div>
+      
+    </section>
+  </main>
+
+  <footer class="noga">
+    <div class="noga-avtorske-pravice">
+      © 2025 Rentyo Gourmet. Vse pravice pridržane.
+    </div>
+  </footer>
+
+<script>
+    // ===========================================
+    // API KONFIGURACIJA
+    // ===========================================
+    // 🔴 KLJUČNI POPRAVEK: Zamenjamo pot iz '/api/uporabnik/profil' v '/api/auth/profil',
+    // da se ujema s konfiguracijo v server.js (app.use('/api/auth', userRoutes);)
+    const PROFIL_API_URL = 'http://localhost:5000/api/auth/profil'; 
+
+    // ===========================================
+    // 1. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
+    // ===========================================
+    const zavihki = document.querySelectorAll(".profil-zavihek");
+    const vsebine = document.querySelectorAll(".vsebina-zavihek");
+
+    zavihki.forEach(zavihek => {
+      zavihek.addEventListener("click", () => {
+        zavihki.forEach(t => t.classList.remove("active"));
+        vsebine.forEach(c => c.classList.remove("active"));
+        zavihek.classList.add("active");
+        const targetId = zavihek.getAttribute("data-target");
+        document.getElementById(targetId).classList.add("active");
+      });
+    });
+
+    // ===========================================
+    // 2. AVTENTIKACIJA IN NALAGANJE PODATKOV
+    // ===========================================
+
+    const zeton = localStorage.getItem('zeton');
+    const akcijeDiv = document.querySelector('.akcije');
+    
+    // Elemente za prikaz podatkov zdaj najdemo po ID-jih, kar je bolj robustno
+    const podatkiImeElement = document.getElementById('profil-ime'); 
+    const podatkiEmailElement = document.getElementById('profil-email'); 
+
+    /**
+     * Prikaz gumba za odjavo in gumba nazaj
+     */
+    const updateHeader = () => {
+        // Gumb za odjavo je zdaj v vsebini profila, ne v glavi.
+        if (!zeton) {
+            // Če ni žetona, uporabnika preusmerimo nazaj
+            window.location.href = 'index.html';
+        }
+        // Listener za odjavo dodamo v naloziPodatkeProfila po inicializaciji jezika
+        
+    };
+    
+    /**
+     * Logika za odjavo
+     */
+    const odjava = (e) => {
+        if (e) e.preventDefault();
+        localStorage.removeItem('zeton'); 
+        localStorage.removeItem('jeLastnik'); 
+        window.location.href = 'index.html'; 
+    };
+    
+    /**
+     * Posodobi prikaz imena in priimka/e-pošte
+     * @param {HTMLElement} element - Element, ki ga posodabljamo
+     * @param {string} labelKey - i18n ključ za labelo (npr. 'profile.name_label')
+     * @param {string} value - Dejanska vrednost (ime ali e-pošta)
+     */
+    const posodobiPrikazPodatka = (element, labelKey, value) => {
+        if (element) {
+            const label = i18next.t(labelKey);
+            // Vrednost postavimo v span.placeholder-text za konsistenco z initial DOM
+            const span = element.querySelector('.placeholder-text');
+            element.innerHTML = `<strong>${label}:</strong> `;
+            if(span) {
+                span.textContent = value;
+                element.appendChild(span);
+            } else {
+                 element.innerHTML += value;
+            }
+        }
+    };
+
+    /**
+     * Pokliče zaščiten endpoint in napolni osebne podatke
+     */
+    const naloziPodatkeProfila = async () => {
+        if (!zeton) return;
+
+        // NOVO: Dodajanje event listenerja za gumb ODJAVA, ki je sedaj v vsebini
+        const gumbOdjava = document.getElementById('gumb-odjava');
+        if (gumbOdjava) {
+            gumbOdjava.addEventListener('click', odjava);
+        }
+
+        try {
+            const response = await fetch(PROFIL_API_URL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${zeton}` 
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Preverimo, ali podatki ustrezajo pričakovani strukturi
+                const uporabnik = data.uporabnik || data; 
+
+                if (uporabnik && uporabnik.ime && uporabnik.email) {
+                    posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
+                    posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
+                    
+                } else {
+                    // Prikaz, če strežnik vrne 200 OK, a podatki niso pravilni
+                    alert("Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.");
+                    console.error("Strežnik je vrnil OK, a manjkajo podatki 'ime' ali 'email'.", data);
+                }
+
+                
+            } else if (response.status === 401 || response.status === 403) {
+                // Če žeton ni veljaven ali dostop ni dovoljen
+                console.error("Avtorizacija neuspešna:", response.status);
+                alert("Vaša seja je potekla. Prosimo, prijavite se ponovno.");
+                odjava();
+            } else {
+                // Ta alert se sproži ob napakah, kot je 404 ali 500
+                console.error("Napaka pri nalaganju profila:", response.status);
+                
+                // NOVO: Podrobnejše sporočilo za 404
+                let statusText = `Koda: ${response.status}. Preverite, ali je API pot **${PROFIL_API_URL}** pravilno nastavljena v vašem backend strežniku.`;
+                if (response.status === 404) {
+                    statusText = `Koda: 404 (Pot ni najdena). **Obvezno preverite vaš backend** (strežnik na portu 5000), ker ta pot **${PROFIL_API_URL}** tam ne obstaja! (Ste ponovno zagnali strežnik?)`;
+                }
+
+                alert(`Napaka pri nalaganju podatkov profila. (${statusText})`);
+            }
+
+        } catch (error) {
+            console.error("Napaka pri komunikaciji z backendom:", error);
+            alert("Kritična napaka pri povezovanju s strežnikom. Preverite, ali vaš backend teče na portu 5000.");
+        }
+    };
+
+
+    // ===========================================
+    // 3. i18next IN ZAGON
+    // ===========================================
+
+    const updateContent = () => {
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        el.textContent = i18next.t(key);
+      });
+      // Posodobimo tudi dinamično vsebino, ki ni nastavljena z data-i18n
+      document.title = i18next.t("app.profile_title");
+
+      // Ponovno posodobimo labele po nalaganju jezika (če so bile naložene dinamično)
+      const imeLabel = i18next.t('profile.name_label');
+      const emailLabel = i18next.t('profile.email_label');
+
+      // Ta del je pomemben za i18n, ko se vsebina nalaga asinhrono
+      if (podatkiImeElement) {
+          const content = podatkiImeElement.querySelector('span')?.textContent || '';
+          podatkiImeElement.innerHTML = `<strong>${imeLabel}:</strong> <span class="placeholder-text">${content}</span>`;
+      }
+      if (podatkiEmailElement) {
+          const content = podatkiEmailElement.querySelector('span')?.textContent || '';
+          podatkiEmailElement.innerHTML = `<strong>${emailLabel}:</strong> <span class="placeholder-text">${content}</span>`;
+      }
+      
+      // Posodobitev teksta na novem gumbu Odjava
+      const gumbOdjava = document.getElementById('gumb-odjava');
+      if (gumbOdjava) {
+          // Preprečimo podvajanje elementov (ikona + besedilo) pri ponovnem klicu updateContent
+          const ikona = gumbOdjava.querySelector('.fas');
+          gumbOdjava.textContent = i18next.t('header.logout');
+          if (ikona) gumbOdjava.prepend(ikona); // Vrnemo ikono na začetek
+      }
+    };
+
+    const loadLanguage = () => {
+        return localStorage.getItem('i18nextLng') || 'sl'; 
+    };
+    
+    i18next.use(i18nextHttpBackend).init(
+      {
+        lng: loadLanguage(), 
+        fallbackLng: "sl",
+        backend: { loadPath: "./i18n/{{lng}}.json" }, 
+      },
+      (err) => {
+        if (err) console.error(err);
+        
+        updateContent();
+        updateHeader(); // Poskrbi le za preusmeritev, če ni žetona
+        naloziPodatkeProfila(); // Zaženemo nalaganje podatkov in doda listener za odjavo
+        
+        // 🆕 KLJUČNA LOGIKA: Prikaz/skrivanje formularja za kartico
+        const gumbDodajKartico = document.getElementById('gumb-dodaj-kartico');
+        const formularKartice = document.getElementById('kartica-formular');
+        const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
+
+        if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
+            
+            const preklopiPrikazFormularja = () => {
+                formularKartice.classList.toggle('skrij-formular');
+                // Po želji lahko spremenite besedilo na gumbu Dodaj/Posodobi, ko je formular odprt
+                const jePrikazan = !formularKartice.classList.contains('skrij-formular');
+                gumbDodajKartico.textContent = jePrikazan ? i18next.t('profile.hide_card_button') : i18next.t('profile.add_card_button');
+            };
+
+            gumbDodajKartico.addEventListener('click', preklopiPrikazFormularja);
+            gumbPrekliciKartico.addEventListener('click', preklopiPrikazFormularja);
+
+            // ⚠️ OPOZORILO: Dodajte event listener za SUBMIT, ki bo preprečil ponovno nalaganje strani
+            const form = document.getElementById('formular-kartice');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // Tukaj bi prišla logika za pošiljanje podatkov kartice na strežnik
+                    alert('Podatki kartice shranjeni! (Implementacija pošiljanja na strežnik še sledi)');
+                    preklopiPrikazFormularja(); // Skrij formular po shranjevanju/preklicu
+                });
+            }
+        }
+      }
+    );
+  </script>
+</body>
+</html>

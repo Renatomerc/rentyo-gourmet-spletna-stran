@@ -1,0 +1,199 @@
+{
+  "app": {
+    "title": "Iskanje Restavracij - Gourmet & Experience",
+    "profile_title": "Moj Profil - Gourmet & Experience"
+  },
+  "header": {
+    "login": "Prijava",
+    "profile": "Moj Profil",
+    "logout": "Odjava"
+  },
+  "hero": {
+    "title": "Gourmet & Experience"
+  },
+  "search": {
+    "restaurant_city_label": "Restavracija ali mesto",
+    "restaurant_city_placeholder": "Vnesite ime ali mesto",
+    "date_label": "Datum",
+    "date_placeholder": "Izberite datum",
+    "time_label": "Čas rezervacije",
+    "select_time": "Izberi čas",
+    "persons_label": "Število oseb",
+    "search_button": "Išči",
+    "person_singular": "{{count}}",
+    "person_plural": "{{count}}"
+  },
+  "quick_search": {
+    "title": "Hitra izbira kuhinje"
+  },
+  "cuisine": {
+    "meat": "Mesna",
+    "vegetarian": "Vegi",
+    "fish": "Ribja",
+    "drinks": "Pijača",
+    "brunch": "Brunch"
+  },
+  "results": {
+    "popular_title": "Priljubljeno v vaši bližini",
+    "featured_title": "Izpostavljeno",
+    "reserve_button": "Rezerviraj",
+    "description_1": "Tradicionalna slovenska kuhinja in prijetno vzdušje.",
+    "description_2": "Sodobne jedi z lokalnimi sestavinami.",
+    "description_3": "Pristna italijanska hrana in odlične pice.",
+    "description_4": "Izvrstne rastlinske jedi za vsakogar.",
+    "description_5": "Izvrstni brunchi za vsakogar.",
+    "check_tables": "Preveri mize ob {{time}}",
+    "cuisine": "Kuhinja",
+    "na": "Ni podatkov",
+    "search_results": "Rezultati iskanja",
+    "available_tomorrow": "Jutri ob {{time}}",
+    "unavailable": "Ni prostih miz"
+  },
+  "messages": {
+    "enter_search_criteria": "Prosimo, vnesite mesto ali vrsto kuhinje za iskanje.",
+    "required_fields_missing": "Prosimo, izpolnite vse obvezne podatke: datum, čas in število oseb.",
+    "searching": "Iskanje restavracij za '{{criteria}}'...",
+    "search_success": "Najdeno {{count}} restavracij.",
+    "search_error": "Iskanje ni uspelo.",
+    "no_restaurants_found": "Ni najdenih restavracij.",
+    "reserving": "Rezerviram {{stevilo}} osebi ob {{cas}}...",
+    "reservation_success": "Rezervacija uspešna! Miza št. {{miza}} je rezervirana za {{trajanje}}.",
+    "reservation_failed": "Rezervacija ni uspela.",
+    "server_connection_error": "Povezava s strežnikom ni uspela.",
+    "server_connection_error_retry": "Napaka pri povezavi s strežnikom, poskusite znova.",
+    "login_success": "Prijava uspešna! Dobrodošli.",
+    "registration_success": "Uspešna registracija!",
+    "login_failed": "Prijava neuspešna.",
+    "registration_failed": "Registracija ni uspela.",
+    "server_error": "Napaka strežnika.",
+    "check_availability_prompt": "Preveri proste mize",
+    "available_times_found": "Trenutno prosti termini.",
+    "no_restaurant_selected": "Napaka: Ni izbrane restavracije.",
+    "select_reservation_date": "Prosimo, izberite datum rezervacije.",
+    "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti."
+  },
+  "auth": {
+    "login_title": "Prijava",
+    "register_title": "Registracija",
+    "login_success": "Prijava uspešna! Dobrodošli.",
+    "register_success": "Registracija uspešna! Zdaj se lahko prijavite.",
+    "login_error": "Napaka pri prijavi.",
+    "register_error": "Registracija ni uspela.",
+    "server_error": "Napaka pri povezavi s strežnikom."
+  },
+  "modal": {
+    "login_tab": "Prijava",
+    "register_tab": "Registracija",
+    "email_placeholder": "E-pošta",
+    "password_placeholder": "Geslo",
+    "name_placeholder": "Ime in priimek",
+    "login_button": "Prijavi se",
+    "register_button": "Ustvari račun",
+    "tab_menu": "Meni",
+    "tab_gallery": "Slike & Zemljevid",
+    "tab_reviews": "Ocene",
+    "tab_special_offer": "Aktualna Ponudba", 
+    "special_offer_title": "Posebna ponudba restavracije",
+    "special_offer_default": "Trenutno ni aktivne posebne ponudbe ali sezonskega menija.",
+    "no_reviews": "Trenutno ni na voljo podrobnih ocen za prikaz.",
+    "no_menu": "Meni še ni na voljo.",
+    "reserve_button": "Rezerviraj mizo",
+    "gallery_title": "Galerija slik",
+    "map_title": "Zemljevid Lokacije",
+    "reservation_persons": "Število oseb",
+    "reservation_date": "Datum",
+    "reservation_modal": {
+      "title": "Izberite trajanje obiska",
+      "duration_label": "Kako dolgo želite ostati?",
+      "duration_0_5h": "Pol ure (30 min)",
+      "duration_1h": "1 ura",
+      "duration_1_5h": "1 ura in pol (90 min)",
+      "duration_2h": "2 uri",
+      "confirm_button": "Potrdi trajanje in rezerviraj"
+    }
+  },
+  "footer": {
+    "about_company_title": "O Rentyo Gourmet",
+    "about_us": "O nas",
+    "about_us_href": "/sl/o-nas.html", 
+    "contact": "Kontakt",
+    "contact_href": "/sl/kontakt.html",
+    "career": "Kariera",
+    "career_href": "/sl/kariera.html", 
+    "media_press": "Mediji / Press kotiček",
+    "media_press_href": "/sl/mediji-press.html",
+    "legal_info_title": "Pravne informacije",
+    "legal_info_href": "/sl/pravne-informacije.html", 
+    "privacy_policy": "Politika zasebnosti",
+    "privacy_policy_href": "/sl/politika-zasebnosti.html", 
+    "cookie_policy": "Piškotki",
+    "cookie_policy_href": "/sl/politika-kolacici.html", 
+    "terms_of_use": "Pogoji uporabe",
+    "terms_of_use_href": "/sl/uvjeti-koristenja.html", 
+    "legal_notice": "Pravno obvestilo",
+    "legal_notice_href": "/sl/pravna-obavijest.html",
+    "partnerships_title": "Partnerstva",
+    "for_partners": "Za partnerje",
+    "for_partners_href": "/sl/partnerstva.html#za-partnerje",
+    "affiliate_program": "Partnerski program",
+    "affiliate_program_href": "/sl/partnerstva.html#partnerski-program",
+    "connect_title": "Poveži se z nami",
+    "payment_info_prefix": "Varno plačilo, ki ga omogoča",
+    "copyright_text": "© 2025 Rentyo Gourmet. Vse pravice pridržane."
+    
+  },
+  "profile": {
+    "title": "Moj Uporabniški Profil",
+    "tab_data": "Osebni Podatki",
+    "tab_current": "Aktualne Rezervacije",
+    "tab_history": "Zgodovina Rezervacij",
+    "tab_points_payment": "Točke in Plačilo",
+    "tab_notifications": "Obvestila", 
+    "data_subtitle": "Vaši podatki",
+    "name_label": "Ime in priimek:",
+    "email_label": "E-pošta:",
+    "edit_button": "Uredi podatke",
+    "current_subtitle": "Aktivne rezervacije",
+    "cancel_button": "Prekliči",
+    "history_subtitle": "Pretekle rezervacije",
+    "points_payment_subtitle": "Točke in Plačilna sredstva",
+    "points_title": "Vaše zbrane točke",
+    "points_status": "Trenutno stanje: {{count}} točk (Dovolj za 10€ popusta)",
+    "card_title": "Shranjena kreditna kartica",
+    "card_info": "Visa končnica: **** 1234",
+    "add_card_button": "Dodaj/Posodobi kartico",
+    "save_card_button": "Shrani kartico", 
+    "hide_card_button": "Odstrani kartico", 
+    "notifications_subtitle": "Vaša obvestila"
+  },
+  "warning": {
+      "title": "Opozorilo",
+      "default_message": "Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.",
+      "understand_button": "Razumem"
+  },
+  "registration": {
+    "pogoji_strinjanje": "Strinjam se s ",
+    "splosni_pogoji_link": "Splošnimi pogoji",
+    "splosni_pogoji_href": "/sl/uvjeti-koristenja.html",
+    "in_politiko": " in ",
+    "politika_zasebnosti_link": "Politiko zasebnosti",
+    "politika_zasebnosti_href": "/sl/politika-zasebnosti.html"
+  },
+  "cookieConsent": {
+    "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analizo prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
+    "moreInfoLink": {
+      "text": "Preberi več.",
+      "url": "politika-zasebnosti.html"
+    },
+    "buttons": [
+      {
+        "id": "decline-cookies",
+        "text": "Zavrni (samo nujni)"
+      },
+      {
+        "id": "accept-cookies",
+        "text": "Sprejmem vse"
+      }
+    ]
+  }
+}
