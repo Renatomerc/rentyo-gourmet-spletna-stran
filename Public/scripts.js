@@ -139,7 +139,7 @@ if (typeof i18next !== 'undefined') {
 // -------------------------------------------------------------
 // 1. GLOBALNA NASTAVITEV IN TOKEN
 // -------------------------------------------------------------
-const API_BASE_URL = 'http://localhost:5000/api'; // Nastavite na pravi URL strežnika
+const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; // Nastavite na pravi URL strežnika
 const authTokenKey = 'jwtToken'; // Ključ za shranjevanje žetona
 
 // Pridobi avtentikacijski žeton iz localStorage

@@ -1,7 +1,7 @@
 // app.js (v mapi Public)
 
 // Definirajte bazni URL za vaš API
-const API_BASE_URL = 'http://localhost:5000/api/restavracije';
+const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/restavracije';
 
 // Funkcija za zagon pridobivanja podatkov
 async function naloziRestavracije() {
