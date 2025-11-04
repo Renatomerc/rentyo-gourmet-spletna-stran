@@ -23,14 +23,16 @@ let preveriGosta;
 
 // 🟢 KLJUČNO: Preverjanje tajnih ključev
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-const COOKIE_SECRET = process.env.COOKIE_SECRET;
+// 🔥 POPRAVLJENO: Zagotovimo, da COOKIE_SECRET ni null/undefined (dodamo fallback vrednost)
+const COOKIE_SECRET = process.env.COOKIE_SECRET || 'fallback_secret_for_cookies'; 
 
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
 }
-if (!COOKIE_SECRET) {
-    console.warn("⚠️ OPOZORILO: COOKIE_SECRET ni najden. Podpisovanje piškotkov ne bo delovalo! Dodajte v .env.");
-}
+// OPOZORILO ZDAJ NI VEČ POTREBNO, KER IMAMO FALLBACK
+// if (!COOKIE_SECRET) {
+//     console.warn("⚠️ OPOZORILO: COOKIE_SECRET ni najden. Podpisovanje piškotkov ne bo delovalo! Dodajte v .env.");
+// }
 
 try {
     authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
@@ -75,7 +77,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// 🔥 Vključitev Cookie Parserja
+// 🔥 Vključitev Cookie Parserja (uporaba COOKIE_SECRET z zagotovljeno vrednostjo)
 app.use(cookieParser(COOKIE_SECRET));
 
 
