@@ -31,7 +31,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
         return jwt.sign({ id: uporabnikId }, TAJNI_KLJUC, { expiresIn: '7d' }); 
     };
     
-    // ⭐ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka (Z SAME SITE: 'None')
+    // ⭐ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka (DODAN path: '/')
     const nastaviAuthPiškotek = (res, zeton) => {
         // Piškotek za avtentikacijo:
         res.cookie('auth_token', zeton, {
@@ -39,7 +39,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
             signed: true,   // Uporabi COOKIE_SECRET iz server.js za podpisovanje
             maxAge: 7 * 24 * 60 * 60 * 1000, // Veljavnost 7 dni (v milisekundah)
             secure: true,   // KLJUČNO: Ker Render vedno uporablja HTTPS (in 'None' zahteva secure)
-            sameSite: 'None' // KLJUČNO ZA CORS: Omogoči prenos piškotkov med domenama
+            sameSite: 'None', // KLJUČNO ZA CORS: Omogoči prenos piškotkov med domenama
+            path: '/'       // ⭐ KLJUČNO: Piškotek velja za celotno domeno!
         });
     };
     // ==========================================================
@@ -70,7 +71,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
             });
             
             const zeton = generirajZeton(novUporabnik._id);
-            nastaviAuthPiškotek(res, zeton); // <--- NOVO: Nastavi piškotek!
+            nastaviAuthPiškotek(res, zeton); 
 
             // V odgovor ne pošljemo več žetona, ampak samo podatke
             res.status(201).json({
@@ -79,7 +80,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
                 email: novUporabnik.email,
                 jeLastnik: novUporabnik.jeLastnik,
                 cena: novUporabnik.cena,
-                msg: "Registracija uspešna. Žeton shranjen v varnem piškotku." // <--- INFO za frontend
+                msg: "Registracija uspešna. Žeton shranjen v varnem piškotku." 
             });
 
         } catch (err) {
@@ -101,7 +102,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
             if (!gesloPravilno) return res.status(401).json({ msg: 'Neveljavne poverilnice.' });
 
             const zeton = generirajZeton(uporabnik._id);
-            nastaviAuthPiškotek(res, zeton); // <--- NOVO: Nastavi piškotek!
+            nastaviAuthPiškotek(res, zeton); 
 
             // V odgovor ne pošljemo več žetona, ampak samo podatke
             res.json({
@@ -110,7 +111,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
                 email: uporabnik.email,
                 jeLastnik: uporabnik.jeLastnik,
                 cena: uporabnik.cena,
-                msg: "Prijava uspešna. Žeton shranjen v varnem piškotku." // <--- INFO za frontend
+                msg: "Prijava uspešna. Žeton shranjen v varnem piškotku." 
             });
         } catch (err) {
             console.error('❌ NAPAKA PRI PRIJAVI:', err);
@@ -118,34 +119,31 @@ module.exports = (JWT_SECRET_KEY, preveriGosta) => {
         }
     });
     
-    // ⭐ NOVO: Ruta za odjavo (logout)
+    // ⭐ RUTA ZA ODJAVO (logout)
     router.post('/odjava', (req, res) => {
         // Izbriše piškotek tako, da mu nastavi datum veljavnosti v preteklosti
         res.cookie('auth_token', '', { 
             httpOnly: true, 
-            expires: new Date(0) 
+            expires: new Date(0),
+            path: '/'       // ⭐ KLJUČNO: Path mora biti enak kot pri nastavitvi!
         });
         res.status(200).json({ msg: 'Uspešno odjavljen. Piškotek izbrisan.' });
     });
 
     // ==========================================================
-    // ✅ POPRAVLJENA ZAŠČITENA POT: /api/auth/profil
+    // ⭐ ZAŠČITENA POT: /api/auth/profil
     // ==========================================================
-    // Opomba: Odstranimo 'async', saj middleware že skrbi za asinhronost
-    router.get('/profil', preveriGosta, (req, res) => { 
+    router.get('/profil', preveriGosta, (req, res) => {
         
-        //🔥 KLJUČNI POPRAVEK:
-        // Ker je req.uporabnik sedaj že navaden JSON objekt (nastavljen v authMiddleware.js)
-        // se izognemo destrukturiranju znotraj try/catch, da zagotovimo stabilnost.
+        // Uporabljamo asinhronost iz middleware-a, zato ni potreben 'await' tukaj.
         
-        if (req.uporabnik && req.uporabnik.id) { // Preverimo, ali je uporabnik avtenticiran (ima ID, ne le anonimni gost)
+        if (req.uporabnik && req.uporabnik.id) { 
             const uporabnikPodatki = req.uporabnik;
             
-            // Posredujemo samo potrebne podatke in izpustimo geslo, ki bi sicer moralo biti že odstranjeno v middleware
             res.json({
                 msg: "Podatki profila uspešno pridobljeni.",
                 uporabnik: { 
-                    _id: uporabnikPodatki._id || uporabnikPodatki.id, 
+                    _id: uporabnikPodatki._id || uporabnikPodatki.id, // Varen dostop
                     ime: uporabnikPodatki.ime, 
                     email: uporabnikPodatki.email, 
                     jeLastnik: uporabnikPodatki.jeLastnik, 
