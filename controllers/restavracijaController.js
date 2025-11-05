@@ -3,7 +3,8 @@
 // Vsebuje vso poslovno logiko za restavracije, rezervacije in Geo iskanje.
 // ===============================================
 
-const Restavracija = require('../models/Restavracija');
+// ⚠️ OPOMBA: Če se strežnik zatakne, je najverjetnejša težava pri uvozu ali definiciji modela.
+const Restavracija = require('../models/Restavracija'); 
 const mongoose = require('mongoose');
 
 // Pomožna funkcija: Preveri, ali se dve rezervaciji prekrivata
@@ -26,35 +27,37 @@ const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, 
 // =================================================================
 
 /**
- * 🚀 **NOVA FUNKCIJA ZA FRONTEND**
+ * 🚀 **FUNKCIJA ZA FRONTEND**
  * Pridobivanje vseh restavracij za začetni prikaz (GET /privzeto)
- * KLJUČNO: Dodano je logiranje za ugotovitev, kje se strežnik zatakne.
  */
 exports.getPrivzetoRestavracije = async (req, res) => {
-    // 📢 LOG: Sporočilo 1 - Klic prejet
-    console.log("===> ZACETEK: API klic za /privzeto prejet.");
+    // 📢 LOG 1: Prva vrstica, ki se izvede v asinhroni funkciji
+    console.log("===> ZACETEK: API klic za /privzeto prejet (Pred poizvedbo).");
 
     try {
-        // 🚀 KLJUČNA TOČKA: Mongoose poizvedba
+        // 🔥 Test: Ali je model sploh na voljo in ga lahko kličemo
+        if (Restavracija === undefined) {
+             console.error("!!! KRITIČNA NAPAKA: Model Restavracija ni definiran/uvožen.");
+             return res.status(500).json({ msg: 'Model restavracije ni na voljo na strežniku.' });
+        }
+        
         const restavracije = await Restavracija.find({});
-        // 📢 LOG: Sporočilo 2 - Poizvedba uspešna
+        
+        // 📢 LOG 2: Poizvedba uspešna
         console.log(`===> MongoDB uspeh: Najdenih ${restavracije.length} restavracij.`);
 
         if (!restavracije || restavracije.length === 0) {
             console.warn("Ni najdenih restavracij v bazi.");
-            // Vrnite prazen seznam z 200, če je uspeh
             return res.status(200).json([]); 
         }
         
-        // Vrnemo seznam restavracij
         res.status(200).json(restavracije);
-        // 📢 LOG: Sporočilo 3 - Odgovor poslan
+        // 📢 LOG 3: Odgovor poslan
         console.log("===> KONEC: Uspešen odgovor poslan odjemalcu.");
 
     } catch (error) {
-        // 📢 LOG: Sporočilo 4 - Kritična napaka!
+        // 📢 LOG 4: Kritična napaka!
         console.error('!!! KRITIČNA NAPAKA pri pridobivanju restavracij (Privzeto):', error.message);
-        // Zagotovimo, da strežnik pošlje 500, da frontend ne visi
         res.status(500).json({ 
             msg: 'Napaka strežnika pri dostopu do podatkovne baze.',
             details: error.message 
@@ -64,14 +67,13 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 
 
 /**
- * Pridobitev vseh restavracij (GET /) - Originalni kontroler, ki ostane za splošno uporabo
+ * Pridobitev vseh restavracij (GET /) - Originalni kontroler
  */
 exports.pridobiVseRestavracije = async (req, res) => {
     try {
         const restavracije = await Restavracija.find({});
         res.json(restavracije);
     } catch (error) {
-        // Dodajmo bolj specifično logiranje v konzolo
         console.error('Napaka pri pridobivanju vseh restavracij (Originalni klic):', error);
         res.status(500).json({ msg: 'Napaka pri pridobivanju restavracij.' });
     }
@@ -79,7 +81,6 @@ exports.pridobiVseRestavracije = async (req, res) => {
 
 /**
  * Ustvarjanje nove restavracije (POST /)
- * Uporabno predvsem za ADMIN ali avtomatizirano polnjenje.
  */
 exports.ustvariRestavracijo = async (req, res) => {
     try {
@@ -87,7 +88,6 @@ exports.ustvariRestavracijo = async (req, res) => {
         const shranjenaRestavracija = await novaRestavracija.save();
         res.status(201).json(shranjenaRestavracija);
     } catch (error) {
-        // Error 11000 pomeni Duplicate Key (npr. email že obstaja)
         if (error.code === 11000) {
             return res.status(409).json({ msg: 'Restavracija s tem e-poštnim naslovom ali imenom že obstaja.' });
         }
@@ -103,7 +103,6 @@ exports.pridobiRestavracijoPoId = async (req, res) => {
     try {
         const restavracijaId = req.params.id;
         
-        // 🔥 POPRAVEK: Izboljšano preverjanje, ki vrne neveljaven ID v sporočilu.
         if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
             console.error(`Neveljaven format ID restavracije pri GET: ${restavracijaId}`);
             return res.status(400).json({ 
@@ -129,12 +128,10 @@ exports.posodobiRestavracijo = async (req, res) => {
         const restavracijaId = req.params.id;
         const updateData = req.body; 
 
-        // Dodano preverjanje veljavnosti ID-ja tudi za PUT
         if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
             return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
         }
 
-        // Uporabite findByIdAndUpdate za splošno posodobitev, ki ne vpliva na slike/meni (to ima svojo pot)
         const updatedRestavracija = await Restavracija.findByIdAndUpdate(
             restavracijaId,
             updateData,
@@ -160,7 +157,6 @@ exports.izbrisiRestavracijo = async (req, res) => {
     try {
         const restavracijaId = req.params.id;
         
-        // Dodano preverjanje veljavnosti ID-ja tudi za DELETE
         if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
             return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
         }
@@ -244,28 +240,23 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
 /**
  * Pridobivanje prostih ur (POST /proste_ure ALI GET /preveri_rezervacijo/:id/:datum/:osebe)
- * * 🔥 KLJUČNI POPRAVEK: Omogoča branje parametrov iz req.body (POST) ali req.params (GET).
  */
 exports.pridobiProsteUre = async (req, res) => {
     
     // Prilagodljivo branje: Najprej poskusimo BODY (POST), nato PARAMS (GET)
     const restavracijaId = req.body.restavracijaId || req.params.restavracijaId;
     const datum = req.body.datum || req.params.datum;
-    // Osebe beremo tudi prilagodljivo, preden parsiramo
     const stevilo_oseb_string = req.body.stevilo_oseb || req.params.stevilo_oseb; 
-    // TrajanjeUr je običajno samo v BODY (POST)
     const trajanjeUr = req.body.trajanjeUr; 
 
     if (!restavracijaId || !datum || !stevilo_oseb_string) {
         return res.status(400).json({ msg: 'Manjkajoči podatki: restavracijaId, datum ali stevilo_oseb.' });
     }
     
-    // Dodano preverjanje ID-ja za Geospatial klic
     if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
         return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
     }
 
-    // Pretvorba števila oseb v integer (ključno, če prihaja iz URL-ja kot string)
     const stevilo_oseb = parseInt(stevilo_oseb_string);
     if (isNaN(stevilo_oseb) || stevilo_oseb <= 0) {
         return res.status(400).json({ msg: 'Neveljavno število oseb.' });
@@ -277,10 +268,8 @@ exports.pridobiProsteUre = async (req, res) => {
         const privzetoTrajanje = trajanjeUr ? parseFloat(trajanjeUr) : 1.5; 
         
         const rezultatiAggregation = await Restavracija.aggregate([
-            // Uporabite preverjen ID
             { $match: { _id: new mongoose.Types.ObjectId(restavracijaId) } }, 
             { $unwind: "$mize" }, 
-            // Uporabimo preverjeno in pretvorjeno spremenljivko stevilo_oseb
             { $match: { "mize.kapaciteta": { $gte: stevilo_oseb } } }, 
             { $project: {
                 _id: 0, 
@@ -303,7 +292,6 @@ exports.pridobiProsteUre = async (req, res) => {
             const miza = aggResult.miza;
             const prosteUre = [];
             
-            // 🔥 NOVO: Robustno pridobivanje imena mize za izpis
             const mizaImeZaIzpis = miza.Miza || miza.ime || miza.naziv || `ID: ${miza._id.toString().substring(0, 4)}...`;
 
             const obstojeceRezervacije = (miza.rezervacije || []).filter(rez => rez.datum === datum);
@@ -330,7 +318,7 @@ exports.pridobiProsteUre = async (req, res) => {
 
             if (prosteUre.length > 0) {
                 koncniRezultati.push({
-                    mizaIme: mizaImeZaIzpis, // Uporabi robustno ime
+                    mizaIme: mizaImeZaIzpis, 
                     mizaId: miza._id, 
                     kapaciteta: miza.kapaciteta,
                     prosteUre: prosteUre
@@ -348,17 +336,14 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 🔥 POPRAVLJENO: Uvedeno je robustnejše preverjanje imena mize in preklopljeno na UpdateOne za zanesljivo shranjevanje.
  */
 exports.ustvariRezervacijo = async (req, res) => {
     const { restavracijaId, mizaId, imeGosta, telefon, stevilo_oseb, datum, casStart, trajanjeUr } = req.body;
     
-    // 1. Preveri manjkajoče polja
     if (!restavracijaId || !mizaId || !imeGosta || !datum || !casStart) {
         return res.status(400).json({ msg: 'Manjkajo vsi potrebni podatki za rezervacijo (restavracijaId, mizaId, imeGosta, datum, casStart).' });
     }
 
-    // 2. Natančno preverjanje veljavnosti ID-ja
     if (!mongoose.Types.ObjectId.isValid(restavracijaId) || !mongoose.Types.ObjectId.isValid(mizaId)) {
         const neveljavenId = !mongoose.Types.ObjectId.isValid(restavracijaId) ? restavracijaId : mizaId;
         return res.status(400).json({ msg: `Neveljaven format ID: "${neveljavenId}"` });
@@ -368,7 +353,6 @@ exports.ustvariRezervacijo = async (req, res) => {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
         
-        // 3. Pridobi restavracijo in mizo za PREVERJANJE ZASEDENOSTI (lahko je lean, saj ne shranjujemo tega dokumenta nazaj)
         const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
 
         if (!restavracija) {
@@ -381,10 +365,8 @@ exports.ustvariRezervacijo = async (req, res) => {
              return res.status(404).json({ msg: 'Miza ni najdena v restavraciji.' });
         }
 
-        // ⚠️ POPRAVEK 1: Določimo ime mize z varovalnimi mehanizmi za sporočila o napaki/uspehu
         const mizaIme = izbranaMiza.Miza || izbranaMiza.ime || izbranaMiza.naziv || `ID: ${izbranaMiza._id.toString().substring(0, 4)}...`;
 
-        // 4. Preveri prekrivanje
         const obstojeceRezervacije = (izbranaMiza.rezervacije || []).filter(rez => rez.datum === datum);
 
         for (const obstojecaRezervacija of obstojeceRezervacije) {
@@ -397,7 +379,6 @@ exports.ustvariRezervacijo = async (req, res) => {
             }
         }
         
-        // 5. Če ni prekrivanja, ustvari novo rezervacijo
         const novaRezervacija = {
             imeGosta,
             telefon,
@@ -405,23 +386,18 @@ exports.ustvariRezervacijo = async (req, res) => {
             datum,
             casStart: casZacetka,
             trajanjeUr: trajanje,
-            status: 'POTRJENO', // 🔥 DODANO: status je pomemben za logiko
-            // userId: req.user.id 
+            status: 'POTRJENO',
         };
 
-        // 6. 🔥 POPRAVEK 2: Uporabi ATOMIČNO POSODOBITEV ($push) za zanesljivo shranjevanje. 
-        // To je hitreje in bolj varno kot findById in save().
         const rezultat = await Restavracija.updateOne(
             { _id: restavracijaId, "mize._id": mizaId },
             { $push: { "mize.$.rezervacije": novaRezervacija } }
         );
 
         if (rezultat.modifiedCount === 0) {
-             // To se zgodi, če je bil restavracija ali miza med branjem in pisanjem izbrisana
              return res.status(500).json({ msg: 'Napaka pri shranjevanju. Restavracija ali miza ni bila najdena ali posodobljena.' });
         }
 
-        // 7. Odgovor
         res.status(201).json({ 
             msg: `Rezervacija uspešno ustvarjena za ${mizaIme} ob ${casStart}.`,
             rezervacija: novaRezervacija 
@@ -429,7 +405,6 @@ exports.ustvariRezervacijo = async (req, res) => {
 
     } catch (error) {
         console.error('Napaka pri ustvarjanju rezervacije:', error);
-        // Po novem zanesljivem shranjevanju bi morala ta napaka zajeti samo resne težave v povezavi z DB.
         res.status(500).json({ msg: 'Napaka serverja pri ustvarjanju rezervacije.' });
     }
 };
@@ -440,7 +415,6 @@ exports.ustvariRezervacijo = async (req, res) => {
 exports.izbrisiRezervacijo = async (req, res) => {
     const { restavracijaId, mizaId, rezervacijaId } = req.body;
 
-    // Dodano preverjanje ID-jev za brisanje rezervacije
     if (!mongoose.Types.ObjectId.isValid(restavracijaId) || !mongoose.Types.ObjectId.isValid(mizaId) || !mongoose.Types.ObjectId.isValid(rezervacijaId)) {
         return res.status(400).json({ msg: 'Neveljaven format ID-ja.' });
     }
@@ -475,7 +449,6 @@ exports.posodobiAdminVsebino = async (req, res) => {
     const restavracijaId = req.params.restavracijaId;
     const { novOpis, glavnaSlikaUrl, galerijaUrlsi, novMeni } = req.body;
     
-    // Dodano preverjanje ID-ja za admin posodobitve
     if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
         return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
     }
