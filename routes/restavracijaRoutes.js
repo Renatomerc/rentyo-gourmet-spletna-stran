@@ -16,22 +16,23 @@ module.exports = (preveriGosta) => {
     // =================================================================
 
     // -----------------------------------------------------------------
+    // 🟢 ZAČETNI KLIC ZA FRONTEND (Najpomembnejše!)
+    // -----------------------------------------------------------------
+    /**
+     * GET /api/restavracije/privzeto
+     * Povezava na funkcijo z obsežnim logiranjem, ki smo jo dodali v Controller.
+     */
+    router.get('/privzeto', restavracijaController.getPrivzetoRestavracije); 
+
+
+    // -----------------------------------------------------------------
     // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI:
     // -----------------------------------------------------------------
     
     // 1. Združljiva z odjemalcem: GET pot, ki uporablja parametre iz URL-ja (za stare klice/preverjanje)
-    // Če odjemalec kliče /api/restavracije/preveri_rezervacijo/ID/DATUM/OSEBE, se ujema tukaj.
-    /**
-     * GET /api/restavracije/preveri_rezervacijo/:restavracijaId/:datum/:stevilo_oseb
-     * Uporabimo enak controller kot za proste_ure, če zmore obdelati obe obliki.
-     * PREDPOSTAVKA: pridobiProsteUre zmore prebrati tudi req.params (za GET).
-     */
     router.get('/preveri_rezervacijo/:restavracijaId/:datum/:stevilo_oseb', restavracijaController.pridobiProsteUre);
     
     // 2. Originalna POST pot (Priporočljiva, saj se parametri lažje prenašajo v telesu)
-    /**
-     * POST /api/restavracije/proste_ure
-     */
     router.post('/proste_ure', restavracijaController.pridobiProsteUre);
     
     

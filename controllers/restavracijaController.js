@@ -26,7 +26,45 @@ const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, 
 // =================================================================
 
 /**
- * Pridobitev vseh restavracij (GET /)
+ * 🚀 **NOVA FUNKCIJA ZA FRONTEND**
+ * Pridobivanje vseh restavracij za začetni prikaz (GET /privzeto)
+ * KLJUČNO: Dodano je logiranje za ugotovitev, kje se strežnik zatakne.
+ */
+exports.getPrivzetoRestavracije = async (req, res) => {
+    // 📢 LOG: Sporočilo 1 - Klic prejet
+    console.log("===> ZACETEK: API klic za /privzeto prejet.");
+
+    try {
+        // 🚀 KLJUČNA TOČKA: Mongoose poizvedba
+        const restavracije = await Restavracija.find({});
+        // 📢 LOG: Sporočilo 2 - Poizvedba uspešna
+        console.log(`===> MongoDB uspeh: Najdenih ${restavracije.length} restavracij.`);
+
+        if (!restavracije || restavracije.length === 0) {
+            console.warn("Ni najdenih restavracij v bazi.");
+            // Vrnite prazen seznam z 200, če je uspeh
+            return res.status(200).json([]); 
+        }
+        
+        // Vrnemo seznam restavracij
+        res.status(200).json(restavracije);
+        // 📢 LOG: Sporočilo 3 - Odgovor poslan
+        console.log("===> KONEC: Uspešen odgovor poslan odjemalcu.");
+
+    } catch (error) {
+        // 📢 LOG: Sporočilo 4 - Kritična napaka!
+        console.error('!!! KRITIČNA NAPAKA pri pridobivanju restavracij (Privzeto):', error.message);
+        // Zagotovimo, da strežnik pošlje 500, da frontend ne visi
+        res.status(500).json({ 
+            msg: 'Napaka strežnika pri dostopu do podatkovne baze.',
+            details: error.message 
+        });
+    }
+};
+
+
+/**
+ * Pridobitev vseh restavracij (GET /) - Originalni kontroler, ki ostane za splošno uporabo
  */
 exports.pridobiVseRestavracije = async (req, res) => {
     try {
@@ -34,7 +72,7 @@ exports.pridobiVseRestavracije = async (req, res) => {
         res.json(restavracije);
     } catch (error) {
         // Dodajmo bolj specifično logiranje v konzolo
-        console.error('Napaka pri pridobivanju vseh restavracij:', error);
+        console.error('Napaka pri pridobivanju vseh restavracij (Originalni klic):', error);
         res.status(500).json({ msg: 'Napaka pri pridobivanju restavracij.' });
     }
 };
