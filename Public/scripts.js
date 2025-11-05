@@ -585,33 +585,61 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
  */
 function odpriPotrditveniModal(e) {
     const gumb = e.currentTarget;
+    
+    // 1. Poberemo vse potrebne podatke (cas, datum, stevilo oseb, Ime Mize)
     const casStartDecimal = parseFloat(gumb.dataset.casDecimal);
-    const mizaIme = gumb.dataset.mizaIme;
+    const mizaIme = gumb.dataset.mizaIme; 
     const datum = gumb.dataset.datum;
     const steviloOseb = parseInt(gumb.dataset.osebe);
     const casString = gumb.dataset.uraString;
+
+    // 🔥 POPRAVEK: MORAMO ZAJETI TUDI MIZA ID (MongoDB ObjectId)
+    // To pomeni, da ga mora v HTML gumb že vsebovati kot data-miza-id
+    const mizaId = gumb.dataset.mizaId; 
+
     const restavracijaId = document.getElementById('tabRezervacija').querySelector('[data-reserv-id]').value;
     
-    // 💡 Tu potrebujete modal za potrditev v vašem HTML-ju!
-    // Zaenkrat bomo uporabili samo potrditev v konzoli, dokler ne dobim HTML-ja:
+    // Če mizaId ni definiran, se ustavi!
+    if (!mizaId) {
+        console.error("Miza ID ni bil najden v data-atributih gumba. Preverite HTML.");
+        prikaziSporocilo("Napaka: Manjka identifikator mize.", 'error');
+        return;
+    }
+
 
     const rezervacijaPodatki = {
         restavracijaId,
-        mizaIme,
-        imeGosta: 'Spletni Gost', // Lahko dobimo iz prijavljenega uporabnika
+        mizaId, // <-- KLJUČNI POPRAVEK
+        imeGosta: 'Spletni Gost', 
         telefon: '000 000 000',
         stevilo_oseb: steviloOseb,
-        datum: datum, // YYYY-MM-DD
+        datum: datum, 
         casStart: casStartDecimal,
-        trajanjeUr: 1.5, // Privzeto
+        trajanjeUr: 1.5,
+        // Dodamo mizaIme za sporočilo (čeprav ga backend ne potrebuje)
+        mizaIme: mizaIme 
     };
 
     // POZOR: Ker nimamo HTML za potrditveni modal, kličemo direktno Izvedbo
+    // Dovoljena je samo uporaba MODAL (NE confirm())
+    // ----------------------------------------------------------------------------------
+    // ⚠️ POZOR: Uporaba window.confirm() je ZELO slaba praksa in ni dovoljena v Canvasu!
+    // Morate uporabiti navaden HTML modal, jaz ga bom zamenjal s konzolnim logom
+    // ----------------------------------------------------------------------------------
+    
+    console.log("Potrditveni modal bi se moral prikazati.");
+    
+    // Po uspešni potrditvi v vašem modalu:
+    handleIzvedbaRezervacije(rezervacijaPodatki);
+    
+    // Namesto uporabe confirm() (ki je prepovedan):
+    /*
     const potrditev = confirm(i18next.t('messages.confirm_reservation', { miza: mizaIme, cas: casString }));
     
     if (potrditev) {
         handleIzvedbaRezervacije(rezervacijaPodatki);
     }
+    */
 }
 
 

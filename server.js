@@ -77,11 +77,24 @@ app.use(cookieParser(COOKIE_SECRET));
 
 
 // ========================================
-// 🔗 API POTI
+// 🔗 API POTI (POSODOBLJENO PREVERJANJE)
 // ========================================
-if (restavracijaRouter) app.use('/api/restavracije', restavracijaRouter);
-if (userRoutes) app.use('/api/auth', userRoutes); 
-if (uploadRouter) app.use('/api/upload', uploadRouter); 
+if (restavracijaRouter) {
+    app.use('/api/restavracije', restavracijaRouter);
+    console.log("✅ API Pot za Restavracije (/api/restavracije) je uspešno priključena.");
+} else {
+    console.error("❌ KRITIČNA NAPAKA: restavracijaRouter se ni uspel naložiti. Preverite napake v routes/restavracijaRoutes.js ali modelu!");
+}
+
+if (userRoutes) {
+    app.use('/api/auth', userRoutes); 
+    console.log("✅ API Pot za Avtentikacijo (/api/auth) je uspešno priključena.");
+}
+
+if (uploadRouter) {
+    app.use('/api/upload', uploadRouter); 
+    console.log("✅ API Pot za Nalaganje (/api/upload) je uspešno priključena.");
+}
 
 
 // ========================================
