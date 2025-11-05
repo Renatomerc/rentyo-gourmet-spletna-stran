@@ -48,9 +48,9 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 },
                 deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
                 
-                // NOVO: Dodajanje Opisa in Menija
+                // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
-                menu: 1, 
+                meni: 1, // <--- SEDAJ PRAVILNO
                 
                 // Ostala polja
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
