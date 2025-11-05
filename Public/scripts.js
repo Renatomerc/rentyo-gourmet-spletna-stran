@@ -546,12 +546,29 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * 🔥 KLJUČNI POPRAVEK: V gumb dodamo data-miza-id, da vemo, katero mizo rezervirati.
+ * 🔥 DOKONČEN POPRAVEK: Zanesljivo pretvarjanje decimalnega časa v HH:MM format z zaokroževanjem napak pri float številkah.
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
     if (!rezultatiContainer) return;
     
+    // --- Pomožna funkcija za zanesljivo pretvorbo ---
+    const convertDecimalToTime = (decimalHour) => {
+        // 1. Zanesljivo pretvorimo v celo število minut, da se izognemo float napakam.
+        // Npr. 9.5 * 60 = 570 celih minut
+        const totalMinutes = Math.round(decimalHour * 60); 
+
+        // 2. Izračunamo ure in preostale minute
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        
+        return `${formattedHours}:${formattedMinutes}`;
+    };
+    // ------------------------------------------------
+
     rezultatiContainer.innerHTML = '';
     let html = '';
 
@@ -560,10 +577,11 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         html += `<div class="flex flex-wrap gap-2">`;
         
         miza.prosteUre.forEach(uraDecimal => {
-            // Pretvorba iz decimalnega formata (npr. 18.5) v HH:MM format (npr. 18:30)
-            const ura = Math.floor(uraDecimal);
-            const minute = (uraDecimal % 1) * 60;
-            const casString = `${String(ura).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+            
+            // Debugging: Preverite, kaj pride iz Backenda (ostane za vsak slučaj)
+            console.log("Prejeto decimalno uro iz DB/API-ja:", uraDecimal);
+            
+            const casString = convertDecimalToTime(uraDecimal);
             
             html += `
                 <button class="gumb-izbira-ure" 

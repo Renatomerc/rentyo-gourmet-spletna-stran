@@ -1098,6 +1098,8 @@
     .meni-seznam ul li strong {
         display: block;
         color: #333;
+        font-size: 14px;
+        font-weight: 500; 
     }
 
     /* Slike in Zemljevid */
@@ -2809,25 +2811,52 @@ function prikaziPodrobnosti(restavracija) {
     // Generiranje Menija (meni: Object v DB)
     if(modalMeni) {
         modalMeni.innerHTML = '';
-        const menuObj = restavracija.meni || {};
+        // Uporabimo polje 'meni', ki ga vrača Backend
+        const menuObj = restavracija.meni || {}; 
         
         let hasMenu = false;
-        // Prehodimo ključe in vrednosti v "meni" objektu (npr. Zajtrki, Kosila, itd.)
+        
+        // Predpostavimo, da sta 'osnovni_meni' in 'tedenska_ponudba' ključa v menuObj
         for (const kategorija in menuObj) {
-            // Predpostavimo, da je vsaka kategorija polje elementov menija
+            // Dobi seznam jedi (Array)
             const items = menuObj[kategorija]; 
+            
+            // 🔥 NOV DODATEK: Prikaz "Aktualna Ponudba" kot ločen zavihek (če je to to)
+            if (kategorija === 'tedenska_ponudba') {
+                continue; // Ta zanka obdeluje le zavihek 'Meni', tedensko ponudbo obdelamo spodaj
+            }
             
             if (Array.isArray(items) && items.length > 0) {
                 hasMenu = true;
-                // Dodamo naslov kategorije
-                const categoryHeader = document.createElement('h4');
-                categoryHeader.textContent = kategorija;
-                modalMeni.appendChild(categoryHeader);
-                
+                // Dodamo naslov kategorije (ki ga ne želimo, če je to 'osnovni_meni')
+                // Če je ključ 'osnovni_meni', ga SKRIJEMO in uporabimo lastni naslov ali pa ga popolnoma izpustimo.
+                if (kategorija !== 'osnovni_meni') {
+                    const categoryHeader = document.createElement('h4');
+                    categoryHeader.textContent = kategorija;
+                    modalMeni.appendChild(categoryHeader);
+                }
+
                 items.forEach(item => {
                     const li = document.createElement('li');
-                    // Predpostavljamo, da so elementi v kategoriji še vedno objekti z J (jed) in P (cena/opis)
-                    li.innerHTML = `<strong>${item.j || item.jed || 'Jed'}</strong> <span>${item.p || item.opis || 'Opis/Cena'}</span>`;
+                    
+                    // 🔥 KLJUČNI POPRAVEK: Izračun cene/opisa
+                    let desnaVrednost = '';
+                    if (item.cena !== undefined && item.cena !== null) {
+                        desnaVrednost = `${item.cena} €`; // Prikaz cene
+                    } else if (item.opis) {
+                        desnaVrednost = item.opis; // Prikaz opisa, če cena manjka
+                    } else {
+                        desnaVrednost = ''; 
+                    }
+
+                    // Prikaz jedi in cene/opisa
+                    li.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <strong style="flex-shrink: 1;">${item.jed || 'Jed'}</strong> 
+                            <span style="flex-shrink: 0; margin-left: 15px;">${desnaVrednost}</span>
+                        </div>
+                    `;
+                    
                     modalMeni.appendChild(li);
                 });
             }
@@ -2838,15 +2867,37 @@ function prikaziPodrobnosti(restavracija) {
         }
     }
     
-    // Polnjenje zavihka Aktualna Ponudba (Predpostavljamo, da je to v polju 'aktualnaPonudba' ali podobno)
-    if(modalAktualnaPonudbaOpis) {
-        const ponudba = restavracija.aktualna_ponudba || restavracija.akcijskaPonudba || ''; // Preveri več ključev
-        if (ponudba) {
-            modalAktualnaPonudbaOpis.textContent = ponudba;
-            modalAktualnaPonudbaOpis.style.fontStyle = 'normal';
+    // Polnjenje zavihka Aktualna Ponudba (Predpostavljamo, da je to v polju 'tedenska_ponudba')
+    const ponudbaItems = restavracija.meni?.tedenska_ponudba || [];
+    const modalAktualnaPonudbaDiv = document.getElementById('tabAktualnaPonudba'); // Predpostavljam, da je ID tega zavihka to
+    
+    if (modalAktualnaPonudbaDiv) {
+        let ponudbaHtml = '';
+        if (ponudbaItems.length > 0) {
+            ponudbaItems.forEach(item => {
+                // Generiramo HTML na enak način kot osnovni meni
+                let desnaVrednost = '';
+                if (item.cena !== undefined && item.cena !== null) {
+                    desnaVrednost = `${item.cena} €`;
+                } else if (item.opis) {
+                    desnaVrednost = item.opis;
+                } else {
+                    desnaVrednost = '';
+                }
+
+                ponudbaHtml += `
+                    <li style="list-style: none;">
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <strong style="flex-shrink: 1;">${item.jed || 'Jed'}</strong> 
+                            <span style="flex-shrink: 0; margin-left: 15px;">${desnaVrednost}</span>
+                        </div>
+                    </li>
+                `;
+            });
+            modalAktualnaPonudbaDiv.innerHTML = `<ul style="padding-left: 0;">${ponudbaHtml}</ul>`;
         } else {
-            modalAktualnaPonudbaOpis.textContent = i18next.t('modal.special_offer_default');
-            modalAktualnaPonudbaOpis.style.fontStyle = 'italic';
+            // Uporabite i18next prevod, če je na voljo
+            modalAktualnaPonudbaDiv.innerHTML = '<p class="text-gray-500"><span data-i18n="modal.no_special_offer">Aktualna ponudba trenutno ni na voljo.</span></p>';
         }
     }
     
