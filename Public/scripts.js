@@ -59,9 +59,7 @@ const updateContent = () => {
     }
 
     // -------------------------------------------------------------
-    // 6. POPRAVLJENA LOGIKA ZA DINAMIČNO PREPISOVANJE LINKOV (HREF)
-    //    * KLJUČNO: JSON mora zdaj vrniti samo pot (npr. '/o-nas.html').
-    //    * Koda sama doda jezik in predpono '/public/'.
+    // 6. LOGIKA ZA DINAMIČNO PREPISOVANJE LINKOV (HREF)
     // -------------------------------------------------------------
     const currentLang = i18next.language || 'sl'; 
     
@@ -74,14 +72,11 @@ const updateContent = () => {
         // 1. Preverimo, ali je pot veljavna in se razlikuje od ključa
         if (genericPath && genericPath !== key) {
             
-            // 2. ZGRADIMO PRAVILNO ABSOLUTNO POT, ki vključuje jezik in '/public/'
-            // Pričakovana končna pot: /public/sl/o-nas.html
-            // OPOMBA: glede na to, da je index.html v korenu, je /public/ morda odveč, a ga pustimo.
+            // 2. ZGRADIMO PRAVILNO ABSOLUTNO POT
             const dynamicPath = `/${currentLang}${genericPath.startsWith('/') ? genericPath : '/' + genericPath}`;
             
             el.setAttribute('href', dynamicPath);
         } else if (genericPath === key) {
-             // Opozorilo, če ključ ni najden, kar povzroči, da gumb ostane href='#'
              console.warn(`Ključ poti ni najden v JSON: ${key}. Preverite datoteko i18n/${currentLang}.json.`);
         }
     });
@@ -141,7 +136,6 @@ if (typeof i18next !== 'undefined') {
 // 1. GLOBALNA NASTAVITEV IN TOKEN
 // -------------------------------------------------------------
 // 🔥 KRITIČEN POPRAVEK: API_BASE_URL mora biti celoten URL Render servisa, 
-// sicer se klici na rentyo.eu domeno končajo z 404!
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; 
 const authTokenKey = 'jwtToken'; // Ključ za shranjevanje žetona
 
@@ -385,6 +379,9 @@ function prikaziRezultate(restavracije, datum, cas, steviloOseb, jePrivzetoNalag
         // KLJUČNO: Shranimo ID, da ga lahko kliknemo za modal!
         kartica.dataset.restavracijaId = restavracija._id;
 
+        // 🔥 POPRAVEK: Uporabimo imeRestavracije (ki ga pošilja backend)
+        const imeRestavracije = restavracija.imeRestavracije || 'Neznano Ime (Frontend)';
+
         // Logika za prikaz ocene v obliki zvezdic
         const rating = restavracija.ocena_povprecje || 0;
         const zvezdice = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
@@ -393,7 +390,7 @@ function prikaziRezultate(restavracije, datum, cas, steviloOseb, jePrivzetoNalag
         const lokaliziranOpis = restavracija.description ? restavracija.description[currentLang] || restavracija.description.sl : i18next.t('results.na');
 
         // Določitev glavne slike
-        const slikaUrl = restavracija.mainImageUrl || `https://placehold.co/400x200/51296a/white?text=${restavracija.ime.replace(/\s/g, '+')}`;
+        const slikaUrl = restavracija.mainImageUrl || `https://placehold.co/400x200/51296a/white?text=${imeRestavracije.replace(/\s/g, '+')}`;
 
         // Logika za cene (€, €€, €€€)
         const cenovniRazred = '€'.repeat(restavracija.priceRange || 1);
@@ -409,9 +406,9 @@ function prikaziRezultate(restavracije, datum, cas, steviloOseb, jePrivzetoNalag
         }
 
         kartica.innerHTML = `
-            <img src="${slikaUrl}" class="kartica-slika" alt="${i18next.t('results.image_alt_prefix')} ${restavracija.ime}">
+            <img src="${slikaUrl}" class="kartica-slika" alt="${i18next.t('results.image_alt_prefix')} ${imeRestavracije}">
             <div class="kartica-vsebina">
-                <h3>${restavracija.ime} <span class="ocena-stevilka">(${cenovniRazred})</span></h3>
+                <h3>${imeRestavracije} <span class="ocena-stevilka">(${cenovniRazred})</span></h3>
                 <div class="info-ocena-oddaljenost">
                     <p class="ocena">${zvezdice} <span class="ocena-stevilka">(${rating.toFixed(1)})</span></p>
                     <span class="oddaljenost"><i class="fas fa-route"></i> 2.5 km</span>
@@ -425,8 +422,7 @@ function prikaziRezultate(restavracije, datum, cas, steviloOseb, jePrivzetoNalag
 
                 <button class="gumb-rezervacija"
                     data-restavracija-id="${restavracija._id}"
-                    data-ime="${restavracija.ime}"
-                    data-datum="${datum}"
+                    data-ime="${imeRestavracije}" data-datum="${datum}"
                     data-cas="${cas}"
                     data-stevilo-oseb="${steviloOseb}"
                     data-rezervacija-gumb>
@@ -464,7 +460,7 @@ function handlePripravaRezervacije(e) {
     e.preventDefault();
 
     const restavracijaId = e.target.dataset.restavracijaId;
-    const restavracijaIme = e.target.dataset.ime;
+    const restavracijaIme = e.target.dataset.ime; // Sedaj bere imeRestavracije
     const datum = e.target.dataset.datum; // YYYY-MM-DD format
     const cas = e.target.dataset.cas;
     const steviloOseb = parseInt(e.target.dataset.steviloOseb);
@@ -573,8 +569,7 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
                 <button class="gumb-izbira-ure" 
                     data-cas-decimal="${uraDecimal}" 
                     data-miza-ime="${miza.mizaIme}"
-                    data-miza-id="${miza.mizaId || 'neznan_id'}"  <!-- 🔥 POPRAVEK: DODAN MIZA ID -->
-                    data-datum="${datum}"
+                    data-miza-id="${miza.mizaId || 'neznan_id'}"  data-datum="${datum}"
                     data-osebe="${steviloOseb}"
                     data-ura-string="${casString}">
                     ${casString}
@@ -716,15 +711,12 @@ function setupRestavracijaModalClosure() {
                 restavracijaModal.classList.remove('active');
             }
         });
-        // Klic setupRestavracijaTabs mora biti znotraj handleOdpriModalPodrobnosti
-        // da zagotovi, da so DOM elementi prisotni.
     }
 }
 
 
 /**
  * Nastavi poslušalce za preklapljanje zavihkov znotraj detajlnega modala.
- * Opomba: Klicana je v handleOdpriModalPodrobnosti, ko je modalna vsebina že napolnjena.
  */
 function setupRestavracijaTabs() {
     // Opomba: Te elemente je treba po vsakem odpiranju modala znova najti!
@@ -860,12 +852,14 @@ async function handleOdpriModalPodrobnosti(e) {
 
 /**
  * Vstavi podatke v HTML strukturo detajlnega modala.
- * 🔥 POTRDITEV: Ta funkcija dinamično naloži Meni z uporabo ustvariMenijaHTML.
  */
 function prikaziModalPodrobnosti(restavracija) {
     if (!restavracijaModal) return;
 
     const currentLang = i18next.language;
+
+    // 🔥 POPRAVEK: Dobi ime restavracije z najširšo možno preverbo (imeRestavracije, ime, naziv)
+    const prikazanoIme = restavracija.imeRestavracije || restavracija.ime || restavracija.naziv || i18next.t('messages.unknown_name');
 
     // Lokalizacija podatkov
     const opis = restavracija.description ? restavracija.description[currentLang] || restavracija.description.sl : i18next.t('results.na');
@@ -875,7 +869,9 @@ function prikaziModalPodrobnosti(restavracija) {
 
     // 1. NAPOLNIMO STATIČNE ELEMENTE MODALA
     document.getElementById('modalSlika').style.backgroundImage = `url('${slikaUrl}')`;
-    document.getElementById('modalIme').innerHTML = `${restavracija.ime} <span class="ocena-stevilka">(${cenovniRazred})</span>`;
+    // 🔥 POPRAVLJENA VRSTICA: Uporaba nove spremenljivke prikazanoIme
+    document.getElementById('modalIme').innerHTML = `${prikazanoIme} <span class="ocena-stevilka">(${cenovniRazred})</span>`; 
+    
     document.getElementById('modalKuhinja').innerHTML = `<i class="fas fa-utensils"></i> ${restavracija.cuisine.join(', ')}`;
     document.getElementById('modalLokacija').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${restavracija.naslovPodjetja || i18next.t('messages.location_na')}`;
     document.getElementById('modalOcena').innerHTML = `<i class="fas fa-star"></i> ${rating.toFixed(1)}/5 (${restavracija.st_ocen || 0})`;
@@ -890,7 +886,11 @@ function prikaziModalPodrobnosti(restavracija) {
     // 3. Napolnimo zavihek GALERIJA
     const tabGalerija = document.getElementById('tabGalerija');
     if(tabGalerija) {
-        tabGalerija.innerHTML = ustvariGalerijeHTML(restavracija.galleryUrls, restavracija.latitude, restavracija.longitude);
+        // Opomba: Uporabite restavracija.lokacija.coordinates[1] za lat, [0] za lng, če je v GeoJSON formatu
+        const lat = restavracija.lokacija && restavracija.lokacija.coordinates ? restavracija.lokacija.coordinates[1] : null;
+        const lng = restavracija.lokacija && restavracija.lokacija.coordinates ? restavracija.lokacija.coordinates[0] : null;
+
+        tabGalerija.innerHTML = ustvariGalerijeHTML(restavracija.galleryUrls, lat, lng);
     }
     
     // 4. Počistimo rezultate prostih ur (ker nismo še preverili)
