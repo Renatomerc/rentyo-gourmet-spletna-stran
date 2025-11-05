@@ -205,19 +205,32 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
 
 /**
- * Pridobivanje prostih ur (POST /proste_ure)
- * 🔥 POPRAVLJENO: Vključen robusten način za pridobitev imena mize.
+ * Pridobivanje prostih ur (POST /proste_ure ALI GET /preveri_rezervacijo/:id/:datum/:osebe)
+ * * 🔥 KLJUČNI POPRAVEK: Omogoča branje parametrov iz req.body (POST) ali req.params (GET).
  */
 exports.pridobiProsteUre = async (req, res) => {
-    const { restavracijaId, datum, stevilo_oseb, trajanjeUr } = req.body;
+    
+    // Prilagodljivo branje: Najprej poskusimo BODY (POST), nato PARAMS (GET)
+    const restavracijaId = req.body.restavracijaId || req.params.restavracijaId;
+    const datum = req.body.datum || req.params.datum;
+    // Osebe beremo tudi prilagodljivo, preden parsiramo
+    const stevilo_oseb_string = req.body.stevilo_oseb || req.params.stevilo_oseb; 
+    // TrajanjeUr je običajno samo v BODY (POST)
+    const trajanjeUr = req.body.trajanjeUr; 
 
-    if (!restavracijaId || !datum || !stevilo_oseb) {
+    if (!restavracijaId || !datum || !stevilo_oseb_string) {
         return res.status(400).json({ msg: 'Manjkajoči podatki: restavracijaId, datum ali stevilo_oseb.' });
     }
     
     // Dodano preverjanje ID-ja za Geospatial klic
     if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
         return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    }
+
+    // Pretvorba števila oseb v integer (ključno, če prihaja iz URL-ja kot string)
+    const stevilo_oseb = parseInt(stevilo_oseb_string);
+    if (isNaN(stevilo_oseb) || stevilo_oseb <= 0) {
+        return res.status(400).json({ msg: 'Neveljavno število oseb.' });
     }
 
 
@@ -229,6 +242,7 @@ exports.pridobiProsteUre = async (req, res) => {
             // Uporabite preverjen ID
             { $match: { _id: new mongoose.Types.ObjectId(restavracijaId) } }, 
             { $unwind: "$mize" }, 
+            // Uporabimo preverjeno in pretvorjeno spremenljivko stevilo_oseb
             { $match: { "mize.kapaciteta": { $gte: stevilo_oseb } } }, 
             { $project: {
                 _id: 0, 

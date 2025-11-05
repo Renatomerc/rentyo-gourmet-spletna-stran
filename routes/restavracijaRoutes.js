@@ -13,9 +13,28 @@ module.exports = (preveriGosta) => {
     
     // =================================================================
     // 💥 1. POTI Z FIKSNIMI IMENI (Ki niso ID-ji)
-    //    Te poti morajo biti na vrhu, da jih ne prestrežejo poti kot /:id
     // =================================================================
 
+    // -----------------------------------------------------------------
+    // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI:
+    // -----------------------------------------------------------------
+    
+    // 1. Združljiva z odjemalcem: GET pot, ki uporablja parametre iz URL-ja (za stare klice/preverjanje)
+    // Če odjemalec kliče /api/restavracije/preveri_rezervacijo/ID/DATUM/OSEBE, se ujema tukaj.
+    /**
+     * GET /api/restavracije/preveri_rezervacijo/:restavracijaId/:datum/:stevilo_oseb
+     * Uporabimo enak controller kot za proste_ure, če zmore obdelati obe obliki.
+     * PREDPOSTAVKA: pridobiProsteUre zmore prebrati tudi req.params (za GET).
+     */
+    router.get('/preveri_rezervacijo/:restavracijaId/:datum/:stevilo_oseb', restavracijaController.pridobiProsteUre);
+    
+    // 2. Originalna POST pot (Priporočljiva, saj se parametri lažje prenašajo v telesu)
+    /**
+     * POST /api/restavracije/proste_ure
+     */
+    router.post('/proste_ure', restavracijaController.pridobiProsteUre);
+    
+    
     // -----------------------------------------------------------------
     // 🌍 ISKANJE RESTAVRACIJ PO BLIŽINI (GEOSPATIAL $geoNear)
     // -----------------------------------------------------------------
@@ -29,19 +48,10 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     /**
      * PUT /api/restavracije/admin/posodobi_vsebino/:restavracijaId
-     * To je specifična pot, ki ima fiksno 'admin/posodobi_vsebino' pred parametrom.
      */
     router.put('/admin/posodobi_vsebino/:restavracijaId', preveriGosta, restavracijaController.posodobiAdminVsebino);
     
-    // -----------------------------------------------------------------
-    // IZRAČUN PROSTIH UR IN MIZ (/proste_ure)
-    // -----------------------------------------------------------------
-    /**
-     * POST /api/restavracije/proste_ure
-     */
-    router.post('/proste_ure', restavracijaController.pridobiProsteUre);
-
-
+    
     // -----------------------------------------------------------------
     // USTVARJANJE NOVE REZERVACIJE (/ustvari_rezervacijo)
     // -----------------------------------------------------------------
@@ -64,9 +74,6 @@ module.exports = (preveriGosta) => {
     // 💥 2. SPLOŠNI CRUD (/, POST /) - Fiksne poti brez parametrov
     // =================================================================
     
-    /**
-     * Združimo GET in POST za osnovno pot /api/restavracije/
-     */
     router.route('/')
         // OSNOVNI CRUD: Pridobitev vseh restavracij (GET /)
         .get(restavracijaController.pridobiVseRestavracije)
@@ -78,10 +85,6 @@ module.exports = (preveriGosta) => {
     // 💥 3. DINAMIČNE POTI (/:id) - NA ZADNJE MESTO!
     // =================================================================
 
-    /**
-     * Združimo vse operacije (GET, PUT, DELETE) na poti /api/restavracije/:id
-     * Uporaba router.route() je tukaj najboljša praksa.
-     */
     router.route('/:id')
         // OSNOVNI CRUD: Pridobitev ene restavracije (GET /:id)
         .get(restavracijaController.pridobiRestavracijoPoId)

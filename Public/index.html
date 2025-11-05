@@ -2367,7 +2367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Override gumba "Rezerviraj mizo"
+// 2. Override gumba "Rezerviraj mizo"
     if (gumbRezervirajModal) {
         // Odstranimo inline 'onclick="odpriDurationModal()"' iz HTML
         gumbRezervirajModal.onclick = null; 
@@ -2377,52 +2377,104 @@ document.addEventListener('DOMContentLoaded', () => {
             const izbranDatum = modalDatumInput.value; 
             const steviloOseb = modalOsebeInput.value;
 
-            // Preverimo, ali smo že izbrali čas in je ta ura še vedno veljavna
+            // 1. Preverimo, ali smo že izbrali čas in je ta ura še vedno veljavna
             if (globalSelectedTime) {
-                // Če je ura izbrana, gremo direktno na modal trajanja
                 odpriDurationModal();
                 return;
             }
 
-            // POVEŽEMO Z LOKALIZACIJO (i18n)
+            // 2. Preverjanje in opozorila
             
             if (!currentRestaurantId) {
-                // 🔥 POPRAVEK za prevajanje: Uporaba i18next ključa
                 const errorMsg = i18next.t('messages.no_restaurant_selected');
                 prosteUreRezultati.innerHTML = `<p style="color: red;">${errorMsg}</p>`;
                 return;
             }
 
             if (!izbranDatum) {
-                // 🔥 POPRAVEK za prevajanje: Uporaba i18next ključa
                 const warningMsg = i18next.t('messages.select_reservation_date');
                 prosteUreRezultati.innerHTML = `<p style="color: red;">${warningMsg}</p>`;
                 return;
             }
             
-            // Če sta datum in restavracija izbrana, počistimo polje, preden se prikažejo proste ure.
+            // 3. Priprava UI za nalaganje
             prosteUreRezultati.innerHTML = '';
+            prosteUreRezultati.innerHTML = `<p data-i18n="messages.loading_availability">Preverjam razpoložljivost...</p>`;
 
-                // --- SIMULACIJA API KLICA IN PRIKAZ REZULTATOV ---
-                console.log(`Preverjanje za ID: ${currentRestaurantId}, Datum: ${izbranDatum}, Osebe: ${steviloOseb}`);
+
+            // --- 🔥 KLIC API-ja Z DODATNIM PREVERJANJEM ODGOVORA ---
+            
+            const dataToSend = {
+                restavracijaId: currentRestaurantId,
+                datum: izbranDatum,
+                stevilo_oseb: steviloOseb,
+                // trajanjeUr: 1.5 // po potrebi
+            };
+
+            console.log(`Preverjanje za ID: ${currentRestaurantId}, Datum: ${izbranDatum}, Osebe: ${steviloOseb}`);
+            
+            // 🎯 POPRAVLJEN URL: 'restavracije' namesto 'restavracija'
+            fetch('/api/restavracije/proste_ure', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend)
+            })
+            // 🛑 POPRAVEK: Preverimo, ali je odgovor uspešen, preden ga poskusimo parsati kot JSON
+            .then(async response => {
+                if (!response.ok) {
+                    // Poskusimo dobiti besedilo napake, če je na voljo
+                    const errorText = await response.text();
+                    console.error('API Klic neuspešen - Status:', response.status, 'Odgovor strežnika:', errorText);
+                    // Ustvarimo splošno napako, ki jo ujame naslednji .catch() blok
+                    throw new Error(i18next.t('messages.server_error_detailed', { status: response.status }));
+                }
+                return response.json();
+            })
+            .then(data => {
+                let ureHTML = '';
                 
-                setTimeout(() => {
-                    // To simulira klic 'preveriRazpolozljivost' in prikaže gumbe
-                    prosteUreRezultati.innerHTML = `
-                        <p style="margin-bottom: 10px;" data-i18n="messages.available_times_found">Na voljo proste ure za ${izbranDatum}:</p>
-                        <div class="gumbi-proste-ure">
-                            <button type="button" class="gumb-ura" data-time="18:00">18:00</button>
-                            <button type="button" class="gumb-ura" data-time="19:30">19:30</button>
-                            <button type="button" class="gumb-ura" data-time="20:00">20:00</button>
-                        </div>
-                    `;
-                    updateContent(); // Posodobimo prevode
+                if (data.mize && data.mize.length > 0) {
+                    // Za shranjevanje edinstvenih ur, ki so že prikazane
+                    const prikazaneUre = new Set();
                     
-                    // 3. Nastavimo poslušalce za dinamično ustvarjene gumbe z urami
-                    setupTimeSlotListeners();
+                    ureHTML += `<p style="margin-bottom: 10px;" data-i18n="messages.available_times_found">Na voljo proste ure za ${izbranDatum}:</p>`;
+                    ureHTML += '<div class="gumbi-proste-ure">';
+                    
+                    data.mize.forEach(miza => {
+                        miza.prosteUre.forEach(ura => {
+                            const uraFormat = ura.toFixed(2).replace('.', ':').padEnd(5, '0');
+                            
+                            if (!prikazaneUre.has(uraFormat)) {
+                                // 🔥 KLJUČNO: Shranimo tudi miza ID na gumb, da ga bomo lahko poslali nazaj v ustvariRezervacijo
+                                ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${miza._id}">${uraFormat}</button>`;
+                                prikazaneUre.add(uraFormat);
+                            }
+                        });
+                    });
 
-                }, 1000); // 1 sekunda simulacije nalaganja
+                    ureHTML += '</div>';
+                    
+                } else {
+                    // Ni prostih ur
+                    ureHTML = `<p class="alert alert-warning">${data.msg || i18next.t('messages.no_times_available')}</p>`;
+                }
+                
+                prosteUreRezultati.innerHTML = ureHTML;
+                updateContent(); 
+                setupTimeSlotListeners(); 
+
+            })
+            .catch(error => {
+                console.error('Končna napaka pri pridobivanju prostih ur:', error.message);
+                
+                const errorMsg = error.message.includes('messages.server_error') 
+                    ? error.message 
+                    : i18next.t('messages.server_error'); 
+                
+                prosteUreRezultati.innerHTML = `<p class="alert alert-danger">${errorMsg}</p>`;
             });
+            
+        });
     }
     
     // =================================================================
