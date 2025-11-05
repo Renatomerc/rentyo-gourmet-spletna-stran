@@ -28,28 +28,29 @@ const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, 
 
 /**
  * 🚀 **FUNKCIJA ZA FRONTEND (KONČNA POPRAVLJENA AGGREGATION)**
- * Zagotavlja, da se polje 'imeRestavracije' pravilno pošlje Frontendu,
- * in uporablja najverjetnejše ključe v bazi ($ime in $naziv).
+ * Vključuje nalaganje imena, opisa, menija, slik in ostalih podatkov za kartice.
  */
 exports.getPrivzetoRestavracije = async (req, res) => {
-    console.log("===> API klic za /privzeto prejet. Vrnjeni bodo agregirani podatki.");
+    console.log("===> API klic za /privzeto prejet. Vrnjeni bodo agregirani podatki z opisom in menijem.");
 
     try {
         const restavracije = await Restavracija.aggregate([
             { $limit: 10 },
             { $project: {
                 _id: 1, 
-                // 🔥 POPRAVEK: Vrni pravo ime restavracije (ime, naziv ali privzeto sporočilo, če je prazno)
+                // Ključni podatki kartice
                 imeRestavracije: { $ifNull: ["$ime", "$naziv", "Ime manjka v bazi (Controller)"] }, 
-                // Uporaba prve slike ali prve iz galerije
                 urlSlike: { 
                     $ifNull: [
                         "$mainImageUrl", 
                         { $arrayElemAt: ["$galleryUrls", 0] }
                     ]
                 },
-                // Uporaba prve kuhinje iz arraya
                 deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
+                
+                // NOVO: Dodajanje Opisa in Menija
+                opis: { $ifNull: ["$opis", "Opis manjka."] }, 
+                menu: 1, 
                 
                 // Ostala polja
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
