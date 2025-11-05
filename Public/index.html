@@ -2759,7 +2759,379 @@ i18next.use(i18nextHttpBackend).init(
 );
 
 
+// =================================================================
+// III. MOCK PODATKI in LOGIKA KARTIC RESTAVRACIJ (POSODOBLJENO)
+// =================================================================
 
+// 1. Mock Podatki 
+const MOCK_RESTAVRACIJE_RAW = [
+    { id: '66f1f3d89bf1398867f6c69c', ime: "Restavracija Lounge", kuhinja: "Mesne jedi", lokacija: "Ljubljana", ocena_povprecje: 4.5, opis: "Traditional Slovenian cuisine and pleasant ambiance.", slika: "Slika-1.png", 
+      meni: [{j: "Goveja juha s fritati", p: "6.00€"}, {j: "Dunajski zrezek s pomfrijem", p: "14.50€"}, {j: "Kremna rezina", p: "4.00€"}, {j: "Tuna steak z zelenjavo", p: "22.00€"}, {j: "Sveže pečena postrv", p: "18.50€"}],
+      // NOVO: Dodajanje ponudbe v Mock podatke
+      aktualna_ponudba: "Vsak četrtek nudimo 20% popust na vse morske jedi in brezplačno sladico. Rezervirajte hitro!",
+      galerija: ["placeholder_1_gal1.jpg", "placeholder_1_gal2.jpg"],
+      gps_lokacija: "46.056946, 14.505751", // Ljubljana
+     
+    },
+    { id: '6909f55d49051c6af5a7c6bc', ime: "Lipa", kuhinja: "Italijanska", lokacija: "Maribor", ocena_povprecje: 4.8, opis: "Avtentične testenine in pizze na drva.", slika: "placeholder_2.jpg",
+      meni: [{j: "Pizza Margherita", p: "9.50€"}, {j: "Lasanja Bolognese", p: "12.00€"}, {j: "Tiramisu", p: "5.50€"}],
+      aktualna_ponudba: "Sezonska ponudba: Tartufi in divjačina. Posebni menu za 35€ na osebo.",
+      galerija: ["placeholder_2_gal1.jpg"],
+      gps_lokacija: "46.554650, 15.645881", // Maribor
+     
+    },
+    { id: '690af48d49051c6af5a7d8d1', ime: "Restavracija Otočec", kuhinja: "Azijska", lokacija: "Koper", ocena_povprecje: 4.2, opis: "Hitra in sveža azijska kuhinja s prilagodljivimi sestavinami.", slika: "placeholder_3.jpg", 
+      meni: [{j: "Chicken Pad Thai", p: "10.50€"}, {j: "Vegan Curry", p: "11.00€"}],
+      // NOVO: Prazna ponudba za testiranje
+      aktualna_ponudba: null, 
+      galerija: [], 
+      gps_lokacija: "45.546059, 13.729226", // Koper
+     
+    },
+    { id: '690af4b449051c6af5a7d8e7', ime: "Picerija Italijana", kuhinja: "Mesne jedi", lokacija: "Celje", ocena_povprecje: 4.6, opis: "Najboljši gurmanski burgerji v mestu.", slika: "placeholder_4.jpg", meni: [], galerija: [], gps_lokacija: "46.233333, 15.266667", razpolozljivost_status: "available", razpolozljivost_cas: "18:00" },
+    { id: '690af4b449051c6af5a7d8e8', ime: "Vegan Heaven", kuhinja: "Vegetarijanske jedi", lokacija: "Ljubljana", ocena_povprecje: 4.7, opis: "Kreativne in zdrave veganske jedi.", slika: "placeholder_5.jpg", 
+      meni: [{j: "Green Smoothie Bowl", p: "7.00€"}, {j: "Avocado Toast", p: "6.50€"}],
+      aktualna_ponudba: "Dnevna veganska malica od 11.00 do 14.00, 9.90€.",
+      galerija: ["placeholder_5_gal1.jpg"],
+      gps_lokacija: "46.056946, 14.505751",
+     
+    },
+];
+
+// ** NOVO: Ločeni podatki za 'Izpostavljeno' **
+// Uporabimo podnabor zgornjih restavracij za simulacijo
+const MOCK_IZPOSTAVLJENO_RAW = [
+    MOCK_RESTAVRACIJE_RAW[0], // Restavracija Lounge
+    MOCK_RESTAVRACIJE_RAW[1], // Trattoria Romana
+    MOCK_RESTAVRACIJE_RAW[3], // Burger Heaven
+];
+
+let allRestavracije = [];
+let currentFilterKuhinja = ''; 
+// POPRAVLJENO: Uporaba pravilnega ID-ja za Priljubljeno sekcijo
+const mrezaKarticDiv = document.getElementById('restavracije-container'); 
+const statusKarticeDiv = document.getElementById('statusKartice');
+const gumbiKategorijDiv = document.querySelector('.gumbi-kategorij');
+
+// ** NOVO: Elementi za Izpostavljeno sekcijo **
+const mrezaIzpostavljenoKarticDiv = document.getElementById('mrezaIzpostavljenoKartic');
+const statusIzpostavljenoKarticeDiv = document.getElementById('statusIzpostavljenoKartice');
+
+
+// Elementi vsebine modala
+const restavracijaModal = document.getElementById('restavracijaModal');
+const zapriRestavracijaModal = document.getElementById('zapriRestavracijaModal');
+const modalSlika = document.getElementById('modalSlika');
+const modalIme = document.getElementById('modalIme');
+const modalKuhinja = document.getElementById('modalKuhinja');
+const modalLokacija = document.getElementById('modalLokacija');
+const modalOcena = document.getElementById('modalOcena');
+const modalOpis = document.getElementById('modalOpis');
+
+// Novi elementi za zavihke
+const modalTabs = document.querySelectorAll('.modal-tab');
+const modalMeni = document.getElementById('modalMeni');
+const galerijaSlikeDiv = document.getElementById('galerijaSlike');
+const modalZemljevid = document.getElementById('modalZemljevid');
+
+// 🔥 NOVO: Element za aktualno ponudbo
+const modalAktualnaPonudbaOpis = document.getElementById('modalAktualnaPonudbaOpis');
+
+// ** NOVO: Globalna spremenljivka za shranjevanje ID-ja restavracije **
+let currentRestaurantId = null;
+
+
+// Pomožna funkcija za zvezdice (OSTANE NESPREMENJENO)
+function generateStarsHTML(rating) {
+    const fullStar = '★'; 
+    const maxStars = 5;
+    const roundedRating = Math.round(rating);
+
+    let starsHTML = '';
+    for (let i = 1; i <= maxStars; i++) {
+        if (i <= roundedRating) {
+            starsHTML += `<span style="color: #ff9900;">${fullStar}</span>`;
+        } else {
+            starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
+        }
+    }
+    return starsHTML;
+}
+
+// FUNKCIJA ZA LOGIKO ZAVIHKOV (OSTANE NESPREMENJENO)
+modalTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        
+        // Odstrani 'active' iz vseh zavihkov
+        modalTabs.forEach(t => t.classList.remove('active'));
+        // Dodaj 'active' trenutnemu zavihku
+        tab.classList.add('active');
+        
+        // Skrij vso vsebino
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Prikaži ciljno vsebino
+        // Imena zavihkov so Meni, Galerija, Ocene, AktualnaPonudba
+        const targetElementId = `tab${targetTab.charAt(0).toUpperCase() + targetTab.slice(1)}`;
+        document.getElementById(targetElementId).classList.add('active');
+    });
+});
+
+// Funkcija, ki napolni modal s podatki in ga odpre (POSODOBLJENO)
+function prikaziPodrobnosti(restavracija) {
+    
+    // ** KLJUČNA SPREMEMBA: Shranimo ID izbrane restavracije **
+    currentRestaurantId = restavracija.id;
+    
+    // Dodamo ID restavracije v skrito polje (če je potrebno za API)
+    document.querySelector('[data-reserv-id]').value = restavracija.id; 
+
+    // 1. Polnjenje Glavnih podrobnosti
+    modalSlika.style.backgroundImage = `url(${restavracija.slika})`;
+    modalIme.textContent = restavracija.ime;
+    modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${restavracija.kuhinja}`;
+    modalLokacija.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${restavracija.lokacija}`;
+    modalOcena.innerHTML = `<i class="fas fa-star"></i> ${restavracija.ocena_povprecje.toFixed(1)}`;
+    modalOpis.textContent = restavracija.opis;
+
+    // 2. Generiranje Menija (Zavihek Meni)
+    modalMeni.innerHTML = '';
+    if (restavracija.meni && restavracija.meni.length > 0) {
+        restavracija.meni.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.j}</strong> <span>${item.p}</span>`;
+            modalMeni.appendChild(li);
+        });
+    } else {
+        modalMeni.innerHTML = '<li class="text-gray-500"><span data-i18n="modal.no_menu">Meni še ni na voljo.</span></li>';
+    }
+    
+    // 🔥 NOVO: Polnjenje zavihka Aktualna Ponudba
+    if (restavracija.aktualna_ponudba) {
+        modalAktualnaPonudbaOpis.textContent = restavracija.aktualna_ponudba;
+        modalAktualnaPonudbaOpis.style.fontStyle = 'normal';
+    } else {
+        modalAktualnaPonudbaOpis.textContent = i18next.t('modal.special_offer_default');
+        modalAktualnaPonudbaOpis.style.fontStyle = 'italic';
+    }
+    
+    // 3. Generiranje Galerije in Zemljevida (Zavihek Slike & Zemljevid)
+    galerijaSlikeDiv.innerHTML = '';
+    if (restavracija.galerija && restavracija.galerija.length > 0) {
+        restavracija.galerija.forEach(slika => {
+            const img = document.createElement('img');
+            img.src = slika; 
+            img.alt = restavracija.ime;
+            galerijaSlikeDiv.appendChild(img);
+        });
+    } else {
+        galerijaSlikeDiv.innerHTML = '<p class="text-gray-500">Ni dodatnih slik za prikaz.</p>';
+    }
+
+    // Vdelan Zemljevid (Google Maps Embed API)
+    if (restavracija.gps_lokacija) {
+        // Opomba: Ta URL za Google Maps Embed API ni popoln in bo ustvaril neveljaven zemljevid. 
+        // Vendar ga ohranjam, ker je bil v vašem originalu:
+        const mapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d34604.28892301824!2d$$${restavracija.gps_lokacija.split(',')[1]}!3d${restavracija.gps_lokacija.split(',')[0]}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNjbCsDM2JzMzLjciTiAxNMKwMDAnMjUuNCJF!5e0!3m2!1ssl!2ssi!4v1700000000000&z=14`;
+        modalZemljevid.src = mapUrl;
+    } else {
+        modalZemljevid.src = 'about:blank';
+    }
+    
+    // 4. Resetiraj prikaz prostih ur ob odprtju nove restavracije
+    document.getElementById('prosteUreRezultati').innerHTML = 
+        '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+    globalSelectedTime = null; // Ponastavimo izbrano uro
+    
+    // 5. Resetiraj na prvi zavihek (Meni) ob odpiranju in ga aktiviraj
+    document.querySelector('.modal-tab[data-tab="meni"]').click();
+
+    // 6. Odpri modal
+    restavracijaModal.classList.add('active');
+    updateContent(); // Posodobi prevode znotraj modala
+}
+
+// Zapiranje modala (listenerji) (OSTANE NESPREMENJENO)
+zapriRestavracijaModal.addEventListener('click', () => {
+    restavracijaModal.classList.remove('active');
+    modalZemljevid.src = 'about:blank';
+    currentRestaurantId = null; // Resetiramo ID
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === restavracijaModal) {
+        restavracijaModal.classList.remove('active');
+        modalZemljevid.src = 'about:blank';
+        currentRestaurantId = null; // Resetiramo ID
+    }
+});
+
+// 2. Renderiranje Ene Kartice (ZA PRILJUBLJENO - POPOLNA KARTICA)
+function renderCard(restavracija) {
+    const card = document.createElement('div');
+    card.className = 'kartica';
+    card.setAttribute('data-id', restavracija.id);
+
+    const ratingDisplay = `${generateStarsHTML(restavracija.ocena_povprecje)} <span class="ocena-stevilka">(${restavracija.ocena_povprecje.toFixed(1)})</span>`;
+    
+    // Generiranje naključne oddaljenosti med 1.0 km in 15.0 km
+    const oddaljenostKm = (Math.random() * 14 + 1).toFixed(1); 
+    
+    const status = restavracija.razpolozljivost_status;
+    const cas = restavracija.razpolozljivost_cas;
+    
+    let razpolozljivostTextKey;
+    let isAvailable = true;
+    
+    if (status === 'available') {
+        razpolozljivostTextKey = i18next.t('results.available_today', { time: cas });
+    } else if (status === 'tomorrow') {
+        razpolozljivostTextKey = i18next.t('results.available_tomorrow', { time: cas });
+    } else {
+        razpolozljivostTextKey = i18next.t('results.unavailable');
+        isAvailable = false;
+    }
+
+    const razpolozljivostHTML = `
+        <div class="razpolozljivost-ovoj ${!isAvailable ? 'zasedeno' : ''}">
+            
+        </div>
+    `;
+
+    card.innerHTML = `
+        <img src="${restavracija.slika}" alt="${restavracija.ime}" class="kartica-slika">
+        <div class="kartica-vsebina">
+            <h3>${restavracija.ime}</h3>
+            
+            <div class="info-ocena-oddaljenost">
+                <p class="ocena">${ratingDisplay}</p>
+                <span class="oddaljenost"><i class="fas fa-location-arrow"></i> ${oddaljenostKm} km</span>
+            </div>
+            
+            ${razpolozljivostHTML} 
+        </div>
+    `;
+    
+    // Listener za celotno kartico
+    card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('gumb-rezervacija')) {
+             return;
+        }
+        prikaziPodrobnosti(restavracija);
+    });
+    
+    return card;
+}
+
+// ** NOVO: Renderiranje Ene Kartice (ZA IZPOSTAVLJENO - POENOSTAVLJENA KARTICA) **
+function renderFeaturedCard(restavracija) {
+    const card = document.createElement('div');
+    card.className = 'kartica kartica-izpostavljeno';
+    card.setAttribute('data-id', restavracija.id);
+    
+    // Listener za celotno kartico
+    card.addEventListener('click', () => prikaziPodrobnosti(restavracija));
+
+    card.innerHTML = `
+        <div class="slika-kartice" style="background-image: url('${restavracija.slika}')"></div>
+        <div class="vsebina-kartice-izpostavljeno">
+            <h3>${restavracija.ime}</h3>
+        </div>
+    `;
+    
+    return card;
+}
+
+// 3. Filtriranje in Prikaz (PRILJUBLJENO)
+function filterAndRenderRestavracije() {
+    const filtered = allRestavracije.filter(r => {
+        if (currentFilterKuhinja === '') return true; 
+        return r.kuhinja === currentFilterKuhinja;
+    });
+
+    mrezaKarticDiv.innerHTML = '';
+    statusKarticeDiv.textContent = '';
+    
+    if (filtered.length === 0) {
+        statusKarticeDiv.textContent = i18next.t('messages.no_restaurants_found'); 
+        return;
+    }
+
+    filtered.forEach(restavracija => {
+        mrezaKarticDiv.appendChild(renderCard(restavracija));
+    });
+    
+    // Posodobimo prevode statusov v karticah po renderju
+    updateContent(); 
+}
+
+// ** NOVO: Prikaz Izpostavljenih Restavracij **
+function renderFeaturedRestavracije() {
+    mrezaIzpostavljenoKarticDiv.innerHTML = '';
+    statusIzpostavljenoKarticeDiv.style.display = 'none';
+
+    if (MOCK_IZPOSTAVLJENO_RAW.length === 0) {
+        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + i18next.t('messages.no_restaurants_found') + '</div>'; 
+        return;
+    }
+    
+    MOCK_IZPOSTAVLJENO_RAW.forEach(restavracija => {
+        mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
+    });
+    
+    updateContent();
+}
+
+// 4. Nastavitev Gumbov za Hitro Iskanje Listenerji (OSTANE NESPREMENJENO)
+function setupKuhinjaFiltersListeners() {
+    document.querySelectorAll('.gumb-kategorija').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            document.querySelectorAll('.gumb-kategorija').forEach(b => b.classList.remove('active'));
+            
+            const novaKuhinja = btn.getAttribute('data-kuhinja');
+            if (currentFilterKuhinja === novaKuhinja) {
+                currentFilterKuhinja = ''; 
+            } else {
+                btn.classList.add('active'); 
+                currentFilterKuhinja = novaKuhinja;
+            }
+            
+            filterAndRenderRestavracije();
+        });
+    });
+}
+
+// 5. Glavna funkcija za nalaganje (simulacija fetch) - DODAN KLIC ZA IZPOSTAVLJENO
+async function loadRestavracije() {
+    statusKarticeDiv.textContent = i18next.t('messages.searching', { criteria: '...' }); 
+    
+    // Prikaz statusa za izpostavljene
+    statusIzpostavljenoKarticeDiv.textContent = i18next.t('messages.searching', { criteria: '...' });
+    
+    await new Promise(resolve => setTimeout(resolve, 500)); 
+    
+    try {
+        allRestavracije = MOCK_RESTAVRACIJE_RAW;
+        
+        setupKuhinjaFiltersListeners();
+        filterAndRenderRestavracije();
+        // ** KLJUČNO: Nalaganje izpostavljenih restavracij **
+        renderFeaturedRestavracije(); 
+
+    } catch (error) {
+        console.error("Napaka pri nalaganju restavracij:", error);
+        statusKarticeDiv.textContent = i18next.t('messages.search_error'); 
+        statusIzpostavljenoKarticeDiv.textContent = i18next.t('messages.search_error'); 
+    }
+}
+
+document.querySelector('.iskalnik').addEventListener('submit', (e) => {
+    e.preventDefault();
+    filterAndRenderRestavracije();
+});
 
 
 // =================================================================
