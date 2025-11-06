@@ -546,7 +546,7 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * 🔥 POSODOBITEV: Prikazuje 10:30, a ohranja 10.5 kot podatkovno vrednost za Backend.
+ * 🔥 REŠITEV: Prikazuje SAMO polne ure (npr. 10:00, 11:00).
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
@@ -562,7 +562,7 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         const formattedHours = String(hours).padStart(2, '0');
         const formattedMinutes = String(minutes).padStart(2, '0');
         
-        return `${formattedHours}:${formattedMinutes}`; // Vrnjeno: '10:30'
+        return `${formattedHours}:${formattedMinutes}`; 
     };
     // ------------------------------------------------
 
@@ -575,15 +575,16 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         
         miza.prosteUre.forEach(uraDecimal => {
             
-            // 1. Popravi decimalno število na 2 decimalki za zanesljivost
+            // 1. Popravi decimalno število na 2 decimalki za zanesljivost (odpravlja float napake)
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
             
-            // 🔥 ODSTRANJENO: Filter, ki bi preskočil 10.5
-            // if (fixedDecimal % 1 !== 0) {
-            //     return; 
-            // }
+            // 🔥 KLJUČNI FILTER: Preveri, ali je fiksirano število celo število (npr. 10.0, 11.0).
+            if (fixedDecimal % 1 !== 0) {
+                // Če ni celo število (npr. 10.5), ga preskoči
+                return; 
+            }
             
-            const casString = convertDecimalToTime(fixedDecimal); // Sedaj je to '10:30'
+            const casString = convertDecimalToTime(fixedDecimal); // Npr. '10:00'
             
             html += `
                 <button class="gumb-izbira-ure" 
