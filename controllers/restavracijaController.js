@@ -243,11 +243,10 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
 /**
  * Pridobivanje prostih ur (POST /proste_ure ALI GET /preveri_rezervacijo/:id/:datum/:osebe)
- * 🔥 POPRAVEK: Ura se izračunava s štetjem minut, da se odpravijo napake pri plavajočih številih.
+ * 🔥 DVOJNI POPRAVEK: Zanesljiv izračun ur in pravilna uporaba ObjectId za agregacijo.
  */
 exports.pridobiProsteUre = async (req, res) => {
     
-    // Prilagodljivo branje: Najprej poskusimo BODY (POST), nato PARAMS (GET)
     const restavracijaId = req.body.restavracijaId || req.params.restavracijaId;
     const datum = req.body.datum || req.params.datum;
     const stevilo_oseb_string = req.body.stevilo_oseb || req.params.stevilo_oseb; 
@@ -257,10 +256,14 @@ exports.pridobiProsteUre = async (req, res) => {
         return res.status(400).json({ msg: 'Manjkajoči podatki: restavracijaId, datum ali stevilo_oseb.' });
     }
     
-    // Uporabiti morate ustrezen Mongoose objekt, ki ste ga definirali, npr.:
-    // if (!mongoose.Types.ObjectId.isValid(restavracijaId)) { 
-    //     return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
-    // }
+    // 🔥 POPRAVEK 1: Preveri format in pripravi ObjectId za agregacijo
+    let restavracijaObjectId;
+    try {
+        // Predpostavka: Mongoose in Restavracija Model sta uvožena.
+        restavracijaObjectId = new mongoose.Types.ObjectId(restavracijaId); 
+    } catch (e) {
+        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    }
 
     const stevilo_oseb = parseInt(stevilo_oseb_string);
     if (isNaN(stevilo_oseb) || stevilo_oseb <= 0) {
@@ -272,10 +275,9 @@ exports.pridobiProsteUre = async (req, res) => {
         const interval = 0.5; // Interval za preverjanje: 30 minut
         const privzetoTrajanje = trajanjeUr ? parseFloat(trajanjeUr) : 1.5; 
         
-        // Predvidevam, da je 'Restavracija' ustrezen Mongoose Model in 'mongoose' je uvožen
         const rezultatiAggregation = await Restavracija.aggregate([
-            // Uporabiti morate ustrezen Mongoose objekt (npr. 'new mongoose.Types.ObjectId')
-            { $match: { _id: restavracijaId } }, 
+            // 🔥 POPRAVEK 2: Uporabi pravilno pretvorjen ObjectId
+            { $match: { _id: restavracijaObjectId } }, 
             { $unwind: "$mize" }, 
             { $match: { "mize.kapaciteta": { $gte: stevilo_oseb } } }, 
             { $project: {
@@ -295,7 +297,7 @@ exports.pridobiProsteUre = async (req, res) => {
         const casZaprtja = rezultatiAggregation[0].delovniCasEnd || 23; 
         const minimalniCasKonca = casZaprtja - privzetoTrajanje;
 
-        // 🔥 Uvedba izračuna v minutah
+        // Izračun v minutah za zanesljivost
         const zacetekMinut = casZacetka * 60; 
         const konecMinut = minimalniCasKonca * 60; 
         const intervalMinut = interval * 60; // 30 minut
@@ -306,12 +308,12 @@ exports.pridobiProsteUre = async (req, res) => {
             
             const mizaImeZaIzpis = miza.Miza || miza.ime || miza.naziv || `ID: ${miza._id.toString().substring(0, 4)}...`;
 
+            // OPOZORILO: Prepričajte se, da obstaja funkcija seRezervacijiPrekrivata()
             const obstojeceRezervacije = (miza.rezervacije || []).filter(rez => rez.datum === datum);
 
-            // Zanka zdaj teče po minutah, kar je matematično zanesljivo
+            // Zanka zdaj teče po minutah
             for (let min = zacetekMinut; min <= konecMinut; min += intervalMinut) {
                 
-                // Pretvorba nazaj v decimalno uro (npr. 480 minut / 60 = 8.0)
                 const uraFormatirana = min / 60; 
                 let jeProsto = true;
 
@@ -326,7 +328,6 @@ exports.pridobiProsteUre = async (req, res) => {
                 }
 
                 if (jeProsto) {
-                    // Poslali bomo npr. 8.0, 8.5, 9.0...
                     prosteUre.push(uraFormatirana); 
                 }
             }
@@ -345,7 +346,7 @@ exports.pridobiProsteUre = async (req, res) => {
         res.json({ msg: 'Uspešno pridobljene proste mize in ure.', mize: koncniRezultati });
 
     } catch (error) {
-        console.error('Napaka pri preverjanju prostih ur:', error);
+        console.error('Končna napaka pri pridobivanju prostih ur:', error);
         res.status(500).json({ msg: 'Napaka serverja pri pridobivanju prostih ur.' });
     }
 };
