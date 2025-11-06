@@ -546,14 +546,15 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * 🔥 FINALNI FILTER: Najprej fiksira decimalno število, nato filtrira SAMO polne ure.
+ * 🔥 POSODOBITEV: Prikazuje 10:30, a ohranja 10.5 kot podatkovno vrednost za Backend.
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
     if (!rezultatiContainer) return;
     
-    // --- Pomožna funkcija za zanesljivo pretvorbo ---
+    // --- Pomožna funkcija za zanesljivo pretvorbo (decimalna ura -> HH:MM) ---
     const convertDecimalToTime = (decimalHour) => {
+        // Zanesljiv izračun v minutah
         const totalMinutes = Math.round(decimalHour * 60); 
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -561,7 +562,7 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         const formattedHours = String(hours).padStart(2, '0');
         const formattedMinutes = String(minutes).padStart(2, '0');
         
-        return `${formattedHours}:${formattedMinutes}`;
+        return `${formattedHours}:${formattedMinutes}`; // Vrnjeno: '10:30'
     };
     // ------------------------------------------------
 
@@ -574,26 +575,23 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         
         miza.prosteUre.forEach(uraDecimal => {
             
-            // 1. Popravi decimalno število na 2 decimalki za zanesljivost (npr. 10.000000001 postane 10.00)
+            // 1. Popravi decimalno število na 2 decimalki za zanesljivost
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
             
-            // 🔥 KLJUČNI FILTER: Preveri, ali je fiksirano število celo število.
-            if (fixedDecimal % 1 !== 0) {
-                // Če ni polna ura (ima decimalke), jo preskoči
-                return; 
-            }
+            // 🔥 ODSTRANJENO: Filter, ki bi preskočil 10.5
+            // if (fixedDecimal % 1 !== 0) {
+            //     return; 
+            // }
             
-            const casString = convertDecimalToTime(fixedDecimal); // Uporabi fiksirano vrednost
+            const casString = convertDecimalToTime(fixedDecimal); // Sedaj je to '10:30'
             
             html += `
                 <button class="gumb-izbira-ure" 
-                    data-cas-decimal="${uraDecimal}" 
-                    data-miza-ime="${miza.mizaIme}"
+                    data-cas-decimal="${uraDecimal}" data-miza-ime="${miza.mizaIme}"
                     data-miza-id="${miza.mizaId || 'neznan_id'}"  data-datum="${datum}"
                     data-osebe="${steviloOseb}"
                     data-ura-string="${casString}">
-                    ${casString}
-                </button>
+                    ${casString} </button>
             `;
         });
         html += `</div>`;
