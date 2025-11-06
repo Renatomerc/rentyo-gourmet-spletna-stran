@@ -3011,6 +3011,7 @@ const potrdiRezervacijo = () => {
         return;
     }
     
+    // Zbiranje podatkov
     const datum = modalDatumInput ? modalDatumInput.value : null; 
     const steviloOseb = modalOsebeInput ? modalOsebeInput.value : null; 
     const cas = globalSelectedTime; 
@@ -3026,33 +3027,25 @@ const potrdiRezervacijo = () => {
     
     console.log("=========================================");
     console.log(i18next.t('messages.reserving', { stevilo: steviloOseb, cas: cas }));
-    console.log(`Podatki za simulacijo: Restavracija ID: ${currentRestaurantId}, Datum: ${datum}, Osebe: ${steviloOseb}, Trajanje: ${trajanje} ur`);
+    console.log(`Podatki za rezervacijo: Restavracija ID: ${currentRestaurantId}, Datum: ${datum}, Osebe: ${steviloOseb}, Trajanje: ${trajanje} ur`);
     console.log("=========================================");
-    
-    // SIMULACIJA API klica
-    setTimeout(() => {
-        const reservationSuccess = Math.random() > 0.1; 
 
-        if (reservationSuccess) {
-            const maxMize = 18; 
-            const miza = Math.floor(Math.random() * maxMize) + 1; 
-            const trajanjeMin = parseFloat(trajanje) * 60 + ' min';
-            
-            alert(i18next.t('messages.reservation_success', { miza: miza, trajanje: trajanjeMin }) || `Rezervacija uspešna! Miza št. ${miza}, trajanje ${trajanjeMin}.`);
-            console.log(i18next.t('messages.reservation_success', { miza: miza, trajanje: trajanjeMin }));
-        } else {
-             alert(i18next.t('messages.reservation_failed') || 'Rezervacija neuspešna. Poskusite z drugim časom.');
-             console.error(i18next.t('messages.reservation_failed'));
-        }
-        
-        currentRestaurantId = null;
-        globalSelectedTime = null; 
-    }, 1000); 
+    // 🔥🔥🔥 VSTAVLJEN DEJANSKI API KLIC (Prek funkcije handleIzvedbaRezervacije) 🔥🔥🔥
+    const rezervacijaPodatki = {
+        restavracijaId: currentRestaurantId,
+        datum: datum,
+        steviloOseb: steviloOseb,
+        casStart: cas, 
+        trajanjeUr: parseFloat(trajanje)
+    };
+
+    // Kličemo funkcijo, ki izvede fetch klic na Backend
+    if (typeof handleIzvedbaRezervacije === 'function') {
+        handleIzvedbaRezervacije(rezervacijaPodatki);
+    } else {
+        console.error("Napaka: Funkcija 'handleIzvedbaRezervacije' ni definirana. Prepričajte se, da je koda za API klic prisotna.");
+    }
 }
-
-// Listener za gumb Potrdi trajanje in nadaljuj
-if(potrdiTrajanjeGumb) potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
-
 
 // =================================================================
 // VII. LOGIKA OPOZORILNEGA OKNA
