@@ -553,18 +553,23 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     if (!rezultatiContainer) return;
     
     // --- Pomožna funkcija za zanesljivo pretvorbo (decimalna ura -> HH:MM) ---
-    const convertDecimalToTime = (decimalHour) => {
-        // Zanesljiv izračun v minutah
-        const totalMinutes = Math.round(decimalHour * 60); 
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        
-        const formattedHours = String(hours).padStart(2, '0');
-        const formattedMinutes = String(minutes).padStart(2, '0');
-        
-        return `${formattedHours}:${formattedMinutes}`; 
-    };
-    // ------------------------------------------------
+const convertDecimalToTime = (decimalHour) => {
+    
+    // 🔥 POPRAVEK: Najprej zaokrožimo decimalno število na eno decimalko.
+    // To premaga Back-end float napake, ki povzročajo napačen prikaz.
+    const roundedDecimalHour = Math.round(decimalHour * 10) / 10;
+
+    // Zanesljiv izračun v minutah
+    const totalMinutes = Math.round(roundedDecimalHour * 60); 
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    
+    return `${formattedHours}:${formattedMinutes}`; 
+};
+// ------------------------------------------------
 
     rezultatiContainer.innerHTML = '';
     let html = '';
