@@ -3071,15 +3071,17 @@ function prikaziOpozoriloObZagonu() {
     });
 }
 
+
 // 🔥🔥🔥 KLJUČNI POPRAVEK: Listener za gumb Potrdi Trajanje / Rezerviraj Mizo 🔥🔥🔥
-// Uporabljamo vaš potrjeni ID gumba: potrdiTrajanjeGumb
+// Uporabljamo globalno definirano spremenljivko potrdiTrajanjeGumb (ki je definirana na začetku skripte)
 
-const potrdiRezervacijoGumb = document.getElementById("potrdiTrajanjeGumb"); 
-
-if (potrdiRezervacijoGumb) {
-    potrdiRezervacijoGumb.addEventListener('click', potrdiRezervacijo);
+if (potrdiTrajanjeGumb) {
+    // Dodamo Listener, ki kliče funkcijo potrdiRezervacijo
+    potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
+    
 } else {
-    console.warn("Opozorilo: Gumb za potrditev rezervacije (ID 'potrdiTrajanjeGumb') ni najden!");
+    // Če spremenljivka ni definirana, opozorimo
+    console.warn("Opozorilo: Gumb za potrditev rezervacije (ID 'potrdiTrajanjeGumb') ni najden v DOM-u ali je izven dosega!");
 }
 
 // =================================================================
