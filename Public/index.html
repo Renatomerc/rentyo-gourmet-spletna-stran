@@ -2530,7 +2530,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (!prikazaneUre.has(uraFormat)) {
                                     // Dodana mizaIme (če je na voljo, sicer se ne shrani)
                                     const mizaIme = miza.ime || ''; 
-                                    ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${miza._id}" data-miza-ime="${mizaIme}">${uraFormat}</button>`;
+                                    
+                                    // 🔥🔥🔥 POPRAVEK: Uporabimo miza.mizaId namesto miza._id 🔥🔥🔥
+                                    ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${miza.mizaId}" data-miza-ime="${mizaIme}">${uraFormat}</button>`;
+                                    
                                     prikazaneUre.add(uraFormat);
                                 }
                             });
