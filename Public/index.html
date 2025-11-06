@@ -3052,32 +3052,19 @@ const potrdiRezervacijo = () => {
 // (OSTANE NESPREMENJENA)
 // =================================================================
 
-function prikaziOpozoriloObZagonu() {
-    const warningSeen = localStorage.getItem('warningSeen');
-
-    if (warningSeen !== 'true' && warningModal) {
-        warningModal.classList.add('active');
-    }
-    
-    if(gumbRazumem) gumbRazumem.addEventListener('click', () => {
-        if(warningModal) warningModal.classList.remove('active');
-        localStorage.setItem('warningSeen', 'true');
-    });
-    
-    if(warningModal) window.addEventListener("click", (e) => {
-        if (e.target === warningModal) {
-            warningModal.classList.remove("active");
-        }
-    });
-}
+// ... (funkcija prikaziOpozoriloObZagonu) ...
 
 
 // 🔥🔥🔥 KLJUČNI POPRAVEK: Listener za gumb Potrdi Trajanje / Rezerviraj Mizo 🔥🔥🔥
-// Uporabljamo globalno definirano spremenljivko potrdiTrajanjeGumb (ki je definirana na začetku skripte)
+// Dodamo e.preventDefault(), da se prepreči napačno obnašanje (kot je ponovna sprožitev GET klica).
 
 if (potrdiTrajanjeGumb) {
     // Dodamo Listener, ki kliče funkcijo potrdiRezervacijo
-    potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
+    potrdiTrajanjeGumb.addEventListener('click', (e) => {
+        // Prepreči privzeto obnašanje gumba (npr. sprožitev forme ali napačne funkcije)
+        e.preventDefault(); 
+        potrdiRezervacijo();
+    });
     
 } else {
     // Če spremenljivka ni definirana, opozorimo
