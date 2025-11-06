@@ -546,19 +546,15 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * 🔥 DOKONČEN POPRAVEK: Zanesljivo pretvarjanje decimalnega časa v HH:MM format z zaokroževanjem napak pri float številkah.
+ * FILTRIRA proste ure, da prikaže SAMO polne ure (npr. 10.0, 11.0, ignorira 10.5).
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
     if (!rezultatiContainer) return;
     
-    // --- Pomožna funkcija za zanesljivo pretvorbo ---
+    // --- Pomožna funkcija za zanesljivo pretvorbo (ostane za formatiranje polnih ur) ---
     const convertDecimalToTime = (decimalHour) => {
-        // 1. Zanesljivo pretvorimo v celo število minut, da se izognemo float napakam.
-        // Npr. 9.5 * 60 = 570 celih minut
         const totalMinutes = Math.round(decimalHour * 60); 
-
-        // 2. Izračunamo ure in preostale minute
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
         
@@ -578,8 +574,11 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         
         miza.prosteUre.forEach(uraDecimal => {
             
-            // Debugging: Preverite, kaj pride iz Backenda (ostane za vsak slučaj)
-            console.log("Prejeto decimalno uro iz DB/API-ja:", uraDecimal);
+            // 🔥 KLJUČNI FILTER: Preveri, ali je uraDecimal celo število (npr. 10.0, 11.0, ignorira 10.5)
+            if (uraDecimal % 1 !== 0) {
+                // Če ni polna ura (npr. 10.5), jo preskoči
+                return; 
+            }
             
             const casString = convertDecimalToTime(uraDecimal);
             

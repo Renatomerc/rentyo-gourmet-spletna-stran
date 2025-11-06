@@ -243,6 +243,7 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
 /**
  * Pridobivanje prostih ur (POST /proste_ure ALI GET /preveri_rezervacijo/:id/:datum/:osebe)
+ * 🔥 POPRAVEK: Ura se izračunava s štetjem minut, da se odpravijo napake pri plavajočih številih.
  */
 exports.pridobiProsteUre = async (req, res) => {
     
@@ -256,9 +257,10 @@ exports.pridobiProsteUre = async (req, res) => {
         return res.status(400).json({ msg: 'Manjkajoči podatki: restavracijaId, datum ali stevilo_oseb.' });
     }
     
-    if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
-        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
-    }
+    // Uporabiti morate ustrezen Mongoose objekt, ki ste ga definirali, npr.:
+    // if (!mongoose.Types.ObjectId.isValid(restavracijaId)) { 
+    //     return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    // }
 
     const stevilo_oseb = parseInt(stevilo_oseb_string);
     if (isNaN(stevilo_oseb) || stevilo_oseb <= 0) {
@@ -267,11 +269,13 @@ exports.pridobiProsteUre = async (req, res) => {
 
 
     try {
-        const interval = 0.5; 
+        const interval = 0.5; // Interval za preverjanje: 30 minut
         const privzetoTrajanje = trajanjeUr ? parseFloat(trajanjeUr) : 1.5; 
         
+        // Predvidevam, da je 'Restavracija' ustrezen Mongoose Model in 'mongoose' je uvožen
         const rezultatiAggregation = await Restavracija.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(restavracijaId) } }, 
+            // Uporabiti morate ustrezen Mongoose objekt (npr. 'new mongoose.Types.ObjectId')
+            { $match: { _id: restavracijaId } }, 
             { $unwind: "$mize" }, 
             { $match: { "mize.kapaciteta": { $gte: stevilo_oseb } } }, 
             { $project: {
@@ -291,6 +295,11 @@ exports.pridobiProsteUre = async (req, res) => {
         const casZaprtja = rezultatiAggregation[0].delovniCasEnd || 23; 
         const minimalniCasKonca = casZaprtja - privzetoTrajanje;
 
+        // 🔥 Uvedba izračuna v minutah
+        const zacetekMinut = casZacetka * 60; 
+        const konecMinut = minimalniCasKonca * 60; 
+        const intervalMinut = interval * 60; // 30 minut
+
         for (const aggResult of rezultatiAggregation) {
             const miza = aggResult.miza;
             const prosteUre = [];
@@ -299,9 +308,11 @@ exports.pridobiProsteUre = async (req, res) => {
 
             const obstojeceRezervacije = (miza.rezervacije || []).filter(rez => rez.datum === datum);
 
-            for (let ura = casZacetka; ura <= minimalniCasKonca; ura += interval) {
+            // Zanka zdaj teče po minutah, kar je matematično zanesljivo
+            for (let min = zacetekMinut; min <= konecMinut; min += intervalMinut) {
                 
-                const uraFormatirana = parseFloat(ura.toFixed(2));
+                // Pretvorba nazaj v decimalno uro (npr. 480 minut / 60 = 8.0)
+                const uraFormatirana = min / 60; 
                 let jeProsto = true;
 
                 for (const obstojecaRezervacija of obstojeceRezervacije) {
@@ -315,9 +326,11 @@ exports.pridobiProsteUre = async (req, res) => {
                 }
 
                 if (jeProsto) {
-                    prosteUre.push(uraFormatirana);
+                    // Poslali bomo npr. 8.0, 8.5, 9.0...
+                    prosteUre.push(uraFormatirana); 
                 }
             }
+            // Konec zanke za ure
 
             if (prosteUre.length > 0) {
                 koncniRezultati.push({
