@@ -546,13 +546,13 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * FILTRIRA proste ure, da prikaže SAMO polne ure (npr. 10.0, 11.0, ignorira 10.5).
+ * 🔥 FINALNI FILTER: Najprej fiksira decimalno število, nato filtrira SAMO polne ure.
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
     if (!rezultatiContainer) return;
     
-    // --- Pomožna funkcija za zanesljivo pretvorbo (ostane za formatiranje polnih ur) ---
+    // --- Pomožna funkcija za zanesljivo pretvorbo ---
     const convertDecimalToTime = (decimalHour) => {
         const totalMinutes = Math.round(decimalHour * 60); 
         const hours = Math.floor(totalMinutes / 60);
@@ -574,13 +574,16 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
         
         miza.prosteUre.forEach(uraDecimal => {
             
-            // 🔥 KLJUČNI FILTER: Preveri, ali je uraDecimal celo število (npr. 10.0, 11.0, ignorira 10.5)
-            if (uraDecimal % 1 !== 0) {
-                // Če ni polna ura (npr. 10.5), jo preskoči
+            // 1. Popravi decimalno število na 2 decimalki za zanesljivost (npr. 10.000000001 postane 10.00)
+            const fixedDecimal = Math.round(uraDecimal * 100) / 100;
+            
+            // 🔥 KLJUČNI FILTER: Preveri, ali je fiksirano število celo število.
+            if (fixedDecimal % 1 !== 0) {
+                // Če ni polna ura (ima decimalke), jo preskoči
                 return; 
             }
             
-            const casString = convertDecimalToTime(uraDecimal);
+            const casString = convertDecimalToTime(fixedDecimal); // Uporabi fiksirano vrednost
             
             html += `
                 <button class="gumb-izbira-ure" 
