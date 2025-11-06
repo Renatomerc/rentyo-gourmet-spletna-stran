@@ -20,8 +20,8 @@
     "select_time": "Odaberi vrijeme",
     "persons_label": "Broj osoba",
     "search_button": "Traži",
-    "person_singular": "{{count}} osoba",
-    "person_plural": "{{count}} osoba"
+    "person_singular": "{{count}}",
+    "person_plural": "{{count}}"
   },
   "quick_search": {
     "title": "Brzi odabir kuhinje"
@@ -57,8 +57,8 @@
     "search_error": "Pretraga nije uspjela.",
     "no_restaurants_found": "Nema pronađenih restorana.",
     "reserving": "Rezerviram za {{stevilo}} osobe u {{cas}}...",
-    "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran za {{trajanje}}.",
     
+    "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran za {{trajanje}}.",
     
     "reservation_success_minimal": "Rezervacija uspješna u {{cas}}!",
     

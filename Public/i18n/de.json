@@ -20,8 +20,8 @@
     "select_time": "Zeit auswählen",
     "persons_label": "Anzahl der Personen",
     "search_button": "Suchen",
-    "person_singular": "{{count}} Person",
-    "person_plural": "{{count}} Personen"
+    "person_singular": "{{count}}",
+    "person_plural": "{{count}}"
   },
   "quick_search": {
     "title": "Schnelle Küchenauswahl"
@@ -57,8 +57,8 @@
     "search_error": "Suche fehlgeschlagen.",
     "no_restaurants_found": "Keine Restaurants gefunden.",
     "reserving": "Reserviere für {{stevilo}} Personen um {{cas}}...",
-    "reservation_success": "Reservierung erfolgreich! Tisch Nr. {{miza}} ist für {{trajanje}} reserviert.",
     
+    "reservation_success": "Reservierung erfolgreich! Tisch Nr. {{miza}} ist für {{trajanje}} reserviert.",
     
     "reservation_success_minimal": "Reservierung erfolgreich um {{cas}}!",
     

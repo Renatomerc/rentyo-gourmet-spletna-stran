@@ -20,8 +20,8 @@
     "select_time": "Seleziona ora",
     "persons_label": "Numero di persone",
     "search_button": "Cerca",
-    "person_singular": "{{count}} persona",
-    "person_plural": "{{count}} persone"
+    "person_singular": "{{count}}",
+    "person_plural": "{{count}}"
   },
   "quick_search": {
     "title": "Selezione rapida della cucina"
@@ -57,9 +57,9 @@
     "search_error": "Ricerca fallita.",
     "no_restaurants_found": "Nessun ristorante trovato.",
     "reserving": "Prenoto per {{stevilo}} persone alle {{cas}}...",
+    
+    
     "reservation_success": "Prenotazione riuscita! Il tavolo n. {{miza}} è riservato per {{trajanje}}.",
-    
-    
     "reservation_success_minimal": "Prenotazione riuscita alle {{cas}}!",
     
     "reservation_failed": "Prenotazione fallita.",
@@ -76,7 +76,6 @@
     "select_reservation_date": "Si prega di selezionare una data di prenotazione.",
     "pogoji_required": "Per registrarsi è necessario accettare i Termini e Condizioni Generali e la Politica sulla Privacy."
   },
-  
   
   "duration": {
     "one_hour": "un'ora",
@@ -135,7 +134,7 @@
     "media_press": "Media / Angolo Stampa",
     "media_press_href": "/it/mediji-press.html",
     "legal_info_title": "Informazioni Legali",
-    "legal_info_href": "/it/pravne-informacije.html",
+    "legal_info_href": "/it/pravne-informazioni.html",
     "privacy_policy": "Politica sulla Privacy",
     "privacy_policy_href": "/it/politika-zasebnosti.html",
     "cookie_policy": "Cookie",
@@ -149,7 +148,10 @@
     "for_partners_href": "/it/partnerstva.html#za-partnerje",
     "affiliate_program": "Programma di Affiliazione",
     "affiliate_program_href": "/it/partnerstva.html#partnerski-program",
-    "connect_title": "Connettiti z nami",
+    
+    
+    "connect_title": "Connettiti con noi",
+    
     "payment_info_prefix": "Pagamento sicuro fornito da",
     "copyright_text": "© 2025 Rentyo Gourmet. Tutti i diritti riservati."
   },

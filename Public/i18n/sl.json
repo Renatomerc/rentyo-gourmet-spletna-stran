@@ -57,11 +57,11 @@
     "search_error": "Iskanje ni uspelo.",
     "no_restaurants_found": "Ni najdenih restavracij.",
     "reserving": "Rezerviram {{stevilo}} osebi ob {{cas}}...",
+
     "reservation_success": "Rezervacija uspešna! Miza št. {{miza}} je rezervirana za {{trajanje}}.",
-    
-  
-    "reservation_success_minimal": "Rezervacija uspešna ob {{cas}}!",
-    
+
+   "reservation_success_minimal": "Uspešno rezervirano ob {{cas}}!",
+
     "reservation_failed": "Rezervacija ni uspela.",
     "server_connection_error": "Povezava s strežnikom ni uspela.",
     "server_connection_error_retry": "Napaka pri povezavi s strežnikom, poskusite znova.",
