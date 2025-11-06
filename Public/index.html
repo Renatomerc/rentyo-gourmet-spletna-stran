@@ -3072,12 +3072,14 @@ function prikaziOpozoriloObZagonu() {
 }
 
 // 🔥🔥🔥 KLJUČNI POPRAVEK: Listener za gumb Potrdi Trajanje / Rezerviraj Mizo 🔥🔥🔥
+// Uporabljamo vaš potrjeni ID gumba: potrdiTrajanjeGumb
 
-const potrdiRezervacijoGumb = document.getElementById('rezervirajMizoGumb'); // 🔥 PREVERITE ID GUMBA! 🔥
+const potrdiRezervacijoGumb = document.getElementById("potrdiTrajanjeGumb"); 
+
 if (potrdiRezervacijoGumb) {
     potrdiRezervacijoGumb.addEventListener('click', potrdiRezervacijo);
 } else {
-    console.warn("Opozorilo: Gumb za potrditev rezervacije (ID 'rezervirajMizoGumb') ni najden! Preverite ID v HTML-ju.");
+    console.warn("Opozorilo: Gumb za potrditev rezervacije (ID 'potrdiTrajanjeGumb') ni najden!");
 }
 
 // =================================================================
