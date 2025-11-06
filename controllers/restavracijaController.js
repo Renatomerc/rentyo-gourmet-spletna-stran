@@ -243,7 +243,7 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
 /**
  * Pridobivanje prostih ur (POST /proste_ure ALI GET /preveri_rezervacijo/:id/:datum/:osebe)
- * 🔥 DVOJNI POPRAVEK: Zanesljiv izračun ur in pravilna uporaba ObjectId za agregacijo.
+ * 🔥 POPRAVEK: Zmanjšanje intervala na polno uro (1.0).
  */
 exports.pridobiProsteUre = async (req, res) => {
     
@@ -272,7 +272,8 @@ exports.pridobiProsteUre = async (req, res) => {
 
 
     try {
-        const interval = 0.5; // Interval za preverjanje: 30 minut
+        // 🔥🔥🔥 SPREMENJENO: Nastavimo interval na 1.0 (60 minut)
+        const interval = 1.0; 
         const privzetoTrajanje = trajanjeUr ? parseFloat(trajanjeUr) : 1.5; 
         
         const rezultatiAggregation = await Restavracija.aggregate([
@@ -300,7 +301,7 @@ exports.pridobiProsteUre = async (req, res) => {
         // Izračun v minutah za zanesljivost
         const zacetekMinut = casZacetka * 60; 
         const konecMinut = minimalniCasKonca * 60; 
-        const intervalMinut = interval * 60; // 30 minut
+        const intervalMinut = interval * 60; // Sedaj je to 60 minut
 
         for (const aggResult of rezultatiAggregation) {
             const miza = aggResult.miza;
@@ -314,7 +315,7 @@ exports.pridobiProsteUre = async (req, res) => {
             // Zanka zdaj teče po minutah
             for (let min = zacetekMinut; min <= konecMinut; min += intervalMinut) {
                 
-                const uraFormatirana = min / 60; 
+                const uraFormatirana = min / 60; // Generira 10.0, 11.0, 12.0...
                 let jeProsto = true;
 
                 for (const obstojecaRezervacija of obstojeceRezervacije) {
