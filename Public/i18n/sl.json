@@ -58,6 +58,10 @@
     "no_restaurants_found": "Ni najdenih restavracij.",
     "reserving": "Rezerviram {{stevilo}} osebi ob {{cas}}...",
     "reservation_success": "Rezervacija uspešna! Miza št. {{miza}} je rezervirana za {{trajanje}}.",
+    
+  
+    "reservation_success_minimal": "Rezervacija uspešna ob {{cas}}!",
+    
     "reservation_failed": "Rezervacija ni uspela.",
     "server_connection_error": "Povezava s strežnikom ni uspela.",
     "server_connection_error_retry": "Napaka pri povezavi s strežnikom, poskusite znova.",
@@ -72,6 +76,14 @@
     "select_reservation_date": "Prosimo, izberite datum rezervacije.",
     "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti."
   },
+  
+  
+  "duration": {
+    "one_hour": "1 ura",
+    "one_half_hours": "1 uro in pol",
+    "two_hours": "2 uri"
+  },
+  
   "auth": {
     "login_title": "Prijava",
     "register_title": "Registracija",

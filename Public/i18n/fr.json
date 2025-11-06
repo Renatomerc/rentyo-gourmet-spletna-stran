@@ -58,6 +58,10 @@
     "no_restaurants_found": "Aucun restaurant trouvé.",
     "reserving": "Réservation pour {{stevilo}} personnes à {{cas}}...",
     "reservation_success": "Réservation réussie ! La table n° {{miza}} est réservée pour {{trajanje}}.",
+    
+    
+    "reservation_success_minimal": "Réservation réussie à {{cas}}!",
+    
     "reservation_failed": "Échec de la réservation.",
     "server_connection_error": "Échec de la connexion au serveur.",
     "server_connection_error_retry": "Erreur de connexion au serveur, veuillez réessayer.",
@@ -72,6 +76,14 @@
     "select_reservation_date": "Veuillez sélectionner une date de réservation.",
     "pogoji_required": "Pour vous inscrire, vous devez accepter les Conditions Générales et la Politique de Confidentialité."
   },
+  
+  
+  "duration": {
+    "one_hour": "une heure", 
+    "one_half_hours": "une heure et demie",
+    "two_hours": "deux heures"
+  },
+  
   "auth": {
     "login_title": "Connexion",
     "register_title": "Inscription",

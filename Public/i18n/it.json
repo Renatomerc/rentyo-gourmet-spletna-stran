@@ -58,6 +58,10 @@
     "no_restaurants_found": "Nessun ristorante trovato.",
     "reserving": "Prenoto per {{stevilo}} persone alle {{cas}}...",
     "reservation_success": "Prenotazione riuscita! Il tavolo n. {{miza}} è riservato per {{trajanje}}.",
+    
+    
+    "reservation_success_minimal": "Prenotazione riuscita alle {{cas}}!",
+    
     "reservation_failed": "Prenotazione fallita.",
     "server_connection_error": "Connessione al server fallita.",
     "server_connection_error_retry": "Errore di connessione al server, riprova.",
@@ -72,6 +76,14 @@
     "select_reservation_date": "Si prega di selezionare una data di prenotazione.",
     "pogoji_required": "Per registrarsi è necessario accettare i Termini e Condizioni Generali e la Politica sulla Privacy."
   },
+  
+  
+  "duration": {
+    "one_hour": "un'ora",
+    "one_half_hours": "un'ora e mezza",
+    "two_hours": "due ore"
+  },
+  
   "auth": {
     "login_title": "Accesso",
     "register_title": "Registrazione",
@@ -137,7 +149,7 @@
     "for_partners_href": "/it/partnerstva.html#za-partnerje",
     "affiliate_program": "Programma di Affiliazione",
     "affiliate_program_href": "/it/partnerstva.html#partnerski-program",
-    "connect_title": "Connettiti con noi",
+    "connect_title": "Connettiti z nami",
     "payment_info_prefix": "Pagamento sicuro fornito da",
     "copyright_text": "© 2025 Rentyo Gourmet. Tutti i diritti riservati."
   },

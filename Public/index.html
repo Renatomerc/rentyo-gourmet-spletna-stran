@@ -1606,6 +1606,56 @@
         display: none;
     }
 }
+/* ========================================= */
+/* OBLIKOVANJE ZA TOASTER OBVESTILA */
+/* ========================================= */
+
+#toaster-container {
+    position: fixed;
+    top: 20px; /* Ali bottom: 20px, če želite, da so spodaj */
+    right: 20px;
+    z-index: 10000; /* Poskrbite, da je nad vsem */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 15px 20px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease-out, transform 0.4s ease-out;
+    max-width: 300px;
+    min-width: 200px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.success {
+    background-color: #4CAF50; /* Zelena za uspeh */
+}
+
+.toast.error {
+    background-color: #f44336; /* Rdeča za napako */
+}
+
+.toast.info {
+    background-color: #2196F3; /* Modra za info */
+}
+
+.toast.warning {
+    background-color: #ff9800; /* Oranžna za opozorilo */
+}
+
+.toast-icon {
+    margin-right: 10px;
+}
 
   </style>
 </head>
@@ -2127,9 +2177,63 @@ function generateStarsHTML(rating) {
     return starsHTML;
 }
 
-const prikaziSporocilo = (msg, type) => { 
-    console.log(`[Sporočilo za uporabnika] ${type}: ${msg}`);
-    alert(msg);
+/**
+ * Zamenjana funkcija za prikaz prilagojenih Toaster obvestil.
+ * ZAHTEVA: HTML element z id="toaster-container" in ustrezno CSS oblikovanje.
+ * ZAHTEVA: Knjižnico Font Awesome za prikaz ikon.
+ */
+const prikaziSporocilo = (msg, type = 'info', duration = 4000) => { 
+    console.log(`[Toaster Sporočilo] ${type}: ${msg}`);
+    
+    const container = document.getElementById('toaster-container');
+    if (!container) {
+        // Če ni kontejnerja (HTML dela), se vrnemo na navaden console log, morda na alert za kritične napake
+        console.error("Toaster container (id='toaster-container') ni najden v HTML-ju. Prikazovanje sporočila v konzolo.");
+        // OPOZORILO: Če želite, da se kljub temu prikaže alert, ga aktivirajte tukaj:
+        // alert(`[NAPAKA PRI PRIKAZU - OPOZORILO] ${msg}`); 
+        return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let iconClass = '';
+    // Izbira ikone glede na tip sporočila
+    if (type === 'success') iconClass = 'fas fa-check-circle';
+    else if (type === 'error') iconClass = 'fas fa-exclamation-triangle';
+    else if (type === 'warning') iconClass = 'fas fa-exclamation-circle';
+    else iconClass = 'fas fa-info-circle'; // 'info'
+
+    toast.innerHTML = `
+        <div>
+            <span class="toast-icon"><i class="${iconClass}"></i></span>
+            <span>${msg}</span>
+        </div>
+    `;
+
+    container.prepend(toast); // Dodamo na vrh seznama, da je najnovejše obvestilo zgoraj
+    
+    // Vizualni efekt prikaza (fade in in slide)
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10); // Majhen zamik, da CSS tranzicija deluje
+
+    // Avtomatsko odstranjevanje
+    setTimeout(() => {
+        toast.classList.remove('show');
+        // Po končani tranziciji element odstranimo iz DOM
+        toast.addEventListener('transitionend', () => {
+            toast.remove();
+        }, { once: true });
+    }, duration);
+    
+    // Omogočimo ročno zapiranje s klikom
+    toast.addEventListener('click', () => {
+        toast.classList.remove('show');
+        toast.addEventListener('transitionend', () => {
+            toast.remove();
+        }, { once: true });
+    });
 };
 
 const preimenujOsebe = () => {
@@ -2977,7 +3081,26 @@ window.handleIzvedbaRezervacije = async (podatki) => {
 
         if (response.ok) {
             const mizaIme = podatki.mizaIme || 'izbrana miza';
-            prikaziSporocilo(i18next.t('messages.reservation_success', { miza: mizaIme, cas: podatki.casStart }) || 'Rezervacija uspešna!', 'success');
+            
+       // 🔥 POPRAVEK: Ustvarimo lepo formatiran niz za trajanje
+            let trajanjePrikaz;
+            if (podatki.trajanjeUr === 1.0) { // NOVO PREVERJANJE ZA 1 URO
+                trajanjePrikaz = i18next.t('duration.one_hour') || '1 ura';
+            } else if (podatki.trajanjeUr === 1.5) {
+                trajanjePrikaz = i18next.t('duration.one_half_hours') || '1 uro in pol';
+            } else if (podatki.trajanjeUr === 2.0) {
+                trajanjePrikaz = i18next.t('duration.two_hours') || '2 uri';
+            } else {
+                trajanjePrikaz = `${podatki.trajanjeUr} ur`;
+            }
+            
+            // Uporabimo sporočilo, ki ne zahteva kompleksnega prevajanja znotraj Toasterja
+            const uspehMsg = i18next.t('messages.reservation_success_minimal', { 
+                cas: podatki.casStart
+            }) || `Rezervacija uspešna ob ${podatki.casStart}!`;
+            
+            prikaziSporocilo(uspehMsg, 'success');
+            
             if(durationModal) durationModal.classList.remove('active');
             if(restavracijaModal) restavracijaModal.classList.remove('active');
             // Ponovno naloži kartice
@@ -3189,5 +3312,9 @@ if(typeof flatpickr !== "undefined") {
 }
     
 </script>
+    
+    <div id="toaster-container">
+        </div>
+
 </body>
 </html>

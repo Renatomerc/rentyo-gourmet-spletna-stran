@@ -58,6 +58,10 @@
     "no_restaurants_found": "No restaurants found.",
     "reserving": "Reserving for {{stevilo}} people at {{cas}}...",
     "reservation_success": "Reservation successful! Table no. {{miza}} is reserved for {{trajanje}}.",
+    
+    
+    "reservation_success_minimal": "Reservation successful at {{cas}}!",
+    
     "reservation_failed": "Reservation failed.",
     "server_connection_error": "Server connection failed.",
     "server_connection_error_retry": "Server connection error, please try again.",
@@ -72,6 +76,14 @@
     "select_reservation_date": "Please select a reservation date.",
     "pogoji_required": "To register, you must accept the General Terms and Conditions and Privacy Policy."
   },
+  
+  
+  "duration": {
+    "one_hour": "1 hour",
+    "one_half_hours": "1 hour and a half",
+    "two_hours": "2 hours"
+  },
+  
   "auth": {
     "login_title": "Login",
     "register_title": "Registration",

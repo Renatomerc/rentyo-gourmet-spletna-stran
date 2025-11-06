@@ -58,6 +58,10 @@
     "no_restaurants_found": "Keine Restaurants gefunden.",
     "reserving": "Reserviere für {{stevilo}} Personen um {{cas}}...",
     "reservation_success": "Reservierung erfolgreich! Tisch Nr. {{miza}} ist für {{trajanje}} reserviert.",
+    
+    
+    "reservation_success_minimal": "Reservierung erfolgreich um {{cas}}!",
+    
     "reservation_failed": "Reservierung fehlgeschlagen.",
     "server_connection_error": "Serververbindung fehlgeschlagen.",
     "server_connection_error_retry": "Fehler bei der Serververbindung, bitte versuchen Sie es erneut.",
@@ -72,6 +76,14 @@
     "select_reservation_date": "Bitte wählen Sie ein Reservierungsdatum aus.",
     "pogoji_required": "Zur Registrierung müssen Sie die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung akzeptieren."
   },
+  
+  
+  "duration": {
+    "one_hour": "1 Stunde",
+    "one_half_hours": "Eineinhalb Stunden",
+    "two_hours": "2 Stunden"
+  },
+  
   "auth": {
     "login_title": "Anmelden",
     "register_title": "Registrierung",
