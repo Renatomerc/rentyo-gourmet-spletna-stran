@@ -2998,6 +2998,8 @@ function setupTimeSlotListeners() {
         button.addEventListener('click', (e) => {
             timeButtons.forEach(btn => btn.classList.remove('selected'));
             globalSelectedTime = e.target.getAttribute('data-time');
+            // 🔥 Poskrbimo za shranjevanje mizaId
+            window.globalSelectedMizaId = e.target.getAttribute('data-miza-id'); 
             e.target.classList.add('selected');
             odpriDurationModal(); 
         });
@@ -3017,9 +3019,15 @@ const potrdiRezervacijo = () => {
     const cas = globalSelectedTime; 
     const izbranoTrajanjeElement = durationModal ? durationModal.querySelector('input[name="duration"]:checked') : null;
     const trajanje = izbranoTrajanjeElement ? izbranoTrajanjeElement.value : '1.0'; 
+    // 🔥 Novi podatki, ki jih potrebujemo (uporaba globalSelectedMizaId iz listenerja)
+    const mizaId = window.globalSelectedMizaId;
     
-    if (!datum || !cas || !steviloOseb) {
-        alert(i18next.t('messages.required_fields_missing') || 'Izpolnite vsa polja.');
+    // 🔥 Opomba: Ime in telefon sta simulirana, dokler ne dodate polj v modal
+    const imeGosta = "Testni Rezervant";
+    const telefon = "000000000"; 
+    
+    if (!datum || !cas || !steviloOseb || !mizaId) { // Dodamo preverjanje mizaId
+        alert(i18next.t('messages.required_fields_missing') || 'Izpolnite vsa polja in izberite mizo/uro.');
         return;
     }
     
@@ -3027,24 +3035,24 @@ const potrdiRezervacijo = () => {
     
     console.log("=========================================");
     console.log(i18next.t('messages.reserving', { stevilo: steviloOseb, cas: cas }));
-    console.log(`Podatki za rezervacijo: Restavracija ID: ${currentRestaurantId}, Datum: ${datum}, Osebe: ${steviloOseb}, Trajanje: ${trajanje} ur`);
+    console.log(`Podatki za rezervacijo: Restavracija ID: ${currentRestaurantId}, Datum: ${datum}, Osebe: ${steviloOseb}, Trajanje: ${trajanje} ur, Miza ID: ${mizaId}`);
     console.log("=========================================");
 
     // 🔥🔥🔥 VSTAVLJEN DEJANSKI API KLIC (Prek funkcije handleIzvedbaRezervacije) 🔥🔥🔥
     const rezervacijaPodatki = {
         restavracijaId: currentRestaurantId,
         datum: datum,
-        steviloOseb: steviloOseb,
+        stevilo_oseb: steviloOseb, // Popravljeno: Uporabljamo stevilo_oseb za ujemanje z backendom
         casStart: cas, 
-        trajanjeUr: parseFloat(trajanje)
+        trajanjeUr: parseFloat(trajanje),
+        mizaId: mizaId, 
+        imeGosta: imeGosta,
+        telefon: telefon,
     };
 
-    // Kličemo funkcijo, ki izvede fetch klic na Backend
-    if (typeof handleIzvedbaRezervacije === 'function') {
-        handleIzvedbaRezervacije(rezervacijaPodatki);
-    } else {
-        console.error("Napaka: Funkcija 'handleIzvedbaRezervacije' ni definirana. Prepričajte se, da je koda za API klic prisotna.");
-    }
+    // 🔥 UKINEMO PREVERJANJE DOSEGA, da napaka ni tiha, temveč jasna "ni definiran"
+    // To bo zdaj sprožilo rdečo napako v Konzoli, dokler se ne odpravi problem z dosegom datotek!
+    handleIzvedbaRezervacije(rezervacijaPodatki);
 }
 
 // =================================================================
