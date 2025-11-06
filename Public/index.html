@@ -2062,6 +2062,8 @@ let MOCK_IZPOSTAVLJENO_RAW = [];
 let currentFilterKuhinja = ''; 
 let globalSelectedTime = null; 
 let currentRestaurantId = null; 
+let globalSelectedMizaId = null; // DODANO: Za shranjevanje ID mize
+let globalSelectedMizaIme = null; // DODANO: Za shranjevanje imena mize
 
 // GLOBALNE DEFINICIJE DOM ELEMENTOV (SKRAJŠANO ZA PRIKAZ)
 const modal = document.getElementById("loginModal");
@@ -2108,8 +2110,9 @@ const gumbRezervirajModal = document.querySelector('.gumb-rezerviraj-modal');
 
 // =================================================================
 // I. POMOŽNE FUNKCIJE (Zvezdice, Sporočila, Prevajanje, Čas)
-// (OSTANEJO NESPREMENJENE)
 // =================================================================
+
+// ... (Vaše pomožne funkcije) ...
 
 function generateStarsHTML(rating) {
     const fullStar = '★'; 
@@ -2129,6 +2132,7 @@ function generateStarsHTML(rating) {
 
 const prikaziSporocilo = (msg, type) => { 
     console.log(`[Sporočilo za uporabnika] ${type}: ${msg}`);
+    // Uporabimo alert() za hitre povratne informacije, kot ste želeli
     alert(msg);
 };
 
@@ -2166,11 +2170,33 @@ const updateContent = () => {
   preimenujOsebe();
 };
 
+// 🔥 POMOŽNA FUNKCIJA ZA API KLICE
+const getAuthHeaders = () => {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('zeton');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+};
+
+// 🔥 POMOŽNA FUNKCIJA ZA FORMATIRANJE DATUMA ZA BACKEND (dd.mm.YYYY -> YYYY-mm-dd)
+const formatirajDatumZaBackend = (datumPrikaz) => {
+    if (!datumPrikaz || datumPrikaz.length !== 10) return null;
+    try {
+        const [dan, mesec, leto] = datumPrikaz.split('.');
+        // Morda je format YYYY-MM-DD zahtevan
+        return `${leto}-${mesec.padStart(2, '0')}-${dan.padStart(2, '0')}`;
+    } catch (e) {
+        console.error("Napaka pri formatiranju datuma:", e);
+        return null;
+    }
+};
 
 // =================================================================
 // II. LOGIKA PRIJAVE/ODJAVE IN MODALOV ZA UPORABNIKE
-// (OSTANE NESPREMENJENA)
 // =================================================================
+// ... (Vaša logika prijave/odjave in modalov) ...
 
 const setLoginStatus = (isLoggedIn) => {
     if (!isLoggedIn) {
@@ -2454,12 +2480,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 prosteUreRezultati.innerHTML = '';
                 prosteUreRezultati.innerHTML = `<p data-i18n="messages.loading_availability">Preverjam razpoložljivost...</p>`;
             }
+            
+            // Formatiranje datuma za API
+            const datumZaBackend = formatirajDatumZaBackend(izbranDatum); 
 
             const dataToSend = {
                 restavracijaId: currentRestaurantId,
-                datum: izbranDatum,
-                stevilo_oseb: steviloOseb,
+                datum: datumZaBackend, // Uporabite formatiran datum
+                stevilo_oseb: parseInt(steviloOseb),
             };
+            
+            // 🔥 Preverite, ali je datum pravilno formatiran
+            if (!datumZaBackend) {
+                 console.error("Neveljaven datum za backend:", izbranDatum);
+                 if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p class="alert alert-danger">Napaka: Neveljaven datum format. Izberite ponovno.</p>`;
+                 return;
+            }
 
             fetch(`${API_BASE_URL}/restavracije/proste_ure`, {
                 method: 'POST',
@@ -2485,10 +2521,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     data.mize.forEach(miza => {
                         if (miza.prosteUre) { 
                              miza.prosteUre.forEach(ura => {
-                                const uraFormat = ura.toFixed(2).replace('.', ':').padEnd(5, '0');
+                                // Prikaz ure mora biti v formatu HH:MM
+                                const uraFloat = parseFloat(ura);
+                                const ure = Math.floor(uraFloat);
+                                const minute = Math.round((uraFloat - ure) * 60);
+                                const uraFormat = `${ure.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
                                 
                                 if (!prikazaneUre.has(uraFormat)) {
-                                    ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${miza._id}">${uraFormat}</button>`;
+                                    // Dodana mizaIme (če je na voljo, sicer se ne shrani)
+                                    const mizaIme = miza.ime || ''; 
+                                    ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${miza._id}" data-miza-ime="${mizaIme}">${uraFormat}</button>`;
                                     prikazaneUre.add(uraFormat);
                                 }
                             });
@@ -2522,7 +2564,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // =================================================================
 // III. LOGIKA SOGLASJA ZA PIŠKOTKE
-// (OSTANE NESPREMENJENA)
 // =================================================================
 
 const CONSENT_COOKIE_NAME = 'user_consent_given';
@@ -2580,10 +2621,10 @@ function initializeCookieConsent() {
 }
 window.onload = initializeCookieConsent;
 
-
 // =================================================================
 // IV. LOGIKA KARTIC RESTAVRACIJ (KLJUČNI POPRAVEK MAPIRANJA)
 // =================================================================
+// ... (Vaša logika kartic restavracij) ...
 
 // 1. Renderiranje Ene Kartice (ZA PRILJUBLJENO)
 function renderCard(restavracija) {
@@ -2601,8 +2642,6 @@ function renderCard(restavracija) {
     const ratingDisplay = `${generateStarsHTML(restavracija.ocena_povprecje || 0)} <span class="ocena-stevilka">(${(restavracija.ocena_povprecje || 0).toFixed(1)})</span>`;
     
     // Za demo: Lokacija na kartici kot koordinate (Lon, Lat) in oddaljenost
-    const lon = restavracija.lokacija?.coordinates?.[0] || 0;
-    const lat = restavracija.lokacija?.coordinates?.[1] || 0;
     const oddaljenostKm = (Math.random() * 14 + 1).toFixed(1); 
     
     // Status in čas (ostane simulirano)
@@ -2713,7 +2752,7 @@ function renderFeaturedRestavracije() {
     updateContent();
 }
 
-// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji (OSTANE NESPREMENJENO)
+// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji 
 function setupKuhinjaFiltersListeners() {
     document.querySelectorAll('.gumb-kategorija').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -2740,7 +2779,7 @@ if(iskalnik) iskalnik.addEventListener('submit', (e) => {
 });
 
 
-// 6. Glavna funkcija za nalaganje (PRAVI API KLIC) (OSTANE NESPREMENJENA)
+// 6. Glavna funkcija za nalaganje (PRAVI API KLIC) 
 async function loadRestavracije() {
     if (!mrezaKarticDiv) return; 
 
@@ -2780,6 +2819,7 @@ async function loadRestavracije() {
 // =================================================================
 // V. LOGIKA MODALA RESTAVRACIJE (KLJUČNI POPRAVEK MAPIRANJA)
 // =================================================================
+// ... (Vaša logika modala restavracije) ...
 
 // Funkcija, ki napolni modal s podatki in ga odpre
 function prikaziPodrobnosti(restavracija) {
@@ -2926,11 +2966,12 @@ function prikaziPodrobnosti(restavracija) {
     updateContent(); 
 }
 
-// Zapiranje modala (OSTANE NESPREMENJENO)
+// Zapiranje modala 
 if(zapriRestavracijaModal) zapriRestavracijaModal.addEventListener('click', () => {
     if(restavracijaModal) restavracijaModal.classList.remove('active');
     if(modalZemljevid) modalZemljevid.src = 'about:blank';
     currentRestaurantId = null; 
+    globalSelectedMizaId = null; // Reset
 });
 
 if(restavracijaModal) window.addEventListener('click', (e) => {
@@ -2938,10 +2979,11 @@ if(restavracijaModal) window.addEventListener('click', (e) => {
         restavracijaModal.classList.remove('active');
         if(modalZemljevid) modalZemljevid.src = 'about:blank';
         currentRestaurantId = null; 
+        globalSelectedMizaId = null; // Reset
     }
 });
 
-// LOGIKA ZAVIHKOV (OSTANE NESPREMENJENA)
+// LOGIKA ZAVIHKOV 
 modalTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         const targetTab = tab.getAttribute('data-tab');
@@ -2956,14 +2998,73 @@ modalTabs.forEach(tab => {
 
 // =================================================================
 // VI. LOGIKA REZERVACIJE IN TRAJANJA
-// (OSTANE NESPREMENJENA)
 // =================================================================
+
+/**
+ * 🔥 POPRAVEK: Funkcija preimenovana v window.handleIzvedbaRezervacije, 
+ * da se zagotovi globalni doseg in prepreči ReferenceError.
+ */
+window.handleIzvedbaRezervacije = async (podatki) => {
+
+    // Preverimo, če je uporabnik prijavljen
+    if (!localStorage.getItem('zeton')) {
+        prikaziSporocilo(i18next.t('messages.login_required') || 'Za rezervacijo morate biti prijavljeni.', 'error');
+        // Odprite modal za prijavo/registracijo, če obstaja
+        if(modal) modal.classList.add("active");
+        return;
+    }
+    
+    const url = `${API_BASE_URL}/restavracije/ustvari_rezervacijo`;
+
+    try {
+        prikaziSporocilo(i18next.t('messages.reserving', { cas: podatki.casStart, stevilo: podatki.stevilo_oseb }), 'info');
+
+        const payload = {
+            restavracijaId: podatki.restavracijaId,
+            mizaId: podatki.mizaId,
+            imeGosta: podatki.imeGosta,
+            telefon: podatki.telefon,
+            stevilo_oseb: parseInt(podatki.stevilo_oseb),
+            // Uporabimo formatiran datum (YYYY-MM-DD)
+            datum: formatirajDatumZaBackend(podatki.datum), 
+            casStart: podatki.casStart, 
+            trajanjeUr: podatki.trajanjeUr 
+        };
+        
+        console.log("Poslani podatki za rezervacijo:", payload);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const mizaIme = podatki.mizaIme || 'izbrana miza';
+            prikaziSporocilo(i18next.t('messages.reservation_success', { miza: mizaIme, cas: podatki.casStart }) || 'Rezervacija uspešna!', 'success');
+            if(durationModal) durationModal.classList.remove('active');
+            if(restavracijaModal) restavracijaModal.classList.remove('active');
+            // Ponovno naloži kartice, da posodobi razpoložljivost
+            loadRestavracije();
+        } else {
+            prikaziSporocilo(data.msg || i18next.t('messages.reservation_failed') || 'Rezervacija ni uspela.', 'error');
+        }
+
+    } catch (error) {
+        console.error('Napaka pri API klicu za rezervacijo:', error);
+        prikaziSporocilo(i18next.t('messages.server_connection_error_retry') || 'Napaka strežnika pri rezervaciji.', 'error');
+    }
+}
+
 
 // Odpre modal za izbiro trajanja
 window.odpriDurationModal = () => {
-    if (!currentRestaurantId || !globalSelectedTime) {
-        console.error("Napaka: Ni izbrane restavracije ali časa za rezervacijo.");
-        alert("Napaka: Prosimo, izberite čas rezervacije.");
+    if (!currentRestaurantId || !globalSelectedTime || !globalSelectedMizaId) { // Dodana globalSelectedMizaId
+        console.error("Napaka: Ni izbrane restavracije, časa ali mize za rezervacijo.");
+        // 🔥 POPRAVEK: Izboljšano opozorilo
+        prikaziSporocilo("Napaka: Prosimo, izberite čas rezervacije in mizo.", 'error');
         if(restavracijaModal) restavracijaModal.classList.add('active'); 
         return;
     }
@@ -2995,39 +3096,59 @@ if(durationOpcije) durationOpcije.querySelectorAll('.duration-opcija').forEach(o
 function setupTimeSlotListeners() {
     const timeButtons = document.querySelectorAll('#prosteUreRezultati .gumb-ura');
     timeButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            timeButtons.forEach(btn => btn.classList.remove('selected'));
-            globalSelectedTime = e.target.getAttribute('data-time');
-            // 🔥 Poskrbimo za shranjevanje mizaId
-            window.globalSelectedMizaId = e.target.getAttribute('data-miza-id'); 
-            e.target.classList.add('selected');
-            odpriDurationModal(); 
-        });
+        // Odstranimo stari listener, če je bil dodan
+        button.removeEventListener('click', timeButtonClickHandler); 
+        // Dodamo nov listener, ki bo shranil mizaId in odprl modal
+        button.addEventListener('click', timeButtonClickHandler); 
     });
 }
 
+// Handler za klik na gumb za uro
+const timeButtonClickHandler = (e) => {
+    const timeButtons = document.querySelectorAll('#prosteUreRezultati .gumb-ura');
+    timeButtons.forEach(btn => btn.classList.remove('selected'));
+    
+    // 🔥 Pravilno shranjevanje podatkov iz gumba
+    globalSelectedTime = e.target.getAttribute('data-time');
+    globalSelectedMizaId = e.target.getAttribute('data-miza-id'); 
+    globalSelectedMizaIme = e.target.getAttribute('data-miza-ime'); 
+    
+    e.target.classList.add('selected');
+    odpriDurationModal(); 
+};
+
+
 // Funkcija za potrditev rezervacije
 const potrdiRezervacijo = () => {
+    // 🔥 Pripomočka za modale morata biti dosegljiva
+    const modalDatumInput = document.getElementById('tabRezervacija')?.querySelector('[data-reserv-datum]');
+    const modalOsebeInput = document.getElementById('tabRezervacija')?.querySelector('[data-reserv-osebe]');
+
     if (!currentRestaurantId) {
         alert("Napaka: Restavracija ni izbrana!");
         return;
     }
     
     // Zbiranje podatkov
-    const datum = modalDatumInput ? modalDatumInput.value : null; 
+    const datum = modalDatumInput ? modalDatumInput.value : null; // Datum prikaza (npr. 06.11.2025)
     const steviloOseb = modalOsebeInput ? modalOsebeInput.value : null; 
     const cas = globalSelectedTime; 
     const izbranoTrajanjeElement = durationModal ? durationModal.querySelector('input[name="duration"]:checked') : null;
     const trajanje = izbranoTrajanjeElement ? izbranoTrajanjeElement.value : '1.0'; 
     // 🔥 Novi podatki, ki jih potrebujemo (uporaba globalSelectedMizaId iz listenerja)
-    const mizaId = window.globalSelectedMizaId;
+    const mizaId = globalSelectedMizaId;
     
-    // 🔥 Opomba: Ime in telefon sta simulirana, dokler ne dodate polj v modal
+    // 🔥 Opomba: Ime in telefon sta simulirana
     const imeGosta = "Testni Rezervant";
     const telefon = "000000000"; 
     
     if (!datum || !cas || !steviloOseb || !mizaId) { // Dodamo preverjanje mizaId
-        alert(i18next.t('messages.required_fields_missing') || 'Izpolnite vsa polja in izberite mizo/uro.');
+        
+        // 🔥 POPRAVEK: Jasnejše opozorilo in vrnitev na prejšnji modal
+        prikaziSporocilo(i18next.t('messages.required_fields_missing_time_miza') || 'Izpolnite vsa polja in **IZBERITE URO/MIZO** na prejšnjem koraku.', 'error');
+        
+        if(durationModal) durationModal.classList.remove('active');
+        if(restavracijaModal) restavracijaModal.classList.add('active'); 
         return;
     }
     
@@ -3042,7 +3163,7 @@ const potrdiRezervacijo = () => {
     const rezervacijaPodatki = {
         restavracijaId: currentRestaurantId,
         datum: datum,
-        stevilo_oseb: steviloOseb, // Popravljeno: Uporabljamo stevilo_oseb za ujemanje z backendom
+        stevilo_oseb: steviloOseb, 
         casStart: cas, 
         trajanjeUr: parseFloat(trajanje),
         mizaId: mizaId, 
@@ -3050,21 +3171,32 @@ const potrdiRezervacijo = () => {
         telefon: telefon,
     };
 
-    // 🔥 UKINEMO PREVERJANJE DOSEGA, da napaka ni tiha, temveč jasna "ni definiran"
-    // To bo zdaj sprožilo rdečo napako v Konzoli, dokler se ne odpravi problem z dosegom datotek!
+    // Klic manjkajoče funkcije
     handleIzvedbaRezervacije(rezervacijaPodatki);
 }
 
 // =================================================================
 // VII. LOGIKA OPOZORILNEGA OKNA
-// (OSTANE NESPREMENJENA)
 // =================================================================
 
-// ... (funkcija prikaziOpozoriloObZagonu) ...
+// ... (funkcija prikaziOpozoriloObZagonu - manjkajoča, dodajamo jo kot prazno, če je niste poslali) ...
+function prikaziOpozoriloObZagonu() {
+    // Predpostavljamo, da je ta funkcija tukaj
+    if (warningModal && !localStorage.getItem('warningDismissed')) {
+        // Če ni gumba 'Razumem', ga ne moremo prikazati
+        if (gumbRazumem) {
+            warningModal.classList.add('active');
+            gumbRazumem.addEventListener('click', () => {
+                warningModal.classList.remove('active');
+                localStorage.setItem('warningDismissed', 'true');
+            });
+        }
+    }
+}
 
 
 // 🔥🔥🔥 KLJUČNI POPRAVEK: Listener za gumb Potrdi Trajanje / Rezerviraj Mizo 🔥🔥🔥
-// Dodamo e.preventDefault(), da se prepreči napačno obnašanje (kot je ponovna sprožitev GET klica).
+// Ta del je bil pravilen.
 
 if (potrdiTrajanjeGumb) {
     // Dodamo Listener, ki kliče funkcijo potrdiRezervacijo
@@ -3081,7 +3213,6 @@ if (potrdiTrajanjeGumb) {
 
 // =================================================================
 // VIII. ZAGON IN INITIALIZATION
-// (OSTANE NESPREMENJENA)
 // =================================================================
 
 const setupLanguageSwitcher = () => {

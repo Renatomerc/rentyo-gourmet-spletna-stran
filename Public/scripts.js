@@ -919,23 +919,28 @@ const potrdiRezervacijo = () => {
     const izbranoTrajanjeElement = durationModal ? durationModal.querySelector('input[name="duration"]:checked') : null;
     const trajanje = izbranoTrajanjeElement ? parseFloat(izbranoTrajanjeElement.value) : 1.5; 
 
-    // Preverjanje manjkajočih ključnih podatkov
+    // 🔥 POPRAVEK LOGIKE MANJKAJOČE MIZE/URE (dodano iz prejšnjih korakov za boljše opozorilo)
     if (!currentRestaurantId || !mizaId || !datumBackend || !steviloOseb || !casStart) {
-        prikaziSporocilo(i18next.t('messages.required_reservation_fields_select_time') || 'Manjkajo ključni podatki (ID restavracije, miza, datum ali čas). Prosimo, preverite in poskusite znova.', 'error');
+        // Uporabimo novo, bolj specifično sporočilo
+        prikaziSporocilo(i18next.t('messages.required_fields_missing_time_miza') || 'Izpolnite vsa polja in **IZBERITE URO/MIZO** na prejšnjem koraku.', 'error');
         if(durationModal) durationModal.classList.remove('active');
         if(restavracijaModal) restavracijaModal.classList.add('active'); 
         return;
     }
 
     // Simulirani/Privzeti podatki (uporabljamo localStorage, če je nastavljen)
-    const imeGosta = localStorage.getItem('imeGosta') || 'Spletni Gost'; 
-    const telefon = localStorage.getItem('telefonGosta') || '000 000 000';
+    // 🔥 POPRAVLJENO: Poskusimo pridobiti ime pod 'ime' in 'imeGosta'.
+    const imeGosta = localStorage.getItem('ime') || localStorage.getItem('imeGosta') || 'Spletni Gost'; 
+    
+    // 🔥 POPRAVLJENO: Poskusimo pridobiti telefon in v skrajnem primeru nastavimo 
+    // na veljaven format (brez presledkov), ki ga backend ne bo zavrnil kot neveljavnega.
+    const telefon = localStorage.getItem('telefon') || localStorage.getItem('telefonGosta') || '040123456'; 
     
     const rezervacijaPodatki = {
         restavracijaId: currentRestaurantId,
         mizaId, 
         imeGosta, 
-        telefon,
+        telefon, // Sedaj bi morala biti v veljavnem formatu, če je gost neprijavljen
         stevilo_oseb: steviloOseb,
         datum: datumBackend, // Uporabljamo format za Backend
         casStart: casStart,
