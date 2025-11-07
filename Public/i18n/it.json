@@ -47,7 +47,8 @@
     "na": "Nessun dato",
     "search_results": "Risultati della Ricerca",
     "available_tomorrow": "Domani alle {{time}}",
-    "unavailable": "Nessun tavolo disponibile"
+    "unavailable": "Nessun tavolo disponibile",
+    "available_today": "Disponibile oggi" 
   },
   "messages": {
     "enter_search_criteria": "Si prega di inserire una città o un tipo di cucina per la ricerca.",
@@ -57,11 +58,8 @@
     "search_error": "Ricerca fallita.",
     "no_restaurants_found": "Nessun ristorante trovato.",
     "reserving": "Prenoto per {{stevilo}} persone alle {{cas}}...",
-    
-    
     "reservation_success": "Prenotazione riuscita! Il tavolo n. {{miza}} è riservato per {{trajanje}}.",
     "reservation_success_minimal": "Prenotazione riuscita alle {{cas}}!",
-    
     "reservation_failed": "Prenotazione fallita.",
     "server_connection_error": "Connessione al server fallita.",
     "server_connection_error_retry": "Errore di connessione al server, riprova.",
@@ -74,15 +72,14 @@
     "available_times_found": "Orari attualmente disponibili.",
     "no_restaurant_selected": "Errore: Nessun ristorante selezionato.",
     "select_reservation_date": "Si prega di selezionare una data di prenotazione.",
-    "pogoji_required": "Per registrarsi è necessario accettare i Termini e Condizioni Generali e la Politica sulla Privacy."
+    "pogoji_required": "Per registrarsi è necessario accettare i Termini e Condizioni Generali e la Politica sulla Privacy.",
+    "login_required": "Per la prenotazione è necessario l'accesso. Si prega di effettuare il login." 
   },
-  
   "duration": {
     "one_hour": "un'ora",
     "one_half_hours": "un'ora e mezza",
     "two_hours": "due ore"
   },
-  
   "auth": {
     "login_title": "Accesso",
     "register_title": "Registrazione",
@@ -148,10 +145,7 @@
     "for_partners_href": "/it/partnerstva.html#za-partnerje",
     "affiliate_program": "Programma di Affiliazione",
     "affiliate_program_href": "/it/partnerstva.html#partnerski-program",
-    
-    
     "connect_title": "Connettiti con noi",
-    
     "payment_info_prefix": "Pagamento sicuro fornito da",
     "copyright_text": "© 2025 Rentyo Gourmet. Tutti i diritti riservati."
   },

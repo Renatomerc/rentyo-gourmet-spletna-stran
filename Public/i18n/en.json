@@ -47,7 +47,8 @@
     "na": "No data",
     "search_results": "Search Results",
     "available_tomorrow": "Tomorrow at {{time}}",
-    "unavailable": "No tables available"
+    "unavailable": "No tables available",
+    "available_today": "Available today" 
   },
   "messages": {
     "enter_search_criteria": "Please enter a city or cuisine type to search.",
@@ -57,11 +58,8 @@
     "search_error": "Search failed.",
     "no_restaurants_found": "No restaurants found.",
     "reserving": "Reserving for {{stevilo}} people at {{cas}}...",
-    
     "reservation_success": "Reservation successful! Table no. {{miza}} is reserved for {{trajanje}}.",
-    
     "reservation_success_minimal": "Reservation successful at {{cas}}!",
-    
     "reservation_failed": "Reservation failed.",
     "server_connection_error": "Server connection failed.",
     "server_connection_error_retry": "Server connection error, please try again.",
@@ -74,16 +72,14 @@
     "available_times_found": "Currently available slots.",
     "no_restaurant_selected": "Error: No restaurant selected.",
     "select_reservation_date": "Please select a reservation date.",
-    "pogoji_required": "To register, you must accept the General Terms and Conditions and Privacy Policy."
+    "pogoji_required": "To register, you must accept the General Terms and Conditions and Privacy Policy.",
+    "login_required": "Login is required to make a reservation. Please log in." 
   },
-  
-  
   "duration": {
     "one_hour": "1 hour",
     "one_half_hours": "1 hour and a half",
     "two_hours": "2 hours"
   },
-  
   "auth": {
     "login_title": "Login",
     "register_title": "Registration",

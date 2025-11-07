@@ -44,7 +44,11 @@ const updateContent = () => {
 
     // 4. POSODOBIMO VSEBINO WARNING MODALA PO PREVODU
     if (document.getElementById('warningModal')) {
-        posodobiWarningModalVsebino();
+        // Ta funkcija mora biti definirana drugje, kjer je Warning Modal.
+        // Če ni definirana, boste dobili napako ReferenceError.
+        if (typeof posodobiWarningModalVsebino === 'function') {
+            posodobiWarningModalVsebino();
+        }
     }
 
     // Prevajanje vsebine v modalnem oknu, ki je dinamično ustvarjena
@@ -74,6 +78,7 @@ const updateContent = () => {
         if (genericPath && genericPath !== key) {
             
             // 2. ZGRADIMO PRAVILNO ABSOLUTNO POT
+            // Uporaba trenutnega jezika, ki ga je nastavil i18next
             const dynamicPath = `/${currentLang}${genericPath.startsWith('/') ? genericPath : '/' + genericPath}`;
             
             el.setAttribute('href', dynamicPath);
@@ -86,12 +91,12 @@ const updateContent = () => {
 const setupLanguageSwitcher = () => {
     const langSelect = document.querySelector('.izbira-jezika');
     if (langSelect) {
-        // Nastavimo select na trenutni jezik
+        // Nastavimo select na trenutni jezik, ki ga je določil i18next
         langSelect.value = i18next.language;
 
         langSelect.addEventListener('change', (e) => {
             const newLang = e.target.value;
-            // Shranimo izbiro v localStorage za naslednji obisk
+            // Shranimo izbiro v localStorage za naslednji obisk (visoka prioriteta)
             localStorage.setItem('lang', newLang);
 
             // Zamenjamo jezik in prevedemo vsebino
@@ -103,32 +108,59 @@ const setupLanguageSwitcher = () => {
     }
 };
 
-const initI18n = (defaultLang) => {
+// 🚨 POSODOBLJENA FUNKCIJA initI18n ZA SAMODEJNO ZAZNAVANJE 🚨
+const initI18n = (fallbackLang) => {
     i18next
-        .use(i18nextHttpBackend) // Uporabimo backend za nalaganje JSON datotek
+        .use(i18nextHttpBackend) 
+        .use(i18nextBrowserLanguageDetector) // 👈 Dodamo detektor jezika
         .init({
-            lng: defaultLang, // Privzeti jezik (sl)
-            fallbackLng: 'sl',
-            ns: ['translation'], // Namespace, ki ga uporabljamo
+            // Konfiguracija, kako detektor išče jezik
+            detection: {
+                // Vrstni red iskanja:
+                order: [
+                    'localStorage', // 1. Uporabniška izbira ima prednost
+                    'navigator',    // 2. Nastavitev brskalnika
+                    'querystring', 
+                    'cookie',       
+                    'htmlTag'
+                ],
+                // Ime ključa, ki ga preverja v localStorage
+                lookupLocalStorage: 'lang', 
+                caches: ['localStorage'] 
+            },
+            
+            // Jezik, ki se uporabi, če detektor ne najde podprtega jezika
+            fallbackLng: fallbackLang, 
+            ns: ['translation'],
             backend: {
-                // Pot do datotek s prevodi
                 loadPath: './i18n/{{lng}}.json'
             },
             debug: false
         }, (err, t) => {
             if (err) return console.error('Napaka pri inicializaciji i18next:', err);
+            
+            // Po nalaganju shranimo dejanski jezik, ki ga je izbral i18next (lahko je iz brskalnika)
+            const currentLang = i18next.language || fallbackLang;
+            localStorage.setItem('lang', currentLang);
+
             // Po uspešnem nalaganju prevedemo stran in nastavimo poslušalca
             updateContent();
             setupLanguageSwitcher();
             // Po prevajanju se prikaže warning modal, če ga še nismo videli
-            prikaziWarningModal();
+            // Funkcija prikaziWarningModal() mora biti definirana drugje.
+            if (typeof prikaziWarningModal === 'function') {
+                prikaziWarningModal();
+            }
         });
 };
 
-// Zagon prevajanja ob nalaganju strani
-const savedLang = localStorage.getItem('lang') || 'sl'; // Preveri shranjen jezik
-if (typeof i18next !== 'undefined') {
-    initI18n(savedLang);
+// 🚨 POSODOBLJEN ZAGON PREVAJANJA 🚨
+// i18nextBrowserLanguageDetector bo sedaj izbral jezik, 'sl' je samo rezervni jezik.
+const fallbackLang = 'sl'; 
+if (typeof i18next !== 'undefined' && typeof i18nextBrowserLanguageDetector !== 'undefined') {
+    initI18n(fallbackLang);
+} else if (typeof i18nextBrowserLanguageDetector === 'undefined') {
+    console.error('i18nextBrowserLanguageDetector knjižnica ni naložena! Preverite HTML vključitev.');
 } else {
     console.error('i18next knjižnica ni naložena!');
 }
@@ -537,13 +569,17 @@ function ustvariGalerijeHTML(galerijaUrl, lat, lng) {
         slikeHtml += `<p class="p-4 text-center text-gray-500">${i18next.t('modal.no_gallery')}</p>`;
     }
 
-    let zemljevidHtml = `<h4 data-i18n="modal.map_title" class="text-xl font-bold mb-3 mt-6 text-gray-700">${i18next.t('modal.map_title')}</h4>`;
+let zemljevidHtml = `<h4 data-i18n="modal.map_title" class="text-xl font-bold mb-3 mt-6 text-gray-700">${i18next.t('modal.map_title')}</h4>`;
+    
     if (lat && lng) {
-        // Uporaba Google Maps embed formata
+        // 🔥 POPRAVEK JE TUKAJ
+        // Uporabite preverjen format za Google Maps vdelavo (output=embed)
+        const embedUrl = `google.com/maps/embed/v1/view2{lat},${lng}&hl=sl&z=15&output=embed`;
+        
         zemljevidHtml += `
             <div class="zemljevid-ovoj rounded-lg overflow-hidden shadow-lg">
                 <iframe
-                    src="https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed"
+                    src="${embedUrl}" 
                     width="100%"
                     height="400"
                     style="border:0;"

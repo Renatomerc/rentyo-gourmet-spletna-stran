@@ -377,7 +377,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     /* Prilagojena višina za bolj pravokoten videz na namizju */
-    height: 300px; 
+    height: 350px; 
 }
 
 .kartica:hover {
@@ -705,7 +705,7 @@ a:hover {
     }
     
     .kartica img {
-        height: 200px; 
+        height: 180px; 
     }
 }
 

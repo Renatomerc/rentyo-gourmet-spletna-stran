@@ -47,7 +47,8 @@
     "na": "Ni podatkov",
     "search_results": "Rezultati iskanja",
     "available_tomorrow": "Jutri ob {{time}}",
-    "unavailable": "Ni prostih miz"
+    "unavailable": "Ni prostih miz",
+    "available_today": "Na voljo danes" 
   },
   "messages": {
     "enter_search_criteria": "Prosimo, vnesite mesto ali vrsto kuhinje za iskanje.",
@@ -57,11 +58,8 @@
     "search_error": "Iskanje ni uspelo.",
     "no_restaurants_found": "Ni najdenih restavracij.",
     "reserving": "Rezerviram {{stevilo}} osebi ob {{cas}}...",
-
     "reservation_success": "Rezervacija uspešna! Miza št. {{miza}} je rezervirana za {{trajanje}}.",
-
-   "reservation_success_minimal": "Uspešno rezervirano ob {{cas}}!",
-
+    "reservation_success_minimal": "Uspešno rezervirano ob {{cas}}!",
     "reservation_failed": "Rezervacija ni uspela.",
     "server_connection_error": "Povezava s strežnikom ni uspela.",
     "server_connection_error_retry": "Napaka pri povezavi s strežnikom, poskusite znova.",
@@ -74,16 +72,14 @@
     "available_times_found": "Trenutno prosti termini.",
     "no_restaurant_selected": "Napaka: Ni izbrane restavracije.",
     "select_reservation_date": "Prosimo, izberite datum rezervacije.",
-    "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti."
+    "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti.",
+    "login_required": "Za rezervacijo je potrebna prijava. Prosimo, prijavite se." 
   },
-  
-  
   "duration": {
     "one_hour": "1 ura",
     "one_half_hours": "1 uro in pol",
     "two_hours": "2 uri"
   },
-  
   "auth": {
     "login_title": "Prijava",
     "register_title": "Registracija",
@@ -152,7 +148,6 @@
     "connect_title": "Poveži se z nami",
     "payment_info_prefix": "Varno plačilo, ki ga omogoča",
     "copyright_text": "© 2025 Rentyo Gourmet. Vse pravice pridržane."
-    
   },
   "profile": {
     "title": "Moj Uporabniški Profil",

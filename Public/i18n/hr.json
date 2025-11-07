@@ -47,7 +47,8 @@
     "na": "Nema podataka",
     "search_results": "Rezultati pretrage",
     "available_tomorrow": "Sutra u {{time}}",
-    "unavailable": "Nema slobodnih stolova"
+    "unavailable": "Nema slobodnih stolova",
+    "available_today": "Dostupno danas" 
   },
   "messages": {
     "enter_search_criteria": "Molimo, unesite grad ili vrstu kuhinje za pretragu.",
@@ -57,11 +58,8 @@
     "search_error": "Pretraga nije uspjela.",
     "no_restaurants_found": "Nema pronađenih restorana.",
     "reserving": "Rezerviram za {{stevilo}} osobe u {{cas}}...",
-    
     "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran za {{trajanje}}.",
-    
     "reservation_success_minimal": "Rezervacija uspješna u {{cas}}!",
-    
     "reservation_failed": "Rezervacija nije uspjela.",
     "server_connection_error": "Povezivanje s poslužiteljem nije uspjelo.",
     "server_connection_error_retry": "Greška pri povezivanju s poslužiteljem, pokušajte ponovno.",
@@ -74,16 +72,14 @@
     "available_times_found": "Trenutno dostupni termini.",
     "no_restaurant_selected": "Greška: Nije odabran restoran.",
     "select_reservation_date": "Molimo, odaberite datum rezervacije.",
-    "pogoji_required": "Za registraciju morate prihvatiti Opće uvjete i Politiku privatnosti."
+    "pogoji_required": "Za registraciju morate prihvatiti Opće uvjete i Politiku privatnosti.",
+    "login_required": "Za rezervaciju je potrebna prijava. Molimo, prijavite se." 
   },
-  
-  
   "duration": {
     "one_hour": "1 sat",
     "one_half_hours": "1 sat i pol",
     "two_hours": "2 sata"
   },
-  
   "auth": {
     "login_title": "Prijava",
     "register_title": "Registracija",

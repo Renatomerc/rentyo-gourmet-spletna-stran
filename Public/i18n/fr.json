@@ -47,7 +47,8 @@
     "na": "Aucune donnée",
     "search_results": "Résultats de la recherche",
     "available_tomorrow": "Demain à {{time}}",
-    "unavailable": "Aucune table disponible"
+    "unavailable": "Aucune table disponible",
+    "available_today": "Disponible aujourd'hui" 
   },
   "messages": {
     "enter_search_criteria": "Veuillez entrer une ville ou un type de cuisine pour la recherche.",
@@ -57,11 +58,8 @@
     "search_error": "Échec de la recherche.",
     "no_restaurants_found": "Aucun restaurant trouvé.",
     "reserving": "Réservation pour {{stevilo}} personnes à {{cas}}...",
-    
     "reservation_success": "Réservation réussie ! La table n° {{miza}} est réservée pour {{trajanje}}.",
-    
     "reservation_success_minimal": "Réservation réussie à {{cas}}!",
-    
     "reservation_failed": "Échec de la réservation.",
     "server_connection_error": "Échec de la connexion au serveur.",
     "server_connection_error_retry": "Erreur de connexion au serveur, veuillez réessayer.",
@@ -74,16 +72,14 @@
     "available_times_found": "Créneaux actuellement disponibles.",
     "no_restaurant_selected": "Erreur : Aucun restaurant sélectionné.",
     "select_reservation_date": "Veuillez sélectionner une date de réservation.",
-    "pogoji_required": "Pour vous inscrire, vous devez accepter les Conditions Générales et la Politique de Confidentialité."
+    "pogoji_required": "Pour vous inscrire, vous devez accepter les Conditions Générales et la Politique de Confidentialité.",
+    "login_required": "La connexion est requise pour la réservation. Veuillez vous connecter." 
   },
-  
-  
   "duration": {
     "one_hour": "une heure", 
     "one_half_hours": "une heure et demie",
     "two_hours": "deux heures"
   },
-  
   "auth": {
     "login_title": "Connexion",
     "register_title": "Inscription",
