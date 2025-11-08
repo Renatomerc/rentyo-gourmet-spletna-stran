@@ -448,31 +448,54 @@ exports.ustvariRezervacijo = async (req, res) => {
 
 /**
  * Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
- * 💥 POPRAVLJENO: Spremeni status na PREKLICANO namesto izbrisa (za zgodovino)
+ * 💥 POPRAVLJENO: Spremeni status na PREKLICANO in DODANO VARNOSTNO PREVERJANJE LASTNIŠTVA!
  */
 exports.izbrisiRezervacijo = async (req, res) => {
     const { restavracijaId, mizaId, rezervacijaId } = req.body;
+    
+    // ID prijavljenega uporabnika dobimo iz avtentikacijskega middleware-a
+    const uporabnikovId = req.uporabnik ? req.uporabnik.id : null; 
 
-    if (!mongoose.Types.ObjectId.isValid(restavracijaId) || !mongoose.Types.ObjectId.isValid(mizaId) || !mongoose.Types.ObjectId.isValid(rezervacijaId)) {
-        return res.status(400).json({ msg: 'Neveljaven format ID-ja.' });
+    if (!uporabnikovId) {
+        // Ta klic bi se moral ustaviti že v routerju, a je dodatna varnost dobrodošla.
+        console.log("❌ ZAVRNJENO: Poskus preklica brez veljavnega uporabniškega ID-ja.");
+        return res.status(401).json({ msg: 'Neavtorizirano: Za preklic morate biti prijavljeni.' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(restavracijaId) || 
+        !mongoose.Types.ObjectId.isValid(mizaId) || 
+        !mongoose.Types.ObjectId.isValid(rezervacijaId)) 
+    {
+        return res.status(400).json({ msg: 'Neveljaven format ID-ja (Restavracija, Miza ali Rezervacija).' });
     }
 
     try {
         // Uporaba arrayFilters za posodobitev v gnezdenem polju
+        // KLJUČNO: V arrayFilters dodamo POGOJ, da se mora ujemati tudi ID uporabnika (rez.uporabnikId)
         const rezultat = await Restavracija.updateOne(
-            { _id: restavracijaId }, // Filter za restavracijo
-            { $set: { "mize.$[miza].rezervacije.$[rez].status": "PREKLICANO" } }, // Posodobi status
+            { 
+                _id: restavracijaId, // 1. Filter za restavracijo
+                "mize._id": mizaId // 2. Filter za mizo
+            }, 
+            { 
+                $set: { 
+                    "mize.$[miza].rezervacije.$[rez].status": "PREKLICANO" 
+                } 
+            }, 
             { 
                 arrayFilters: [ // Natančno določi, katero mizo in rezervacijo
                     { "miza._id": new mongoose.Types.ObjectId(mizaId) },
-                    { "rez._id": new mongoose.Types.ObjectId(rezervacijaId) } 
-                ],
-                new: true 
+                    { 
+                        // 🟢 VARNOSTNI POGOJ: Rezervacija mora imeti pravi ID IN pravi uporabnikId
+                        "rez._id": new mongoose.Types.ObjectId(rezervacijaId),
+                        "rez.uporabnikId": new mongoose.Types.ObjectId(uporabnikovId) 
+                    } 
+                ]
             }
         );
 
         if (rezultat.modifiedCount === 0) {
-            return res.status(404).json({ msg: 'Rezervacija ali miza ni najdena ali pa je že preklicana.' });
+            return res.status(404).json({ msg: 'Rezervacija ni najdena, nimate dovoljenja za preklic, ali pa je že preklicana.' });
         }
 
         res.json({ msg: 'Rezervacija uspešno preklicana (Status posodobljen).' });

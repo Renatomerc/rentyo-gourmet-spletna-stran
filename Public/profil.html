@@ -659,13 +659,14 @@
                     preklicGumb.textContent = i18next.t('profile.cancel_button');
                     preklicGumb.style.flexShrink = '0'; // Ne skrči se
 
-                    // Dummy ID, ker mizaId še vedno ni v agregaciji
-                    const mizaIdDummy = '000000000000000000000000'; 
+                    // 🟢 POPRAVEK: Uporabimo dejanski mizaId, ki ga posreduje backend
+                    const mizaId = rez.mizaId; 
                     
                     preklicGumb.addEventListener('click', (e) => {
                         e.stopPropagation(); 
-                        console.log(`[FRONTEND] Poskus preklica: RezervacijaID: ${rez._id}, RestavracijaID: ${rez.restavracijaId}, MizaID: ${mizaIdDummy}`);
-                        prekliciRezervacijo(rez.restavracijaId, mizaIdDummy, rez._id);
+                        console.log(`[FRONTEND] Poskus preklica: RezervacijaID: ${rez._id}, RestavracijaID: ${rez.restavracijaId}, MizaID: ${mizaId}`);
+                        // 🟢 POPRAVLJEN KLIC
+                        prekliciRezervacijo(rez.restavracijaId, mizaId, rez._id);
                     });
                     
                     kartica.appendChild(preklicGumb);
