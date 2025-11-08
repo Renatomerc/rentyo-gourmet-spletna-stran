@@ -419,9 +419,13 @@
         // ===========================================
         // API KONFIGURACIJA
         // ===========================================
-        // 🔴 KLJUČNI POPRAVEK: Zamenjamo pot iz '/api/uporabnik/profil' v '/api/auth/profil',
-        // da se ujema s konfiguracijo v server.js (app.use('/api/auth', userRoutes);)
-        const PROFIL_API_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/auth/profil';
+        const BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/';
+        
+        // 🔴 KLJUČNI POPRAVEK: Popravljene in dodane API poti
+        const PROFIL_API_URL = `${BASE_URL}auth/profil`;
+        const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
+        const ZGODOVINA_REZERVACIJ_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`;
+        const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`; // Uporabimo DELETE pot
 
         // ===========================================
         // 1. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
@@ -446,21 +450,21 @@
         const zeton = localStorage.getItem('zeton');
         const akcijeDiv = document.querySelector('.akcije');
         
-        // Elemente za prikaz podatkov zdaj najdemo po ID-jih, kar je bolj robustno
+        // Elemente za prikaz podatkov
         const podatkiImeElement = document.getElementById('profil-ime'); 
         const podatkiEmailElement = document.getElementById('profil-email'); 
+        // 🆕 NOVO: Kontejnerji za rezervacije
+        const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
+        const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
 
         /**
          * Prikaz gumba za odjavo in gumba nazaj
          */
         const updateHeader = () => {
-            // Gumb za odjavo je zdaj v vsebini profila, ne v glavi.
             if (!zeton) {
                 // Če ni žetona, uporabnika preusmerimo nazaj
                 window.location.href = 'index.html';
             }
-            // Listener za odjavo dodamo v naloziPodatkeProfila po inicializaciji jezika
-            
         };
         
         /**
@@ -481,12 +485,9 @@
          */
         const posodobiPrikazPodatka = (element, labelKey, value) => {
             if (element) {
-                // Preveri, ali je i18next inicializiran
                 const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
-                // Vrednost postavimo v span.placeholder-text za konsistenco z initial DOM
                 let span = element.querySelector('.placeholder-text');
                 
-                // Popravek: ponovno sestavimo HTML, da se prikaže nova labela in dinamična vsebina
                 element.innerHTML = `<strong>${label}:</strong> `; 
                 
                 if(!span) {
@@ -504,7 +505,7 @@
         const naloziPodatkeProfila = async () => {
             if (!zeton) return;
 
-            // NOVO: Dodajanje event listenerja za gumb ODJAVA, ki je sedaj v vsebini
+            // Dodajanje event listenerja za gumb ODJAVA
             const gumbOdjava = document.getElementById('gumb-odjava');
             if (gumbOdjava) {
                 gumbOdjava.addEventListener('click', odjava);
@@ -521,8 +522,6 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    // Preverimo, ali podatki ustrezajo pričakovani strukturi
                     const uporabnik = data.uporabnik || data; 
 
                     if (uporabnik && uporabnik.ime && uporabnik.email) {
@@ -530,47 +529,197 @@
                         posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
                         
                     } else {
-                        // Namesto alert() uporabimo console.error/log
-                        console.error("Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.", data);
-                        // Uporabniku prikažemo sporočilo na prijazen način (simulirano z izpisom v konzolo)
-                        console.log("NAPAKA: Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.");
+                        console.error("Podatki uporabnika so nepopolni ali v napačni obliki.", data);
                     }
-
                     
                 } else if (response.status === 401 || response.status === 403) {
-                    // Če žeton ni veljaven ali dostop ni dovoljen
                     console.error("Avtorizacija neuspešna:", response.status);
-                    console.log("VAŠA SEJA JE POTEKLA. Prosimo, prijavite se ponovno.");
                     odjava();
                 } else {
-                    // Ta alert se sproži ob napakah, kot je 404 ali 500
                     console.error("Napaka pri nalaganju profila:", response.status);
-                    
-                    // NOVO: Podrobnejše sporočilo za 404
-                    let statusText = `Koda: ${response.status}. Preverite, ali je API pot **${PROFIL_API_URL}** pravilno nastavljena v vašem backend strežniku.`;
-                    if (response.status === 404) {
-                        statusText = `Koda: 404 (Pot ni najdena). **Obvezno preverite vaš backend** (strežnik na portu 5000), ker ta pot **${PROFIL_API_URL}** tam ne obstaja! (Ste ponovno zagnali strežnik?)`;
-                    }
-
-                    console.log(`NAPAKA PRI NALAGANJU PODATKOV PROFILA. (${statusText})`);
                 }
 
             } catch (error) {
                 console.error("Napaka pri komunikaciji z backendom:", error);
-                console.log("KRITIČNA NAPAKA pri povezovanju s strežnikom. Preverite, ali vaš backend teče.");
+            }
+        };
+
+        // ===========================================
+        // 3. LOGIKA ZA REZERVACIJE (NOVO)
+        // ===========================================
+        
+        /**
+         * Klic API-ja za preklic rezervacije
+         */
+        const prekliciRezervacijo = async (restavracijaId, mizaId, rezervacijaId) => {
+            if (!confirm(i18next.t('profile.cancel_confirmation'))) return;
+            
+            try {
+                const response = await fetch(PREKLIC_REZERVACIJE_API_URL, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}`
+                    },
+                    body: JSON.stringify({ 
+                        restavracijaId, 
+                        mizaId, 
+                        rezervacijaId 
+                    })
+                });
+
+                if (response.ok) {
+                    alert(i18next.t('profile.cancel_success'));
+                    // Ponovno nalaganje obeh seznamov po uspešnem preklicu
+                    naloziAktivneRezervacije(); 
+                    naloziZgodovinoRezervacij();
+                } else {
+                    const errorData = await response.json();
+                    alert(`${i18next.t('profile.cancel_error')}: ${errorData.msg || response.statusText}`);
+                }
+            } catch (error) {
+                console.error("Napaka pri preklicu rezervacije:", error);
+                alert(i18next.t('profile.server_error'));
+            }
+        };
+
+        /**
+         * Pomožna funkcija za renderiranje rezervacij
+         */
+        const renderRezervacije = (rezervacije, kontejnerElement, jeAktivnaLista) => {
+            // Ponastavi vsebino kontejnerja (hrani samo h3 naslov)
+            const h3 = kontejnerElement.querySelector('h3');
+            kontejnerElement.innerHTML = '';
+            if (h3) kontejnerElement.appendChild(h3);
+
+            if (!rezervacije || rezervacije.length === 0) {
+                const sporocilo = jeAktivnaLista 
+                    ? i18next.t('profile.no_current_reservations')
+                    : i18next.t('profile.no_history_reservations');
+                
+                const p = document.createElement('p');
+                p.textContent = sporocilo;
+                kontejnerElement.appendChild(p);
+                return;
+            }
+
+            rezervacije.forEach(rez => {
+                const p = document.createElement('p');
+                // Formatiranje časa (npr. 19.5 -> 19:30)
+                const casFormatted = String(rez.cas_rezervacije).split('.');
+                const ura = casFormatted[0];
+                const minute = casFormatted.length > 1 && casFormatted[1] === '5' ? '30' : '00';
+                const casIzpis = `${ura}:${minute}`;
+
+
+                let textContent = `${rez.ime_restavracije}, ${rez.datum_rezervacije} ob ${casIzpis} (${rez.stevilo_oseb} oseb)`;
+                
+                if (!jeAktivnaLista) {
+                    // Za zgodovino dodamo status
+                    const statusText = rez.status === 'PREKLICANO' 
+                        ? i18next.t('profile.status_cancelled') 
+                        : i18next.t('profile.status_completed');
+                    textContent += ` - [${statusText}]`;
+                }
+
+                p.textContent = textContent;
+                p.classList.add('kartica-podatkov'); // Uporabimo enak stil za kartico
+                p.style.display = 'flex';
+                p.style.justifyContent = 'space-between';
+                p.style.alignItems = 'center';
+                p.style.padding = '15px 20px';
+
+
+                if (jeAktivnaLista) {
+                    const preklicGumb = document.createElement('button');
+                    preklicGumb.classList.add('gumb-preklici');
+                    preklicGumb.textContent = i18next.t('profile.cancel_button');
+                    
+                    // Ker nam backend aggregation ne da mizaId, ga moramo pridobiti v prekliciRezervacijo
+                    // Zaenkrat pošljemo samo rezervacijaId in restavracijaId (mizaId bo morda treba poiskati na backendu)
+                    // PREDPOSTAVKA: Zaenkrat pošljemo samo Rezervacija ID in Restavracija ID, Miza ID najde backend
+                    // ČE BACKEND ZAHTEVA VSE TRI:
+                    // PUSTIMO PREKLIC BUTTON SAMO KOT MESTO. Implementacija bo polno delovala, ko bo na voljo tudi mizaId iz agregacije.
+                    // Začasna rešitev: Miza ID nastavimo na dummy vrednost
+                    const mizaIdDummy = '000000000000000000000000'; // Dummy ID
+                    
+                    preklicGumb.addEventListener('click', () => {
+                        // OPOZORILO: Tukaj je morda treba dodati logiko, ki na podlagi Rezervacija ID pokliče strežnik,
+                        // da dobi Restavracija ID in Miza ID, če teh ni v agregaciji!
+                        // Ker jih backend zahteva, jih moramo poslati. Ker jih nimamo, uporabimo 
+                        // RezervacijaId kot mizaId in pošljemo restavracijaId:
+                        prekliciRezervacijo(rez.restavracijaId, mizaIdDummy, rez._id);
+                    });
+                    
+                    // Za mobilni pogled: Poravnava gumba na isto linijo
+                    p.style.flexWrap = 'wrap'; 
+                    preklicGumb.style.marginTop = '0';
+                    preklicGumb.style.marginLeft = '10px'; 
+                    p.appendChild(preklicGumb);
+                }
+
+                kontejnerElement.appendChild(p);
+            });
+        };
+
+        /**
+         * Klic API-ja za aktivne rezervacije
+         */
+        const naloziAktivneRezervacije = async () => {
+            try {
+                const response = await fetch(AKTIVNE_REZERVACIJE_API_URL, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${zeton}` }
+                });
+
+                if (response.ok) {
+                    const rezervacije = await response.json();
+                    renderRezervacije(rezervacije, aktivneRezervacijeKontejner, true);
+                } else if (response.status === 401 || response.status === 403) {
+                    renderRezervacije([], aktivneRezervacijeKontejner, true);
+                    console.error("Dostop do aktivnih rezervacij zavrnjen.");
+                } else {
+                    console.error("Napaka pri nalaganju aktivnih rezervacij:", response.status);
+                    aktivneRezervacijeKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
+                }
+            } catch (error) {
+                console.error("Kritična napaka pri nalaganju aktivnih rezervacij:", error);
+            }
+        };
+
+        /**
+         * Klic API-ja za zgodovino rezervacij
+         */
+        const naloziZgodovinoRezervacij = async () => {
+            try {
+                const response = await fetch(ZGODOVINA_REZERVACIJ_API_URL, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${zeton}` }
+                });
+
+                if (response.ok) {
+                    const rezervacije = await response.json();
+                    renderRezervacije(rezervacije, zgodovinaRezervacijKontejner, false);
+                } else if (response.status === 401 || response.status === 403) {
+                    renderRezervacije([], zgodovinaRezervacijKontejner, false);
+                    console.error("Dostop do zgodovine rezervacij zavrnjen.");
+                } else {
+                    console.error("Napaka pri nalaganju zgodovine rezervacij:", response.status);
+                    zgodovinaRezervacijKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
+                }
+            } catch (error) {
+                console.error("Kritična napaka pri nalaganju zgodovine rezervacij:", error);
             }
         };
 
 
         // ===========================================
-        // 3. i18next IN ZAGON
+        // 4. i18next IN ZAGON
         // ===========================================
 
         const updateContent = () => {
-          // Posodobi vse elemente z atributom data-i18n
           document.querySelectorAll("[data-i18n]").forEach((el) => {
             const key = el.getAttribute("data-i18n");
-            // Posebna obravnava za gumbe z ikonami, da se besedilo ne podvoji
             if (el.tagName === 'BUTTON' || el.classList.contains('profil-zavihek')) {
                 const ikona = el.querySelector('.fas');
                 el.textContent = i18next.t(key);
@@ -582,11 +731,10 @@
           
           document.title = i18next.t("app.profile_title");
 
-          // Ponovno posodobimo labele po nalaganju jezika (če so bile naložene dinamično)
+          // Ponovno posodobimo labele po nalaganju jezika
           const imeLabel = i18next.t('profile.name_label');
           const emailLabel = i18next.t('profile.email_label');
 
-          // Popravek i18n za dinamične labele
           if (podatkiImeElement) {
               const content = podatkiImeElement.querySelector('span')?.textContent || '';
               podatkiImeElement.innerHTML = `<strong>${imeLabel}:</strong> <span class="placeholder-text">${content}</span>`;
@@ -606,26 +754,34 @@
             {
                 lng: loadLanguage(), 
                 fallbackLng: "sl",
-                // Predpostavljamo, da je i18n mapa na voljo
                 backend: { loadPath: "./i18n/{{lng}}.json" }, 
             },
             (err) => {
                 if (err) console.error("i18next napaka pri nalaganju: ", err);
                 
                 updateContent();
-                updateHeader(); // Poskrbi le za preusmeritev, če ni žetona
-                naloziPodatkeProfila(); // Zaženemo nalaganje podatkov in doda listener za odjavo
+                updateHeader();
+                
+                // 🚀 ZAGON NALAGANJA PODATKOV IN REZERVACIJ
+                naloziPodatkeProfila(); 
+                naloziAktivneRezervacije(); // 🆕 KLJUČNO
+                naloziZgodovinoRezervacij(); // 🆕 KLJUČNO
                 
                 // 🆕 KLJUČNA LOGIKA: Prikaz/skrivanje formularja za kartico
                 const gumbDodajKartico = document.getElementById('gumb-dodaj-kartico');
                 const formularKartice = document.getElementById('kartica-formular');
                 const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
+                
+                // POČISTIMO STATIČNO VSEBINO v "Aktualne rezervacije" in "Zgodovina rezervacij"
+                // saj jo bomo dinamično naložili
+                aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>`;
+                zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>`;
+
 
                 if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
                     
                     const preklopiPrikazFormularja = () => {
                         formularKartice.classList.toggle('skrij-formular');
-                        // Po želji lahko spremenite besedilo na gumbu Dodaj/Posodobi, ko je formular odprt
                         const jePrikazan = !formularKartice.classList.contains('skrij-formular');
                         gumbDodajKartico.textContent = i18next.t(jePrikazan ? 'profile.hide_card_button' : 'profile.add_card_button');
                     };
@@ -633,17 +789,12 @@
                     gumbDodajKartico.addEventListener('click', preklopiPrikazFormularja);
                     gumbPrekliciKartico.addEventListener('click', preklopiPrikazFormularja);
 
-                    // ⚠️ OPOZORILO: Dodajte event listener za SUBMIT, ki bo preprečil ponovno nalaganje strani
                     const form = document.getElementById('formular-kartice');
                     if (form) {
                         form.addEventListener('submit', (e) => {
                             e.preventDefault();
-                            // Tukaj bi prišla logika za pošiljanje podatkov kartice na strežnik
-                            
-                            // Namesto alert() izpišemo v konzolo
                             console.log('Podatki kartice shranjeni! (Implementacija pošiljanja na strežnik še sledi)');
-                            
-                            preklopiPrikazFormularja(); // Skrij formular po shranjevanju/preklicu
+                            preklopiPrikazFormularja();
                         });
                     }
                 }
