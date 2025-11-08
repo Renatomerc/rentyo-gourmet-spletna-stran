@@ -261,7 +261,7 @@
         }
 
         .profil-zavihek {
-            width: 45%;
+            width: 70%;
             padding: 5px 20px; /* Malo večji padding za boljše tapkanje */
             border-radius: 25px;
             text-align: left;
@@ -416,230 +416,239 @@
   </footer>
 
 <script>
-    // ===========================================
-    // API KONFIGURACIJA
-    // ===========================================
-    // 🔴 KLJUČNI POPRAVEK: Zamenjamo pot iz '/api/uporabnik/profil' v '/api/auth/profil',
-    // da se ujema s konfiguracijo v server.js (app.use('/api/auth', userRoutes);)
-    const PROFIL_API_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/auth/profil';
+        // ===========================================
+        // API KONFIGURACIJA
+        // ===========================================
+        // 🔴 KLJUČNI POPRAVEK: Zamenjamo pot iz '/api/uporabnik/profil' v '/api/auth/profil',
+        // da se ujema s konfiguracijo v server.js (app.use('/api/auth', userRoutes);)
+        const PROFIL_API_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/auth/profil';
 
-    // ===========================================
-    // 1. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
-    // ===========================================
-    const zavihki = document.querySelectorAll(".profil-zavihek");
-    const vsebine = document.querySelectorAll(".vsebina-zavihek");
+        // ===========================================
+        // 1. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
+        // ===========================================
+        const zavihki = document.querySelectorAll(".profil-zavihek");
+        const vsebine = document.querySelectorAll(".vsebina-zavihek");
 
-    zavihki.forEach(zavihek => {
-      zavihek.addEventListener("click", () => {
-        zavihki.forEach(t => t.classList.remove("active"));
-        vsebine.forEach(c => c.classList.remove("active"));
-        zavihek.classList.add("active");
-        const targetId = zavihek.getAttribute("data-target");
-        document.getElementById(targetId).classList.add("active");
-      });
-    });
+        zavihki.forEach(zavihek => {
+            zavihek.addEventListener("click", () => {
+                zavihki.forEach(t => t.classList.remove("active"));
+                vsebine.forEach(c => c.classList.remove("active"));
+                zavihek.classList.add("active");
+                const targetId = zavihek.getAttribute("data-target");
+                document.getElementById(targetId).classList.add("active");
+            });
+        });
 
-    // ===========================================
-    // 2. AVTENTIKACIJA IN NALAGANJE PODATKOV
-    // ===========================================
+        // ===========================================
+        // 2. AVTENTIKACIJA IN NALAGANJE PODATKOV
+        // ===========================================
 
-    const zeton = localStorage.getItem('zeton');
-    const akcijeDiv = document.querySelector('.akcije');
-    
-    // Elemente za prikaz podatkov zdaj najdemo po ID-jih, kar je bolj robustno
-    const podatkiImeElement = document.getElementById('profil-ime'); 
-    const podatkiEmailElement = document.getElementById('profil-email'); 
-
-    /**
-     * Prikaz gumba za odjavo in gumba nazaj
-     */
-    const updateHeader = () => {
-        // Gumb za odjavo je zdaj v vsebini profila, ne v glavi.
-        if (!zeton) {
-            // Če ni žetona, uporabnika preusmerimo nazaj
-            window.location.href = 'index.html';
-        }
-        // Listener za odjavo dodamo v naloziPodatkeProfila po inicializaciji jezika
+        const zeton = localStorage.getItem('zeton');
+        const akcijeDiv = document.querySelector('.akcije');
         
-    };
-    
-    /**
-     * Logika za odjavo
-     */
-    const odjava = (e) => {
-        if (e) e.preventDefault();
-        localStorage.removeItem('zeton'); 
-        localStorage.removeItem('jeLastnik'); 
-        window.location.href = 'index.html'; 
-    };
-    
-    /**
-     * Posodobi prikaz imena in priimka/e-pošte
-     * @param {HTMLElement} element - Element, ki ga posodabljamo
-     * @param {string} labelKey - i18n ključ za labelo (npr. 'profile.name_label')
-     * @param {string} value - Dejanska vrednost (ime ali e-pošta)
-     */
-    const posodobiPrikazPodatka = (element, labelKey, value) => {
-        if (element) {
-            const label = i18next.t(labelKey);
-            // Vrednost postavimo v span.placeholder-text za konsistenco z initial DOM
-            const span = element.querySelector('.placeholder-text');
-            element.innerHTML = `<strong>${label}:</strong> `;
-            if(span) {
+        // Elemente za prikaz podatkov zdaj najdemo po ID-jih, kar je bolj robustno
+        const podatkiImeElement = document.getElementById('profil-ime'); 
+        const podatkiEmailElement = document.getElementById('profil-email'); 
+
+        /**
+         * Prikaz gumba za odjavo in gumba nazaj
+         */
+        const updateHeader = () => {
+            // Gumb za odjavo je zdaj v vsebini profila, ne v glavi.
+            if (!zeton) {
+                // Če ni žetona, uporabnika preusmerimo nazaj
+                window.location.href = 'index.html';
+            }
+            // Listener za odjavo dodamo v naloziPodatkeProfila po inicializaciji jezika
+            
+        };
+        
+        /**
+         * Logika za odjavo
+         */
+        const odjava = (e) => {
+            if (e) e.preventDefault();
+            localStorage.removeItem('zeton'); 
+            localStorage.removeItem('jeLastnik'); 
+            window.location.href = 'index.html'; 
+        };
+        
+        /**
+         * Posodobi prikaz imena in priimka/e-pošte
+         * @param {HTMLElement} element - Element, ki ga posodabljamo
+         * @param {string} labelKey - i18n ključ za labelo (npr. 'profile.name_label')
+         * @param {string} value - Dejanska vrednost (ime ali e-pošta)
+         */
+        const posodobiPrikazPodatka = (element, labelKey, value) => {
+            if (element) {
+                // Preveri, ali je i18next inicializiran
+                const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
+                // Vrednost postavimo v span.placeholder-text za konsistenco z initial DOM
+                let span = element.querySelector('.placeholder-text');
+                
+                // Popravek: ponovno sestavimo HTML, da se prikaže nova labela in dinamična vsebina
+                element.innerHTML = `<strong>${label}:</strong> `; 
+                
+                if(!span) {
+                    span = document.createElement('span');
+                    span.className = 'placeholder-text';
+                }
                 span.textContent = value;
                 element.appendChild(span);
-            } else {
-                 element.innerHTML += value;
             }
-        }
-    };
+        };
 
-    /**
-     * Pokliče zaščiten endpoint in napolni osebne podatke
-     */
-    const naloziPodatkeProfila = async () => {
-        if (!zeton) return;
+        /**
+         * Pokliče zaščiten endpoint in napolni osebne podatke
+         */
+        const naloziPodatkeProfila = async () => {
+            if (!zeton) return;
 
-        // NOVO: Dodajanje event listenerja za gumb ODJAVA, ki je sedaj v vsebini
-        const gumbOdjava = document.getElementById('gumb-odjava');
-        if (gumbOdjava) {
-            gumbOdjava.addEventListener('click', odjava);
-        }
-
-        try {
-            const response = await fetch(PROFIL_API_URL, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${zeton}` 
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                
-                // Preverimo, ali podatki ustrezajo pričakovani strukturi
-                const uporabnik = data.uporabnik || data; 
-
-                if (uporabnik && uporabnik.ime && uporabnik.email) {
-                    posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
-                    posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
-                    
-                } else {
-                    // Prikaz, če strežnik vrne 200 OK, a podatki niso pravilni
-                    alert("Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.");
-                    console.error("Strežnik je vrnil OK, a manjkajo podatki 'ime' ali 'email'.", data);
-                }
-
-                
-            } else if (response.status === 401 || response.status === 403) {
-                // Če žeton ni veljaven ali dostop ni dovoljen
-                console.error("Avtorizacija neuspešna:", response.status);
-                alert("Vaša seja je potekla. Prosimo, prijavite se ponovno.");
-                odjava();
-            } else {
-                // Ta alert se sproži ob napakah, kot je 404 ali 500
-                console.error("Napaka pri nalaganju profila:", response.status);
-                
-                // NOVO: Podrobnejše sporočilo za 404
-                let statusText = `Koda: ${response.status}. Preverite, ali je API pot **${PROFIL_API_URL}** pravilno nastavljena v vašem backend strežniku.`;
-                if (response.status === 404) {
-                    statusText = `Koda: 404 (Pot ni najdena). **Obvezno preverite vaš backend** (strežnik na portu 5000), ker ta pot **${PROFIL_API_URL}** tam ne obstaja! (Ste ponovno zagnali strežnik?)`;
-                }
-
-                alert(`Napaka pri nalaganju podatkov profila. (${statusText})`);
+            // NOVO: Dodajanje event listenerja za gumb ODJAVA, ki je sedaj v vsebini
+            const gumbOdjava = document.getElementById('gumb-odjava');
+            if (gumbOdjava) {
+                gumbOdjava.addEventListener('click', odjava);
             }
 
-        } catch (error) {
-            console.error("Napaka pri komunikaciji z backendom:", error);
-            alert("Kritična napaka pri povezovanju s strežnikom. Preverite, ali vaš backend teče na portu 5000.");
-        }
-    };
-
-
-    // ===========================================
-    // 3. i18next IN ZAGON
-    // ===========================================
-
-    const updateContent = () => {
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        const key = el.getAttribute("data-i18n");
-        el.textContent = i18next.t(key);
-      });
-      // Posodobimo tudi dinamično vsebino, ki ni nastavljena z data-i18n
-      document.title = i18next.t("app.profile_title");
-
-      // Ponovno posodobimo labele po nalaganju jezika (če so bile naložene dinamično)
-      const imeLabel = i18next.t('profile.name_label');
-      const emailLabel = i18next.t('profile.email_label');
-
-      // Ta del je pomemben za i18n, ko se vsebina nalaga asinhrono
-      if (podatkiImeElement) {
-          const content = podatkiImeElement.querySelector('span')?.textContent || '';
-          podatkiImeElement.innerHTML = `<strong>${imeLabel}:</strong> <span class="placeholder-text">${content}</span>`;
-      }
-      if (podatkiEmailElement) {
-          const content = podatkiEmailElement.querySelector('span')?.textContent || '';
-          podatkiEmailElement.innerHTML = `<strong>${emailLabel}:</strong> <span class="placeholder-text">${content}</span>`;
-      }
-      
-      // Posodobitev teksta na novem gumbu Odjava
-      const gumbOdjava = document.getElementById('gumb-odjava');
-      if (gumbOdjava) {
-          // Preprečimo podvajanje elementov (ikona + besedilo) pri ponovnem klicu updateContent
-          const ikona = gumbOdjava.querySelector('.fas');
-          gumbOdjava.textContent = i18next.t('header.logout');
-          if (ikona) gumbOdjava.prepend(ikona); // Vrnemo ikono na začetek
-      }
-    };
-
-    const loadLanguage = () => {
-        return localStorage.getItem('i18nextLng') || 'sl'; 
-    };
-    
-    i18next.use(i18nextHttpBackend).init(
-      {
-        lng: loadLanguage(), 
-        fallbackLng: "sl",
-        backend: { loadPath: "./i18n/{{lng}}.json" }, 
-      },
-      (err) => {
-        if (err) console.error(err);
-        
-        updateContent();
-        updateHeader(); // Poskrbi le za preusmeritev, če ni žetona
-        naloziPodatkeProfila(); // Zaženemo nalaganje podatkov in doda listener za odjavo
-        
-        // 🆕 KLJUČNA LOGIKA: Prikaz/skrivanje formularja za kartico
-        const gumbDodajKartico = document.getElementById('gumb-dodaj-kartico');
-        const formularKartice = document.getElementById('kartica-formular');
-        const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
-
-        if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
-            
-            const preklopiPrikazFormularja = () => {
-                formularKartice.classList.toggle('skrij-formular');
-                // Po želji lahko spremenite besedilo na gumbu Dodaj/Posodobi, ko je formular odprt
-                const jePrikazan = !formularKartice.classList.contains('skrij-formular');
-                gumbDodajKartico.textContent = jePrikazan ? i18next.t('profile.hide_card_button') : i18next.t('profile.add_card_button');
-            };
-
-            gumbDodajKartico.addEventListener('click', preklopiPrikazFormularja);
-            gumbPrekliciKartico.addEventListener('click', preklopiPrikazFormularja);
-
-            // ⚠️ OPOZORILO: Dodajte event listener za SUBMIT, ki bo preprečil ponovno nalaganje strani
-            const form = document.getElementById('formular-kartice');
-            if (form) {
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    // Tukaj bi prišla logika za pošiljanje podatkov kartice na strežnik
-                    alert('Podatki kartice shranjeni! (Implementacija pošiljanja na strežnik še sledi)');
-                    preklopiPrikazFormularja(); // Skrij formular po shranjevanju/preklicu
+            try {
+                const response = await fetch(PROFIL_API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}` 
+                    }
                 });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Preverimo, ali podatki ustrezajo pričakovani strukturi
+                    const uporabnik = data.uporabnik || data; 
+
+                    if (uporabnik && uporabnik.ime && uporabnik.email) {
+                        posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
+                        posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
+                        
+                    } else {
+                        // Namesto alert() uporabimo console.error/log
+                        console.error("Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.", data);
+                        // Uporabniku prikažemo sporočilo na prijazen način (simulirano z izpisom v konzolo)
+                        console.log("NAPAKA: Podatki uporabnika so nepopolni ali v napačni obliki. Preverite odgovor strežnika.");
+                    }
+
+                    
+                } else if (response.status === 401 || response.status === 403) {
+                    // Če žeton ni veljaven ali dostop ni dovoljen
+                    console.error("Avtorizacija neuspešna:", response.status);
+                    console.log("VAŠA SEJA JE POTEKLA. Prosimo, prijavite se ponovno.");
+                    odjava();
+                } else {
+                    // Ta alert se sproži ob napakah, kot je 404 ali 500
+                    console.error("Napaka pri nalaganju profila:", response.status);
+                    
+                    // NOVO: Podrobnejše sporočilo za 404
+                    let statusText = `Koda: ${response.status}. Preverite, ali je API pot **${PROFIL_API_URL}** pravilno nastavljena v vašem backend strežniku.`;
+                    if (response.status === 404) {
+                        statusText = `Koda: 404 (Pot ni najdena). **Obvezno preverite vaš backend** (strežnik na portu 5000), ker ta pot **${PROFIL_API_URL}** tam ne obstaja! (Ste ponovno zagnali strežnik?)`;
+                    }
+
+                    console.log(`NAPAKA PRI NALAGANJU PODATKOV PROFILA. (${statusText})`);
+                }
+
+            } catch (error) {
+                console.error("Napaka pri komunikaciji z backendom:", error);
+                console.log("KRITIČNA NAPAKA pri povezovanju s strežnikom. Preverite, ali vaš backend teče.");
             }
-        }
-      }
-    );
-  </script>
+        };
+
+
+        // ===========================================
+        // 3. i18next IN ZAGON
+        // ===========================================
+
+        const updateContent = () => {
+          // Posodobi vse elemente z atributom data-i18n
+          document.querySelectorAll("[data-i18n]").forEach((el) => {
+            const key = el.getAttribute("data-i18n");
+            // Posebna obravnava za gumbe z ikonami, da se besedilo ne podvoji
+            if (el.tagName === 'BUTTON' || el.classList.contains('profil-zavihek')) {
+                const ikona = el.querySelector('.fas');
+                el.textContent = i18next.t(key);
+                if (ikona) el.prepend(ikona);
+            } else {
+                el.textContent = i18next.t(key);
+            }
+          });
+          
+          document.title = i18next.t("app.profile_title");
+
+          // Ponovno posodobimo labele po nalaganju jezika (če so bile naložene dinamično)
+          const imeLabel = i18next.t('profile.name_label');
+          const emailLabel = i18next.t('profile.email_label');
+
+          // Popravek i18n za dinamične labele
+          if (podatkiImeElement) {
+              const content = podatkiImeElement.querySelector('span')?.textContent || '';
+              podatkiImeElement.innerHTML = `<strong>${imeLabel}:</strong> <span class="placeholder-text">${content}</span>`;
+          }
+          if (podatkiEmailElement) {
+              const content = podatkiEmailElement.querySelector('span')?.textContent || '';
+              podatkiEmailElement.innerHTML = `<strong>${emailLabel}:</strong> <span class="placeholder-text">${content}</span>`;
+          }
+          
+        };
+
+        const loadLanguage = () => {
+            return localStorage.getItem('i18nextLng') || 'sl'; 
+        };
+        
+        i18next.use(i18nextHttpBackend).init(
+            {
+                lng: loadLanguage(), 
+                fallbackLng: "sl",
+                // Predpostavljamo, da je i18n mapa na voljo
+                backend: { loadPath: "./i18n/{{lng}}.json" }, 
+            },
+            (err) => {
+                if (err) console.error("i18next napaka pri nalaganju: ", err);
+                
+                updateContent();
+                updateHeader(); // Poskrbi le za preusmeritev, če ni žetona
+                naloziPodatkeProfila(); // Zaženemo nalaganje podatkov in doda listener za odjavo
+                
+                // 🆕 KLJUČNA LOGIKA: Prikaz/skrivanje formularja za kartico
+                const gumbDodajKartico = document.getElementById('gumb-dodaj-kartico');
+                const formularKartice = document.getElementById('kartica-formular');
+                const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
+
+                if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
+                    
+                    const preklopiPrikazFormularja = () => {
+                        formularKartice.classList.toggle('skrij-formular');
+                        // Po želji lahko spremenite besedilo na gumbu Dodaj/Posodobi, ko je formular odprt
+                        const jePrikazan = !formularKartice.classList.contains('skrij-formular');
+                        gumbDodajKartico.textContent = i18next.t(jePrikazan ? 'profile.hide_card_button' : 'profile.add_card_button');
+                    };
+
+                    gumbDodajKartico.addEventListener('click', preklopiPrikazFormularja);
+                    gumbPrekliciKartico.addEventListener('click', preklopiPrikazFormularja);
+
+                    // ⚠️ OPOZORILO: Dodajte event listener za SUBMIT, ki bo preprečil ponovno nalaganje strani
+                    const form = document.getElementById('formular-kartice');
+                    if (form) {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            // Tukaj bi prišla logika za pošiljanje podatkov kartice na strežnik
+                            
+                            // Namesto alert() izpišemo v konzolo
+                            console.log('Podatki kartice shranjeni! (Implementacija pošiljanja na strežnik še sledi)');
+                            
+                            preklopiPrikazFormularja(); // Skrij formular po shranjevanju/preklicu
+                        });
+                    }
+                }
+            }
+        );
+    </script>
 </body>
 </html>

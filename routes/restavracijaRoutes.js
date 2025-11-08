@@ -71,6 +71,20 @@ module.exports = (preveriGosta) => {
     router.delete('/izbrisi_rezervacijo', preveriGosta, restavracijaController.izbrisiRezervacijo);
     
     
+    // -----------------------------------------------------------------
+    // 🟢 NOVO: POTI ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA)
+    // -----------------------------------------------------------------
+    /**
+     * GET /api/restavracije/uporabnik/aktivne
+     */
+    router.get('/uporabnik/aktivne', preveriGosta, restavracijaController.pridobiAktivneRezervacijeUporabnika);
+
+    /**
+     * GET /api/restavracije/uporabnik/zgodovina
+     */
+    router.get('/uporabnik/zgodovina', preveriGosta, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
+
+
     // =================================================================
     // 💥 2. SPLOŠNI CRUD (/, POST /) - Fiksne poti brez parametrov
     // =================================================================
