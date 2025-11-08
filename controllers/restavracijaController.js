@@ -280,22 +280,49 @@ exports.pridobiProsteUre = async (req, res) => {
             // 🔥 POPRAVEK 2: Uporabi pravilno pretvorjen ObjectId
             { $match: { _id: restavracijaObjectId } }, 
             { $unwind: "$mize" }, 
-            { $match: { "mize.kapaciteta": { $gte: stevilo_oseb } } }, 
+            // 🟢 POPRAVEK ZA ADMIN PRIKAZ/PREVERJANJE PROSTIH MEST: 
+            // Izločimo rezervacije, ki so bile že preklicane (če bi se klic uporabil za zasedenost).
+            { $unwind: { path: "$mize.rezervacije", preserveNullAndEmptyArrays: true } }, // Dodan unwind rezervacij
+            { $match: { 
+                $or: [
+                    { "mize.rezervacije.status": { $exists: false } },
+                    { "mize.rezervacije.status": { $ne: 'PREKLICANO' } }
+                ]
+            }},
+            // Vrnemo se na "mize" array, da lahko preverimo kapaciteto
+            { $group: {
+                _id: "$mize._id",
+                miza: { $first: "$mize" },
+                delovniCasStart: { $first: "$delovniCasStart" },
+                delovniCasEnd: { $first: "$delovniCasEnd" },
+                rezervacije: { $push: "$mize.rezervacije" }
+            }},
+            { $match: { "miza.kapaciteta": { $gte: stevilo_oseb } } }, 
             { $project: {
                 _id: 0, 
-                miza: "$mize",
-                delovniCasStart: "$delovniCasStart",
-                delovniCasEnd: "$delovniCasEnd"
+                miza: "$miza",
+                rezervacije: "$rezervacije",
+                delovniCasStart: 1,
+                delovniCasEnd: 1
             }}
         ]);
 
         if (rezultatiAggregation.length === 0) {
             return res.json({ msg: 'Ni ustreznih miz za to število oseb.', mize: [] });
         }
+        
+        // Zamenjaj rezultatiAggregation z bolj čisto strukturo za nadaljnjo logiko
+        const aggrRezultatiZaLogiko = rezultatiAggregation.map(r => ({
+            miza: r.miza,
+            delovniCasStart: r.delovniCasStart,
+            delovniCasEnd: r.delovniCasEnd,
+            rezervacije: r.rezervacije.filter(rez => rez && rez.casStart) // Odstranimo morebitne null/undefine
+        }));
+
 
         const koncniRezultati = [];
-        const casZacetka = rezultatiAggregation[0].delovniCasStart || 8; 
-        const casZaprtja = rezultatiAggregation[0].delovniCasEnd || 23; 
+        const casZacetka = aggrRezultatiZaLogiko[0].delovniCasStart || 8; 
+        const casZaprtja = aggrRezultatiZaLogiko[0].delovniCasEnd || 23; 
         const minimalniCasKonca = casZaprtja - privzetoTrajanje;
 
         // Izračun v minutah za zanesljivost
@@ -303,14 +330,14 @@ exports.pridobiProsteUre = async (req, res) => {
         const konecMinut = minimalniCasKonca * 60; 
         const intervalMinut = interval * 60; // Sedaj je to 60 minut
 
-        for (const aggResult of rezultatiAggregation) {
+        for (const aggResult of aggrRezultatiZaLogiko) { // Uporabimo novo strukturo
             const miza = aggResult.miza;
             const prosteUre = [];
             
             const mizaImeZaIzpis = miza.Miza || miza.ime || miza.naziv || `ID: ${miza._id.toString().substring(0, 4)}...`;
 
-            // OPOZORILO: Prepričajte se, da obstaja funkcija seRezervacijiPrekrivata()
-            const obstojeceRezervacije = (miza.rezervacije || []).filter(rez => rez.datum === datum);
+            // Uporabimo že filtrirane rezervacije
+            const obstojeceRezervacije = (aggResult.rezervacije || []).filter(rez => rez.datum === datum);
 
             // Zanka zdaj teče po minutah
             for (let min = zacetekMinut; min <= konecMinut; min += intervalMinut) {
