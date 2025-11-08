@@ -585,6 +585,7 @@
 
         /**
          * Pomožna funkcija za renderiranje rezervacij
+         * 💥 POPRAVLJENO: Ustvarjanje ustrezne HTML strukture za "kartice"
          */
         const renderRezervacije = (rezervacije, kontejnerElement, jeAktivnaLista) => {
             // Ponastavi vsebino kontejnerja (hrani samo h3 naslov)
@@ -599,66 +600,78 @@
                 
                 const p = document.createElement('p');
                 p.textContent = sporocilo;
+                p.style.padding = '15px 20px';
+                p.style.backgroundColor = '#f8f8f8';
+                p.style.borderRadius = '8px';
                 kontejnerElement.appendChild(p);
                 return;
             }
 
             rezervacije.forEach(rez => {
-                const p = document.createElement('p');
-                // Formatiranje časa (npr. 19.5 -> 19:30)
-                const casFormatted = String(rez.cas_rezervacije).split('.');
-                const ura = casFormatted[0];
-                const minute = casFormatted.length > 1 && casFormatted[1] === '5' ? '30' : '00';
-                const casIzpis = `${ura}:${minute}`;
-
-
-                let textContent = `${rez.ime_restavracije}, ${rez.datum_rezervacije} ob ${casIzpis} (${rez.stevilo_oseb} oseb)`;
+                // 💥 POPRAVEK: Uporabimo <div> za boljšo strukturo 'kartice'
+                const kartica = document.createElement('div');
+                kartica.classList.add('kartica-rezervacije'); 
+                kartica.classList.add('kartica-podatkov'); 
+                kartica.style.padding = '15px 20px';
+                kartica.style.marginBottom = '10px';
+                kartica.style.border = '1px solid #ccc';
+                kartica.style.borderRadius = '8px';
+                kartica.style.display = 'flex';
+                kartica.style.flexDirection = 'row'; /* Osnovni prikaz v vrsti */
+                kartica.style.justifyContent = 'space-between'; /* Razmak med vsebino in gumbom */
+                kartica.style.alignItems = 'center';
+                kartica.style.gap = '15px';
+                kartica.style.backgroundColor = '#fff';
                 
+                // --- 1. Podatki o rezervaciji (Text Content) ---
+
+                // Formatiranje časa (npr. 19.5 -> 19:30)
+                const cas = rez.cas_rezervacije;
+                const ura = Math.floor(cas); // 19.5 -> 19
+                // Izboljšana pretvorba decimal v minute:
+                const minute = Math.round((cas - ura) * 60); 
+                const casIzpis = `${ura.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+
+                const podatkiDiv = document.createElement('div');
+                podatkiDiv.classList.add('rezervacija-podatki');
+                
+                let htmlContent = `
+                    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
+                    <p style="margin: 5px 0 0 0;">${rez.datum_rezervacije} ob ${casIzpis} (${rez.stevilo_oseb} oseb)</p>
+                `;
+
                 if (!jeAktivnaLista) {
                     // Za zgodovino dodamo status
                     const statusText = rez.status === 'PREKLICANO' 
                         ? i18next.t('profile.status_cancelled') 
                         : i18next.t('profile.status_completed');
-                    textContent += ` - [${statusText}]`;
+                    const color = rez.status === 'PREKLICANO' ? 'orange' : 'grey';
+                    htmlContent += `<p style="margin: 5px 0 0 0; font-weight: bold; color: ${color};">[${statusText}]</p>`;
                 }
-
-                p.textContent = textContent;
-                p.classList.add('kartica-podatkov'); // Uporabimo enak stil za kartico
-                p.style.display = 'flex';
-                p.style.justifyContent = 'space-between';
-                p.style.alignItems = 'center';
-                p.style.padding = '15px 20px';
-
-
+                
+                podatkiDiv.innerHTML = htmlContent;
+                kartica.appendChild(podatkiDiv);
+                
+                // --- 2. Gumb za preklic (Samo za aktivne) ---
                 if (jeAktivnaLista) {
                     const preklicGumb = document.createElement('button');
                     preklicGumb.classList.add('gumb-preklici');
                     preklicGumb.textContent = i18next.t('profile.cancel_button');
+                    preklicGumb.style.flexShrink = '0'; // Ne skrči se
+
+                    // Dummy ID, ker mizaId še vedno ni v agregaciji
+                    const mizaIdDummy = '000000000000000000000000'; 
                     
-                    // Ker nam backend aggregation ne da mizaId, ga moramo pridobiti v prekliciRezervacijo
-                    // Zaenkrat pošljemo samo rezervacijaId in restavracijaId (mizaId bo morda treba poiskati na backendu)
-                    // PREDPOSTAVKA: Zaenkrat pošljemo samo Rezervacija ID in Restavracija ID, Miza ID najde backend
-                    // ČE BACKEND ZAHTEVA VSE TRI:
-                    // PUSTIMO PREKLIC BUTTON SAMO KOT MESTO. Implementacija bo polno delovala, ko bo na voljo tudi mizaId iz agregacije.
-                    // Začasna rešitev: Miza ID nastavimo na dummy vrednost
-                    const mizaIdDummy = '000000000000000000000000'; // Dummy ID
-                    
-                    preklicGumb.addEventListener('click', () => {
-                        // OPOZORILO: Tukaj je morda treba dodati logiko, ki na podlagi Rezervacija ID pokliče strežnik,
-                        // da dobi Restavracija ID in Miza ID, če teh ni v agregaciji!
-                        // Ker jih backend zahteva, jih moramo poslati. Ker jih nimamo, uporabimo 
-                        // RezervacijaId kot mizaId in pošljemo restavracijaId:
+                    preklicGumb.addEventListener('click', (e) => {
+                        e.stopPropagation(); 
+                        console.log(`[FRONTEND] Poskus preklica: RezervacijaID: ${rez._id}, RestavracijaID: ${rez.restavracijaId}, MizaID: ${mizaIdDummy}`);
                         prekliciRezervacijo(rez.restavracijaId, mizaIdDummy, rez._id);
                     });
                     
-                    // Za mobilni pogled: Poravnava gumba na isto linijo
-                    p.style.flexWrap = 'wrap'; 
-                    preklicGumb.style.marginTop = '0';
-                    preklicGumb.style.marginLeft = '10px'; 
-                    p.appendChild(preklicGumb);
+                    kartica.appendChild(preklicGumb);
                 }
 
-                kontejnerElement.appendChild(p);
+                kontejnerElement.appendChild(kartica);
             });
         };
 
