@@ -3,7 +3,8 @@
 // Poskrbi za usmerjanje. Logika je v Controllerju.
 // ===============================================
 
-module.exports = (preveriGosta) => {
+// 🚨 POPRAVEK 1: Sprejme CELOTEN objekt authMiddleware za dostop do obeh funkcij
+module.exports = ({ preveriGosta, zahtevajPrijavo }) => {
     const express = require('express');
     const router = express.Router();
     
@@ -16,96 +17,68 @@ module.exports = (preveriGosta) => {
     // =================================================================
 
     // -----------------------------------------------------------------
-    // 🟢 ZAČETNI KLIC ZA FRONTEND (Najpomembnejše!)
+    // 🟢 ZAČETNI KLIC ZA FRONTEND (Ostane brez middleware-a)
     // -----------------------------------------------------------------
-    /**
-     * GET /api/restavracije/privzeto
-     * Povezava na funkcijo z obsežnim logiranjem, ki smo jo dodali v Controller.
-     */
     router.get('/privzeto', restavracijaController.getPrivzetoRestavracije); 
 
 
     // -----------------------------------------------------------------
-    // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI:
+    // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI: (Ostane brez middleware-a)
     // -----------------------------------------------------------------
-    
-    // 1. Združljiva z odjemalcem: GET pot, ki uporablja parametre iz URL-ja (za stare klice/preverjanje)
     router.get('/preveri_rezervacijo/:restavracijaId/:datum/:stevilo_oseb', restavracijaController.pridobiProsteUre);
-    
-    // 2. Originalna POST pot (Priporočljiva, saj se parametri lažje prenašajo v telesu)
     router.post('/proste_ure', restavracijaController.pridobiProsteUre);
     
     
     // -----------------------------------------------------------------
-    // 🌍 ISKANJE RESTAVRACIJ PO BLIŽINI (GEOSPATIAL $geoNear)
+    // 🌍 ISKANJE RESTAVRACIJ PO BLIŽINI (Ostane brez middleware-a)
     // -----------------------------------------------------------------
-    /**
-     * GET /api/restavracije/blizina?lat=...&lon=...&radius=...
-     */
     router.get('/blizina', restavracijaController.pridobiRestavracijePoBlizini);
     
     // -----------------------------------------------------------------
-    // ADMIN: POSODOBITEV BOGATIH PODATKOV (Slike, Opis, Meni)
+    // ADMIN: POSODOBITEV BOGATIH PODATKOV 
+    // 🚨 ZAŠČITA: Ostanemo pri preveriGosta, ker je to admin pot (Če imate admin auth, jo uporabite)
     // -----------------------------------------------------------------
-    /**
-     * PUT /api/restavracije/admin/posodobi_vsebino/:restavracijaId
-     */
     router.put('/admin/posodobi_vsebino/:restavracijaId', preveriGosta, restavracijaController.posodobiAdminVsebino);
     
     
     // -----------------------------------------------------------------
     // USTVARJANJE NOVE REZERVACIJE (/ustvari_rezervacijo)
+    // 🚨 POPRAVEK 2: ZAHTEVAJ PRIJAVO
     // -----------------------------------------------------------------
-    /**
-     * POST /api/restavracije/ustvari_rezervacijo
-     */
-    router.post('/ustvari_rezervacijo', preveriGosta, restavracijaController.ustvariRezervacijo);
+    router.post('/ustvari_rezervacijo', zahtevajPrijavo, restavracijaController.ustvariRezervacijo);
 
 
     // -----------------------------------------------------------------
     // BRISANJE REZERVACIJE (/izbrisi_rezervacijo)
+    // 🚨 POPRAVEK 3: ZAHTEVAJ PRIJAVO
     // -----------------------------------------------------------------
-    /**
-     * DELETE /api/restavracije/izbrisi_rezervacijo
-     */
-    router.delete('/izbrisi_rezervacijo', preveriGosta, restavracijaController.izbrisiRezervacijo);
+    router.delete('/izbrisi_rezervacijo', zahtevajPrijavo, restavracijaController.izbrisiRezervacijo);
     
     
     // -----------------------------------------------------------------
     // 🟢 NOVO: POTI ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA)
+    // 🚨 POPRAVEK 4: ZAHTEVAJ PRIJAVO
     // -----------------------------------------------------------------
-    /**
-     * GET /api/restavracije/uporabnik/aktivne
-     */
-    router.get('/uporabnik/aktivne', preveriGosta, restavracijaController.pridobiAktivneRezervacijeUporabnika);
-
-    /**
-     * GET /api/restavracije/uporabnik/zgodovina
-     */
-    router.get('/uporabnik/zgodovina', preveriGosta, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
+    router.get('/uporabnik/aktivne', zahtevajPrijavo, restavracijaController.pridobiAktivneRezervacijeUporabnika);
+    router.get('/uporabnik/zgodovina', zahtevajPrijavo, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
 
 
     // =================================================================
-    // 💥 2. SPLOŠNI CRUD (/, POST /) - Fiksne poti brez parametrov
-    // =================================================================
+    // 💥 2. SPLOŠNI CRUD (/, POST /)
+    // -----------------------------------------------------------------
     
     router.route('/')
-        // OSNOVNI CRUD: Pridobitev vseh restavracij (GET /)
         .get(restavracijaController.pridobiVseRestavracije)
-        // OSNOVNI CRUD: Ustvarjanje nove restavracije (POST /)
         .post(preveriGosta, restavracijaController.ustvariRestavracijo);
 
 
     // =================================================================
-    // 💥 3. DINAMIČNE POTI (/:id) - NA ZADNJE MESTO!
-    // =================================================================
+    // 💥 3. DINAMIČNE POTI (/:id) 
+    // -----------------------------------------------------------------
 
     router.route('/:id')
-        // OSNOVNI CRUD: Pridobitev ene restavracije (GET /:id)
         .get(restavracijaController.pridobiRestavracijoPoId)
-        // OSNOVNI CRUD: Posodabljanje restavracije (PUT /:id)
         .put(preveriGosta, restavracijaController.posodobiRestavracijo)
-        // OSNOVNI CRUD: Brisanje restavracije (DELETE /:id)
         .delete(preveriGosta, restavracijaController.izbrisiRestavracijo);
     
     return router;
