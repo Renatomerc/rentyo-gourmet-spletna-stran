@@ -6,6 +6,17 @@ const mongoose = require('mongoose');
 
 // 1. Shema za vdelan dokument Rezervacija
 const RezervacijaSchema = new mongoose.Schema({
+    // 🟢 POPRAVEK: DODAN KLJUČNI uporabnikId za povezavo z registriranim uporabnikom
+    uporabnikId: {
+        type: mongoose.Schema.Types.ObjectId, // Uporabimo pravilen Mongoose tip
+        ref: 'Uporabnik' // Referenca na Uporabnik model
+    },
+    status: { 
+        type: String, 
+        default: 'POTRJENO',
+        enum: ['POTRJENO', 'PREKLICANO', 'ZAKLJUČENO'] 
+    },
+    
     casStart: { type: Number, required: true },
     trajanjeUr: { type: Number, required: true },
     imeGosta: { type: String, required: true },
