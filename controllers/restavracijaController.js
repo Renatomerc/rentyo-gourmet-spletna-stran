@@ -354,11 +354,24 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 💥 POPRAVEK: DODAN `uporabnikId` IZ REQ.UPORABNIK.ID ZA FILTRIRANJE NA PROFILU
+ * 💥 POPRAVEK: Zagotovitev shranjevanja ID-ja uporabnika in prisilno preverjanje prijave.
  */
 exports.ustvariRezervacijo = async (req, res) => {
-    // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo! Če preveriGosta deluje, bi moral biti.
-    const userId = req.uporabnik.id; 
+    // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo!
+    const userId = req.uporabnik ? req.uporabnik.id : null; 
+    
+    // 🚨 ZAŠČITA: Če ID manjka ali ni veljaven, prekinemo.
+    // To zagotovi, da se rezervacija ne ustvari, če uporabnik ni uspešno prijavljen in ima veljaven ID.
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId.toString())) {
+        console.log("❌ ZAVRNJENO: Poskus rezervacije brez veljavnega uporabniškega ID-ja.");
+        return res.status(401).json({ 
+            error: 'Unauthorized', 
+            message: 'Za ustvarjanje rezervacije morate biti prijavljeni z veljavnim uporabniškim računom.' 
+        });
+    }
+    
+    // Sedaj vemo, da je userId veljaven string ID. Varno ga pretvorimo.
+    const uporabnikIdObject = new mongoose.Types.ObjectId(userId.toString());
     
     const { restavracijaId, mizaId, imeGosta, telefon, stevilo_oseb, datum, casStart, trajanjeUr } = req.body;
     
@@ -402,8 +415,8 @@ exports.ustvariRezervacijo = async (req, res) => {
         }
         
         const novaRezervacija = {
-            // 💥 NOVO: Shranjevanje ID-ja uporabnika
-            uporabnikId: userId ? new mongoose.Types.ObjectId(userId) : null,
+            // 💥 KLJUČNO: Uporabimo zagotovljeni in pretvorjeni ID
+            uporabnikId: uporabnikIdObject,
             imeGosta,
             telefon,
             stevilo_oseb: stevilo_oseb || 2,
