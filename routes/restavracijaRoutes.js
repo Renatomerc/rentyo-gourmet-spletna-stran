@@ -3,7 +3,8 @@
 // Poskrbi za usmerjanje. Logika je v Controllerju.
 // ===============================================
 
-module.exports = (preveriGosta) => {
+// 🚨 POPRAVEK: Sprejmemo CELOTEN objekt, ki ga vrne authMiddleware
+module.exports = ({ preveriGosta, zahtevajPrijavo }) => { 
     const express = require('express');
     const router = express.Router();
     
@@ -49,6 +50,7 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     /**
      * PUT /api/restavracije/admin/posodobi_vsebino/:restavracijaId
+     * Potreben je prijavljen uporabnik (admin), zato lahko uporabimo 'zahtevajPrijavo' ali 'preveriGosta' (če imate poseben middleware za admina). Zaenkrat pustimo 'preveriGosta'.
      */
     router.put('/admin/posodobi_vsebino/:restavracijaId', preveriGosta, restavracijaController.posodobiAdminVsebino);
     
@@ -58,8 +60,9 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     /**
      * POST /api/restavracije/ustvari_rezervacijo
+     * 🚨 POPRAVEK: Uporabi 'zahtevajPrijavo', da prepreči anonimne rezervacije.
      */
-    router.post('/ustvari_rezervacijo', preveriGosta, restavracijaController.ustvariRezervacijo);
+    router.post('/ustvari_rezervacijo', zahtevajPrijavo, restavracijaController.ustvariRezervacijo);
 
 
     // -----------------------------------------------------------------
@@ -67,8 +70,9 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     /**
      * DELETE /api/restavracije/izbrisi_rezervacijo
+     * 🚨 POPRAVEK: Tudi brisanje/preklic naj bo zaščiteno.
      */
-    router.delete('/izbrisi_rezervacijo', preveriGosta, restavracijaController.izbrisiRezervacijo);
+    router.delete('/izbrisi_rezervacijo', zahtevajPrijavo, restavracijaController.izbrisiRezervacijo);
     
     
     // -----------------------------------------------------------------
@@ -76,13 +80,15 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     /**
      * GET /api/restavracije/uporabnik/aktivne
+     * 🚨 POPRAVEK: Obvezna prijava za dostop do profila.
      */
-    router.get('/uporabnik/aktivne', preveriGosta, restavracijaController.pridobiAktivneRezervacijeUporabnika);
+    router.get('/uporabnik/aktivne', zahtevajPrijavo, restavracijaController.pridobiAktivneRezervacijeUporabnika);
 
     /**
      * GET /api/restavracije/uporabnik/zgodovina
+     * 🚨 POPRAVEK: Obvezna prijava za dostop do zgodovine.
      */
-    router.get('/uporabnik/zgodovina', preveriGosta, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
+    router.get('/uporabnik/zgodovina', zahtevajPrijavo, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
 
 
     // =================================================================
