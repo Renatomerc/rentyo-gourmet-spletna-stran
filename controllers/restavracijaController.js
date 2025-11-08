@@ -435,10 +435,9 @@ exports.ustvariRezervacijo = async (req, res) => {
 
 /**
  * Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
+ * 💥 POPRAVLJENO: Spremeni status na PREKLICANO namesto izbrisa (za zgodovino)
  */
 exports.izbrisiRezervacijo = async (req, res) => {
-    // OPOMBA: Ta funkcija še vedno zahteva restavracijaId in mizaId v telesu zahteve, kar ni idealno za frontend.
-    // Če želite brisati samo z rezervacijaId, boste morali poiskati restavracijo/mizo z agregacijo/find.
     const { restavracijaId, mizaId, rezervacijaId } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(restavracijaId) || !mongoose.Types.ObjectId.isValid(mizaId) || !mongoose.Types.ObjectId.isValid(rezervacijaId)) {
@@ -446,28 +445,34 @@ exports.izbrisiRezervacijo = async (req, res) => {
     }
 
     try {
+        // Uporaba arrayFilters za posodobitev v gnezdenem polju
         const rezultat = await Restavracija.updateOne(
-            { _id: restavracijaId, "mize._id": mizaId },
-            // Zamenjamo pull z 'status: PREKICANO', če želimo zgodovino, 
-            // ampak za direktno brisanje je $pull pravilen.
-            { "$pull": { "mize.$.rezervacije": { _id: rezervacijaId } } } 
+            { _id: restavracijaId }, // Filter za restavracijo
+            { $set: { "mize.$[miza].rezervacije.$[rez].status": "PREKLICANO" } }, // Posodobi status
+            { 
+                arrayFilters: [ // Natančno določi, katero mizo in rezervacijo
+                    { "miza._id": new mongoose.Types.ObjectId(mizaId) },
+                    { "rez._id": new mongoose.Types.ObjectId(rezervacijaId) } 
+                ],
+                new: true 
+            }
         );
 
         if (rezultat.modifiedCount === 0) {
-            return res.status(404).json({ msg: 'Rezervacija ali miza ni najdena za izbris.' });
+            return res.status(404).json({ msg: 'Rezervacija ali miza ni najdena ali pa je že preklicana.' });
         }
 
-        res.json({ msg: 'Rezervacija uspešno preklicana.' });
+        res.json({ msg: 'Rezervacija uspešno preklicana (Status posodobljen).' });
 
     } catch (error) {
-        console.error('Napaka pri brisanju rezervacije:', error);
-        res.status(500).json({ msg: 'Napaka serverja.' });
+        console.error('Napaka pri preklicu rezervacije:', error);
+        res.status(500).json({ msg: 'Napaka serverja pri preklicu rezervacije.' });
     }
 };
 
 
 // =================================================================
-// 💥 4. FUNKCIJE ZA PROFIL UPORABNIKA (NOVO)
+// 💥 4. FUNKCIJE ZA PROFIL UPORABNIKA (POPRAVLJENE)
 // =================================================================
 
 /**
@@ -484,7 +489,7 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
     
     // Uporabimo današnji datum za filtriranje prihodnjih rezervacij
     const danesISO = new Date().toISOString().slice(0, 10); 
-    console.log(`[AKTIVNE] Poskus pridobivanja za Uporabnik ID: ${userId} od datuma: ${danesISO}`); // 💡 DIAGNOSTIKA
+    console.log(`[AKTIVNE] Poskus pridobivanja za Uporabnik ID: ${userId} od datuma: ${danesISO}`); 
 
     try {
         const aktivne = await Restavracija.aggregate([
@@ -495,16 +500,16 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
             // FILTRIRANJE: Samo rezervacije trenutnega uporabnika in prihodnje
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
-                // Dodan $exists: true za robustnost
-                "mize.rezervacije.datum": { $exists: true, $gte: danesISO }, 
+                "mize.rezervacije.datum": { $exists: true, $gte: danesISO }, // Datum danes ali v prihodnosti (String primerjava)
                 "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] } // Izključi neaktivne statuse
             }},
 
-            // PROJEKCIJA: Izloči samo relevantne podatke za Frontend
+            // PROJEKCIJA: Dodan mizaId, ki ga frontend potrebuje za preklic
             { $project: {
                 _id: "$mize.rezervacije._id", // ID rezervacije
                 ime_restavracije: "$ime", // Ime restavracije
                 restavracijaId: "$_id",
+                mizaId: "$mize._id", // 💥 POPRAVEK: DODAN mizaId
                 datum_rezervacije: "$mize.rezervacije.datum",
                 cas_rezervacije: "$mize.rezervacije.casStart",
                 stevilo_oseb: "$mize.rezervacije.stevilo_oseb",
@@ -514,9 +519,9 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
             { $sort: { datum_rezervacije: 1, cas_rezervacije: 1 } }
         ]);
 
-        console.log(`[AKTIVNE] Število najdenih rezervacij: ${aktivne.length}`); // 💡 DIAGNOSTIKA
+        console.log(`[AKTIVNE] Število najdenih rezervacij: ${aktivne.length}`); 
         if (aktivne.length === 0) {
-             console.log("[AKTIVNE] Agregacija ni vrnila rezultatov. Preverite: 1) format datuma v bazi (YYYY-MM-DD), 2) ujemanje uporabnikId, 3) status.");
+             console.log("[AKTIVNE] Agregacija ni vrnila rezultatov. Vzrok je verjetno MANJKAJOČE POLJE 'uporabnikId' v starejših testnih rezervacijah. Prosim, preverite bazo.");
         }
 
         res.status(200).json(aktivne);
@@ -546,7 +551,7 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             { $unwind: "$mize" },
             { $unwind: "$mize.rezervacije" },
             
-            // FILTRIRANJE: Samo rezervacije trenutnega uporabnika
+            // FILTRIRANJE
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
                 $or: [
@@ -557,11 +562,12 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
                  ]
             }},
 
-            // PROJEKCIJA
+            // PROJEKCIJA: Dodan mizaId
             { $project: {
                 _id: "$mize.rezervacije._id", // ID rezervacije
                 ime_restavracije: "$ime", // Ime restavracije
                 restavracijaId: "$_id",
+                mizaId: "$mize._id", // 💥 POPRAVEK: DODAN mizaId
                 datum_rezervacije: "$mize.rezervacije.datum",
                 cas_rezervacije: "$mize.rezervacije.casStart",
                 stevilo_oseb: "$mize.rezervacije.stevilo_oseb",
