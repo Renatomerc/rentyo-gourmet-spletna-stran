@@ -3,9 +3,7 @@
 // Poskrbi za usmerjanje. Logika je v Controllerju.
 // ===============================================
 
-// 🚨 POPRAVEK: Sprejmemo celoten objekt, ki ga pošilja server.js
-// S tem dobimo dostop do funkcije zahtevajPrijavo.
-module.exports = ({ preveriGosta, zahtevajPrijavo }) => {
+module.exports = (preveriGosta) => {
     const express = require('express');
     const router = express.Router();
     
@@ -57,37 +55,34 @@ module.exports = ({ preveriGosta, zahtevajPrijavo }) => {
     
     // -----------------------------------------------------------------
     // USTVARJANJE NOVE REZERVACIJE (/ustvari_rezervacijo)
-    // 🚨 POPRAVEK: Uporabimo zahtevajPrijavo, da zagotovimo prisotnost ID-ja.
     // -----------------------------------------------------------------
     /**
      * POST /api/restavracije/ustvari_rezervacijo
      */
-    router.post('/ustvari_rezervacijo', zahtevajPrijavo, restavracijaController.ustvariRezervacijo);
+    router.post('/ustvari_rezervacijo', preveriGosta, restavracijaController.ustvariRezervacijo);
 
 
     // -----------------------------------------------------------------
     // BRISANJE REZERVACIJE (/izbrisi_rezervacijo)
-    // 🚨 POPRAVEK: Za brisanje potrebujemo ID uporabnika (zahtevajPrijavo)
     // -----------------------------------------------------------------
     /**
      * DELETE /api/restavracije/izbrisi_rezervacijo
      */
-    router.delete('/izbrisi_rezervacijo', zahtevajPrijavo, restavracijaController.izbrisiRezervacijo);
+    router.delete('/izbrisi_rezervacijo', preveriGosta, restavracijaController.izbrisiRezervacijo);
     
     
     // -----------------------------------------------------------------
     // 🟢 NOVO: POTI ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA)
-    // 🚨 POPRAVEK: Za prikaz profila potrebujemo ID uporabnika (zahtevajPrijavo)
     // -----------------------------------------------------------------
     /**
      * GET /api/restavracije/uporabnik/aktivne
      */
-    router.get('/uporabnik/aktivne', zahtevajPrijavo, restavracijaController.pridobiAktivneRezervacijeUporabnika);
+    router.get('/uporabnik/aktivne', preveriGosta, restavracijaController.pridobiAktivneRezervacijeUporabnika);
 
     /**
      * GET /api/restavracije/uporabnik/zgodovina
      */
-    router.get('/uporabnik/zgodovina', zahtevajPrijavo, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
+    router.get('/uporabnik/zgodovina', preveriGosta, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
 
 
     // =================================================================
