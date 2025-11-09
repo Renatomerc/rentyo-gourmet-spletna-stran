@@ -773,7 +773,9 @@ async function preveriProsteUre(rezervacijaPodatki) {
 
 /**
  * Prikazuje proste ure kot gumbe, razvrščene po mizi.
- * 🔥 REŠITEV: Prikazuje SAMO polne ure (npr. 10:00, 11:00).
+ * Implementirano:
+ * 1. Filtriranje ur v preteklosti za današnji dan.
+ * 2. Sortiranje vseh prostih ur od najmanjše do največje, ne glede na mizo.
  */
 function prikaziProsteUre(mize, datum, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
@@ -781,91 +783,102 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     
     // --- Pomožna funkcija za zanesljivo pretvorbo (decimalna ura -> HH:MM) ---
     const convertDecimalToTime = (decimalHour) => {
-        
-        // 🔥 POPRAVEK: Najprej zaokrožimo decimalno število na eno decimalko.
-        // To premaga Back-end float napake, ki povzročajo napačen prikaz.
+        // ... (Ostane nespremenjeno)
         const roundedDecimalHour = Math.round(decimalHour * 10) / 10;
-
-        // Zanesljiv izračun v minutah
         const totalMinutes = Math.round(roundedDecimalHour * 60); 
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        
         const formattedHours = String(hours).padStart(2, '0');
         const formattedMinutes = String(minutes).padStart(2, '0');
-        
         return `${formattedHours}:${formattedMinutes}`; 
     };
     // ------------------------------------------------
 
     // 🔑 NOVA LOGIKA: Določitev trenutne ure in datuma
     const danes = new Date();
-    // Datum danes v enakem formatu kot 'datum' (npr. "09. 11. 2025")
+    // Preverite, ali imate flatpickr naložen za formatiranje datuma,
+    // sicer bo to povzročilo napako. Predpostavljam, da deluje.
     const datumDanesPrikaz = flatpickr.formatDate(danes, "d. m. Y"); 
-    // Trenutni čas v decimalni obliki (npr. 16:55 -> 16.916)
     const trenutnaDecimalnaUra = danes.getHours() + danes.getMinutes() / 60;
-    
-    // Preverimo, ali je izbrani datum današnji dan
     const jeDanes = (datum === datumDanesPrikaz);
 
-    rezultatiContainer.innerHTML = '';
-    let html = '';
+    // 🔑 NOVA STRUKTURA: Združimo vse proste termine v eno polje za lažje sortiranje.
+    // Uporabljamo Map za zbiranje edinstvenih ur, ki imajo vsaj eno prosto mizo.
+    // Ključ: decimalna ura, Vrednost: Polje miza objektov, ki so proste ob tem času.
+    const allAvailableTimes = new Map();
 
     mize.forEach(miza => {
-        
-        // Ustvarimo kopijo prostih ur za obdelavo filtriranja in sortiranja
-        let ureZaPrikaz = [...miza.prosteUre]; 
-        
-        // 🔑 NOVA LOGIKA: 1. FILTRIRANJE UR V PRETEKLOSTI (če je danes)
-        if (jeDanes) {
-            ureZaPrikaz = ureZaPrikaz.filter(uraDecimal => {
-                // Obdržimo samo tiste termine, ki so STROGO večji od trenutne ure
-                return uraDecimal > trenutnaDecimalnaUra;
-            });
-        }
-        
-        // 🔑 NOVA LOGIKA: 2. SORTIRANJE UR (vedno, od najmanjše do največje)
-        ureZaPrikaz.sort((a, b) => a - b);
-
-        html += `<h4 class="text-lg font-semibold mt-4 mb-2">${i18next.t('modal.table_label')} ${miza.mizaIme} (${i18next.t('modal.capacity')}: ${miza.kapaciteta})</h4>`;
-        html += `<div class="flex flex-wrap gap-2">`;
-        
-        // Sedaj iteriramo čez že filtrirano in sortirano polje 'ureZaPrikaz'
-        ureZaPrikaz.forEach(uraDecimal => {
+        miza.prosteUre.forEach(uraDecimal => {
             
-            // 1. Popravi decimalno število na 2 decimalki za zanesljivost (odpravlja float napake)
+            // 1. Ohranimo samo cele ure (obstoeči filter)
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
-            
-            // 🔥 KLJUČNI FILTER: Preveri, ali je fiksirano število celo število (npr. 10.0, 11.0).
             if (fixedDecimal % 1 !== 0) {
-                // Če ni celo število (npr. 10.5), ga preskoči
                 return; 
             }
             
-            const casString = convertDecimalToTime(fixedDecimal); // Npr. '10:00'
-            
-            html += `
-                <button class="gumb-izbira-ure" 
-                    data-cas-decimal="${uraDecimal}" data-miza-ime="${miza.mizaIme}"
-                    data-miza-id="${miza.mizaId || 'neznan_id'}"  data-datum="${datum}"
-                    data-osebe="${steviloOseb}"
-                    data-ura-string="${casString}">
-                    ${casString} </button>
-            `;
+            // 2. FILTRIRANJE UR V PRETEKLOSTI (če je danes)
+            if (jeDanes && fixedDecimal <= trenutnaDecimalnaUra) {
+                return; 
+            }
+
+            // Pripravimo objekt mize z njenimi podatki
+            const mizaData = {
+                mizaId: miza.mizaId || 'neznan_id',
+                mizaIme: miza.mizaIme,
+                kapaciteta: miza.kapaciteta
+            };
+
+            // Dodamo mizo k decimalni uri v Map
+            if (!allAvailableTimes.has(fixedDecimal)) {
+                allAvailableTimes.set(fixedDecimal, []);
+            }
+            allAvailableTimes.get(fixedDecimal).push(mizaData);
         });
-        html += `</div>`;
     });
+
+    // 🔑 NOVA LOGIKA: Sortiramo ključe (ure) od najmanjše do največje
+    const sortedTimes = Array.from(allAvailableTimes.keys()).sort((a, b) => a - b);
+    
+    rezultatiContainer.innerHTML = '';
+    let html = `<div class="flex flex-wrap gap-2 justify-center">`;
+    
+    // Iteriramo čez SORTIRANO polje ur
+    sortedTimes.forEach(uraDecimal => {
+        const casString = convertDecimalToTime(uraDecimal); // Npr. '18:00'
+        
+        // Poberemo PRVO prosto mizo za ta čas, da damo v gumb
+        const prostaMiza = allAvailableTimes.get(uraDecimal)[0];
+
+        // POZOR: Prikazujemo gumb samo ENKRAT za to uro.
+        // Če je prostih več miz, bomo v data-atributi gumba uporabili ID prve mize
+        // (to je že rešeno v vašem sistemu z uporabo globalSelectedMizaId ob kliku).
+        
+        html += `
+            <button class="gumb-izbira-ure gumb-ura" 
+                data-cas-decimal="${uraDecimal}" data-miza-ime="${prostaMiza.mizaIme}"
+                data-miza-id="${prostaMiza.mizaId}"  data-datum="${datum}"
+                data-osebe="${steviloOseb}"
+                data-time="${casString}">
+                ${casString} 
+            </button>
+        `;
+    });
+    
+    html += `</div>`;
+    
+    if (sortedTimes.length === 0) {
+         html = `<p class="text-center py-4 text-red-600">${i18next.t('messages.no_time_slots_available') || 'Žal nam je, danes ni več prostih terminov.'}</p>`;
+    }
     
     rezultatiContainer.innerHTML = html;
     
     // Nastavimo poslušalce za izbiro ure (ki sproži potrditveni modal)
+    // Uporabljamo gumb-izbira-ure in gumb-ura za kompatibilnost z obstoječim JS
     document.querySelectorAll('.gumb-izbira-ure').forEach(gumb => {
         gumb.addEventListener('click', odpriPotrditveniModal);
     });
     
-    // 🔥 KLJUČNO: Po vsakem prikazu ur, inicializiramo Listener za trajanje,
-    // saj se gumb za potrditev trajanja nahaja v durationModal,
-    // ki je neodvisen od poteka A (odpriPotrditveniModal).
+    // Inicializiramo Listener za trajanje
     setupTimeSlotListeners();
 }
 
