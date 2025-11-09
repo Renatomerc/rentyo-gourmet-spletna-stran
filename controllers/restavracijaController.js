@@ -381,7 +381,7 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 💥 POPRAVEK: Zagotovitev shranjevanja ID-ja uporabnika in preverjanje "Race Condition".
+ * 💥 POPRAVEK: Zagotovitev shranjevanja ID-ja uporabnika in prisilno preverjanje prijave.
  */
 exports.ustvariRezervacijo = async (req, res) => {
     // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo!
@@ -415,7 +415,6 @@ exports.ustvariRezervacijo = async (req, res) => {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
         
-        // 1. KORAK: PREVERJANJE - Branje stanja in lokalno preverjanje prekrivanja
         const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
 
         if (!restavracija) {
@@ -454,55 +453,14 @@ exports.ustvariRezervacijo = async (req, res) => {
             status: 'POTRJENO',
         };
 
-        // 2. KORAK: ATOMSKO PISANJE IN PREVERJANJE KONFLIKTA V BAZI (Race Condition Protection)
-        // Poizvedba $push bo uspešna SAMO, če za ta datum in casStart še ne obstaja rezervacija, 
-        // kar prepreči, da bi dva hkratna klica vstavila rezervacijo v ISTO sekundo.
         const rezultat = await Restavracija.updateOne(
-            { 
-                _id: restavracijaId, 
-                "mize._id": mizaId,
-                // 🔥 NOVI POGOJ ZA PREPREČITEV RACE CONDITION
-                "mize.rezervacije": { 
-                    $not: { 
-                        $elemMatch: { 
-                            datum: datum, 
-                            casStart: casZacetka // Preprečimo vstavljanje, če se pokriva glavno časovno polje
-                        } 
-                    } 
-                }
-            },
+            { _id: restavracijaId, "mize._id": mizaId },
             { $push: { "mize.$.rezervacije": novaRezervacija } }
         );
 
-
         if (rezultat.modifiedCount === 0) {
-             // To se zgodi, če je prišlo do Race Conditiona (drugi uporabnik je rezerviral vmes)
-             
-             // Opravimo še končno preverjanje, da vrnemo natančno sporočilo
-             const restavracijaPoKonfliktu = await Restavracija.findById(restavracijaId, 'mize').lean();
-             const izbranaMizaPoKonfliktu = restavracijaPoKonfliktu.mize.find(m => m._id.toString() === mizaId);
-             const obstojeceRezervacijePoKonfliktu = (izbranaMizaPoKonfliktu.rezervacije || []).filter(rez => rez.datum === datum);
-             
-             let jePrekrivanje = false;
-             for (const obstojecaRezervacija of obstojeceRezervacijePoKonfliktu) {
-                const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
-                if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojecaRezervacija.casStart, obstojeceTrajanje)) {
-                     jePrekrivanje = true;
-                     break;
-                }
-             }
-
-             if (jePrekrivanje) {
-                return res.status(409).json({ 
-                    msg: `Miza ${mizaIme} je bila medtem že zasedena. Prosimo, osvežite stran in izberite drugo uro. (KONFLIKT PREPREČEN)`,
-                    status: "ZASEDNO_KONFLIKT"
-                });
-             }
-             
-             // Če ni prekrvaljanja in je modifiedCount 0, je problem drugje (npr. ID mize je izginil)
              return res.status(500).json({ msg: 'Napaka pri shranjevanju. Restavracija ali miza ni bila najdena ali posodobljena.' });
         }
-
 
         res.status(201).json({ 
             msg: `Rezervacija uspešno ustvarjena za ${mizaIme} ob ${casStart}.`,
