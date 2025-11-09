@@ -474,8 +474,9 @@ exports.ustvariRezervacijo = async (req, res) => {
 };
 
 /**
- * Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
- * 💥 POPRAVLJENO: Spremeni status na PREKLICANO in DODANO VARNOSTNO PREVERJANJE LASTNIŠTVA!
+ * 🟢 POPRAVLJENO: Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
+ * Izvaja TRDO BRISANJE ($pull), ki rezervacijo v celoti odstrani iz zbirke podatkov.
+ * To rešuje problem vidnosti v Admin portalu.
  */
 exports.izbrisiRezervacijo = async (req, res) => {
     const { restavracijaId, mizaId, rezervacijaId } = req.body;
@@ -484,7 +485,6 @@ exports.izbrisiRezervacijo = async (req, res) => {
     const uporabnikovId = req.uporabnik ? req.uporabnik.id : null; 
 
     if (!uporabnikovId) {
-        // Ta klic bi se moral ustaviti že v routerju, a je dodatna varnost dobrodošla.
         console.log("❌ ZAVRNJENO: Poskus preklica brez veljavnega uporabniškega ID-ja.");
         return res.status(401).json({ msg: 'Neavtorizirano: Za preklic morate biti prijavljeni.' });
     }
@@ -497,39 +497,33 @@ exports.izbrisiRezervacijo = async (req, res) => {
     }
 
     try {
-        // Uporaba arrayFilters za posodobitev v gnezdenem polju
-        // KLJUČNO: V arrayFilters dodamo POGOJ, da se mora ujemati tudi ID uporabnika (rez.uporabnikId)
+        
+        // 🔥 KLJUČNO: Uporabimo $pull za odstranitev celotnega objekta rezervacije iz podpolja 'rezervacije' znotraj ustrezne 'mize'.
         const rezultat = await Restavracija.updateOne(
             { 
-                _id: restavracijaId, // 1. Filter za restavracijo
-                "mize._id": mizaId // 2. Filter za mizo
+                _id: new mongoose.Types.ObjectId(restavracijaId), // Poišči restavracijo
+                "mize._id": new mongoose.Types.ObjectId(mizaId)  // Poišči ustrezno mizo
             }, 
             { 
-                $set: { 
-                    "mize.$[miza].rezervacije.$[rez].status": "PREKLICANO" 
+                $pull: { 
+                    "mize.$.rezervacije": { // Uporabi $ za ustrezno mizo
+                        _id: new mongoose.Types.ObjectId(rezervacijaId), // Rezervacija, ki jo želimo odstraniti
+                        uporabnikId: new mongoose.Types.ObjectId(uporabnikovId) // VARNOST: Preveri lastništvo
+                    }
                 } 
-            }, 
-            { 
-                arrayFilters: [ // Natančno določi, katero mizo in rezervacijo
-                    { "miza._id": new mongoose.Types.ObjectId(mizaId) },
-                    { 
-                        // 🟢 VARNOSTNI POGOJ: Rezervacija mora imeti pravi ID IN pravi uporabnikId
-                        "rez._id": new mongoose.Types.ObjectId(rezervacijaId),
-                        "rez.uporabnikId": new mongoose.Types.ObjectId(uporabnikovId) 
-                    } 
-                ]
             }
         );
 
         if (rezultat.modifiedCount === 0) {
-            return res.status(404).json({ msg: 'Rezervacija ni najdena, nimate dovoljenja za preklic, ali pa je že preklicana.' });
+            // modifiedCount = 0 pomeni, da rezervacija ni bila najdena ali uporabnik ni njen lastnik.
+            return res.status(404).json({ msg: 'Rezervacija ni najdena ali nimate dovoljenja za izbris.' });
         }
 
-        res.json({ msg: 'Rezervacija uspešno preklicana (Status posodobljen).' });
+        res.json({ msg: 'Rezervacija uspešno izbrisana iz baze.' });
 
     } catch (error) {
-        console.error('Napaka pri preklicu rezervacije:', error);
-        res.status(500).json({ msg: 'Napaka serverja pri preklicu rezervacije.' });
+        console.error('Napaka pri TRDEM brisanju rezervacije:', error);
+        res.status(500).json({ msg: 'Napaka serverja pri brisanju rezervacije.' });
     }
 };
 
@@ -563,6 +557,7 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
             // FILTRIRANJE: Samo rezervacije trenutnega uporabnika in prihodnje
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
+                // Po trdem brisanju status ni več kritičen, a ga pustimo za vsak primer
                 "mize.rezervacije.datum": { $exists: true, $gte: danesISO }, // Datum danes ali v prihodnosti (String primerjava)
                 "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] } // Izključi neaktivne statuse
             }},
