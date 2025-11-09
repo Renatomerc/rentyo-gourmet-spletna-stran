@@ -780,32 +780,58 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     if (!rezultatiContainer) return;
     
     // --- Pomožna funkcija za zanesljivo pretvorbo (decimalna ura -> HH:MM) ---
-const convertDecimalToTime = (decimalHour) => {
-    
-    // 🔥 POPRAVEK: Najprej zaokrožimo decimalno število na eno decimalko.
-    // To premaga Back-end float napake, ki povzročajo napačen prikaz.
-    const roundedDecimalHour = Math.round(decimalHour * 10) / 10;
+    const convertDecimalToTime = (decimalHour) => {
+        
+        // 🔥 POPRAVEK: Najprej zaokrožimo decimalno število na eno decimalko.
+        // To premaga Back-end float napake, ki povzročajo napačen prikaz.
+        const roundedDecimalHour = Math.round(decimalHour * 10) / 10;
 
-    // Zanesljiv izračun v minutah
-    const totalMinutes = Math.round(roundedDecimalHour * 60); 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+        // Zanesljiv izračun v minutah
+        const totalMinutes = Math.round(roundedDecimalHour * 60); 
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        
+        return `${formattedHours}:${formattedMinutes}`; 
+    };
+    // ------------------------------------------------
+
+    // 🔑 NOVA LOGIKA: Določitev trenutne ure in datuma
+    const danes = new Date();
+    // Datum danes v enakem formatu kot 'datum' (npr. "09. 11. 2025")
+    const datumDanesPrikaz = flatpickr.formatDate(danes, "d. m. Y"); 
+    // Trenutni čas v decimalni obliki (npr. 16:55 -> 16.916)
+    const trenutnaDecimalnaUra = danes.getHours() + danes.getMinutes() / 60;
     
-    const formattedHours = String(hours).padStart(2, '0');
-    const formattedMinutes = String(minutes).padStart(2, '0');
-    
-    return `${formattedHours}:${formattedMinutes}`; 
-};
-// ------------------------------------------------
+    // Preverimo, ali je izbrani datum današnji dan
+    const jeDanes = (datum === datumDanesPrikaz);
 
     rezultatiContainer.innerHTML = '';
     let html = '';
 
     mize.forEach(miza => {
+        
+        // Ustvarimo kopijo prostih ur za obdelavo filtriranja in sortiranja
+        let ureZaPrikaz = [...miza.prosteUre]; 
+        
+        // 🔑 NOVA LOGIKA: 1. FILTRIRANJE UR V PRETEKLOSTI (če je danes)
+        if (jeDanes) {
+            ureZaPrikaz = ureZaPrikaz.filter(uraDecimal => {
+                // Obdržimo samo tiste termine, ki so STROGO večji od trenutne ure
+                return uraDecimal > trenutnaDecimalnaUra;
+            });
+        }
+        
+        // 🔑 NOVA LOGIKA: 2. SORTIRANJE UR (vedno, od najmanjše do največje)
+        ureZaPrikaz.sort((a, b) => a - b);
+
         html += `<h4 class="text-lg font-semibold mt-4 mb-2">${i18next.t('modal.table_label')} ${miza.mizaIme} (${i18next.t('modal.capacity')}: ${miza.kapaciteta})</h4>`;
         html += `<div class="flex flex-wrap gap-2">`;
         
-        miza.prosteUre.forEach(uraDecimal => {
+        // Sedaj iteriramo čez že filtrirano in sortirano polje 'ureZaPrikaz'
+        ureZaPrikaz.forEach(uraDecimal => {
             
             // 1. Popravi decimalno število na 2 decimalki za zanesljivost (odpravlja float napake)
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
@@ -927,7 +953,7 @@ async function handleIzvedbaRezervacije(podatki) {
 
     } catch (error) {
         console.error('Napaka pri API klicu za rezervacijo:', error);
-        prikaziSporocilo(i18next.t('messages.server_connection_error_retry'), 'error');
+        prikaziSporočilo(i18next.t('messages.server_connection_error_retry'), 'error');
     }
 }
 
@@ -958,7 +984,7 @@ const potrdiRezervacijo = () => {
     // 🔥 POPRAVEK LOGIKE MANJKAJOČE MIZE/URE (dodano iz prejšnjih korakov za boljše opozorilo)
     if (!currentRestaurantId || !mizaId || !datumBackend || !steviloOseb || !casStart) {
         // Uporabimo novo, bolj specifično sporočilo
-        prikaziSporocilo(i18next.t('messages.required_fields_missing_time_miza') || 'Izpolnite vsa polja in **IZBERITE URO/MIZO** na prejšnjem koraku.', 'error');
+        prikaziSporočilo(i18next.t('messages.required_fields_missing_time_miza') || 'Izpolnite vsa polja in **IZBERITE URO/MIZO** na prejšnjem koraku.', 'error');
         if(durationModal) durationModal.classList.remove('active');
         if(restavracijaModal) restavracijaModal.classList.add('active'); 
         return;
@@ -999,7 +1025,7 @@ const potrdiRezervacijo = () => {
 const odpriDurationModal = () => { // Preimenovano v const, da se izognemo window.odpriDurationModal v globalnem obsegu
     if (!currentRestaurantId || !globalSelectedTime || !globalSelectedMizaId) {
         console.error("Napaka: Ni izbrane restavracije, časa ali mize za rezervacijo.");
-        prikaziSporocilo("Napaka: Prosimo, izberite čas in mizo rezervacije.", 'error');
+        prikaziSporočilo("Napaka: Prosimo, izberite čas in mizo rezervacije.", 'error');
         if(restavracijaModal) restavracijaModal.classList.add('active'); 
         return;
     }
