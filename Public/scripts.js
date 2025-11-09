@@ -836,49 +836,52 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     });
 
     // 🔑 NOVA LOGIKA: Sortiramo ključe (ure) od najmanjše do največje
-    const sortedTimes = Array.from(allAvailableTimes.keys()).sort((a, b) => a - b);
+// POPRAVEK: Uporabimo parseFloat(), da zagotovimo pravilno ŠTEVILČNO sortiranje.
+const sortedTimes = Array.from(allAvailableTimes.keys()).sort((a, b) => {
+    return parseFloat(a) - parseFloat(b);
+});
     
-    rezultatiContainer.innerHTML = '';
-    let html = `<div class="flex flex-wrap gap-2 justify-center">`;
+rezultatiContainer.innerHTML = '';
+let html = `<div class="flex flex-wrap gap-2 justify-center">`;
     
-    // Iteriramo čez SORTIRANO polje ur
-    sortedTimes.forEach(uraDecimal => {
-        const casString = convertDecimalToTime(uraDecimal); // Npr. '18:00'
+// Iteriramo čez SORTIRANO polje ur
+sortedTimes.forEach(uraDecimal => {
+    const casString = convertDecimalToTime(uraDecimal); // Npr. '18:00'
         
-        // Poberemo PRVO prosto mizo za ta čas
-        const prostaMiza = allAvailableTimes.get(uraDecimal)[0];
+    // Poberemo PRVO prosto mizo za ta čas
+    const prostaMiza = allAvailableTimes.get(uraDecimal)[0];
 
-        // 🔥 POPRAVEK: Zagotovimo, da so VSI pričakovani data-atributi prisotni!
-        html += `
-            <button class="gumb-izbira-ure gumb-ura" 
-                data-cas-decimal="${uraDecimal}" 
-                data-miza-ime="${prostaMiza.mizaIme}"
-                data-miza-id="${prostaMiza.mizaId}"  
-                data-datum="${datum}"
-                data-osebe="${steviloOseb}"
-                data-ura-string="${casString}" 
-                data-time="${casString}"> 
-                ${casString} 
-            </button>
-        `;
-    });
+    // 🔥 POPRAVEK: Zagotovimo, da so VSI pričakovani data-atributi prisotni!
+    html += `
+        <button class="gumb-izbira-ure gumb-ura" 
+            data-cas-decimal="${uraDecimal}" 
+            data-miza-ime="${prostaMiza.mizaIme}"
+            data-miza-id="${prostaMiza.mizaId}"  
+            data-datum="${datum}"
+            data-osebe="${steviloOseb}"
+            data-ura-string="${casString}" 
+            data-time="${casString}"> 
+            ${casString} 
+        </button>
+    `;
+});
     
-    html += `</div>`;
+html += `</div>`;
     
-    if (sortedTimes.length === 0) {
-         html = `<p class="text-center py-4 text-red-600">${i18next.t('messages.no_time_slots_available') || 'Žal nam je, danes ni več prostih terminov.'}</p>`;
-    }
+if (sortedTimes.length === 0) {
+    html = `<p class="text-center py-4 text-red-600">${i18next.t('messages.no_time_slots_available') || 'Žal nam je, danes ni več prostih terminov.'}</p>`;
+}
     
-    rezultatiContainer.innerHTML = html;
+rezultatiContainer.innerHTML = html;
     
-    // Nastavimo poslušalce za izbiro ure (ki sproži potrditveni modal)
-    document.querySelectorAll('.gumb-izbira-ure').forEach(gumb => {
-        // Opomba: OdpriPotrditveniModal bo uporabil data-ura-string/data-cas-decimal
-        gumb.addEventListener('click', odpriPotrditveniModal);
-    });
+// Nastavimo poslušalce za izbiro ure (ki sproži potrditveni modal)
+document.querySelectorAll('.gumb-izbira-ure').forEach(gumb => {
+    // Opomba: OdpriPotrditveniModal bo uporabil data-ura-string/data-cas-decimal
+    gumb.addEventListener('click', odpriPotrditveniModal);
+});
     
-    // Inicializiramo Listener za trajanje
-    setupTimeSlotListeners();
+// Inicializiramo Listener za trajanje
+setupTimeSlotListeners();
 }
 
 /**
