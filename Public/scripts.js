@@ -796,27 +796,26 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
 
     // 🔑 NOVA LOGIKA: Določitev trenutne ure in datuma
     const danes = new Date();
-    // Preverite, ali imate flatpickr naložen za formatiranje datuma,
-    // sicer bo to povzročilo napako. Predpostavljam, da deluje.
+    // Uporabljamo flatpickr za formatiranje datuma
     const datumDanesPrikaz = flatpickr.formatDate(danes, "d. m. Y"); 
     const trenutnaDecimalnaUra = danes.getHours() + danes.getMinutes() / 60;
     const jeDanes = (datum === datumDanesPrikaz);
 
-    // 🔑 NOVA STRUKTURA: Združimo vse proste termine v eno polje za lažje sortiranje.
-    // Uporabljamo Map za zbiranje edinstvenih ur, ki imajo vsaj eno prosto mizo.
-    // Ključ: decimalna ura, Vrednost: Polje miza objektov, ki so proste ob tem času.
+    // 🔑 NOVA STRUKTURA: Združimo vse proste termine in shranimo podatke o mizi.
+    // Ključ: decimalna ura, Vrednost: Polje miza objektov.
     const allAvailableTimes = new Map();
 
     mize.forEach(miza => {
         miza.prosteUre.forEach(uraDecimal => {
             
-            // 1. Ohranimo samo cele ure (obstoeči filter)
+            // 1. Ohranimo samo cele ure
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
             if (fixedDecimal % 1 !== 0) {
                 return; 
             }
             
             // 2. FILTRIRANJE UR V PRETEKLOSTI (če je danes)
+            // Dodajamo termin samo, če je STROGO po trenutnem času
             if (jeDanes && fixedDecimal <= trenutnaDecimalnaUra) {
                 return; 
             }
@@ -846,19 +845,19 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     sortedTimes.forEach(uraDecimal => {
         const casString = convertDecimalToTime(uraDecimal); // Npr. '18:00'
         
-        // Poberemo PRVO prosto mizo za ta čas, da damo v gumb
+        // Poberemo PRVO prosto mizo za ta čas
         const prostaMiza = allAvailableTimes.get(uraDecimal)[0];
 
-        // POZOR: Prikazujemo gumb samo ENKRAT za to uro.
-        // Če je prostih več miz, bomo v data-atributi gumba uporabili ID prve mize
-        // (to je že rešeno v vašem sistemu z uporabo globalSelectedMizaId ob kliku).
-        
+        // 🔥 POPRAVEK: Zagotovimo, da so VSI pričakovani data-atributi prisotni!
         html += `
             <button class="gumb-izbira-ure gumb-ura" 
-                data-cas-decimal="${uraDecimal}" data-miza-ime="${prostaMiza.mizaIme}"
-                data-miza-id="${prostaMiza.mizaId}"  data-datum="${datum}"
+                data-cas-decimal="${uraDecimal}" 
+                data-miza-ime="${prostaMiza.mizaIme}"
+                data-miza-id="${prostaMiza.mizaId}"  
+                data-datum="${datum}"
                 data-osebe="${steviloOseb}"
-                data-time="${casString}">
+                data-ura-string="${casString}" 
+                data-time="${casString}"> 
                 ${casString} 
             </button>
         `;
@@ -873,8 +872,8 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
     rezultatiContainer.innerHTML = html;
     
     // Nastavimo poslušalce za izbiro ure (ki sproži potrditveni modal)
-    // Uporabljamo gumb-izbira-ure in gumb-ura za kompatibilnost z obstoječim JS
     document.querySelectorAll('.gumb-izbira-ure').forEach(gumb => {
+        // Opomba: OdpriPotrditveniModal bo uporabil data-ura-string/data-cas-decimal
         gumb.addEventListener('click', odpriPotrditveniModal);
     });
     
