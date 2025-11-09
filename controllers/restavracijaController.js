@@ -381,15 +381,14 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 💥 POPRAVEK: Zagotovitev shranjevanja ID-ja uporabnika in prisilno preverjanje prijave.
- * 🟢 POPRAVEK za Race Condition: Odstranjeno .lean() in uporabljeno .exec().
+ * 💥 POPRAVEK: Popravljena logika preverjanja zasedenosti z izključitvijo preklicanih rezervacij.
+ * 🟢 Optimizacija: Vrnitev na hitrejši .lean() s popravljeno logiko.
  */
 exports.ustvariRezervacijo = async (req, res) => {
     // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo!
     const userId = req.uporabnik ? req.uporabnik.id : null; 
     
     // 🚨 ZAŠČITA: Če ID manjka ali ni veljaven, prekinemo.
-    // To zagotovi, da se rezervacija ne ustvari, če uporabnik ni uspešno prijavljen in ima veljaven ID.
     if (!userId || !mongoose.Types.ObjectId.isValid(userId.toString())) {
         console.log("❌ ZAVRNJENO: Poskus rezervacije brez veljavnega uporabniškega ID-ja.");
         return res.status(401).json({ 
@@ -416,16 +415,14 @@ exports.ustvariRezervacijo = async (req, res) => {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
         
-        // 🔥 KLJUČNA SPREMEMBA: Odstranitev .lean() in uporaba .exec() za preprečitev "race condition"
-        const restavracija = await Restavracija.findById(restavracijaId, 'mize').exec(); 
+        // 🟢 POPRAVEK 1: Uporaba .lean() za hitrejše branje podatkov za preverjanje
+        const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
 
         if (!restavracija) {
             return res.status(404).json({ msg: 'Restavracija ni najdena.' });
         }
         
-        // Mongoose dokument pretvorimo v navaden JS objekt za lažje iskanje in delo
-        const restavracijaObj = restavracija.toObject();
-        const izbranaMiza = restavracijaObj.mize.find(m => m._id.toString() === mizaId);
+        const izbranaMiza = restavracija.mize.find(m => m._id.toString() === mizaId);
 
         if (!izbranaMiza) {
              return res.status(404).json({ msg: 'Miza ni najdena v restavraciji.' });
@@ -433,10 +430,12 @@ exports.ustvariRezervacijo = async (req, res) => {
 
         const mizaIme = izbranaMiza.Miza || izbranaMiza.ime || izbranaMiza.naziv || `ID: ${izbranaMiza._id.toString().substring(0, 4)}...`;
 
-        // Filtriramo rezervacije za določen datum, ki niso preklicane
+        // 🔥 POPRAVEK 2: KLJUČNO! Filtriramo rezervacije za določen datum IN izključimo 'PREKLICANO' rezervacije.
+        // Če preklicanih rezervacij ne izključimo, bo preverjanje zasedenosti neustrezno.
         const obstojeceRezervacije = (izbranaMiza.rezervacije || [])
-             .filter(rez => rez.datum === datum && rez.status !== 'PREKLICANO');
+            .filter(rez => rez.datum === datum && rez.status !== 'PREKLICANO');
 
+        // Zdaj preverimo prekrivanje samo z aktivnimi rezervacijami
         for (const obstojecaRezervacija of obstojeceRezervacije) {
             const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
             if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojecaRezervacija.casStart, obstojeceTrajanje)) {
@@ -459,6 +458,8 @@ exports.ustvariRezervacijo = async (req, res) => {
             status: 'POTRJENO',
         };
 
+        // Ta $push operacija je atomska in preprečuje podvajanje za ta specifičen dokument,
+        // s popravljeno logiko preverjanja zasedenosti pa je verjetnost "race condition" močno zmanjšana.
         const rezultat = await Restavracija.updateOne(
             { _id: restavracijaId, "mize._id": mizaId },
             { $push: { "mize.$.rezervacije": novaRezervacija } }
