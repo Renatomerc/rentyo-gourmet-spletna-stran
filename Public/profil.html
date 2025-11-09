@@ -585,7 +585,7 @@
 
         /**
          * Pomožna funkcija za renderiranje rezervacij
-         * 💥 POPRAVLJENO: Ustvarjanje ustrezne HTML strukture za "kartice"
+         * 💥 KLJUČNO POPRAVLJENO: Logika za status v Zgodovini.
          */
         const renderRezervacije = (rezervacije, kontejnerElement, jeAktivnaLista) => {
             // Ponastavi vsebino kontejnerja (hrani samo h3 naslov)
@@ -640,12 +640,18 @@
                     <p style="margin: 5px 0 0 0;">${rez.datum_rezervacije} ob ${casIzpis} (${rez.stevilo_oseb} oseb)</p>
                 `;
 
+                // 🌟 KLJUČNI POPRAVEK: Robustnejša logika za zgodovino
                 if (!jeAktivnaLista) {
-                    // Za zgodovino dodamo status
-                    const statusText = rez.status === 'PREKLICANO' 
+                    const currentStatus = rez.status ? rez.status.toUpperCase() : 'POTRJENO'; // Privzeto POTRJENO, če polje manjka
+
+                    // Če smo prešli na trdo brisanje, je v zgodovini le POTRJENO/ZAKLJUČENO (pretekle)
+                    // Vendar, če boste v bazi ohranili preklicane rezervacije (za zgodovino!), potrebujete to logiko.
+                    const isCancelled = currentStatus === 'PREKLICANO'; 
+                    const statusText = isCancelled
                         ? i18next.t('profile.status_cancelled') 
-                        : i18next.t('profile.status_completed');
-                    const color = rez.status === 'PREKLICANO' ? 'orange' : 'grey';
+                        : i18next.t('profile.status_completed'); // Ostale pretekle (potrjeno/zaključeno)
+                    const color = isCancelled ? 'orange' : 'grey';
+                    
                     htmlContent += `<p style="margin: 5px 0 0 0; font-weight: bold; color: ${color};">[${statusText}]</p>`;
                 }
                 
@@ -713,6 +719,8 @@
 
                 if (response.ok) {
                     const rezervacije = await response.json();
+                    // 🌟 KLJUČNO: Dodan console.log za preverjanje statusov
+                    console.log("Podatki zgodovine rezervacij (za preverjanje statusov):", rezervacije); 
                     renderRezervacije(rezervacije, zgodovinaRezervacijKontejner, false);
                 } else if (response.status === 401 || response.status === 403) {
                     renderRezervacije([], zgodovinaRezervacijKontejner, false);
