@@ -3,7 +3,6 @@
 // Vsebuje vso poslovno logiko za restavracije, rezervacije in Geo iskanje.
 // ===============================================
 
-// ⚠️ OPOMBA: Če se strežnik zatakne, je najverjetnejša težava pri uvozu ali definiciji modela.
 const Restavracija = require('../models/Restavracija'); 
 const mongoose = require('mongoose');
 
@@ -187,6 +186,7 @@ exports.izbrisiRestavracijo = async (req, res) => {
  * Geospatial iskanje (GET /blizina)
  */
 exports.pridobiRestavracijePoBlizini = async (req, res) => {
+    // 🟢 POPRAVLJENA SINTAKSA: Odstranjena odvečna '}'
     const { lat, lon, radius } = req.query; 
     
     const latitude = parseFloat(lat);
@@ -259,7 +259,6 @@ exports.pridobiProsteUre = async (req, res) => {
     // 🔥 POPRAVEK 1: Preveri format in pripravi ObjectId za agregacijo
     let restavracijaObjectId;
     try {
-        // Predpostavka: Mongoose in Restavracija Model sta uvožena.
         restavracijaObjectId = new mongoose.Types.ObjectId(restavracijaId); 
     } catch (e) {
         return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
@@ -381,14 +380,11 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 💥 POPRAVEK: Popravljena logika preverjanja zasedenosti z izključitvijo preklicanih rezervacij.
- * 🟢 Optimizacija: Vrnitev na hitrejši .lean() s popravljeno logiko.
+ * 💥 KONČNI POPRAVEK: Implementacija MongoDB Transakcije za zagotovljeno atomičnost in odpravo podvajanja.
  */
 exports.ustvariRezervacijo = async (req, res) => {
-    // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo!
     const userId = req.uporabnik ? req.uporabnik.id : null; 
     
-    // 🚨 ZAŠČITA: Če ID manjka ali ni veljaven, prekinemo.
     if (!userId || !mongoose.Types.ObjectId.isValid(userId.toString())) {
         console.log("❌ ZAVRNJENO: Poskus rezervacije brez veljavnega uporabniškega ID-ja.");
         return res.status(401).json({ 
@@ -396,8 +392,7 @@ exports.ustvariRezervacijo = async (req, res) => {
             message: 'Za ustvarjanje rezervacije morate biti prijavljeni z veljavnim uporabniškim računom.' 
         });
     }
-    
-    // Sedaj vemo, da je userId veljaven string ID. Varno ga pretvorimo.
+
     const uporabnikIdObject = new mongoose.Types.ObjectId(userId.toString());
     
     const { restavracijaId, mizaId, imeGosta, telefon, stevilo_oseb, datum, casStart, trajanjeUr } = req.body;
@@ -411,34 +406,47 @@ exports.ustvariRezervacijo = async (req, res) => {
         return res.status(400).json({ msg: `Neveljaven format ID: "${neveljavenId}"` });
     }
 
+    // 1. ZAGON MONGOOSE SESSION-a
+    const session = await mongoose.startSession();
+    session.startTransaction(); // Začnemo transakcijo
+    
     try {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
-        
-        // 🟢 POPRAVEK 1: Uporaba .lean() za hitrejše branje podatkov za preverjanje
-        const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
+
+        // 2. BRANJE ZNOTRAJ TRANSAKCIJE (MORAMO POSREDOVATI SESSION)
+        // Uporabimo `.session(session)` za zagotovitev, da je branje del transakcije.
+        const restavracija = await Restavracija.findById(restavracijaId, 'mize')
+            .session(session) // KLJUČNO za transakcijo
+            .lean(); 
 
         if (!restavracija) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ msg: 'Restavracija ni najdena.' });
         }
         
         const izbranaMiza = restavracija.mize.find(m => m._id.toString() === mizaId);
 
         if (!izbranaMiza) {
+             await session.abortTransaction();
+             session.endSession();
              return res.status(404).json({ msg: 'Miza ni najdena v restavraciji.' });
         }
 
         const mizaIme = izbranaMiza.Miza || izbranaMiza.ime || izbranaMiza.naziv || `ID: ${izbranaMiza._id.toString().substring(0, 4)}...`;
 
-        // 🔥 POPRAVEK 2: KLJUČNO! Filtriramo rezervacije za določen datum IN izključimo 'PREKLICANO' rezervacije.
-        // Če preklicanih rezervacij ne izključimo, bo preverjanje zasedenosti neustrezno.
+        // Filtriramo aktivne rezervacije za določen datum
         const obstojeceRezervacije = (izbranaMiza.rezervacije || [])
             .filter(rez => rez.datum === datum && rez.status !== 'PREKLICANO');
 
-        // Zdaj preverimo prekrivanje samo z aktivnimi rezervacijami
+        // 3. LOGIKA PREVERJANJA
         for (const obstojecaRezervacija of obstojeceRezervacije) {
             const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
             if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojecaRezervacija.casStart, obstojeceTrajanje)) {
+                
+                await session.abortTransaction(); // Prekini transakcijo, če je zasedeno!
+                session.endSession();
                 return res.status(409).json({ 
                     msg: `Miza ${mizaIme} je že zasedena v tem času. Prosimo, izberite drugo uro.`,
                     status: "ZASEDNO"
@@ -447,7 +455,6 @@ exports.ustvariRezervacijo = async (req, res) => {
         }
         
         const novaRezervacija = {
-            // 💥 KLJUČNO: Uporabimo zagotovljeni in pretvorjeni ID
             uporabnikId: uporabnikIdObject,
             imeGosta,
             telefon,
@@ -456,18 +463,26 @@ exports.ustvariRezervacijo = async (req, res) => {
             casStart: casZacetka,
             trajanjeUr: trajanje,
             status: 'POTRJENO',
+            _id: new mongoose.Types.ObjectId() // Generiramo nov ID znotraj transakcije
         };
 
-        // Ta $push operacija je atomska in preprečuje podvajanje za ta specifičen dokument,
-        // s popravljeno logiko preverjanja zasedenosti pa je verjetnost "race condition" močno zmanjšana.
+        // 4. PISANJE ZNOTRAJ TRANSAKCIJE
+        // Transakcija bo zaklenila dokument in preprečila 'race condition'.
         const rezultat = await Restavracija.updateOne(
             { _id: restavracijaId, "mize._id": mizaId },
-            { $push: { "mize.$.rezervacije": novaRezervacija } }
+            { $push: { "mize.$.rezervacije": novaRezervacija } },
+            { session } // KLJUČNO: Dodamo session operaciji pisanja
         );
 
         if (rezultat.modifiedCount === 0) {
+             await session.abortTransaction();
+             session.endSession();
              return res.status(500).json({ msg: 'Napaka pri shranjevanju. Restavracija ali miza ni bila najdena ali posodobljena.' });
         }
+
+        // 5. ZAKLJUČEK TRANSAKCIJE
+        await session.commitTransaction();
+        session.endSession();
 
         res.status(201).json({ 
             msg: `Rezervacija uspešno ustvarjena za ${mizaIme} ob ${casStart}.`,
@@ -475,7 +490,16 @@ exports.ustvariRezervacijo = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Napaka pri ustvarjanju rezervacije:', error);
+        // V primeru napake prekini transakcijo in zaključi session
+        if (session && session.inTransaction()) {
+             await session.abortTransaction();
+        }
+        if (session) {
+            session.endSession();
+        }
+        
+        // Prijavi napako 
+        console.error('Napaka pri ustvarjanju rezervacije (TRANSAKCIJA):', error);
         res.status(500).json({ msg: 'Napaka serverja pri ustvarjanju rezervacije.' });
     }
 };
@@ -483,7 +507,6 @@ exports.ustvariRezervacijo = async (req, res) => {
 /**
  * 🟢 POPRAVLJENO: Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
  * Izvaja TRDO BRISANJE ($pull), ki rezervacijo v celoti odstrani iz zbirke podatkov.
- * To rešuje problem vidnosti v Admin portalu.
  */
 exports.izbrisiRezervacijo = async (req, res) => {
     const { restavracijaId, mizaId, rezervacijaId } = req.body;
