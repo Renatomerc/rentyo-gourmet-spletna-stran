@@ -382,6 +382,7 @@ exports.pridobiProsteUre = async (req, res) => {
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
  * 💥 POPRAVEK: Zagotovitev shranjevanja ID-ja uporabnika in prisilno preverjanje prijave.
+ * 🟢 POPRAVEK za Race Condition: Odstranjeno .lean() in uporabljeno .exec().
  */
 exports.ustvariRezervacijo = async (req, res) => {
     // KLJUČNO: Preverite, ali je req.uporabnik.id na voljo!
@@ -415,13 +416,16 @@ exports.ustvariRezervacijo = async (req, res) => {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
         
-        const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
+        // 🔥 KLJUČNA SPREMEMBA: Odstranitev .lean() in uporaba .exec() za preprečitev "race condition"
+        const restavracija = await Restavracija.findById(restavracijaId, 'mize').exec(); 
 
         if (!restavracija) {
             return res.status(404).json({ msg: 'Restavracija ni najdena.' });
         }
         
-        const izbranaMiza = restavracija.mize.find(m => m._id.toString() === mizaId);
+        // Mongoose dokument pretvorimo v navaden JS objekt za lažje iskanje in delo
+        const restavracijaObj = restavracija.toObject();
+        const izbranaMiza = restavracijaObj.mize.find(m => m._id.toString() === mizaId);
 
         if (!izbranaMiza) {
              return res.status(404).json({ msg: 'Miza ni najdena v restavraciji.' });
@@ -429,7 +433,9 @@ exports.ustvariRezervacijo = async (req, res) => {
 
         const mizaIme = izbranaMiza.Miza || izbranaMiza.ime || izbranaMiza.naziv || `ID: ${izbranaMiza._id.toString().substring(0, 4)}...`;
 
-        const obstojeceRezervacije = (izbranaMiza.rezervacije || []).filter(rez => rez.datum === datum);
+        // Filtriramo rezervacije za določen datum, ki niso preklicane
+        const obstojeceRezervacije = (izbranaMiza.rezervacije || [])
+             .filter(rez => rez.datum === datum && rez.status !== 'PREKLICANO');
 
         for (const obstojecaRezervacija of obstojeceRezervacije) {
             const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
