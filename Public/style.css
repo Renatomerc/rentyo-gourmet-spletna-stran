@@ -527,22 +527,15 @@ a:hover {
      }
 
     /* KLJUČNA POPRAVKA ZA DATUM/ČAS (iOS) */
-    .iskalnik input#datum, 
-    .iskalnik input#cas {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        
-        width: 100% !important; 
-        min-width: 100%;
-    }
+   .iskalnik input#datum, 
+.iskalnik input#cas {
+    /* -webkit-appearance: none;  <-- ODSTRANITE/KOMENTIRAJTE TO! */
+    -moz-appearance: none;
+    appearance: none;
     
-    .iskalnik input[type="date"]::-webkit-inner-spin-button,
-    .iskalnik input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
+    width: 100% !important; 
+    min-width: 100%;
+}
     
     /* ---------------------------------------------------- */
     /* NOVI STILI ZA POLJE 'ŠT. LJUDI' IN GUMB 'IŠČI'       */

@@ -74,7 +74,7 @@
     "select_reservation_date": "Molimo, odaberite datum rezervacije.",
     "pogoji_required": "Za registraciju morate prihvatiti Opće uvjete i Politiku privatnosti.",
     "login_required": "Za rezervaciju je potrebna prijava. Molimo, prijavite se.",
-    "google_reviews": "Google recenzija"
+    "google_reviews": "Google"
   },
   "duration": {
     "one_hour": "1 sat",

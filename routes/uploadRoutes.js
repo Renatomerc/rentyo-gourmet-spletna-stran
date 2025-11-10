@@ -4,37 +4,65 @@ const cloudinary = require('../config/cloudinaryConfig'); // Uvoz Cloudinary kon
 const multer = require('multer');
 const fs = require('fs'); // Za brisanje začasne datoteke
 
+// 🔥🔥🔥 POMEMBNO: Uvoz Mongoose modela restavracije
+const Restavracija = require('../models/Restavracija'); 
+// OPOZORILO: Pot '../models/Restavracija' morda ni pravilna za vaš projekt, 
+// preverite, kje se nahaja datoteka vašega modela (npr. Restavracija.js)!
+
 // Nastavitev Multerja: določa, kam se začasno shrani datoteka, preden jo pošljemo na Cloudinary
 const upload = multer({ dest: 'uploads/' }); 
 
 /**
  * POST /api/upload/slika
- * Avtorizacija: Tukaj mora biti v prihodnje admin avtorizacija!
- * Funkcija: Obravnava nalaganje ene datoteke ('file') na Cloudinary.
+ * Funkcija: Obravnava nalaganje ene datoteke ('file') in shranjevanje URL-ja v MongoDB.
+ * Pričakuje: V multipart/form-data polje 'file' (sliko) IN polje 'restavracijaId' (ID restavracije).
  */
 router.post('/slika', upload.single('file'), async (req, res) => {
-    // 1. Preverjanje, ali je datoteka sploh priložena
-    if (!req.file) {
-        return res.status(400).json({ msg: 'Datoteka ni priložena v zahtevku (uporabite ključ "file").' });
+    // 1. Pridobitev ID-ja restavracije iz telesa zahtevka
+    const { restavracijaId } = req.body; 
+
+    // 2. Preverjanje nujnih podatkov
+    if (!req.file || !restavracijaId) {
+        return res.status(400).json({ 
+            msg: 'Manjka datoteka ("file") ali ID restavracije ("restavracijaId").' 
+        });
     }
     
     // Pot do začasno shranjene datoteke v mapi 'uploads/'
     const filePath = req.file.path;
 
     try {
-        // 2. Naloži datoteko na Cloudinary
+        // 3. Naloži datoteko na Cloudinary
         const rezultat = await cloudinary.uploader.upload(filePath, {
-            folder: 'restavracije', // Definira mapo v Cloudinary za boljšo organizacijo
+            folder: 'restavracije', 
             resource_type: 'auto'
         });
 
-        // 3. ZELO POMEMBNO: Izbriši začasno datoteko z lokalnega strežnika
+        // 🔥 4. ZELO POMEMBNO: Shranjevanje URL-ja v MongoDB 🔥
+        const posodobljenaRestavracija = await Restavracija.findByIdAndUpdate(
+            restavracijaId, 
+            { 
+                $set: { 
+                    mainImageUrl: rezultat.secure_url // Shranimo celoten URL v polje, ki ga išče controller
+                } 
+            },
+            { new: true, runValidators: true } // Vrne posodobljen dokument in sproži validatorje
+        );
+        
+        // Preverjanje, ali je bila restavracija posodobljena
+        if (!posodobljenaRestavracija) {
+            fs.unlinkSync(filePath); 
+            return res.status(404).json({ msg: 'Restavracija s tem ID-jem ni bila najdena.' });
+        }
+        // ----------------------------------------------------
+
+        // 5. Izbriši začasno datoteko z lokalnega strežnika
         fs.unlinkSync(filePath); 
 
-        // 4. Vrni URL, ki ga shranimo v MongoDB
+        // 6. Vrni končni URL
         res.status(200).json({
-            msg: 'Slika uspešno naložena na Cloudinary.',
-            url: rezultat.secure_url, // Ta URL shranite v MongoDB dokument restavracije
+            msg: 'Slika uspešno naložena in URL shranjen v bazo.',
+            url: rezultat.secure_url, 
             public_id: rezultat.public_id
         });
 
@@ -43,7 +71,7 @@ router.post('/slika', upload.single('file'), async (req, res) => {
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
-        console.error('Cloudinary napaka pri nalaganju:', error);
+        console.error('Cloudinary/MongoDB napaka pri nalaganju:', error);
         res.status(500).json({ msg: 'Napaka pri nalaganju slike.', error: error.message });
     }
 });

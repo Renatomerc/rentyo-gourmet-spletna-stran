@@ -74,7 +74,7 @@
     "select_reservation_date": "Veuillez sélectionner une date de réservation.",
     "pogoji_required": "Pour vous inscrire, vous devez accepter les Conditions Générales et la Politique de Confidentialité.",
     "login_required": "La connexion est requise pour la réservation. Veuillez vous connecter.",
-    "google_reviews": "avis Google"
+    "google_reviews": "Google"
   },
   "duration": {
     "one_hour": "une heure", 
