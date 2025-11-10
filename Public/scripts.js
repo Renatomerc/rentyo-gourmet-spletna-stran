@@ -852,12 +852,12 @@ sortedTimes.forEach(uraDecimal => {
     // Poberemo PRVO prosto mizo za ta čas
     const prostaMiza = allAvailableTimes.get(uraDecimal)[0];
 
-    // 🔥 POPRAVEK: Zagotovimo, da so VSI pričakovani data-atributi prisotni!
+    // 🔥 POPRAVEK: Miza ID odstranimo, saj bo mizo poiskal backend.
     html += `
         <button class="gumb-izbira-ure gumb-ura" 
             data-cas-decimal="${uraDecimal}" 
-            data-miza-ime="${prostaMiza.mizaIme}"
-            data-miza-id="${prostaMiza.mizaId}"  
+            data-miza-ime="" // Pustimo prazno ali odstranimo
+            data-miza-id="" // ODSTRANJENO!
             data-datum="${datum}"
             data-osebe="${steviloOseb}"
             data-ura-string="${casString}" 
