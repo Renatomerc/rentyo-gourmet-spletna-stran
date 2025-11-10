@@ -718,20 +718,21 @@
         
         /* NOVI STIL: Ovoj za oceno in oddaljenost */
         .info-ocena-oddaljenost {
-            /* 🔥 SPREMENJENO: Dodamo flex-wrap, da omogočimo prelom vrstice za Googlovo oceno */
+            /* 🔥 SPREMENJENO: Dodamo flex-wrap za prelom, kar omogoči, da Google ocena z 100% širine gre v novo vrstico */
             display: flex;
             flex-wrap: wrap; 
-            justify-content: space-between;
+            justify-content: space-between; /* To loči interno oceno in razdaljo v prvi vrstici */
             align-items: center;
-            margin-bottom: 15px; /* Povečana margina za razmik od razpoložljivosti */
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 0px solid #e0e0e0; /* Fina črta za ločitev */
+            border-bottom: 0px solid #e0e0e0;
         }
 
         .kartica-vsebina .ocena {
+            /* INTERNA OCENA: Ostane na levi, zasede le toliko prostora, kot ga potrebuje */
             font-size: 0.8rem;
             color: #333; 
-            margin: 0; /* Odstranimo prejšnje margine */
+            margin: 0;
             font-weight: bold;
         }
 
@@ -743,6 +744,7 @@
         
         /* Stil za navidezno oddaljenost */
         .oddaljenost {
+            /* RAZDALJA: Ostane na desni zgoraj */
             font-size: 0.8rem;
             font-weight: bold;
             color: #333;
@@ -754,14 +756,15 @@
             color: #007bff; /* Ikona v modri barvi */
         }
 
-        /* 🔥 NOVO: Stil za Google oceno na kartici */
+        /* 🔥 NOVO: Stil za Google oceno na kartici - KLJUČNO ZA POSTAVITEV */
         .kartica .google-ocena {
-            /* Ker je oddaljenost na desni in interna ocena na levi, ta zasede celo širino za novo vrstico */
+            /* Ta element zasede CELOTNO širino, s čimer se avtomatsko potisne v novo vrstico pod prejšnja dva elementa */
             width: 100%; 
-            font-size: 0.8rem; /* Enaka velikost kot interna ocena */
-            color: #6c757d; /* Svetlejši tekst */
-            margin-top: 5px; /* Majhen odmik od interne ocene */
-            margin-bottom: 5px; /* Majhen odmik do razdalje/razpoložljivosti */
+            
+            font-size: 0.8rem; 
+            color: #6c757d; 
+            margin-top: 5px; /* Razmik med prvo in drugo vrstico */
+            margin-bottom: 0;
             display: flex;
             align-items: center;
         }
