@@ -34,16 +34,15 @@ module.exports = (preveriGosta) => {
     
     // 2. Originalna POST pot (Priporočljiva, saj se parametri lažje prenašajo v telesu)
     router.post('/proste_ure', restavracijaController.pridobiProsteUre);
-    
+
     // -----------------------------------------------------------------
     // 🔥 NOVO: POT ZA PERIODIČNO OSVEŽEVANJE MIZ (za Polling)
     // -----------------------------------------------------------------
     /**
      * GET /api/restavracije/mize
      * Klic, ki ga frontend uporablja za osveževanje statusa miz.
-     * To zahteva, da funkcija 'pridobiVseMize' obstaja v restavracijaController.js
      */
-    router.get('/mize', restavracijaController.pridobiVseMize);
+    router.get('/mize', restavracijaController.pridobiVseMize); // <--- VSTAVLJENO TUKAJ!
     
     
     // -----------------------------------------------------------------
