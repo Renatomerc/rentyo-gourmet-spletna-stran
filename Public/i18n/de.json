@@ -73,7 +73,8 @@
     "no_restaurant_selected": "Fehler: Kein Restaurant ausgewählt.",
     "select_reservation_date": "Bitte wählen Sie ein Reservierungsdatum aus.",
     "pogoji_required": "Zur Registrierung müssen Sie die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung akzeptieren.",
-    "login_required": "Zur Reservierung ist eine Anmeldung erforderlich. Bitte melden Sie sich an."
+    "login_required": "Zur Reservierung ist eine Anmeldung erforderlich. Bitte melden Sie sich an.",
+    "google_reviews": "Google-Bewertungen"
   },
   "duration": {
     "one_hour": "1 Stunde",

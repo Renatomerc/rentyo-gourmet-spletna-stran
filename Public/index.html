@@ -673,7 +673,7 @@
           gap: 10px; 
         }
         
-       /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
+      /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
         .kartica {
             border: 1px solid #9b9b9b;
             border-radius: 10px;
@@ -718,10 +718,9 @@
         
         /* NOVI STIL: Ovoj za oceno in oddaljenost */
         .info-ocena-oddaljenost {
-            /* 🔥 SPREMENJENO: Dodamo flex-wrap za prelom, kar omogoči, da Google ocena z 100% širine gre v novo vrstico */
             display: flex;
-            flex-wrap: wrap; 
-            justify-content: space-between; /* To loči interno oceno in razdaljo v prvi vrstici */
+            flex-wrap: wrap; /* Ključno za prelom vrstice */
+            justify-content: space-between; /* Ključno za ločitev ocene in razdalje */
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
@@ -729,7 +728,8 @@
         }
 
         .kartica-vsebina .ocena {
-            /* INTERNA OCENA: Ostane na levi, zasede le toliko prostora, kot ga potrebuje */
+            /* INTERNA OCENA: Order 1 (levo zgoraj) */
+            order: 1; 
             font-size: 0.8rem;
             color: #333; 
             margin: 0;
@@ -744,7 +744,8 @@
         
         /* Stil za navidezno oddaljenost */
         .oddaljenost {
-            /* RAZDALJA: Ostane na desni zgoraj */
+            /* RAZDALJA: Order 2 (desno zgoraj, ob interni oceni) */
+            order: 2; 
             font-size: 0.8rem;
             font-weight: bold;
             color: #333;
@@ -756,14 +757,15 @@
             color: #007bff; /* Ikona v modri barvi */
         }
 
-        /* 🔥 NOVO: Stil za Google oceno na kartici - KLJUČNO ZA POSTAVITEV */
+        /* Stil za Google oceno na kartici */
         .kartica .google-ocena {
-            /* Ta element zasede CELOTNO širino, s čimer se avtomatsko potisne v novo vrstico pod prejšnja dva elementa */
+            /* GOOGLE OCENA: Order 3 in 100% širina (nova vrstica) */
+            order: 3; 
             width: 100%; 
             
             font-size: 0.8rem; 
             color: #6c757d; 
-            margin-top: 5px; /* Razmik med prvo in drugo vrstico */
+            margin-top: 5px; 
             margin-bottom: 0;
             display: flex;
             align-items: center;
@@ -2786,12 +2788,13 @@ function renderCard(restavracija) {
     
     let googleRatingHTML = '';
     if (googleRating > 0) {
-        // Prikaz Googlove ocene pod interno oceno
-        // Uporabite posebno oblikovanje (npr. rumeno zvezdico ali Googlovo ikono)
+        // 🔥 POPRAVEK: Pridobimo preveden tekst za "Google mnenj" v JS kot čisti niz
+        const translatedReviewsText = i18next.t('messages.google_reviews') || 'Google mnenj';
+        
         googleRatingHTML = `
             <p class="google-ocena">
                 <i class="fab fa-google" style="color: #4285F4;"></i> 
-                <span>${googleRating.toFixed(1)}/5 (${googleReviewCount} ${i18next.t('messages.google_reviews') || 'Google mnenj'})</span>
+                <span>${googleRating.toFixed(1)}/5 (${googleReviewCount} ${translatedReviewsText})</span>
             </p>
         `;
     }

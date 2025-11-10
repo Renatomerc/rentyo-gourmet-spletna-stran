@@ -73,7 +73,8 @@
     "no_restaurant_selected": "Error: No restaurant selected.",
     "select_reservation_date": "Please select a reservation date.",
     "pogoji_required": "To register, you must accept the General Terms and Conditions and Privacy Policy.",
-    "login_required": "Login is required to make a reservation. Please log in." 
+    "login_required": "Login is required to make a reservation. Please log in.",
+    "google_reviews": "Google reviews"
   },
   "duration": {
     "one_hour": "1 hour",
