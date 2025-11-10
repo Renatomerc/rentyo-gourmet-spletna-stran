@@ -54,6 +54,12 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 
                 // Ostala polja
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
+                
+                // 🔥 NOVO: Polja za Google oceno in število mnenj
+                googleRating: { $ifNull: ["$googleRating", 0] },
+                googleReviewCount: { $ifNull: ["$googleReviewCount", 0] },
+                // ------------------------------------
+                
                 lokacija: 1,
                 razpolozljivost_status: 1,
                 razpolozljivost_cas: 1

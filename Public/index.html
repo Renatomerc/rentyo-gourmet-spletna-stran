@@ -673,7 +673,7 @@
           gap: 10px; 
         }
         
-        /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
+       /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
         .kartica {
             border: 1px solid #9b9b9b;
             border-radius: 10px;
@@ -718,7 +718,9 @@
         
         /* NOVI STIL: Ovoj za oceno in oddaljenost */
         .info-ocena-oddaljenost {
+            /* 🔥 SPREMENJENO: Dodamo flex-wrap, da omogočimo prelom vrstice za Googlovo oceno */
             display: flex;
+            flex-wrap: wrap; 
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px; /* Povečana margina za razmik od razpoložljivosti */
@@ -750,6 +752,24 @@
         }
         .oddaljenost i {
             color: #007bff; /* Ikona v modri barvi */
+        }
+
+        /* 🔥 NOVO: Stil za Google oceno na kartici */
+        .kartica .google-ocena {
+            /* Ker je oddaljenost na desni in interna ocena na levi, ta zasede celo širino za novo vrstico */
+            width: 100%; 
+            font-size: 0.8rem; /* Enaka velikost kot interna ocena */
+            color: #6c757d; /* Svetlejši tekst */
+            margin-top: 5px; /* Majhen odmik od interne ocene */
+            margin-bottom: 5px; /* Majhen odmik do razdalje/razpoložljivosti */
+            display: flex;
+            align-items: center;
+        }
+
+        .kartica .google-ocena .fab.fa-google {
+            font-size: 0.9em; 
+            margin-right: 4px; 
+            color: #4285F4; /* Googlova modra */
         }
 
 
@@ -2753,7 +2773,26 @@ function renderCard(restavracija) {
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
     const slikaUrl = restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'; 
     
-    const ratingDisplay = `${generateStarsHTML(restavracija.ocena_povprecje || 0)} <span class="ocena-stevilka">(${(restavracija.ocena_povprecje || 0).toFixed(1)})</span>`;
+    // 🔥 Interna ocena (vaš obstoječi sistem z zvezdicami)
+    const internaOcena = restavracija.ocena_povprecje || 0;
+    const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">(${(internaOcena).toFixed(1)})</span>`;
+
+    // --- NOVO: Googlova ocena ---
+    const googleRating = restavracija.googleRating || 0;
+    const googleReviewCount = restavracija.googleReviewCount || 0;
+    
+    let googleRatingHTML = '';
+    if (googleRating > 0) {
+        // Prikaz Googlove ocene pod interno oceno
+        // Uporabite posebno oblikovanje (npr. rumeno zvezdico ali Googlovo ikono)
+        googleRatingHTML = `
+            <p class="google-ocena">
+                <i class="fab fa-google" style="color: #4285F4;"></i> 
+                <span>${googleRating.toFixed(1)}/5 (${googleReviewCount} ${i18next.t('messages.google_reviews') || 'Google mnenj'})</span>
+            </p>
+        `;
+    }
+    // ----------------------------
     
     // 🔥 LOGIKA ZA IZRAČUN RAZDALJE
     let oddaljenostKm = '';
@@ -2769,12 +2808,7 @@ function renderCard(restavracija) {
             restavracijaLon
         );
         
-        // --- POPRAVEK JE TUKAJ ---
-        // Uporabite Math.round() za zaokrožitev na najbližje celo število
-        // ali parseInt() za odvzem decimalk (navzdol)
         oddaljenostKm = Math.round(distance).toString(); 
-        // ali: oddaljenostKm = parseInt(distance).toString();
-        // -------------------------
 
     } else {
         // Če ni lokacije, uporabimo privzeto razdaljo/prazno vrednost
@@ -2814,6 +2848,9 @@ function renderCard(restavracija) {
             
             <div class="info-ocena-oddaljenost">
                 <p class="ocena">${ratingDisplay}</p>
+                
+                ${googleRatingHTML} 
+                
                 ${oddaljenostHTML}
             </div>
             

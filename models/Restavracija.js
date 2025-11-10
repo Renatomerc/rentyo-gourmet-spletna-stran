@@ -95,6 +95,19 @@ const RestavracijaSchema = new mongoose.Schema({
         de: Object,
     },
     
+    // 🔥 NOVO: Polja za Google oceno
+    googleRating: { 
+        type: Number, 
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    googleReviewCount: { 
+        type: Number, 
+        default: 0
+    },
+    // ------------------------------------------------
+    
     // 🔥 KLJUČNO: Geospatial polje (MongoDB GeoJSON Point)
     lokacija: {
         type: {
