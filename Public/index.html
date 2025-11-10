@@ -15,14 +15,15 @@
     href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
   />
   
-  <!-- i18next jedro (Že imate) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
-  
-  <!-- i18next HTTP Backend (Že imate) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
-  
-  <!-- 🚨 MANJKAJOČA KNJIŽNICA: DETEKTOR JEZIKA 🚨 -->
   <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@7.2.1/i18nextBrowserLanguageDetector.min.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
 <style>
     /*
@@ -1124,14 +1125,28 @@
         border-radius: 8px;
     }
 
-    .zemljevid-ovoj {
+    /* 🔥 POPRAVEK ZA LEAFLET: Ciljamo tudi na novi ovoj #map-container */
+    .zemljevid-ovoj,
+    #map-container {
         width: 100%;
-        height: 300px;
+        /* Povečana višina za boljši prikaz navodil za pot (Routing Machine) */
+        height: 400px; 
         background-color: #eee;
         border-radius: 8px;
         overflow: hidden;
+        /* Dodamo position, če je potrebno za z-index in absolutno pozicioniranje notranjih elementov Leafleta */
+        position: relative; 
     }
     
+    /* 🔥 NOVO PRAVILO: Zagotovimo, da Leaflet div zavzame celoten prostor */
+    #leaflet-map {
+        width: 100%;
+        height: 100%;
+        /* z-index je ključen, da se kontrolniki prikažejo nad vsem ostalim v modalu */
+        z-index: 1; 
+    }
+
+    /* Ohranjena pravila za stare iframe, če jih še kje uporabljate */
     .zemljevid-ovoj iframe {
         width: 100%;
         height: 100%;
@@ -1166,6 +1181,12 @@
         }
         .galerija-slike img {
             height: 80px;
+        }
+        
+        /* 🔥 POPRAVEK ZA MOBILNI ZEMLJEVID */
+        .zemljevid-ovoj,
+        #map-container {
+            height: 300px; /* Prilagoditev višine za mobilni zaslon */
         }
     }
     

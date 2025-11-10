@@ -554,8 +554,20 @@ function ustvariMenijaHTML(meniPodatki, lang) {
 }
 
 
+// =================================================================
+// 🔥 NOVE GLOBALNE SPREMENLJIVKE ZA LEAFLET
+// =================================================================
+
+// Shranimo koordinate restavracije, da so na voljo Leaflet funkciji
+window.restLat = null;
+window.restLng = null;
+// Shranimo instanco mape, da jo lahko uničimo/ponovno inicializiramo
+let leafletMapInstance = null; 
+
+
 /**
- * Generira HTML za galerijo in zemljevid.
+ * 1. Generira HTML za galerijo in zemljevid.
+ * [POPRAVLJENO]: Ustvari DIV za Leaflet namesto Google Maps iframe.
  */
 function ustvariGalerijeHTML(galerijaUrl, lat, lng) {
     let slikeHtml = `<h4 data-i18n="modal.gallery_title" class="text-xl font-bold mb-3 text-gray-700">${i18next.t('modal.gallery_title')}</h4>`;
@@ -567,33 +579,155 @@ function ustvariGalerijeHTML(galerijaUrl, lat, lng) {
 
     let zemljevidHtml = `<h4 data-i18n="modal.map_title" class="text-xl font-bold mb-3 mt-6 text-gray-700">${i18next.t('modal.map_title')}</h4>`;
     
+    // 🔥 SPREMENJENO: Leaflet logika
     if (lat && lng) {
-        const embedUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=sl&z=15&output=embed`;
-        
-        // Povezava za PREUSMERITEV NA NAVIGACIJO, ki ovija zemljevid
-        const navigacijskiURL = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`; 
-        
+        // Ustvarimo DIV, ki bo Leafletu služil kot platno
         zemljevidHtml += `
-            <a href="${navigacijskiURL}" target="_blank" class="block">
-                <div class="zemljevid-ovoj rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 cursor-pointer relative">
-                    <iframe
-                        src="${embedUrl}" 
-                        width="100%"
-                        height="400"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy">
-                    </iframe>
-                    <div class="absolute inset-0 bg-transparent z-10" aria-label="Kliknite za navigacijo"></div>
-                </div>
-            </a>
-            
+            <div id="map-container" class="rounded-lg overflow-hidden shadow-lg" style="height: 400px; width: 100%;">
+                <div id="leaflet-map" style="height: 100%; width: 100%;"></div>
+            </div>
+            <p id="geo-error" class="text-center py-2 text-red-500 hidden">${i18next.t('messages.geolocation_fail')}</p>
         `;
+        
+        // Shranimo koordinate restavracije v globalne spremenljivke
+        window.restLat = lat;
+        window.restLng = lng;
+        
     } else {
         zemljevidHtml += `<p class="p-4 text-center text-gray-500">${i18next.t('modal.no_map')}</p>`;
+        window.restLat = null;
+        window.restLng = null;
     }
 
     return `<div class="galerija-sekcija p-4">${slikeHtml}</div><div class="zemljevid-sekcija p-4">${zemljevidHtml}</div>`;
+}
+
+
+/**
+ * 2. Inicializira Leaflet zemljevid in izriše pot (po pridobitvi lokacije).
+ * [NOVA FUNKCIJA]
+ */
+function inicializirajLeafletMapo() {
+    const mapElement = document.getElementById('leaflet-map');
+    
+    // Če je mapa že inicializirana ali element ne obstaja, prekinemo
+    if (!mapElement || leafletMapInstance) return;
+    
+    const restLat = window.restLat;
+    const restLng = window.restLng;
+
+    if (!restLat || !restLng) return;
+    
+    // Poskus pridobitve uporabnikove lokacije
+    navigator.geolocation.getCurrentPosition(function(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        const geoErrorEl = document.getElementById('geo-error');
+        
+        // Inicializacija mape
+        leafletMapInstance = L.map('leaflet-map').setView([userLat, userLng], 14);
+
+        // Osnovni sloj (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(leafletMapInstance);
+
+        // Uporabimo standardno ikono Leaflet za preprostost
+        const markerIcon = L.icon({
+             iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+             shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
+             iconSize: [25, 41],
+             iconAnchor: [12, 41],
+             popupAnchor: [1, -34],
+             shadowSize: [41, 41]
+        });
+
+        // Markerji
+        L.marker([userLat, userLng], { icon: markerIcon }).addTo(leafletMapInstance).bindPopup(i18next.t('map.your_location')).openPopup();
+        L.marker([restLat, restLng], { icon: markerIcon }).addTo(leafletMapInstance).bindPopup(i18next.t('map.restaurant_location'));
+
+        // Navigacija (Leaflet Routing Machine)
+        L.Routing.control({
+            waypoints: [
+                L.latLng(userLat, userLng),
+                L.latLng(restLat, restLng)
+            ],
+            routeWhileDragging: false,
+            // Nastavimo barvo poti
+            lineOptions: {
+                styles: [{color: '#007bff', opacity: 0.7, weight: 6}]
+            },
+            show: true,
+            fitSelectedRoutes: true
+        }).addTo(leafletMapInstance);
+        
+        if(geoErrorEl) geoErrorEl.classList.add('hidden'); // Skrijemo sporočilo o napaki
+        
+    },
+    function(error) {
+        // Ob napaki: Pokažemo samo lokacijo restavracije (ne moremo dobiti uporabnikove lokacije)
+        console.error("Napaka pri pridobivanju lokacije:", error.message);
+        
+        // Če še vedno ni inicializiran, ga inicializiramo na restavracijo
+        if (!leafletMapInstance) {
+            leafletMapInstance = L.map('leaflet-map').setView([restLat, restLng], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(leafletMapInstance);
+            
+            L.marker([restLat, restLng]).addTo(leafletMapInstance).bindPopup(i18next.t('map.restaurant_location')).openPopup();
+        }
+
+        // Prikaz sporočila uporabniku
+        const geoErrorEl = document.getElementById('geo-error');
+        if(geoErrorEl) {
+            geoErrorEl.textContent = i18next.t('messages.geolocation_fail');
+            geoErrorEl.classList.remove('hidden');
+        }
+    });
+}
+
+
+/**
+ * 3. Prilagajanje obstoječe funkcije za ravnanje z zavihki (POZOR: Ta je samo primer!)
+ * [POSODOBITEV]: Dodano čiščenje in inicializacija zemljevida.
+ */
+function setupRestavracijaTabs() {
+    const tabsContainer = document.querySelector('.modal-tabs'); 
+    
+    if (!tabsContainer) return;
+
+    tabsContainer.querySelectorAll('.modal-tab').forEach(tab => {
+        tab.removeEventListener('click', handleTabClick);
+        tab.addEventListener('click', handleTabClick);
+    });
+
+    function handleTabClick(e) {
+        e.preventDefault();
+        const tabId = e.currentTarget.dataset.tab;
+
+        // Odstranimo vse aktivne razrede
+        document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Nastavimo aktivni razred
+        e.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        
+        // 🔥 KLJUČNO: Če je aktiviran zavihek za Galerijo/Zemljevid, inicializiramo Leaflet
+        if (tabId === 'tabGalerija') {
+            // Počakamo malo (100ms), da se DOM prepriča, da je #leaflet-map element dejansko Viden in pripravljen!
+            setTimeout(() => {
+                inicializirajLeafletMapo();
+            }, 100);
+        } else {
+            // Če preklopimo na drug zavihek, uničimo obstoječo instanco mape
+            if (leafletMapInstance) {
+                leafletMapInstance.remove();
+                leafletMapInstance = null;
+            }
+        }
+    }
 }
 
 
