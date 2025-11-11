@@ -85,6 +85,18 @@ module.exports = (preveriGosta) => {
     router.get('/uporabnik/zgodovina', preveriGosta, restavracijaController.pridobiZgodovinoRezervacijUporabnika);
 
 
+    // -----------------------------------------------------------------
+    // 💥 NOVO: RUTA ZA ZAKLJUČEVANJE REZERVACIJ IN TOČKE ZVESTOBE
+    // -----------------------------------------------------------------
+    /**
+     * PUT /api/restavracije/zakljuci_rezervacijo
+     * Uporablja se za zaključevanje rezervacije in pripis 50 točk zvestobe.
+     * (Običajno za admina ali lastnika restavracije)
+     */
+    router.put('/zakljuci_rezervacijo', preveriGosta, restavracijaController.oznaciRezervacijoKotZakljuceno);
+    // -----------------------------------------------------------------
+
+
     // =================================================================
     // 💥 2. SPLOŠNI CRUD (/, POST /) - Fiksne poti brez parametrov
     // =================================================================
