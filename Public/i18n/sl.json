@@ -167,6 +167,7 @@
     "points_payment_subtitle": "Točke in Plačilna sredstva",
     "points_title": "Vaše zbrane točke",
     "points_status": "Trenutno stanje: {{count}} točk (Dovolj za 10€ popusta)",
+    "points_status_dynamic": "Trenutno stanje: {{count}} točk",
     "card_title": "Shranjena kreditna kartica",
     "card_info": "Visa končnica: **** 1234",
     "add_card_button": "Dodaj/Posodobi kartico",
