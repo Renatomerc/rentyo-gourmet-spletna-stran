@@ -538,10 +538,9 @@
                             const tockeZaEuro = 45; 
                             const vrednostVPopustu = (tocke / tockeZaEuro).toFixed(2); 
                             
-                            // Uporabimo dinamični i18n prevod. 
-                            // OPOZORILO: Ta ključ 'profile.points_status_dynamic' morate dodati v vaše i18n json datoteke
+                            // 💥 POPRAVLJENO: Uporabimo parameter 'count', saj sl.json definira {{count}}
                             const statusText = i18next.t('profile.points_status_dynamic', {
-                                tocke: tocke, 
+                                count: tocke, // KLJUČNA ZAMENJAVA: tocke -> count
                                 popust: vrednostVPopustu 
                             });
 
@@ -809,6 +808,10 @@
                 lng: loadLanguage(), 
                 fallbackLng: "sl",
                 backend: { loadPath: "./i18n/{{lng}}.json" }, 
+                // 💥 KLJUČNI DODATEK: Konfiguracija interpolacije
+                interpolation: {
+                    escapeValue: false, 
+                }
             },
             (err) => {
                 if (err) console.error("i18next napaka pri nalaganju: ", err);
