@@ -360,7 +360,7 @@
         <h3 data-i18n="profile.points_payment_subtitle">Točke in Plačilna sredstva</h3>
         <div class="kartica-podatkov">
             <h4 data-i18n="profile.points_title">Vaše zbrane točke</h4>
-            <p data-i18n="profile.points_status">Trenutno stanje: <strong>450 točk</strong> (Dovolj za 10€ popusta)</p>
+            <p id="tocke-status-prikaz" data-i18n="profile.points_status">Nalaganje točk...</p>
         </div>
 
         <div class="kartica-podatkov">
@@ -456,6 +456,8 @@
         // 🆕 NOVO: Kontejnerji za rezervacije
         const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
         const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
+        // 🟢 NOVO: Element za prikaz točk
+        const tockeStatusElement = document.getElementById('tocke-status-prikaz');
 
         /**
          * Prikaz gumba za odjavo in gumba nazaj
@@ -500,7 +502,7 @@
         };
 
         /**
-         * Pokliče zaščiten endpoint in napolni osebne podatke
+         * Pokliče zaščiten endpoint in napolni osebne podatke IN točke
          */
         const naloziPodatkeProfila = async () => {
             if (!zeton) return;
@@ -527,6 +529,29 @@
                     if (uporabnik && uporabnik.ime && uporabnik.email) {
                         posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
                         posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
+                        
+                        // 🟢 NOVO: Logika za točke zvestobe
+                        if (tockeStatusElement && uporabnik.tockeZvestobe !== undefined) {
+                            const tocke = uporabnik.tockeZvestobe;
+                            
+                            // To razmerje (45 točk = 1€) morate prilagoditi, če je v backendu drugače
+                            const tockeZaEuro = 45; 
+                            const vrednostVPopustu = (tocke / tockeZaEuro).toFixed(2); 
+                            
+                            // Uporabimo dinamični i18n prevod. 
+                            // OPOZORILO: Ta ključ 'profile.points_status_dynamic' morate dodati v vaše i18n json datoteke
+                            const statusText = i18next.t('profile.points_status_dynamic', {
+                                tocke: tocke, 
+                                popust: vrednostVPopustu 
+                            });
+
+                            // Prikaz
+                            tockeStatusElement.innerHTML = statusText; 
+
+                        } else if (tockeStatusElement) {
+                             // Če točke niso vrnjene, prikažemo statično sporočilo (ki bo po defaultu i18n prevod)
+                             tockeStatusElement.textContent = i18next.t('profile.points_status');
+                        }
                         
                     } else {
                         console.error("Podatki uporabnika so nepopolni ali v napačni obliki.", data);
@@ -764,6 +789,13 @@
           if (podatkiEmailElement) {
               const content = podatkiEmailElement.querySelector('span')?.textContent || '';
               podatkiEmailElement.innerHTML = `<strong>${emailLabel}:</strong> <span class="placeholder-text">${content}</span>`;
+          }
+
+          // Posodobimo tudi status točk, če je statičen (za primere, ko JS še ni dobil podatka iz APIja)
+          if (tockeStatusElement) {
+             tockeStatusElement.textContent = tockeStatusElement.textContent.includes('Nalaganje') 
+                ? i18next.t('profile.points_loading') // Če imate poseben ključ
+                : i18next.t('profile.points_status'); // Privzeti statični ključ (450 točk)
           }
           
         };
