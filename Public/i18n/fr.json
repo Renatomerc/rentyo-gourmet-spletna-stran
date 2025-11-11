@@ -172,7 +172,8 @@
     "add_card_button": "Ajouter/Mettre à jour la carte",
     "save_card_button": "Enregistrer la carte",
     "hide_card_button": "Masquer le formulaire",
-    "notifications_subtitle": "Vos notifications"
+    "notifications_subtitle": "Vos notifications",
+    "status_completed": "Merci pour la réservation"
   },
   "warning": {
     "title": "Avertissement",

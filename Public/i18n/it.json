@@ -172,7 +172,8 @@
     "add_card_button": "Aggiungi/Aggiorna carta",
     "save_card_button": "Salva carta",
     "hide_card_button": "Nascondi modulo",
-    "notifications_subtitle": "Le tue notifiche"
+    "notifications_subtitle": "Le tue notifiche",
+    "status_completed": "Grazie per la prenotazione"
   },
   "warning": {
     "title": "Avviso",

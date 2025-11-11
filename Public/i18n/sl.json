@@ -172,7 +172,8 @@
     "add_card_button": "Dodaj/Posodobi kartico",
     "save_card_button": "Shrani kartico", 
     "hide_card_button": "Odstrani kartico", 
-    "notifications_subtitle": "Vaša obvestila"
+    "notifications_subtitle": "Vaša obvestila",
+    "status_completed": "Hvala za rezervacijo" 
   },
   "warning": {
       "title": "Opozorilo",

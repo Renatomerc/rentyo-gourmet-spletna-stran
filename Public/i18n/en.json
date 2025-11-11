@@ -172,7 +172,8 @@
     "add_card_button": "Add/Update card",
     "save_card_button": "Save Card",
     "hide_card_button": "Hide Form",
-    "notifications_subtitle": "Your notifications"
+    "notifications_subtitle": "Your notifications",
+    "status_completed": "Thank you for the reservation"
   },
   "warning": {
     "title": "Warning",
