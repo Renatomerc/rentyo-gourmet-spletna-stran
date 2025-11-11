@@ -11,7 +11,14 @@ const UporabnikShema = new mongoose.Schema({
     
     jeLastnik: { type: Boolean, default: false },
     // required funkcija je pravilna
-    cena: { type: Number, default: 0, required: function() { return this.jeLastnik; } }
+    cena: { type: Number, default: 0, required: function() { return this.jeLastnik; } },
+    
+    // 🟢 NOVO POLJE: Točke zvestobe
+    tockeZvestobe: {
+        type: Number,
+        default: 0
+    }
+
 }, { timestamps: true });
 
 // Metoda za primerjavo gesla ostaja, ker je uporabljena v routerju

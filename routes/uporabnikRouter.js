@@ -69,6 +69,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 geslo: hashiranoGeslo, 
                 jeLastnik: jeLastnik || false, 
                 cena: cena || 0 
+                // Če ste v Mongoose shemi dodali tockeZvestobe z default: 0, 
+                // ga ni treba explicitno dodajati tukaj.
             });
             
             const zeton = generirajZeton(novUporabnik._id);
@@ -80,6 +82,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: novUporabnik.email,
                 jeLastnik: novUporabnik.jeLastnik,
                 cena: novUporabnik.cena,
+                // Predpostavimo, da je tockeZvestobe: 0, saj ga frontend trenutno ne rabi pri registraciji, ampak ga rabi pri profilu.
                 // 🚀 DODANO: Žeton za frontend (shranjevanje v localStorage)
                 zeton: zeton, 
                 msg: "Registracija uspešna. Žeton shranjen v varnem piškotku in JSON." 
@@ -97,6 +100,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         
         const { email, geslo } = req.body;
         try {
+            // Uporabnik je v tem klicu že najden v DB, zato je polje tockeZvestobe že na voljo
             const uporabnik = await Uporabnik.findOne({ email });
             if (!uporabnik) return res.status(401).json({ msg: 'Neveljavne poverilnice.' });
 
@@ -133,19 +137,38 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     });
 
     // Zaščitena pot: /api/auth/profil
-    router.get('/profil', preveriGosta, zahtevajPrijavo, (req, res) => {
-        const uporabnikPodatki = req.uporabnik;
+    // 🟢 POPRAVEK: Ruta je sedaj ASINHRONA in neposredno kliče bazo!
+    router.get('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
         
-        res.json({
-            msg: "Podatki profila uspešno pridobljeni.",
-            uporabnik: { 
-                _id: uporabnikPodatki._id || uporabnikPodatki.id, 
-                ime: uporabnikPodatki.ime, 
-                email: uporabnikPodatki.email, 
-                jeLastnik: uporabnikPodatki.jeLastnik, 
-                cena: uporabnikPodatki.cena 
+        // Uporabimo ID, ki ga dobimo iz JWT in je shranjen v req.uporabnik (ali req.user/req.payload)
+        const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
+
+        try {
+            // 🟢 KLJUČNA SPREMEMBA: Poiščemo uporabnika neposredno v bazi,
+            // da dobimo VSE POSODOBLJENE PODATKE, vključno s točkeZvestobe.
+            const uporabnikDB = await Uporabnik.findById(uporabnikId).select('-geslo');
+
+            if (!uporabnikDB) {
+                return res.status(404).json({ msg: 'Profilni podatki niso najdeni v bazi.' });
             }
-        });
+            
+            res.json({
+                msg: "Podatki profila uspešno pridobljeni.",
+                uporabnik: { 
+                    _id: uporabnikDB._id, 
+                    ime: uporabnikDB.ime, 
+                    email: uporabnikDB.email, 
+                    jeLastnik: uporabnikDB.jeLastnik, 
+                    cena: uporabnikDB.cena,
+                    // 🟢 NOVO: TOČKE ZVESTOBE
+                    tockeZvestobe: uporabnikDB.tockeZvestobe 
+                }
+            });
+
+        } catch (err) {
+            console.error('❌ NAPAKA PRI NALAGANJU PROFILA IZ BAZE:', err);
+            res.status(500).json({ msg: 'Napaka strežnika pri nalaganju profila.' });
+        }
     });
 
     return router; 
