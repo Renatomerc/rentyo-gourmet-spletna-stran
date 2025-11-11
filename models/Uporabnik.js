@@ -13,10 +13,10 @@ const UporabnikShema = new mongoose.Schema({
     // required funkcija je pravilna
     cena: { type: Number, default: 0, required: function() { return this.jeLastnik; } },
     
-    // 🟢 NOVO POLJE: Točke zvestobe
+    // 🟢 POPRAVLJENO: Točke zvestobe s privzeto vrednostjo 100
     tockeZvestobe: {
         type: Number,
-        default: 0
+        default: 100 // KLJUČNO POPRAVLJENO: Začetnih 100 točk
     }
 
 }, { timestamps: true });

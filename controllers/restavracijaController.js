@@ -7,6 +7,12 @@
 const Restavracija = require('../models/Restavracija'); 
 const mongoose = require('mongoose');
 
+// 🟢 DODANO: Uvozimo model Uporabnik iz sekundarne povezave
+const UporabnikShema = require('../models/Uporabnik'); 
+const dbUsers = require('../dbUsers');
+const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+
+
 // Pomožna funkcija: Preveri, ali se dve rezervaciji prekrivata
 const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, obstojeceTrajanje) => {
     // Pretvori vse v števila
@@ -292,7 +298,7 @@ exports.pridobiProsteUre = async (req, res) => {
             { $match: { 
                 $or: [
                     { "mize.rezervacije.status": { $exists: false } },
-                    { "mize.rezervacije.status": { $ne: 'PREKLICANO' } }
+                    { "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] } } // 🟢 SPREMENJENO: Zaključene se ne štejejo kot aktivno zasedena miza
                 ]
             }},
             // Vrnemo se na "mize" array, da lahko preverimo kapaciteto
@@ -439,7 +445,9 @@ exports.ustvariRezervacijo = async (req, res) => {
             
             // Preverjanje razpoložljivosti časa
             let jeProsta = true;
-            const obstojeceRezervacije = (miza.rezervacije || []).filter(rez => rez.datum === datum);
+            // 🟢 POPRAVEK: Filtriramo še za 'ZAKLJUČENO', saj ta miza ni zasedena.
+            const obstojeceRezervacije = (miza.rezervacije || [])
+                .filter(rez => rez.datum === datum && rez.status !== 'ZAKLJUČENO'); 
             
             for (const obstojecaRezervacija of obstojeceRezervacije) {
                 const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
@@ -592,7 +600,7 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
             // 🔥 POPRAVLJENO FILTRIRANJE AKTIVNIH
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
-                "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] }, 
+                "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] }, // 🟢 ZAKLJUČENO ni aktivno
                 $or: [
                     // 1. Prihodnji datumi
                     { "mize.rezervacije.datum": { $gt: danesISO } },
@@ -630,7 +638,7 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
 };
 
 /**
- * Pridobitev zgodovine (preteklih/preklicanih) rezervacij za prijavljenega uporabnika
+ * Pridobitev zgodovine (preteklih/preklicanih/zaključenih) rezervacij za prijavljenega uporabnika
  * GET /api/restavracije/uporabnik/zgodovina
  */
 exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
@@ -659,6 +667,9 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
                 $or: [
+                    // 🟢 NOVO: Vključimo rezervacije, ki so bile ročno zaključene
+                    { "mize.rezervacije.status": "ZAKLJUČENO" }, 
+
                     // 1. Pretekli datumi (datum je že pretekel)
                     { "mize.rezervacije.datum": { $lt: danesISO } },
                     
@@ -733,5 +744,92 @@ exports.posodobiAdminVsebino = async (req, res) => {
     } catch (error) {
         console.error('Napaka pri posodabljanju admin vsebine:', error);
         res.status(500).json({ msg: 'Napaka serverja.' });
+    }
+};
+
+
+// =================================================================
+// 💥 5. OPERACIJE Z AKCIJSKO DODELITVIJO TOČK
+// =================================================================
+
+/**
+ * 🟢 NOVO: Označi rezervacijo kot zaključeno in uporabniku prišteje 50 točk.
+ * PUT /api/restavracije/zakljuci_rezervacijo
+ * To funkcijo običajno sproži lastnik/admin restavracije.
+ */
+exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
+    // Predpostavljamo, da dobimo te ID-je od Admin portala
+    const { restavracijaId, mizaId, rezervacijaId } = req.body;
+    const TOCK_NA_REZERVACIJO = 50;
+
+    if (!mongoose.Types.ObjectId.isValid(restavracijaId) || 
+        !mongoose.Types.ObjectId.isValid(mizaId) || 
+        !mongoose.Types.ObjectId.isValid(rezervacijaId)) 
+    {
+        return res.status(400).json({ msg: 'Neveljaven format ID-ja (Restavracija, Miza ali Rezervacija).' });
+    }
+
+    try {
+        // 1. Poišči rezervacijo in pridobi uporabnikId
+        const restavracijaInfo = await Restavracija.aggregate([
+            { $match: { "_id": new mongoose.Types.ObjectId(restavracijaId) } },
+            { $unwind: "$mize" },
+            { $match: { "mize._id": new mongoose.Types.ObjectId(mizaId) } },
+            { $unwind: "$mize.rezervacije" },
+            { $match: { "mize.rezervacije._id": new mongoose.Types.ObjectId(rezervacijaId) } },
+            { $project: { uporabnikId: "$mize.rezervacije.uporabnikId", status: "$mize.rezervacije.status" } }
+        ]);
+
+        if (restavracijaInfo.length === 0) {
+            return res.status(404).json({ msg: 'Rezervacija ni najdena.' });
+        }
+        
+        const rezervacija = restavracijaInfo[0];
+
+        if (rezervacija.status === 'ZAKLJUČENO') {
+            return res.status(409).json({ msg: 'Rezervacija je že zaključena in točke so že bile dodeljene.' });
+        }
+
+        // 2. Posodobitev statusa rezervacije na ZAKLJUČENO
+        const rezultatRezervacije = await Restavracija.updateOne(
+            { 
+                _id: restavracijaId, 
+                "mize._id": mizaId, 
+                "mize.rezervacije._id": rezervacijaId 
+            }, 
+            { 
+                // Uporabimo positional operator $ in arrayFilter da točno določimo polje
+                $set: { "mize.$.rezervacije.$[rez].status": 'ZAKLJUČENO' } 
+            },
+            {
+                arrayFilters: [ { "rez._id": new mongoose.Types.ObjectId(rezervacijaId) } ]
+            }
+        );
+        
+        if (rezultatRezervacije.modifiedCount === 0) {
+            return res.status(500).json({ msg: 'Napaka pri posodabljanju statusa rezervacije. Nič ni bilo spremenjeno.' });
+        }
+
+        // 3. 🟢 DODELITEV TOČK UPORABNIKU
+        const userId = rezervacija.uporabnikId; 
+
+        const posodobljenUporabnik = await Uporabnik.findByIdAndUpdate(
+            userId, 
+            { $inc: { tockeZvestobe: TOCK_NA_REZERVACIJO } }, // Prištevanje 50 točk
+            { new: true }
+        );
+
+        if (!posodobljenUporabnik) {
+            console.warn(`Opozorilo: Uporabnik z ID ${userId} ni bil najden. Točke niso bile dodeljene.`);
+        }
+
+        res.json({ 
+            msg: `Rezervacija ID ${rezervacijaId} uspešno zaključena. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
+            noveTocke: posodobljenUporabnik ? posodobljenUporabnik.tockeZvestobe : 'Ni posodobljeno'
+        });
+
+    } catch (error) {
+        console.error('❌ NAPAKA PRI ZAKLJUČEVANJU IN DODELITVI TOČK:', error);
+        res.status(500).json({ msg: 'Napaka strežnika pri zaključku rezervacije.' });
     }
 };
