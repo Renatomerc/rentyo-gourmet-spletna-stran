@@ -688,12 +688,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // B. Nastavitev poslušalcev za ISKANJE
     if (isciForm) {
         // Uporabimo ID-je iz vašega HTML-ja
-        isciForm.addEventListener('submit', (e) => handleIskanjeRestavracij(e,
-            document.getElementById('restavracija_mesto').value,
-            document.getElementById('datum').value,
-            document.getElementById('cas').value,
-            document.getElementById('stevilo_oseb').value
-        ));
+        isciForm.addEventListener('submit', (e) => {
+            // 🔥 POPRAVEK: Prepreči privzeto delovanje formularja (osvežitev strani)
+            e.preventDefault(); 
+            
+            handleIskanjeRestavracij(e,
+                document.getElementById('restavracija_mesto').value,
+                document.getElementById('datum').value,
+                document.getElementById('cas').value,
+                document.getElementById('stevilo_oseb').value
+            );
+        });
     }
 
     // C. Nastavitev poslušalcev za HITRA ISKANJA
@@ -746,7 +751,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // =================================================================
 
 // ... (KODA ZA NALOZI PRIVZETE, HANDLE ISKANJE, PRIKAZI REZULTATE, HANDLEPRIPRAVAREZERVACIJE, PREVERIPROSTEU RE, PRIKAZIPROSTEURE - brez sprememb)
-
 // =================================================================
 // 9. LOGIKA REZERVACIJE (IZ DELA 1)
 // =================================================================
