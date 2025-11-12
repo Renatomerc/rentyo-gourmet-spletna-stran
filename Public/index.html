@@ -3230,13 +3230,49 @@ if(modalOpis) modalOpis.textContent = opis;
         }
     }
     
-    // Generiranje Galerije in Zemljevida (Ostane enako)
+  // Generiranje Galerije (popravljena logika - Sedaj uporablja FLEXBOX za drsno galerijo)
     if(galerijaSlikeDiv) {
-        galerijaSlikeDiv.innerHTML = '<p class="text-gray-500">Ni dodatnih slik za prikaz.</p>';
+        // Zamenjajte ta del z novo logiko:
+
+        // 1. Preverite, ali restavracija ima galerija_slik in ali je ta array daljši od 0
+        const galerijaSlikaURLS = restavracija.galerija_slik; 
+
+        if (galerijaSlikaURLS && galerijaSlikaURLS.length > 0) {
+            
+            // 2. Ustvarite HTML, ki bo vseboval vse slike
+            // 🔥 KLJUČNO: flex, overflow-x-scroll omogoča vodoravno drsenje (sliding)
+            let galerijaHTML = '<div class="flex overflow-x-scroll space-x-4 p-4">';
+            
+            // 3. Iterirajte čez vsak URL in ustvarite <img> tag
+            galerijaSlikaURLS.forEach(url => {
+                galerijaHTML += `
+                    <div class="flex-none w-32 h-32 relative rounded-lg overflow-hidden shadow-md">
+                        <img 
+                            src="${url}" 
+                            alt="Slika restavracije" 
+                            class="absolute top-0 left-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition duration-300"
+                            onclick="openFullSizeImage('${url}')" // Klic funkcije za povečavo
+                        >
+                    </div>
+                `;
+            });
+            
+            galerijaHTML += '</div>';
+
+            // 4. Vstavite ustvarjen HTML v div
+            galerijaSlikeDiv.innerHTML = galerijaHTML;
+
+        } else {
+            // Če array ne obstaja ali je prazen
+            galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni dodatnih slik za prikaz v galeriji.</p>';
+        }
     }
 
+// Generiranje Zemljevida (Ostane enako, popravek URL-ja je izven te razprave)
     if (modalZemljevid) {
-       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`;
+       // OPOZORILO: URL zemljevidov je videti napačen (googleusercontent.com/maps.google.com/0{lat}).
+       // Moral bi biti npr.: `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`
+       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`; 
     }
     
     // Resetiraj prikaz prostih ur
