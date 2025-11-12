@@ -1150,19 +1150,48 @@
     }
 
     /* Slike in Zemljevid */
-    .galerija-slike {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
-        gap: 10px;
-        margin-bottom: 20px;
-    }
+  .galerija-slike {
+    /* 1. Ključno: Uporabite Flexbox za eno vodoravno vrstico */
+    display: flex;
     
-    .galerija-slike img {
-        width: 100%;
-        height: 100px; 
-        object-fit: cover;
-        border-radius: 8px;
-    }
+    /* 2. Ključno: Omogoči vodoravno drsenje, ko vsebina preseže širino */
+    overflow-x: scroll;
+    
+    /* 3. Določite razmik med slikami (namesto gap/space-x) */
+    gap: 1rem; 
+    
+    padding: 1rem;
+    margin-bottom: 20px;
+}
+
+/* Pravila za posamezni element, ki vsebuje sliko */
+.galerija-slike > div {
+    flex-shrink: 0;
+    
+    /* Zagotovite FIKSNO kvadratno višino: */
+    width: 140px !important; /* Dodan !important */
+    height: 140px !important; /* Dodan !important */
+    
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+/* Pravila za IMG tag znotraj DIVa */
+.galerija-slike img {
+    /* Raztegnite sliko, da POPOLNOMA zapolni 120x120px okvir */
+    width: 100% !important; /* Dodan !important */
+    height: 100% !important; /* Dodan !important */
+    
+    object-fit: cover !important; /* Zagotovite, da se izreže in ne deformira */
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.galerija-slike img:hover {
+    opacity: 0.9;
+}
 
     /* 🔥 POPRAVEK ZA LEAFLET: Ciljamo tudi na novi ovoj #map-container */
     .zemljevid-ovoj,
@@ -3230,41 +3259,34 @@ if(modalOpis) modalOpis.textContent = opis;
         }
     }
     
-  // Generiranje Galerije (popravljena logika - Sedaj uporablja FLEXBOX za drsno galerijo)
+  // Generiranje Galerije - POENOSTAVLJENO (Samo ustvari vsebino, ne zunanjega DIV-a)
     if(galerijaSlikeDiv) {
-        // Zamenjajte ta del z novo logiko:
-
-        // 1. Preverite, ali restavracija ima galerija_slik in ali je ta array daljši od 0
         const galerijaSlikaURLS = restavracija.galerija_slik; 
+        
+        // Tukaj ne ustvarimo zunanjega DIV-a, ker že obstaja: <div id="galerijaSlike" class="galerija-slike">
+        let galerijaHTML = ''; 
 
         if (galerijaSlikaURLS && galerijaSlikaURLS.length > 0) {
             
-            // 2. Ustvarite HTML, ki bo vseboval vse slike
-            // 🔥 KLJUČNO: flex, overflow-x-scroll omogoča vodoravno drsenje (sliding)
-            let galerijaHTML = '<div class="flex overflow-x-scroll space-x-4 p-4">';
-            
-            // 3. Iterirajte čez vsak URL in ustvarite <img> tag
             galerijaSlikaURLS.forEach(url => {
+                // Notranji DIV brez Tailwind razredov za velikost, saj jih definira vaš CSS
                 galerijaHTML += `
-                    <div class="flex-none w-32 h-32 relative rounded-lg overflow-hidden shadow-md">
+                    <div class="relative rounded-lg overflow-hidden shadow-md">
                         <img 
                             src="${url}" 
                             alt="Slika restavracije" 
                             class="absolute top-0 left-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition duration-300"
-                            onclick="openFullSizeImage('${url}')" // Klic funkcije za povečavo
+                            onclick="openFullSizeImage('${url}')"
                         >
                     </div>
                 `;
             });
-            
-            galerijaHTML += '</div>';
 
-            // 4. Vstavite ustvarjen HTML v div
-            galerijaSlikeDiv.innerHTML = galerijaHTML;
+            // Vsebino vstavimo v obstoječi <div id="galerijaSlike" class="galerija-slike">
+            galerijaSlikeDiv.innerHTML = galerijaHTML; 
 
         } else {
-            // Če array ne obstaja ali je prazen
-            galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni dodatnih slik za prikaz v galeriji.</p>';
+            galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni slik za prikaz.</p>';
         }
     }
 
