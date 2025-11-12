@@ -490,7 +490,7 @@ function prikaziModalPodrobnosti(restavracija) {
     
     // Prikaži interno oceno
     ocenaHtml += `<div class="internal-rating-detail">
-        <i class="fas fa-star"></i> 
+        <i class="fas fa-circle"></i> 
         ${rating.toFixed(1)}/5 (${restavracija.st_ocen || 0} ${i18next.t('messages.reviews_internal')})
     </div>`;
 

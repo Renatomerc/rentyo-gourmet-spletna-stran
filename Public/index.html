@@ -3130,7 +3130,7 @@ if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuh
 // 🔥 KLJUČNA SPREMEMBA: Uporabimo izračunano spremenljivko 'prikazLokacije'
 if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
 
-if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(restavracija.ocena_povprecje || 0).toFixed(1)}`;
+if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-circle"></i> ${(restavracija.ocena_povprecje || 0).toFixed(1)}`;
 if(modalOpis) modalOpis.textContent = opis;
 
     // Generiranje Menija (Ostane enako)

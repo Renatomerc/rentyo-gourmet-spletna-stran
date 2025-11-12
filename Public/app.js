@@ -137,7 +137,7 @@ function prikaziPodrobnosti(restavracija) {
     modalIme.textContent = ime;
     modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
     modalLokacija.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${lokacija}`;
-    modalOcena.innerHTML = `<i class="fas fa-star"></i> ${ocena_povprecje.toFixed(1)}`;
+    modalOcena.innerHTML = `<i class="fas fa-circle"></i> ${ocena_povprecje.toFixed(1)}`;
     modalOpis.textContent = opis;
 
     // 3. Generiranje Menija (Zavihek Meni)
