@@ -1878,7 +1878,7 @@
                 <div class="info-vrstica">
                     <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
                     <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
-                    <span id="modalOcena"><i class="fas fa-circle"></i> Ocena</span>
+                    <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
                 </div>
                 
                 <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
@@ -2795,9 +2795,17 @@ function renderCard(restavracija) {
     card.setAttribute('data-id', restavracija._id || restavracija.id);
     
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
+    
+    // 🔥 POPRAVEK: Implementacija dinamične slike iz MongoDB polja 'galerija_slik'
+    // Preveri, ali array obstaja in ali ima vsaj en element.
+    const urlGlavneSlike = (restavracija.galerija_slik && restavracija.galerija_slik.length > 0)
+        ? restavracija.galerija_slik[0] // Uporabi prvo sliko za sličico
+        : 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'; // Nadomestna slika
+        
+    // Originalni slikaUrl ni več potreben, ampak ga pustimo za onerror fallback, če slikaUrl ni bil nikoli posodobljen v bazi.
     const slikaUrl = restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'; 
     
-    // 🔥 Interna ocena (vaš obstoječi sistem z zvezdicami)
+    // 🔥 Interna ocena (vaš obstoječi sistem zvezdic)
     const internaOcena = restavracija.ocena_povprecje || 0;
     const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">(${(internaOcena).toFixed(1)})</span>`;
 
@@ -2866,8 +2874,9 @@ function renderCard(restavracija) {
         </div>
     `;
     
+    // 🔥 POPRAVLJEN card.innerHTML: Uporablja se urlGlavneSlike
     card.innerHTML = `
-        <img src="${slikaUrl}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';">
+        <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';">
         <div class="kartica-vsebina">
             <h3>${restavracijaIme}</h3>
             
@@ -3130,7 +3139,7 @@ if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuh
 // 🔥 KLJUČNA SPREMEMBA: Uporabimo izračunano spremenljivko 'prikazLokacije'
 if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
 
-if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-circle"></i> ${(restavracija.ocena_povprecje || 0).toFixed(1)}`;
+if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(restavracija.ocena_povprecje || 0).toFixed(1)}`;
 if(modalOpis) modalOpis.textContent = opis;
 
     // Generiranje Menija (Ostane enako)
