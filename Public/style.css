@@ -13,7 +13,7 @@
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Dopolnjena pisava */
     color: #333; 
-    background-color: #f4f4f9; 
+    background-color: white; 
     line-height: 1.6;
 }
 
@@ -25,7 +25,7 @@ a {
 }
 
 a:hover {
-    color: #ffffff;
+    color: white;
 }
 
 
@@ -38,8 +38,8 @@ a:hover {
     justify-content: space-between; 
     align-items: center; 
     padding: 15px 5%; /* Uporaba odstotkov za boljšo odzivnost */
-    background-color: #ffffff;
-    border-bottom: 1px solid #ddd;
+    background-color: white;
+    border-bottom: 0px solid white;
 }
 
 .logotip img {
@@ -57,7 +57,7 @@ a:hover {
 .gumb-prijava {
     text-decoration: none;
     color: #0070cc;
-    background-color: #ffffff; /* Uporabite poudarjeno barvo za prijavo */
+    background-color: white; /* Uporabite poudarjeno barvo za prijavo */
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 1em;
@@ -77,7 +77,7 @@ a:hover {
     align-items: center;
     border: 0px solid #ccc;
     border-radius: 5px;
-    background-color: #fff;
+    background-color: white;
     padding: 5px;
 }
 
@@ -104,41 +104,50 @@ a:hover {
 
 
 /* ========================================================================= */
-/* NASLOVNA SLIKA (HERO) (ODZIVNOST)         */
+/* NASLOVNA SLIKA (HERO) - POVRNITEV NOVE SLIKE KROGOV */
 /* ========================================================================= */
 
 .naslovna-slika {
-    /* PRIVZETA SLIKA ZA NAMIZNI POGLED (desktop first) */
+    /* 👇 KLJUČNI POPRAVKI ZA NOVI DIZAJN 👇 */
+    
+    /* Vstavimo NOVO sliko s krogi kot ozadje */
     background-image: url('Naslovna-slika-mobilna.png'); 
-    background-size: cover;
-    background-position: center;
-    height: 350px; /* Malo zvišana višina */
+    background-color: white; /* Varnostno belo ozadje */
+    
+    /* Nastavitve slike: */
+    background-size: cover; /* Pokrij celotno območje */
+    background-position: center top; /* Center horizontalno, zgoraj vertikalno */
+    background-repeat: no-repeat;
+    
+    /* Prilagodimo višino. Višina 250px bi morala biti približno prava za kroge. */
+    height: 250px; 
+    
+    /* ... ostali stili ostanejo ... */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: white;
+    color: #333; /* Barva naj bo temna na belem ozadju */
     position: relative;
-    overflow: hidden; /* Skrijemo morebitne prelome ozadja */
+    overflow: hidden; 
+    margin-top: 0 !important; 
+    padding-top: 0 !important;
+    z-index: 10; 
 }
 
-/* Prekrivni sloj za zatemnitev in boljšo berljivost besedila */
+/* Prekrivni sloj: ostane odstranjen, ker slika ni temna */
 .naslovna-slika::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.15); /* Malo močnejša zatemnitev */
-    z-index: 1;
+    content: none; 
+    background-color: transparent; 
 }
 
+/* Prilagoditev naslova h1: */
 .naslovna-slika h1 {
-    font-size: 1.6em; /* Povečan naslov */
+    font-size: 1.6em; 
     z-index: 10; 
     padding: 0 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Močnejša senca za boljšo berljivost */
+    text-shadow: none; 
+    color: #333; /* Besedilo naj bo temno, razen če je nad krogi */
 }
 
 /* ========================================================================= */
@@ -311,6 +320,7 @@ a:hover {
 /* Efekt ob premiku miške */
 .gumb-kategorija:hover {
     background-color: #4edaa9;
+     border: 1px solid #4edaa9; /* Rdeč rob kot poudarek */
     color: #444444;
     transform: translateY(0px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -502,9 +512,9 @@ a:hover {
     
     /* === NOVA MOBILNA NASLOVNA SLIKA === */
     .naslovna-slika {
-        background-image: url('Naslovna-slika-mobilna.png'); 
+        background-image: url('Naslovna-slika-mobilna2.png'); 
         background-position: center top; /* Lahko prilagodite, kateri del slike je viden */
-        height: 210px; /* Zmanjšana višina za mobilni pogled */
+        height: 180px; /* Zmanjšana višina za mobilni pogled */
     }
     /* ==================================== */
 
