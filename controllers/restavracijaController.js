@@ -726,7 +726,10 @@ exports.posodobiAdminVsebino = async (req, res) => {
         const updateData = {};
         if (novOpis) updateData.description = novOpis;
         if (glavnaSlikaUrl) updateData.mainImageUrl = glavnaSlikaUrl;
-        if (galerijaUrlsi) updateData.galleryUrls = galerijaUrlsi;
+        
+        // 🔥 POPRAVEK: Zamenjano 'galleryUrls' z 'galerija_slik'
+        if (galerijaUrlsi) updateData.galerija_slik = galerijaUrlsi;
+        
         if (novMeni) updateData.menu = novMeni;
         
         const posodobljeno = await Restavracija.findByIdAndUpdate(
