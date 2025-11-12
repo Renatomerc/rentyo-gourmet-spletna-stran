@@ -119,7 +119,7 @@ function prikaziPodrobnosti(restavracija) {
     // Predpostavimo, da je ponudba pod specialOffer.sl
     const aktualna_ponudba = restavracija.specialOffer && restavracija.specialOffer.sl ? restavracija.specialOffer.sl : null;
     // Predpostavimo, da so slike galerije pod galleryImageUrls (array)
-    const galerija = restavracija.galleryImageUrls || [];
+    const galerija = restavracija.galerija_slik || [];
     // Predpostavimo, da so koordinate pod location.coordinates (string 'lat,lng' ali podobno)
     const gps_lokacija = restavracija.location && restavracija.location.coordinates ? restavracija.location.coordinates : null;
     // Predpostavimo, da je meni pod menuItems (array)
