@@ -253,8 +253,8 @@
             margin-bottom: 0; /* Odstranimo spodnji rob */
             border-bottom: none; /* Odstranimo spodnjo črto */
             /* Stil menija kot kontejnerja */
-            background-color: #f4f4f9;
-            border: 1px solid #f4f4f9; /* Lahek rob okoli celotnega menija */
+            background-color: white;
+            border: 1px solid white; /* Lahek rob okoli celotnega menija */
             border-radius: 8px;
             margin-bottom: 25px;
             overflow: hidden; /* Odstrani scrollbar */
@@ -265,7 +265,7 @@
             padding: 5px 20px; /* Malo večji padding za boljše tapkanje */
             border-radius: 25px;
             text-align: left;
-            border-bottom: 1px solid #f4f4f9; /* Ločilna črta med zavihki */
+            border-bottom: 0px solid #f4f4f9; /* Ločilna črta med zavihki */
             border-right: none; 
             border-left: 3px solid transparent; /* Priprava za aktivni levi rob */
             font-weight: normal; /* Manj poudarjen font na mobilnem */
@@ -278,11 +278,11 @@
         
         /* Aktivni zavihek (Mobilni) */
         .profil-zavihek.active {
-            border-left-color: #4edaa9; /* Aktivna barva na levi */
+            border-left-color: #1BC0BB; /* Aktivna barva na levi */
             color: #333;
             border-radius: 25px;
-            background-color: #4edaa9;
-            border-bottom-color: #4edaa9; /* Da skrije spodnjo črto pod sabo */
+            background-color: #1BC0BB;
+            border-bottom-color: #1BC0BB; /* Da skrije spodnjo črto pod sabo */
                       /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -676,7 +676,7 @@
                         : i18next.t('profile.status_completed'); // Ostale pretekle (potrjeno/zaključeno)
                     const color = isCancelled ? 'orange' : 'grey';
                     
-                    htmlContent += `<p style="margin: 5px 0 0 0; font-weight: bold; color: ${color};">[${statusText}]</p>`;
+                    htmlContent += `<p style="margin: 5px 0 0 0; font-weight: bold; color: ${color};">${statusText}</p>`;
                 }
                 
                 podatkiDiv.innerHTML = htmlContent;

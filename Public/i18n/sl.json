@@ -118,7 +118,8 @@
       "duration_1h": "1 ura",
       "duration_1_5h": "1 ura in pol (90 min)",
       "duration_2h": "2 uri",
-      "confirm_button": "Potrdi trajanje in rezerviraj"
+      "confirm_button": "Potrdi trajanje in rezerviraj",
+      "qr_reminder": "Ne pozabite ob prihodu skenirajte QR kodo restavracije in pridobite točke in ugodnosti!" 
     }
   },
   "footer": {

@@ -155,12 +155,12 @@ a:hover {
 /* ========================================================================= */
 
 .iskalnik-sekcija {
-    padding: 20px;
+    padding: 15px;
     background-color: #fff;
     border: 3px solid #333;
     box-shadow: 0 0px 0px rgba(0,0,0,0.15); /* Bolj izrazita senca */
-    margin: -70px 5% 40px 5%; /* Negativen rob in širina z % */
-    border-radius: 10px;
+    margin: -50px 5% 20px 5%; /* Negativen rob in širina z % */
+    border-radius: 30px;
     z-index: 20;
     position: relative;
 }
@@ -187,7 +187,7 @@ a:hover {
 .iskalnik select {
     padding: 10px; /* Večji padding */
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 20px;
     font-size: 1em;
     background-color: #fff;
     width: 100%;
@@ -256,7 +256,7 @@ a:hover {
     background-color: #20c0bd;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 20px;
     cursor: pointer;
     font-size: 1.1em;
     font-weight: bold;
@@ -277,7 +277,7 @@ a:hover {
 /* ========================================================================= */
 
 .hitra-iskanja {
-    padding: 15px 5%;
+    padding: 0px 0%;
     text-align: center;
 }
 
@@ -319,9 +319,9 @@ a:hover {
 
 /* Efekt ob premiku miške */
 .gumb-kategorija:hover {
-    background-color: #4edaa9;
-     border: 1px solid #4edaa9; /* Rdeč rob kot poudarek */
-    color: #444444;
+    background-color: #1BC0BB;
+     border: 1px solid #1BC0BB; /* Rdeč rob kot poudarek */
+    color: white;
     transform: translateY(0px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
@@ -350,9 +350,9 @@ a:hover {
     font-size: 1.5em;
 }
 .kartice-restavracij h3 {
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     font-size: 2em;
-    color: #4edaa9
+    color: #333
 }
 
 /* LOČILNA ČRTA (DODANO) */
@@ -509,19 +509,24 @@ a:hover {
 
 /* Odzivnost: Na manjših zaslonih se stolpci naložijo vertikalno */
 @media (max-width: 768px) {
+    .logotip img {
+    max-height: 25px; 
+    width: auto;     
+    display: block;  
+}
     
     /* === NOVA MOBILNA NASLOVNA SLIKA === */
     .naslovna-slika {
         background-image: url('Naslovna-slika-mobilna2.png'); 
-        background-position: center top; /* Lahko prilagodite, kateri del slike je viden */
-        height: 180px; /* Zmanjšana višina za mobilni pogled */
+        background-position: center top; 
+        height: 180px; 
     }
     /* ==================================== */
 
     .noga-vsebina {
         flex-direction: column;
         align-items: center;
-        text-align: center; /* Vsebina na mobilnem centrirana */
+        text-align: center;
     }
     
     .noga-stolpec {
@@ -529,20 +534,19 @@ a:hover {
         margin-bottom: 25px;
     }
     
-    /* Pravilo, ki vsa polja v iskalniku prisili na 100% širine. */
+    /* Vsa polja v iskalniku prisilimo na 100% širine, da se pravilno zložijo */
      .iskalnik input, 
      .iskalnik select,
      .gumb-isci {
          width: 100%;
      }
 
-    /* KLJUČNA POPRAVKA ZA DATUM/ČAS (iOS) */
+    /* KLJUČNA POPRAVKA ZA DATUM/ČAS (iOS) - Lahko ostane, a ni nujno */
     .iskalnik input#datum, 
     .iskalnik input#cas {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        
         width: 100% !important; 
         min-width: 100%;
     }
@@ -553,21 +557,36 @@ a:hover {
         -webkit-appearance: none;
         appearance: none;
     }
+
+    /* ---------------------------------------------------- */
+    /* GLAVNI POPRAVEK: SKRIVANJE DATUMA IN ČASA            */
+    /* ---------------------------------------------------- */
+    
+    /* Skrijemo 2. in 3. polje v iskalniku (Datum in Čas) */
+    .iskalnik-polje:nth-child(2), 
+    .iskalnik-polje:nth-child(3) { 
+         display: none !important;
+         /* ODSTRANIMO VSAK MARGIN, KI BI LAHKO VZTRAJAL NA SKRITIH POLJIH */
+         margin: 0 !important; 
+         padding: 0 !important;
+    }
     
     /* ---------------------------------------------------- */
-    /* NOVI STILI ZA POLJE 'ŠT. LJUDI' IN GUMB 'IŠČI'       */
+    /* PONOVNO POZICIONIRANJE VIDNIH POLJ (Mesto, Osebe, Išči) */
     /* ---------------------------------------------------- */
-    
+
     .iskalnik {
-         /* Prepis: Celoten iskalnik sedaj podpira zlaganje v vrstice */
          flex-direction: row; 
          flex-wrap: wrap; 
          /* Uporaba obstoječega gap-a 15px */
     }
     
-    /* Vsa polja razen zadnjih dveh (ki sta 50%) naj bodo še vedno 100% */
-    .iskalnik-polje:not(:nth-last-child(2)) {
+    /* Polje Mesto/Restavracija (1. vidno polje) naj bo 100% */
+    .iskalnik-polje:nth-child(1) {
         width: 100% !important;
+        /* Ta rob je edini, ki je potreben med zgornjim in spodnjim blokom. */
+        margin-bottom: 15px !important; 
+        margin-top: 0 !important; /* Odstranimo morebiten rob zgoraj */
     }
 
     /* Polje za število ljudi (predzadnji iskalnik-polje) in gumb Išči (zadnji) naj bosta 50% */
@@ -575,13 +594,19 @@ a:hover {
     .gumb-isci {
         /* Uporabimo calc, da od 50% odštejemo polovico razmika (15px / 2) */
         width: calc(50% - 7.5px) !important; 
-        margin-top: 0 !important; /* Odstranimo rob zgoraj, da se poravnata */
+        
+        /* 👇 KLJUČNI POPRAVEK 👇 */
+        /* Odstranimo VSAK ZGORNJI ROB, da se polji pomakneta navzgor */
+        margin-top: 0 !important; 
+        /* Ne potrebujemo margin-bottom, ker ga določa flex-gap. */
     }
     
     .gumb-isci {
-        /* Ključno: Gumb poravnamo na dno, da se ujema z višino select polja */
-        align-self: flex-end; 
+        align-self: flex-end; /* Ključno: Gumb poravnamo na dno, da se ujema z višino select polja */
+        /* Zagotovimo, da se margin-top ne podvoji in ostane 0 */
+        margin-top: 0 !important; 
     }
+
     
     /* ---------------------------------------------------- */
     
@@ -627,7 +652,7 @@ a:hover {
         flex: 0 0 80%; 
         min-width: 55%;
         max-width: 60%;
-        height: 280px; /* Še bolj kompaktna višina na mobilnem */
+        height: 320px; /* Še bolj kompaktna višina na mobilnem */
         
         scroll-snap-align: start; 
     }

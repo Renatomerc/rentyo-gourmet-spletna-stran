@@ -534,6 +534,15 @@
         .gumb-potrdi-trajanje:hover {
             background-color: #33b688;
         }
+        /* Slogi za opomnik o QR kodi in točkah znotraj modalnega okna */
+.duration-content .qr-reminder-text {
+    margin-top: 15px; /* Odmik od gumba */
+    font-size: 1em;
+    color: #666; /* Nevtralno sivo besedilo */
+    text-align: center;
+    border-top: 1px solid #dddddd; /* Nežna ločilna črta nad besedilom */
+    padding-top: 15px;
+}
         
         /* ======================================================= */
         /* V. CUSTOM WARNING MODAL - NOVO OBLIKOVANJE ZA OPOZORILO */
@@ -846,7 +855,7 @@
         height: 250px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         cursor: pointer;
-        background-color: #4edaa9; /* Svetlo ozadje */
+        background-color: #88d82d; /* Svetlo ozadje */
         transition: box-shadow 0.2s, transform 0.2s;
         border: 0px solid #333;
     }
@@ -1018,7 +1027,7 @@
         margin-top: 25px;
         text-align: center;
         border-radius: 20px;
-        background-color: #4edaa9; 
+        background-color: #1BC0BB; 
         color: #333;
         font-size: 1rem;
         font-weight: 600;
@@ -1031,7 +1040,10 @@
     /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     .gumb-rezerviraj-modal:hover {
-        background-color: #39c292;
+        background-color: #148a86;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
     }
 
     /* ======================================================= */
@@ -1065,7 +1077,7 @@
     .modal-tab.active {
         color: #333;
         border-bottom-color: none;
-        background-color: #4edaa9;
+        background-color: #1BC0BB;
         border-radius: 25px;
         margin-bottom: 0px; 
         box-shadow: 0 0px 0px rgba(0,0,0,0.05);
@@ -1979,7 +1991,7 @@
     </div>
   </div>
   
-  <div class="duration-modal" id="durationModal">
+ <div class="duration-modal" id="durationModal">
       <div class="duration-content">
           <span class="close-modal" id="zapriDurationModal">×</span>
           
@@ -2011,6 +2023,10 @@
           </div>
           
           <button id="potrdiTrajanjeGumb" class="gumb-potrdi-trajanje" data-i18n="modal.reservation_modal.confirm_button">Potrdi trajanje in nadaljuj</button>
+          
+          <p class="qr-reminder-text" data-i18n="modal.reservation_modal.qr_reminder">
+              Ne pozabite: ob prihodu skenirajte QR kodo in pridobite točke!
+          </p>
       </div>
   </div>
 

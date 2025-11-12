@@ -1,11 +1,11 @@
 {
   "app": {
     "title": "Ricerca Ristoranti - Gourmet & Experience",
-    "profile_title": "Il mio Profilo - Gourmet & Experience"
+    "profile_title": "Il Mio Profilo - Gourmet & Experience"
   },
   "header": {
     "login": "Accesso",
-    "profile": "Il mio Profilo",
+    "profile": "Il Mio Profilo",
     "logout": "Esci"
   },
   "hero": {
@@ -17,68 +17,68 @@
     "date_label": "Data",
     "date_placeholder": "Seleziona data",
     "time_label": "Ora della prenotazione",
-    "select_time": "Scegli l'ora",
+    "select_time": "Seleziona ora",
     "persons_label": "Numero di persone",
     "search_button": "Cerca",
     "person_singular": "{{count}}",
     "person_plural": "{{count}}"
   },
   "quick_search": {
-    "title": "Selezione rapida della cucina"
+    "title": "Ricerca Veloce per Cucina"
   },
   "cuisine": {
     "meat": "Carne",
-    "vegetarian": "Vegetariana",
+    "vegetarian": "Vegano",
     "fish": "Pesce",
     "drinks": "Bevande",
     "brunch": "Brunch"
   },
   "results": {
-    "popular_title": "Popolare vicino a te",
-    "featured_title": "In evidenza",
+    "popular_title": "Popolari vicino a te",
+    "featured_title": "In Evidenza",
     "reserve_button": "Prenota",
     "description_1": "Cucina tradizionale slovena e atmosfera piacevole.",
     "description_2": "Piatti moderni con ingredienti locali.",
     "description_3": "Autentica cucina italiana e ottime pizze.",
-    "description_4": "Ottimi piatti a base vegetale per tutti.",
-    "description_5": "Ottimi brunch per tutti.",
-    "check_tables": "Controlla tavoli alle {{time}}",
+    "description_4": "Eccellenti piatti a base vegetale per tutti.",
+    "description_5": "Brunch eccellenti per tutti.",
+    "check_tables": "Verifica tavoli alle {{time}}",
     "cuisine": "Cucina",
-    "na": "Non disponibile",
+    "na": "Nessun dato",
     "search_results": "Risultati della ricerca",
     "available_tomorrow": "Domani alle {{time}}",
-    "unavailable": "Nessun tavolo libero",
+    "unavailable": "Nessun tavolo disponibile",
     "available_today": "Disponibile oggi" 
   },
   "messages": {
-    "enter_search_criteria": "Si prega di inserire una città o un tipo di cucina per la ricerca.",
-    "required_fields_missing": "Si prega di compilare tutti i campi obbligatori: data, ora e numero di persone.",
-    "searching": "Ricerca di ristoranti per '{{criteria}}'...",
+    "enter_search_criteria": "Per favore, inserisci una città o un tipo di cucina per la ricerca.",
+    "required_fields_missing": "Per favore, compila tutti i campi obbligatori: data, ora e numero di persone.",
+    "searching": "Ricerca ristoranti per '{{criteria}}'...",
     "search_success": "Trovati {{count}} ristoranti.",
     "search_error": "Ricerca fallita.",
     "no_restaurants_found": "Nessun ristorante trovato.",
-    "reserving": "Prenoto per {{stevilo}} persone alle {{cas}}...",
-    "reservation_success": "Prenotazione riuscita! Il tavolo n. {{miza}} è riservato per {{trajanje}}.",
+    "reserving": "Prenotazione per {{stevilo}} persone alle {{cas}}...",
+    "reservation_success": "Prenotazione riuscita! Tavolo n. {{miza}} è prenotato per {{trajanje}}.",
     "reservation_success_minimal": "Prenotazione riuscita alle {{cas}}!",
     "reservation_failed": "Prenotazione fallita.",
     "server_connection_error": "Connessione al server fallita.",
     "server_connection_error_retry": "Errore di connessione al server, riprova.",
     "login_success": "Accesso riuscito! Benvenuto.",
-    "registration_success": "Registrazione riuscita!",
-    "login_failed": "Accesso fallito.",
+    "registration_success": "Registrazione avvenuta con successo!",
+    "login_failed": "Accesso non riuscito.",
     "registration_failed": "Registrazione fallita.",
     "server_error": "Errore del server.",
-    "check_availability_prompt": "Controlla i tavoli liberi",
-    "available_times_found": "Fasce orarie attualmente disponibili.",
+    "check_availability_prompt": "Verifica tavoli disponibili",
+    "available_times_found": "Orari attualmente disponibili.",
     "no_restaurant_selected": "Errore: Nessun ristorante selezionato.",
-    "select_reservation_date": "Si prega di selezionare una data di prenotazione.",
-    "pogoji_required": "Devi accettare i Termini e Condizioni Generali e la Politica sulla Privacy per registrarti.",
-    "login_required": "È richiesto l'accesso per la prenotazione. Si prega di accedere.",
+    "select_reservation_date": "Per favore, seleziona la data della prenotazione.",
+    "pogoji_required": "Devi accettare i Termini e Condizioni e la Politica sulla Privacy per registrarti.",
+    "login_required": "L'accesso è richiesto per la prenotazione. Per favore, accedi.",
     "google_reviews": "Google"
   },
   "duration": {
     "one_hour": "1 ora",
-    "one_half_hours": "1.5 ore",
+    "one_half_hours": "1 ora e mezza",
     "two_hours": "2 ore"
   },
   "auth": {
@@ -93,22 +93,22 @@
   "modal": {
     "login_tab": "Accesso",
     "register_tab": "Registrazione",
-    "email_placeholder": "Email",
+    "email_placeholder": "E-mail",
     "password_placeholder": "Password",
     "name_placeholder": "Nome e cognome",
     "login_button": "Accedi",
     "register_button": "Crea account",
     "tab_menu": "Menu",
-    "tab_gallery": "Immagini & Mappa",
+    "tab_gallery": "Immagini e Mappa",
     "tab_reviews": "Recensioni",
-    "tab_special_offer": "Offerta attuale", 
-    "special_offer_title": "Offerta speciale del ristorante",
-    "special_offer_default": "Attualmente non sono attive offerte speciali o menù stagionali.",
-    "no_reviews": "Attualmente non sono disponibili recensioni dettagliate da visualizzare.",
-    "no_menu": "Il menù non è ancora disponibile.",
+    "tab_special_offer": "Offerta Attuale", 
+    "special_offer_title": "Offerta Speciale del Ristorante",
+    "special_offer_default": "Al momento non ci sono offerte speciali attive o menu stagionali.",
+    "no_reviews": "Al momento non sono disponibili recensioni dettagliate da mostrare.",
+    "no_menu": "Menu non ancora disponibile.",
     "reserve_button": "Prenota tavolo",
-    "gallery_title": "Galleria immagini",
-    "map_title": "Mappa della posizione",
+    "gallery_title": "Galleria Immagini",
+    "map_title": "Posizione sulla Mappa",
     "reservation_persons": "Numero di persone",
     "reservation_date": "Data",
     "reservation_modal": {
@@ -116,42 +116,43 @@
       "duration_label": "Quanto tempo desideri rimanere?",
       "duration_0_5h": "Mezz'ora (30 min)",
       "duration_1h": "1 ora",
-      "duration_1_5h": "1.5 ore (90 min)",
+      "duration_1_5h": "1 ora e mezza (90 min)",
       "duration_2h": "2 ore",
-      "confirm_button": "Conferma durata e prenota"
+      "confirm_button": "Conferma durata e prenota",
+      "qr_reminder": "Non dimenticare di scansionare il codice QR del ristorante all'arrivo per ottenere punti e vantaggi!" 
     }
   },
   "footer": {
-    "about_company_title": "Riguardo Rentyo Gourmet",
+    "about_company_title": "Informazioni su Rentyo Gourmet",
     "about_us": "Chi siamo",
-    "about_us_href": "/it/chi-siamo.html", 
+    "about_us_href": "/it/o-nas.html", 
     "contact": "Contatto",
-    "contact_href": "/it/contatto.html",
+    "contact_href": "/it/kontakt.html",
     "career": "Carriera",
-    "career_href": "/it/carriera.html", 
-    "media_press": "Media / Area Stampa",
-    "media_press_href": "/it/media-stampa.html",
+    "career_href": "/it/kariera.html", 
+    "media_press": "Media / Angolo Stampa",
+    "media_press_href": "/it/mediji-press.html",
     "legal_info_title": "Informazioni Legali",
-    "legal_info_href": "/it/informazioni-legali.html", 
-    "privacy_policy": "Politica sulla Privacy",
-    "privacy_policy_href": "/it/politica-sulla-privacy.html", 
-    "cookie_policy": "Cookie",
-    "cookie_policy_href": "/it/politica-sui-cookie.html", 
-    "terms_of_use": "Termini di Utilizzo",
-    "terms_of_use_href": "/it/termini-di-utilizzo.html", 
-    "legal_notice": "Avviso Legale",
-    "legal_notice_href": "/it/avviso-legale.html",
+    "legal_info_href": "/it/pravne-informacije.html", 
+    "privacy_policy": "Politica sulla privacy",
+    "privacy_policy_href": "/it/politika-zasebnosti.html", 
+    "cookie_policy": "Informativa sui cookie",
+    "cookie_policy_href": "/it/politika-kolacici.html", 
+    "terms_of_use": "Termini di utilizzo",
+    "terms_of_use_href": "/it/uvjeti-koristenja.html", 
+    "legal_notice": "Note legali",
+    "legal_notice_href": "/it/pravna-obavijest.html",
     "partnerships_title": "Partnership",
     "for_partners": "Per i partner",
-    "for_partners_href": "/it/partnership.html#per-i-partner",
+    "for_partners_href": "/it/partnerstva.html#za-partnerje",
     "affiliate_program": "Programma di affiliazione",
-    "affiliate_program_href": "/it/partnership.html#programma-di-affiliazione",
+    "affiliate_program_href": "/it/partnerstva.html#partnerski-program",
     "connect_title": "Connettiti con noi",
     "payment_info_prefix": "Pagamento sicuro fornito da",
     "copyright_text": "© 2025 Rentyo Gourmet. Tutti i diritti riservati."
   },
   "profile": {
-    "title": "Il mio Profilo Utente",
+    "title": "Il Mio Profilo Utente",
     "tab_data": "Dati Personali",
     "tab_current": "Prenotazioni Attuali",
     "tab_history": "Cronologia Prenotazioni",
@@ -159,16 +160,16 @@
     "tab_notifications": "Notifiche", 
     "data_subtitle": "I tuoi dati",
     "name_label": "Nome e cognome:",
-    "email_label": "Email:",
+    "email_label": "E-mail:",
     "edit_button": "Modifica dati",
     "current_subtitle": "Prenotazioni attive",
     "no_current_reservations": "Attualmente non hai prenotazioni attive.",
     "cancel_button": "Annulla",
     "history_subtitle": "Prenotazioni passate",
     "no_history_reservations": "La cronologia delle prenotazioni è vuota.",
-    "points_payment_subtitle": "Punti e Metodi di pagamento",
-    "points_title": "I tuoi punti raccolti",
-    "points_status": "Stato attuale: {{count}} punti (Sufficienti per uno sconto di 10€)",
+    "points_payment_subtitle": "Punti e Metodi di Pagamento",
+    "points_title": "I tuoi punti accumulati",
+    "points_status": "Stato attuale: {{count}} punti (Sufficienti per 10€ di sconto)",
     "points_status_dynamic": "Stato attuale: {{count}} punti",
     "card_title": "Carta di credito salvata",
     "card_info": "Visa termina con: **** 1234",
@@ -176,35 +177,35 @@
     "save_card_button": "Salva carta", 
     "hide_card_button": "Rimuovi carta", 
     "notifications_subtitle": "Le tue notifiche",
-    "status_completed": "Grazie per la tua prenotazione" 
+    "status_completed": "Grazie per la prenotazione" 
   },
   "warning": {
       "title": "Avviso",
-      "default_message": "Si prega di notare che le informazioni visualizzate su disponibilità e prezzi sono puramente informative.",
+      "default_message": "Si prega di notare che le informazioni visualizzate su disponibilità e prezzi sono solo a scopo informativo.",
       "understand_button": "Capisco"
   },
   "registration": {
-    "pogoji_strinjanje": "Accetto i",
-    "splosni_pogoji_link": "Termini di Utilizzo",
-    "splosni_pogoji_href": "/it/termini-di-utilizzo.html",
-    "in_politiko": " e la",
-    "politika_zasebnosti_link": "Politica sulla Privacy",
-    "politika_zasebnosti_href": "/it/politica-sulla-privacy.html"
+    "pogoji_strinjanje": "Accetto i ",
+    "splosni_pogoji_link": "Termini e Condizioni",
+    "splosni_pogoji_href": "/it/uvjeti-koristenja.html",
+    "in_politiko": " e l'",
+    "politika_zasebnosti_link": "Informativa sulla Privacy",
+    "politika_zasebnosti_href": "/it/politika-zasebnosti.html"
   },
   "cookieConsent": {
-    "message": "Questo sito web utilizza i cookie per fornire una migliore esperienza utente e analizzare il traffico. Per continuare l'utilizzo, chiediamo il tuo consenso.",
+    "message": "Questo sito web utilizza i cookie per fornire una migliore esperienza utente e analizzare il traffico. Per continuare ad usare, è necessario il tuo consenso.",
     "moreInfoLink": {
-      "text": "Leggi di più.",
-      "url": "politica-sulla-privacy.html"
+      "text": "Per saperne di più.",
+      "url": "politika-zasebnosti.html"
     },
     "buttons": [
       {
         "id": "decline-cookies",
-        "text": "Rifiuta (solo necessari)"
+        "text": "Rifiuta (solo essenziali)"
       },
       {
         "id": "accept-cookies",
-        "text": "Accetta tutti"
+        "text": "Accetta tutto"
       }
     ]
   }
