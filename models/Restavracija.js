@@ -86,7 +86,12 @@ const RestavracijaSchema = new mongoose.Schema({
     description: LocalizedDescriptionSchema, 
     
     mainImageUrl: String,
-    galleryUrls: [String],
+    // 🔥 POPRAVEK: Zamenjano galleryUrls z GALERIJA_SLIK
+    galerija_slik: { 
+        type: [String], // Array stringov
+        default: []
+    },
+    // galleryUrls: [String], // Originalno polje, ki je sedaj komentirano/odstranjeno.
 
     menu: {
         sl: Object, 
