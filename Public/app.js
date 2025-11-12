@@ -110,7 +110,8 @@ function prikaziPodrobnosti(restavracija) {
     // 1. Mapiranje podatkov iz API strukture:
     const id = restavracija._id;
     const ime = restavracija.ime || 'Neznano Ime';
-    const slika = restavracija.mainImageUrl || 'placeholder.jpg';
+    // 🔥 POPRAVEK: Uporabimo urlSlike iz API odgovora za glavno sliko
+    const slika = restavracija.urlSlike || 'placeholder.jpg'; 
     const kuhinja = restavracija.cuisine && restavracija.cuisine.length > 0 ? restavracija.cuisine[0] : 'Razno';
     const lokacija = restavracija.location && restavracija.location.city ? restavracija.location.city : 'Neznana lokacija';
     const ocena_povprecje = restavracija.ocena_povprecje || 0;
@@ -251,7 +252,7 @@ function renderCard(restavracija) {
     `;
 
     card.innerHTML = `
-        <img src="${restavracija.mainImageUrl || 'placeholder.jpg'}" alt="${restavracija.ime}" class="kartica-slika">
+        <img src="${restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'}" alt="${restavracija.ime}" class="kartica-slika">
         <div class="kartica-vsebina">
             <h3>${restavracija.ime}</h3>
             <div class="info-ocena-oddaljenost">
@@ -284,7 +285,7 @@ function renderFeaturedCard(restavracija) {
     card.addEventListener('click', () => poglejDetajle(restavracija._id));
 
     card.innerHTML = `
-        <div class="slika-kartice" style="background-image: url('${restavracija.mainImageUrl || 'placeholder.jpg'}')"></div>
+        <div class="slika-kartice" style="background-image: url('${restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'}')"></div>
         <div class="vsebina-kartice-izpostavljeno">
             <h3>${restavracija.ime}</h3>
         </div>
