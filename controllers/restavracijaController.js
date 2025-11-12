@@ -49,7 +49,8 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 urlSlike: { 
                     $ifNull: [
                         "$mainImageUrl", 
-                        { $arrayElemAt: ["$galleryUrls", 0] }
+                        // 🔥 POPRAVEK: Uporabite prvo sliko iz novega polja galerija_slik
+                        { $arrayElemAt: ["$galerija_slik", 0] } 
                     ]
                 },
                 deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
@@ -57,6 +58,9 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
                 meni: 1, // <--- SEDAJ PRAVILNO
+                
+                // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE GALERIJA_SLIK
+                galerija_slik: 1, // <--- TO JE MANJKALO!
                 
                 // Ostala polja
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
