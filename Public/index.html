@@ -763,7 +763,7 @@
             gap: 2px;
         }
         .oddaljenost i {
-            color: #007bff; /* Ikona v modri barvi */
+            color: #1f1f1f; /* Ikona v modri barvi */
         }
 
         /* Stil za Google oceno na kartici */
@@ -1878,7 +1878,7 @@
                 <div class="info-vrstica">
                     <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
                     <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
-                    <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
+                    <span id="modalOcena"><i class="fas fa-circle"></i> Ocena</span>
                 </div>
                 
                 <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
@@ -2246,7 +2246,7 @@ function generateStarsHTML(rating) {
     let starsHTML = '';
     for (let i = 1; i <= maxStars; i++) {
         if (i <= roundedRating) {
-            starsHTML += `<span style="color: #ff9900;">${fullStar}</span>`;
+            starsHTML += `<span style="color: #20c0bd;">${fullStar}</span>`;
         } else {
             starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
         }
