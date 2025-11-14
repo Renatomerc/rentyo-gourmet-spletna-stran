@@ -75,6 +75,7 @@
     "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti.",
     "login_required": "Za rezervacijo je potrebna prijava. Prosimo, prijavite se.",
     "google_reviews": "Google"
+  
   },
   "duration": {
     "one_hour": "1 ura",
@@ -177,7 +178,9 @@
     "save_card_button": "Shrani kartico", 
     "hide_card_button": "Odstrani kartico", 
     "notifications_subtitle": "Vaša obvestila",
-    "status_completed": "Hvala za rezervacijo" 
+    "status_completed": "Hvala za rezervacijo",
+    "cancel_confirmation": "Ali res želite preklicati rezervacijo?",
+    "cancel_success": "Rezervacija je bila uspešno preklicana." 
   },
   "warning": {
       "title": "Opozorilo",

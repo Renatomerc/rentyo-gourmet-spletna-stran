@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Pretraga Restorana - Gourmet & Experience",
+    "title": "Pretraživanje Restorana - Gourmet & Experience",
     "profile_title": "Moj Profil - Gourmet & Experience"
   },
   "header": {
@@ -17,9 +17,9 @@
     "date_label": "Datum",
     "date_placeholder": "Odaberite datum",
     "time_label": "Vrijeme rezervacije",
-    "select_time": "Odaberite vrijeme",
+    "select_time": "Odaberi vrijeme",
     "persons_label": "Broj osoba",
-    "search_button": "Pretraži",
+    "search_button": "Traži",
     "person_singular": "{{count}}",
     "person_plural": "{{count}}"
   },
@@ -28,9 +28,9 @@
   },
   "cuisine": {
     "meat": "Mesna",
-    "vegetarian": "Vegi",
+    "vegetarian": "Vege",
     "fish": "Riblja",
-    "drinks": "Pića",
+    "drinks": "Piće",
     "brunch": "Brunch"
   },
   "results": {
@@ -48,21 +48,21 @@
     "search_results": "Rezultati pretraživanja",
     "available_tomorrow": "Sutra u {{time}}",
     "unavailable": "Nema slobodnih stolova",
-    "available_today": "Dostupno danas" 
+    "available_today": "Dostupno danas"
   },
   "messages": {
-    "enter_search_criteria": "Molimo unesite grad ili vrstu kuhinje za pretraživanje.",
-    "required_fields_missing": "Molimo ispunite sve obvezne podatke: datum, vrijeme i broj osoba.",
+    "enter_search_criteria": "Molimo, unesite grad ili vrstu kuhinje za pretraživanje.",
+    "required_fields_missing": "Molimo, ispunite sve obvezne podatke: datum, vrijeme i broj osoba.",
     "searching": "Pretraživanje restorana za '{{criteria}}'...",
     "search_success": "Pronađeno {{count}} restorana.",
     "search_error": "Pretraživanje nije uspjelo.",
-    "no_restaurants_found": "Nije pronađen nijedan restoran.",
-    "reserving": "Rezerviram za {{stevilo}} osobe u {{cas}}...",
+    "no_restaurants_found": "Nema pronađenih restorana.",
+    "reserving": "Rezerviram za {{stevilo}} osoba u {{cas}}...",
     "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran za {{trajanje}}.",
     "reservation_success_minimal": "Uspješno rezervirano u {{cas}}!",
     "reservation_failed": "Rezervacija nije uspjela.",
-    "server_connection_error": "Veza s poslužiteljem nije uspjela.",
-    "server_connection_error_retry": "Greška u povezivanju s poslužiteljem, pokušajte ponovo.",
+    "server_connection_error": "Povezivanje sa poslužiteljem nije uspjelo.",
+    "server_connection_error_retry": "Greška pri povezivanju sa poslužiteljem, pokušajte ponovo.",
     "login_success": "Prijava uspješna! Dobrodošli.",
     "registration_success": "Uspješna registracija!",
     "login_failed": "Prijava neuspješna.",
@@ -70,10 +70,10 @@
     "server_error": "Greška poslužitelja.",
     "check_availability_prompt": "Provjeri slobodne stolove",
     "available_times_found": "Trenutno slobodni termini.",
-    "no_restaurant_selected": "Greška: Nije odabran nijedan restoran.",
-    "select_reservation_date": "Molimo odaberite datum rezervacije.",
+    "no_restaurant_selected": "Greška: Nije odabran restoran.",
+    "select_reservation_date": "Molimo, odaberite datum rezervacije.",
     "pogoji_required": "Za registraciju morate prihvatiti Opće uvjete i Politiku privatnosti.",
-    "login_required": "Prijava je potrebna za rezervaciju. Molimo prijavite se.",
+    "login_required": "Za rezervaciju je potrebna prijava. Molimo, prijavite se.",
     "google_reviews": "Google"
   },
   "duration": {
@@ -88,58 +88,58 @@
     "register_success": "Registracija uspješna! Sada se možete prijaviti.",
     "login_error": "Greška pri prijavi.",
     "register_error": "Registracija nije uspjela.",
-    "server_error": "Greška pri povezivanju s poslužiteljem."
+    "server_error": "Greška pri povezivanju sa poslužiteljem."
   },
   "modal": {
     "login_tab": "Prijava",
     "register_tab": "Registracija",
-    "email_placeholder": "E-pošta",
+    "email_placeholder": "E-mail",
     "password_placeholder": "Lozinka",
     "name_placeholder": "Ime i prezime",
     "login_button": "Prijavi se",
-    "register_button": "Stvori račun",
+    "register_button": "Kreiraj račun",
     "tab_menu": "Jelovnik",
-    "tab_gallery": "Slike i Karta",
+    "tab_gallery": "Slike & Karta",
     "tab_reviews": "Recenzije",
-    "tab_special_offer": "Trenutna Ponuda", 
-    "special_offer_title": "Posebna Ponuda Restorana",
+    "tab_special_offer": "Aktualna Ponuda",
+    "special_offer_title": "Posebna ponuda restorana",
     "special_offer_default": "Trenutno nema aktivne posebne ponude ili sezonskog jelovnika.",
-    "no_reviews": "Trenutno nema dostupnih detaljnih recenzija za prikaz.",
+    "no_reviews": "Trenutno nisu dostupne detaljne recenzije za prikaz.",
     "no_menu": "Jelovnik još nije dostupan.",
     "reserve_button": "Rezerviraj stol",
-    "gallery_title": "Galerija Slika",
-    "map_title": "Lokacija na Karti",
+    "gallery_title": "Galerija slika",
+    "map_title": "Karta Lokacije",
     "reservation_persons": "Broj osoba",
     "reservation_date": "Datum",
     "reservation_modal": {
-      "title": "Odaberite trajanje posjete",
+      "title": "Odaberite trajanje posjeta",
       "duration_label": "Koliko dugo želite ostati?",
       "duration_0_5h": "Pola sata (30 min)",
       "duration_1h": "1 sat",
       "duration_1_5h": "1 sat i pol (90 min)",
       "duration_2h": "2 sata",
       "confirm_button": "Potvrdi trajanje i rezerviraj",
-      "qr_reminder": "Ne zaboravite skenirati QR kod restorana po dolasku kako biste prikupili bodove i pogodnosti!" 
+      "qr_reminder": "Ne zaboravite skenirati QR kod restorana pri dolasku i dobiti bodove i pogodnosti!"
     }
   },
   "footer": {
     "about_company_title": "O Rentyo Gourmet",
     "about_us": "O nama",
-    "about_us_href": "/hr/o-nas.html", 
+    "about_us_href": "/hr/o-nama.html",
     "contact": "Kontakt",
     "contact_href": "/hr/kontakt.html",
     "career": "Karijera",
-    "career_href": "/hr/karijera.html", 
+    "career_href": "/hr/karijera.html",
     "media_press": "Mediji / Press kutak",
     "media_press_href": "/hr/mediji-press.html",
     "legal_info_title": "Pravne informacije",
-    "legal_info_href": "/hr/pravne-informacije.html", 
+    "legal_info_href": "/hr/pravne-informacije.html",
     "privacy_policy": "Politika privatnosti",
-    "privacy_policy_href": "/hr/politika-privatnosti.html", 
+    "privacy_policy_href": "/hr/politika-privatnosti.html",
     "cookie_policy": "Politika kolačića",
-    "cookie_policy_href": "/hr/politika-kolacici.html", 
+    "cookie_policy_href": "/hr/politika-kolacica.html",
     "terms_of_use": "Uvjeti korištenja",
-    "terms_of_use_href": "/hr/uvjeti-koristenja.html", 
+    "terms_of_use_href": "/hr/uvjeti-koristenja.html",
     "legal_notice": "Pravna obavijest",
     "legal_notice_href": "/hr/pravna-obavijest.html",
     "partnerships_title": "Partnerstva",
@@ -154,48 +154,50 @@
   "profile": {
     "title": "Moj Korisnički Profil",
     "tab_data": "Osobni Podaci",
-    "tab_current": "Trenutne Rezervacije",
+    "tab_current": "Aktualne Rezervacije",
     "tab_history": "Povijest Rezervacija",
     "tab_points_payment": "Bodovi i Plaćanje",
-    "tab_notifications": "Obavijesti", 
+    "tab_notifications": "Obavijesti",
     "data_subtitle": "Vaši podaci",
     "name_label": "Ime i prezime:",
-    "email_label": "E-pošta:",
+    "email_label": "E-mail:",
     "edit_button": "Uredi podatke",
     "current_subtitle": "Aktivne rezervacije",
     "no_current_reservations": "Trenutno nemate aktivnih rezervacija.",
     "cancel_button": "Otkaži",
     "history_subtitle": "Prošle rezervacije",
     "no_history_reservations": "Povijest rezervacija je prazna.",
-    "points_payment_subtitle": "Bodovi i Načini Plaćanja",
-    "points_title": "Vaši prikupljeni bodovi",
+    "points_payment_subtitle": "Bodovi i Sredstva Plaćanja",
+    "points_title": "Vaši sakupljeni bodovi",
     "points_status": "Trenutno stanje: {{count}} bodova (Dovoljno za 10€ popusta)",
     "points_status_dynamic": "Trenutno stanje: {{count}} bodova",
     "card_title": "Spremljena kreditna kartica",
     "card_info": "Visa završava na: **** 1234",
     "add_card_button": "Dodaj/Ažuriraj karticu",
-    "save_card_button": "Spremi karticu", 
-    "hide_card_button": "Ukloni karticu", 
+    "save_card_button": "Spremi karticu",
+    "hide_card_button": "Ukloni karticu",
     "notifications_subtitle": "Vaše obavijesti",
-    "status_completed": "Hvala na rezervaciji" 
+    "status_completed": "Hvala na rezervaciji",
+    "cancel_confirmation": "Jeste li sigurni da želite otkazati rezervaciju?",
+    "cancel_success": "Rezervacija je uspješno otkazana."
   },
   "warning": {
-      "title": "Upozorenje",
-      "default_message": "Molimo uzmite u obzir da su prikazane informacije o dostupnosti i cijenama samo informativne prirode.",
-      "understand_button": "Razumijem"
+    "title": "Upozorenje",
+    "default_message": "Molimo, uzmite u obzir da su prikazane informacije o dostupnosti i cijenama isključivo informativne prirode.",
+    "understand_button": "Razumijem"
   },
   "registration": {
-    "pogoji_strinjanje": "Prihvaćam ",
-    "splosni_pogoji_link": "Opće uvjete",
+    "pogoji_strinjanje": "Slažem se s ",
+    "splosni_pogoji_link": "Općim uvjetima",
     "splosni_pogoji_href": "/hr/uvjeti-koristenja.html",
     "in_politiko": " i ",
-    "politika_zasebnosti_link": "Politiku privatnosti",
+    "politika_zasebnosti_link": "Politikom privatnosti",
     "politika_zasebnosti_href": "/hr/politika-privatnosti.html"
   },
   "cookieConsent": {
-    "message": "Ova web stranica koristi kolačiće za pružanje boljeg korisničkog iskustva i analizu prometa. Za nastavak korištenja molimo vas da date svoj pristanak.",
+    "message": "Ova web stranica koristi kolačiće kako bi osigurala bolje korisničko iskustvo i analizu prometa. Za daljnju upotrebu molimo za vaš pristanak.",
     "moreInfoLink": {
-      "text": "Saznajte više.",
+      "text": "Pročitaj više.",
       "url": "politika-privatnosti.html"
     },
     "buttons": [
@@ -205,7 +207,7 @@
       },
       {
         "id": "accept-cookies",
-        "text": "Prihvati sve"
+        "text": "Prihvaćam sve"
       }
     ]
   }
