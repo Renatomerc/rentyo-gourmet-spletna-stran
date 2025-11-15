@@ -3218,71 +3218,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
 }); 
 
+// =================================================================
+// ⭐ NOVO: POMOŽNA FUNKCIJA ZA PRIDOBIVANJE POLNIH PODROBNOSTI RESTAVRACIJE ⭐
+// =================================================================
+
+/**
+ * Pridobi popoln objekt restavracije z vsemi podrobnostmi (meni, galerija)
+ * @param {string} id - ID restavracije
+ * @returns {Promise<Object|null>} Popoln objekt restavracije ali null v primeru napake
+ */
+async function getFullRestaurantDetails(id) {
+    if (!id) return null;
+
+    // Predpostavljamo, da je API končna točka za celotne podrobnosti: /api/restavracija/{id}
+    const endpoint = `${API_BASE_URL}/restavracije/${id}`; // Uporaba API_BASE_URL + ID restavracije
+    
+    try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+            throw new Error(`Napaka pri pridobivanju podrobnosti: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Napaka pri API klicu za podrobnosti restavracije:", error);
+        return null;
+    }
+}
+
 
 // =================================================================
-// VI. LOGIKA MODALA RESTAVRACIJE
+// VI. LOGIKA MODALA RESTAVRACIJE (POPRAVLJENA)
 // =================================================================
 
 // Funkcija, ki napolni modal s podatki in ga odpre
-function prikaziPodrobnosti(restavracija) {
+async function prikaziPodrobnosti(restavracija) {
     
     currentRestaurantId = restavracija._id || restavracija.id; 
     const reservIdInput = document.querySelector('[data-reserv-id]');
     if (reservIdInput) reservIdInput.value = currentRestaurantId; 
 
-    // ⭐⭐⭐ POPRAVEK: DVOJNA PREVERBA POLJ ZA IME ⭐⭐⭐
-    // Preveri restavracija.ime (iz /isci) ALI restavracija.imeRestavracije (iz /privzeto)
-    const restavracijaIme = restavracija.ime || restavracija.imeRestavracije || 'Neznano Ime'; 
+    // 1. PREVERJANJE IN PRIDOBIVANJE POPOLNIH PODATKOV
+    let popolnaRestavracija = restavracija;
+    // Preverimo, ali manjkajo ključni podatki (meni in galerija)
+    const isMissingDetails = !restavracija.meni || !restavracija.galerija_slik;
+
+    if (currentRestaurantId && isMissingDetails) {
+        // Prikaz opozorila ali nalaganja, medtem ko čakamo na API klic
+        if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Nalaganje podrobnosti...'; 
+
+        const fullData = await getFullRestaurantDetails(currentRestaurantId);
+        
+        if (fullData) {
+            popolnaRestavracija = fullData; // Uporabimo celoten objekt
+        } else {
+            // Če klic ne uspe, prenehamo in uporabimo osnovne podatke
+            if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Neznano Ime';
+            prikaziSporocilo('Napaka pri nalaganju celotnih podrobnosti restavracije.', 'error');
+        }
+    }
+
+    // Sedaj delamo samo s POPOLNO_RESTAVRACIJO
     
-    const kuhinja = restavracija.deviznaKuhinja || 'Neznano';
-    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
-    const opis = restavracija.opis || restavracija.glavniOpis || ''; 
+    // ⭐ POPRAVEK: DVOJNA PREVERBA POLJ ZA IME 
+    const restavracijaIme = popolnaRestavracija.ime || popolnaRestavracija.imeRestavracije || 'Neznano Ime'; 
     
-    // Lokacija restavracije
-const lon = restavracija.lokacija?.coordinates?.[0] || DEFAULT_LON; 
-const lat = restavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
-const gpsString = `${lat.toFixed(4)},${lon.toFixed(4)}`; 
-
-// 🎯 IZRAČUN RAZDALJE ZA MODALNO OKNO
-let prikazLokacije = '';
-
-if (userLocation) {
-     // Izračun razdalje med uporabnikom in restavracijo
-    const distance = getDistance(
-        userLocation.lat, 
-        userLocation.lon, 
-        lat, 
-        lon
-    );
+    const kuhinja = popolnaRestavracija.deviznaKuhinja || 'Neznano';
+    const slikaUrl = popolnaRestavracija.urlSlike || popolnaRestavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    const opis = popolnaRestavracija.opis || popolnaRestavracija.glavniOpis || ''; 
     
-    // Zaokrožitev na celo število (brez decimalk)
-    const oddaljenostKm = Math.round(distance); 
-    
-    // Ustvarimo HTML za prikaz razdalje
-    prikazLokacije = `<i class="fas fa-location-arrow"></i> ${oddaljenostKm} km`;
-    
-} else {
-    // Če lokacija uporabnika ni znana, prikažemo koordinate restavracije.
-    prikazLokacije = `<i class="fas fa-map-marker-alt"></i> ${gpsString}`;
-    // Opomba: Če imate i18n, bi tukaj lahko bil tudi: i18next.t('results.distance_unknown') + ' ' + gpsString
-}
-// ------------------------------------
+    // Lokacija restavracije (uporaba popolneRestavracije)
+    const lon = popolnaRestavracija.lokacija?.coordinates?.[0] || DEFAULT_LON; 
+    const lat = popolnaRestavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
+    const gpsString = `${lat.toFixed(4)},${lon.toFixed(4)}`; 
 
-// Polnjenje Glavnih podrobnosti
-if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
-if(modalIme) modalIme.textContent = restavracijaIme;
-if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+    // 🎯 IZRAČUN RAZDALJE ZA MODALNO OKNO
+    let prikazLokacije = '';
 
-// 🔥 KLJUČNA SPREMEMBA: Uporabimo izračunano spremenljivko 'prikazLokacije'
-if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
+    if (userLocation) {
+        const distance = getDistance(
+            userLocation.lat, 
+            userLocation.lon, 
+            lat, 
+            lon
+        );
+        
+        const oddaljenostKm = Math.round(distance); 
+        prikazLokacije = `<i class="fas fa-location-arrow"></i> ${oddaljenostKm} km`;
+        
+    } else {
+        prikazLokacije = `<i class="fas fa-map-marker-alt"></i> ${gpsString}`;
+    }
+    // ------------------------------------
 
-if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(restavracija.ocena_povprecje || 0).toFixed(1)}`;
-if(modalOpis) modalOpis.textContent = opis;
+    // Polnjenje Glavnih podrobnosti
+    if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
+    if(modalIme) modalIme.textContent = restavracijaIme;
+    if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
 
-    // Generiranje Menija (Ostane enako)
+    // 🔥 KLJUČNA SPREMEMBA: Uporabimo izračunano spremenljivko 'prikazLokacije'
+    if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
+
+    if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
+    if(modalOpis) modalOpis.textContent = opis;
+
+    // Generiranje Menija (Uporaba POPOLNA_RESTAVRACIJA)
     if(modalMeni) {
         modalMeni.innerHTML = '';
-        const menuObj = restavracija.meni || {}; 
+        const menuObj = popolnaRestavracija.meni || {}; 
         
         let hasMenu = false;
         
@@ -3331,8 +3374,8 @@ if(modalOpis) modalOpis.textContent = opis;
         }
     }
     
-    // Polnjenje zavihka Aktualna Ponudba (Ostane enako)
-    const ponudbaItems = restavracija.meni?.tedenska_ponudba || [];
+    // Polnjenje zavihka Aktualna Ponudba (Uporaba POPOLNA_RESTAVRACIJA)
+    const ponudbaItems = popolnaRestavracija.meni?.tedenska_ponudba || [];
     const modalAktualnaPonudbaDiv = document.getElementById('tabAktualnaPonudba'); 
     
     if (modalAktualnaPonudbaDiv) {
@@ -3367,14 +3410,13 @@ if(modalOpis) modalOpis.textContent = opis;
         }
     }
     
-  // Generiranje Galerije - POENOSTAVLJENO (Samo ustvari vsebino, ne zunanjega DIV-a)
+  // Generiranje Galerije - POENOSTAVLJENO (Uporaba POPOLNA_RESTAVRACIJA)
     if(galerijaSlikeDiv) {
-        const galerijaSlikaURLS = restavracija.galerija_slik; 
+        const galerijaSlikaURLS = popolnaRestavracija.galerija_slik || []; // Uporaba praznega arraya, če ni podatkov
         
-        // Tukaj ne ustvarimo zunanjega DIV-a, ker že obstaja: <div id="galerijaSlike" class="galerija-slike">
         let galerijaHTML = ''; 
 
-        if (galerijaSlikaURLS && galerijaSlikaURLS.length > 0) {
+        if (galerijaSlikaURLS.length > 0) {
             
             galerijaSlikaURLS.forEach(url => {
                 // Notranji DIV brez Tailwind razredov za velikost, saj jih definira vaš CSS
