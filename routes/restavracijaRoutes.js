@@ -94,6 +94,16 @@ module.exports = (preveriGosta) => {
      * (Običajno za admina ali lastnika restavracije)
      */
     router.put('/zakljuci_rezervacijo', preveriGosta, restavracijaController.oznaciRezervacijoKotZakljuceno);
+    
+    
+    // -----------------------------------------------------------------
+    // ✅ AKTIVIRANA RUTA ZA ISKANJE
+    // -----------------------------------------------------------------
+    /**
+     * POST /api/restavracije/isci 
+     * Sedaj ta ruta deluje, saj je funkcija restavracijaController.isciRestavracije definirana.
+     */
+    router.post('/isci', restavracijaController.isciRestavracije); 
     // -----------------------------------------------------------------
 
 

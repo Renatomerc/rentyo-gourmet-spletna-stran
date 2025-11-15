@@ -513,6 +513,7 @@ exports.ustvariRezervacijo = async (req, res) => {
     }
 };
 
+
 /**
  * 🟢 POPRAVLJENO: Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
  * Izvaja TRDO BRISANJE ($pull), ki rezervacijo v celoti odstrani iz zbirke podatkov.
@@ -838,5 +839,33 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
     } catch (error) {
         console.error('❌ NAPAKA PRI ZAKLJUČEVANJU IN DODELITVI TOČK:', error);
         res.status(500).json({ msg: 'Napaka strežnika pri zaključku rezervacije.' });
+    }
+};
+
+// =================================================================
+// 🔥 MANJKAJOČA FUNKCIJA ZA ISKANJE (Začasni STUB, ki reši napako)
+// =================================================================
+
+/**
+ * 🚧 Začasna funkcija iskanja (POST /isci) 
+ * POZOR: Če ruto za iskanje v routes.js AKTIVIRATE, mora ta funkcija obstajati!
+ */
+exports.isciRestavracije = async (req, res) => {
+    // Vsi iskalni parametri so v req.body
+    const iskalniParametri = req.body; 
+    console.log("===> API klic za /isci prejet. Iskalni parametri:", iskalniParametri);
+    
+    // 🔥 POZOR: TUKAJ MORATE DODATI LOGIKO ZA ISKANJE V MONGO DB!
+    // Za zdaj vrnemo prazen array, kar reši zrušitev strežnika.
+
+    try {
+        // Klic na bazo z ustrezno filtracijo (npr. Restavracija.find({ ime: new RegExp(iskalniParametri.ime, 'i') }))
+        const rezultati = []; // Začasno prazen array
+        
+        res.status(200).json(rezultati);
+        
+    } catch (error) {
+        console.error("Napaka pri iskanju restavracij:", error);
+        res.status(500).json({ msg: "Napaka strežnika pri iskanju.", error: error.message });
     }
 };
