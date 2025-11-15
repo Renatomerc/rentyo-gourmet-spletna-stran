@@ -1065,7 +1065,7 @@
         border-radius: 25px;
         cursor: pointer;
         font-size: 0.9rem;
-        font-weight: 500; 
+        font-weight: 600; 
         color: #333;
         border-bottom: 0px solid transparent;
         transition: color 0.0s, border-bottom-color 0.0s, background-color 0.0s;
@@ -1075,7 +1075,7 @@
     }
     
     .modal-tab.active {
-        color: #333;
+        color: #ffffff;
         border-bottom-color: none;
         background-color: #1BC0BB;
         border-radius: 25px;
@@ -1866,24 +1866,29 @@
       </form>
     </section>
 
-  <section class="hitra-iskanja">
+ <section class="hitra-iskanja">
     <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
     <div class="gumbi-kategorij">
         <a href="#" class="gumb-kategorija" data-kuhinja="Mesne" data-i18n="cuisine.meat">Mesne jedi</a>
         <a href="#" class="gumb-kategorija" data-kuhinja="Vegi" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Ribje" data-i18n="cuisine.fish">Ribje jedi</a> 
+        <a href="#" class="gumb-kategorija" data-kuhinja="Ribje" data-i18n="cuisine.fish">Ribje jedi</a>
         <a href="#" class="gumb-kategorija" data-kuhinja="Pijača" data-i18n="cuisine.drinks">Pijača</a>
         <a href="#" class="gumb-kategorija" data-kuhinja="Brunch" data-i18n="cuisine.brunch">Brunch</a>
     </div>
 </section>
 
- 
-    <section class="kartice-restavracij">
-      <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
-      <div class="mreza-kartic" id="restavracije-container">
+<section class="kartice-restavracij" id="rezultatiIskanjaSekcija" style="display: none;">
+    <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
+    <div class="mreza-kartic" id="rezultatiIskanja">
+        </div>
+</section>
+
+<section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
+    <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
+    <div class="mreza-kartic" id="restavracije-container">
         <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
-      </div>
-    </section>
+        </div>
+</section>
 
     <section class="kartice-restavracij kartice-izpostavljeno">
         <h3 data-i18n="results.featured_title">Izpostavljeno</h3>

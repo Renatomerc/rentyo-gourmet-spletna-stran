@@ -77,7 +77,7 @@ const updateContent = () => {
         // 1. Preverimo, ali je pot veljavna in se razlikuje od ključa
         if (genericPath && genericPath !== key) {
             
-            // 2. ZGRADIMO PRAVILNO ABSOLUTNO POT
+            // 2. Zgradimo PRAVILNO ABSOLUTNO POT
             // Uporaba trenutnega jezika, ki ga je nastavil i18next
             const dynamicPath = `/${currentLang}${genericPath.startsWith('/') ? genericPath : '/' + genericPath}`;
             
@@ -171,6 +171,13 @@ if (typeof i18next !== 'undefined' && typeof i18nextBrowserLanguageDetector !== 
 // 🔥 KRITIČEN POPRAVEK: API_BASE_URL mora biti celoten URL Render servisa, 
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; 
 const authTokenKey = 'jwtToken'; // Ključ za shranjevanje žetona
+
+// 🔥 NOVE KONSTANTE ZA ISKANJE (ID-ji morajo ustrezati HTML-ju)
+const REZULTATI_CONTAINER_ID = 'rezultatiIskanja'; 
+const SECTIONS = {
+    search: document.getElementById('rezultatiIskanjaSekcija'),
+    default: document.getElementById('privzeteRestavracijeSekcija')
+};
 
 // Pridobi avtentikacijski žeton iz localStorage
 const getAuthHeaders = () => {
@@ -677,6 +684,107 @@ function zapriWarningModal() {
 }
 
 // =================================================================
+// 6.5 LOGIKA ISKANJA (DODATNE FUNKCIJE)
+// =================================================================
+
+/**
+ * 🔥 MANJKAJOČA FUNKCIJA! Pošlje iskalne parametre na API in prikaže rezultate.
+ */
+async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhinjaKljuc = '') {
+    e.preventDefault(); // Za vsak slučaj
+    
+    const rezultatiContainer = document.getElementById(REZULTATI_CONTAINER_ID);
+
+    // Prikaz in skrivanje sekcij glede na predpostavljen HTML
+    if (SECTIONS.default) SECTIONS.default.style.display = 'none'; // Skrij privzeto vsebino
+    if (SECTIONS.search) SECTIONS.search.style.display = 'block'; // Prikaži sekcijo za rezultate
+    
+    if (rezultatiContainer) {
+        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">Iskanje restavracij...</div>`;
+    }
+
+    // Priprava iskalnih parametrov za API
+    const searchParams = {
+        mesto: mesto, // Mesto ali ime restavracije
+        datum: datum,
+        cas: cas,
+        stevilo_oseb: parseInt(stevilo_oseb),
+        kuhinja: kuhinjaKljuc // Samo, če je izbrano s hitrim gumbom
+    };
+
+    try {
+        const url = `${API_BASE_URL}/restavracije/isci`;
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers: getAuthHeaders(),
+            body: JSON.stringify(searchParams)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (data && data.restavracije && data.restavracije.length > 0) {
+                prikaziRezultate(data.restavracije);
+            } else {
+                rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.</div>`;
+            }
+        } else {
+            console.error('Napaka pri API iskanju:', data.msg);
+            rezultatiContainer.innerHTML = `<div class="p-4 text-center text-red-500">Napaka pri pridobivanju podatkov: ${data.msg || 'Neznana napaka'}</div>`;
+        }
+
+    } catch (error) {
+        console.error('Napaka pri povezavi s strežnikom:', error);
+        if (rezultatiContainer) {
+            rezultatiContainer.innerHTML = `<div class="p-4 text-center text-red-500">Napaka pri povezavi s strežnikom. Poskusite znova.</div>`;
+        }
+    }
+}
+
+
+/**
+ * 🔥 MANJKAJOČA FUNKCIJA! Pripravi in prikaže kartice restavracij v vsebniku za iskanje.
+ */
+function prikaziRezultate(restavracije) {
+    const container = document.getElementById(REZULTATI_CONTAINER_ID);
+    if (!container) return; 
+
+    container.innerHTML = ''; // Počisti vsebino
+    
+    let karticeHtml = '';
+
+    restavracije.forEach(restavracija => {
+        // Uporabljamo logiko za ustvarjanje kartice, ki je podobna tisti v naloziPrivzeteRestavracije
+        // Predpostavljamo, da je restavracija objekt z vsemi potrebnimi polji
+        const ime = restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+        const lokacija = restavracija.location || restavracija.naslovPodjetja || 'Neznana lokacija';
+        const ocena = restavracija.rating || restavracija.ocena_povprecje || 'N/A';
+        const stOcen = restavracija.reviewsCount || restavracija.st_ocen || 0;
+        const slikaUrl = restavracija.imageUrl || restavracija.mainImageUrl || 'default-placeholder.jpg';
+
+        karticeHtml += `
+            <div class="kartica" onclick="handleOdpriModalPodrobnosti(event)" data-restavracija-id="${restavracija._id}">
+                <img src="${slikaUrl}" alt="${ime}">
+                <div class="podrobnosti">
+                    <h3>${ime}</h3>
+                    <p>${lokacija}</p>
+                    <div class="ocena">
+                        <span>⭐ ${ocena}</span>
+                        <span>(${stOcen} ${i18next.t('messages.reviews_internal')})</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.insertAdjacentHTML('beforeend', karticeHtml);
+
+    // Po prikazu rezultatov ponovno prevajamo morebitne dinamično vstavljene elemente (čeprav so večinoma statični v tem primeru)
+    updateContent(); 
+}
+
+
+// =================================================================
 // 7. ZAGON IN ISKALNA LOGIKA (IZ 2. DELA)
 // =================================================================
 
@@ -706,8 +814,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gumb.addEventListener('click', (e) => {
             e.preventDefault();
 
-            const dataI18nKey = e.target.getAttribute('data-i18n');
-            const kuhinjaKljuc = dataI18nKey ? dataI18nKey.split('.').pop() : e.target.textContent.trim();
+            // 🔥 POPRAVEK: Uporabimo 'data-kuhinja' kot ključ, če obstaja (kot smo določili prej)
+            const kuhinjaKljuc = e.target.getAttribute('data-kuhinja') || e.target.textContent.trim();
 
             // Preusmerimo na glavno iskalno funkcijo s polji iz iskalnega obrazca
             handleIskanjeRestavracij(e,
@@ -744,13 +852,16 @@ document.addEventListener('DOMContentLoaded', () => {
 }); // Konec DOMContentLoaded
 
 
-// ... (NaloziPrivzeteRestavracije, handleIskanjeRestavracij, prikaziRezultate - brez sprememb)
+// ... (Tukaj mora biti koda za naloziPrivzeteRestavracije in ostale pomožne funkcije)
 
 // =================================================================
 // 8. LOGIKA ISKANJA (IZ DELA 1)
 // =================================================================
 
 // ... (KODA ZA NALOZI PRIVZETE, HANDLE ISKANJE, PRIKAZI REZULTATE, HANDLEPRIPRAVAREZERVACIJE, PREVERIPROSTEU RE, PRIKAZIPROSTEURE - brez sprememb)
+// Opomba: Ker ste v kodi omenili, da sta handleIskanjeRestavracij in prikaziRezultate tukaj brez sprememb, sem ju vstavil v 6.5, kjer sta manjkali, in ju tukaj ne bom ponavljal.
+
+
 // =================================================================
 // 9. LOGIKA REZERVACIJE (IZ DELA 1)
 // =================================================================
