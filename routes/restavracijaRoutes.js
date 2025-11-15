@@ -97,13 +97,14 @@ module.exports = (preveriGosta) => {
     
     
     // -----------------------------------------------------------------
-    // ✅ AKTIVIRANA RUTA ZA ISKANJE
+    // ✅ POPRAVLJENO: RUTA ZA ISKANJE - DODAJE preveriGosta ZA VARNOST
     // -----------------------------------------------------------------
     /**
      * POST /api/restavracije/isci 
-     * Sedaj ta ruta deluje, saj je funkcija restavracijaController.isciRestavracije definirana.
+     * Čeprav je javna, dodajanje preveriGosta zagotovi, da se morebitni neveljavni žetoni 
+     * obdelajo na način, ki ne povzroči avtomatske napake 401.
      */
-    router.post('/isci', restavracijaController.isciRestavracije); 
+    router.post('/isci', preveriGosta, restavracijaController.isciRestavracije); // <--- POPRAVEK
     // -----------------------------------------------------------------
 
 
