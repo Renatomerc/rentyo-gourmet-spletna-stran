@@ -2819,6 +2819,12 @@ function initializeCookieConsent() {
 window.onload = initializeCookieConsent;
 
 // =================================================================
+// 🔥 GLOBALNA KONSTANTA ZA ZANESLJIVO NADOMESTNO SLIKO
+// =================================================================
+const FALLBACK_IMAGE_URL = 'https://placehold.co/300x200?text=Slika+ni+na+voljo';
+
+
+// =================================================================
 // IV. LOGIKA KARTIC RESTAVRACIJ 
 // =================================================================
 
@@ -2830,26 +2836,23 @@ function renderCard(restavracija) {
     
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
     
-    // 🔥 POPRAVEK: Implementacija dinamične slike iz MongoDB polja 'galerija_slik'
-    // Preveri, ali array obstaja in ali ima vsaj en element.
+    // Implementacija dinamične slike
     const urlGlavneSlike = (restavracija.galerija_slik && restavracija.galerija_slik.length > 0)
         ? restavracija.galerija_slik[0] // Uporabi prvo sliko za sličico
-        : 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'; // Nadomestna slika
+        : FALLBACK_IMAGE_URL; // 🔥 POPRAVEK
         
-    // Originalni slikaUrl ni več potreben, ampak ga pustimo za onerror fallback, če slikaUrl ni bil nikoli posodobljen v bazi.
-    const slikaUrl = restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'; 
+    const slikaUrl = restavracija.urlSlike || FALLBACK_IMAGE_URL; // 🔥 POPRAVEK
     
-    // 🔥 Interna ocena (vaš obstoječi sistem zvezdic)
+    // Interna ocena 
     const internaOcena = restavracija.ocena_povprecje || 0;
     const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">(${(internaOcena).toFixed(1)})</span>`;
 
-    // --- NOVO: Googlova ocena ---
+    // Googlova ocena
     const googleRating = restavracija.googleRating || 0;
     const googleReviewCount = restavracija.googleReviewCount || 0;
     
     let googleRatingHTML = '';
     if (googleRating > 0) {
-        // 🔥 POPRAVEK: Pridobimo preveden tekst za "Google mnenj" v JS kot čisti niz
         const translatedReviewsText = i18next.t('messages.google_reviews') || 'Google mnenj';
         
         googleRatingHTML = `
@@ -2859,15 +2862,13 @@ function renderCard(restavracija) {
             </p>
         `;
     }
-    // ----------------------------
     
-    // 🔥 LOGIKA ZA IZRAČUN RAZDALJE
+    // LOGIKA ZA IZRAČUN RAZDALJE
     let oddaljenostKm = '';
     const restavracijaLat = restavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
     const restavracijaLon = restavracija.lokacija?.coordinates?.[0] || DEFAULT_LON;
     
     if (userLocation) {
-         // Izračun razdalje med uporabnikom in restavracijo
         const distance = getDistance(
             userLocation.lat, 
             userLocation.lon, 
@@ -2878,7 +2879,6 @@ function renderCard(restavracija) {
         oddaljenostKm = Math.round(distance).toString(); 
 
     } else {
-        // Če ni lokacije, uporabimo privzeto razdaljo/prazno vrednost
         oddaljenostKm = i18next.t('results.distance_unknown') || '...';
     }
     
@@ -2908,9 +2908,9 @@ function renderCard(restavracija) {
         </div>
     `;
     
-    // 🔥 POPRAVLJEN card.innerHTML: Uporablja se urlGlavneSlike
+    // Kartica HTML
     card.innerHTML = `
-        <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';">
+        <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_URL}';">
         <div class="kartica-vsebina">
             <h3>${restavracijaIme}</h3>
             
@@ -2944,7 +2944,7 @@ function renderFeaturedCard(restavracija) {
     card.addEventListener('click', () => prikaziPodrobnosti(restavracija));
 
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
-    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; // 🔥 POPRAVEK
 
     card.innerHTML = `
         <div class="slika-kartice" style="background-image: url('${slikaUrl}')"></div>
@@ -3020,13 +3020,108 @@ function setupKuhinjaFiltersListeners() {
     });
 }
 
-if(iskalnik) iskalnik.addEventListener('submit', (e) => {
+// =================================================================
+// 5.1 LISTENER ZA GLAVNI ISKALNIK (POPRAVLJEN ZA API KLIC)
+// =================================================================
+if (iskalnik) iskalnik.addEventListener('submit', (e) => {
     e.preventDefault();
-    filterAndRenderRestavracije();
+
+    // Pridobivanje vrednosti iz forme 
+    const mesto = document.getElementById('restavracija_mesto').value || '';
+    const datum = document.getElementById('datum').value || '';
+    const cas = document.getElementById('cas').value || '';
+    const stevilo_oseb = document.getElementById('stevilo_oseb').value || '1'; 
+    
+    // 🔥 KLIC PRAVE FUNKCIJE ZA API ISKANJE
+    if (typeof handleIskanjeRestavracij === 'function') {
+        handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb); 
+    } else {
+        console.error("Napaka: Funkcija handleIskanjeRestavracij ni definirana.");
+    }
 });
 
 
-// 6. Glavna funkcija za nalaganje (PRAVI API KLIC) 
+// =================================================================
+// 6. GLAVNA LOGIKA ISKANJA (KLIC API /isci) - MANJKAJOČI DEL
+// =================================================================
+
+async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhinjaKljuc = '') {
+    
+    const rezultatiContainer = document.getElementById('rezultatiIskanja');
+    const searchSection = document.getElementById('rezultatiIskanjaSekcija');
+    const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
+
+    // 👇 LOGIKA PREKLAPLJANJA SEKCIJ
+    if (defaultSection) defaultSection.classList.add('hidden');    // Skrijemo privzeto
+    if (searchSection) searchSection.classList.remove('hidden'); // Prikažemo rezultate iskanja
+    
+    if (rezultatiContainer) {
+        // Prikaz sporočila, da potrdimo, da se klic izvaja
+        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">Iskanje restavracij...</div>`;
+    }
+
+    const searchParams = {
+        mesto: mesto, 
+        datum: datum,
+        cas: cas,
+        stevilo_oseb: parseInt(stevilo_oseb),
+        kuhinja: kuhinjaKljuc 
+    };
+    
+    // 🔥🔥 DEBUG: PREVERITE TA IZPIS V KONZOLI
+    const url = `${API_BASE_URL}/restavracije/isci`;
+    console.log("🔥 DEBUG: API URL:", url);
+    console.log("🔥 DEBUG: Iskalni parametri:", searchParams);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers: getAuthHeaders(), // Predvidevamo, da je getAuthHeaders() definiran
+            body: JSON.stringify(searchParams)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (data && data.restavracije && data.restavracije.length > 0) {
+                // Če API vrne restavracije, jih prikažemo.
+                prikaziRezultate(data.restavracije); 
+            } else {
+                rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.</div>`;
+            }
+        } else {
+            console.error("API iskanje neuspešno:", data);
+            rezultatiContainer.innerHTML = `<div class="p-4 text-center text-red-600">Napaka strežnika pri iskanju.</div>`;
+        }
+
+    } catch (error) {
+        console.error("Napaka pri klicu iskanja restavracij:", error);
+        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-red-600">Napaka pri komunikaciji s strežnikom.</div>`;
+    }
+}
+
+// =================================================================
+// 6.1 POMOŽNA FUNKCIJA ZA PRIKAZ REZULTATOV ISKANJA
+// =================================================================
+
+function prikaziRezultate(restavracije) {
+    const container = document.getElementById('rezultatiIskanja');
+    if (!container) return; 
+
+    container.innerHTML = '';
+    
+    restavracije.forEach(restavracija => {
+        container.appendChild(renderCard(restavracija)); // Uporabite vašo funkcijo renderCard!
+    });
+    
+    // Prevede naslov sekcije (results.search_title) in vsebino kartic
+    updateContent(); 
+}
+
+
+// =================================================================
+// 7. Glavna funkcija za nalaganje (PRAVI API KLIC) 
+// =================================================================
 async function loadRestavracije() {
     if (!mrezaKarticDiv) return; 
 
