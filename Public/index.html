@@ -3042,7 +3042,7 @@ if (iskalnik) iskalnik.addEventListener('submit', (e) => {
 
 
 // =================================================================
-// 6. GLAVNA LOGIKA ISKANJA (KLIC API /isci) - MANJKAJOČI DEL
+// 6. GLAVNA LOGIKA ISKANJA (KLIC API /isci) - POPRAVEK ODBIRANJA PODATKOV
 // =================================================================
 
 async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhinjaKljuc = '') {
@@ -3082,10 +3082,15 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
 
         const data = await response.json();
 
+        // =======================================================
+        // ⭐ POPRAVEK LOGIKE FRONT-ENDA ⭐
+        // Odgovor je array, ne objekt z lastnostjo .restavracije.
+        // =======================================================
         if (response.ok) {
-            if (data && data.restavracije && data.restavracije.length > 0) {
+            // Preverimo, ali je 'data' array in ima več kot 0 elementov
+            if (Array.isArray(data) && data.length > 0) {
                 // Če API vrne restavracije, jih prikažemo.
-                prikaziRezultate(data.restavracije); 
+                prikaziRezultate(data); // Pošljemo celoten 'data' array funkciji prikaziRezultate
             } else {
                 rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.</div>`;
             }
