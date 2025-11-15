@@ -717,7 +717,10 @@ function prikaziRezultate(restavracije) {
     let karticeHtml = '';
 
     restavracije.forEach(restavracija => {
-        const ime = restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+        // ** POPRAVEK: ZARADI MONGO DB SHEME **
+        // Dodamo 'restavracija.ime' kot primarno polje za ime
+        const ime = restavracija.ime || restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+        // -------------------------------------
         const lokacija = restavracija.location || restavracija.naslovPodjetja || 'Neznana lokacija';
         const ocena = restavracija.rating || restavracija.ocena_povprecje || 'N/A';
         const stOcen = restavracija.reviewsCount || restavracija.st_ocen || 0;
@@ -789,7 +792,10 @@ async function naloziPrivzeteRestavracije() {
             let karticeHtml = '';
             
             data.restavracije.forEach(restavracija => {
-                const ime = restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+                // ** POPRAVEK: ZARADI MONGO DB SHEME **
+                // Dodamo 'restavracija.ime' kot primarno polje za ime
+                const ime = restavracija.ime || restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+                // -------------------------------------
                 const lokacija = restavracija.location || restavracija.naslovPodjetja || 'Neznana lokacija';
                 const ocena = restavracija.rating || restavracija.ocena_povprecje || 'N/A';
                 const stOcen = restavracija.reviewsCount || restavracija.st_ocen || 0;

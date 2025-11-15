@@ -27,7 +27,7 @@ const statusIzpostavljenoKarticeDiv = document.getElementById('statusIzpostavlje
 // Elementi vsebine modala
 const restavracijaModal = document.getElementById('restavracijaModal');
 const zapriRestavracijaModal = document.getElementById('zapriRestavracijaModal');
-const modalSlika = document.getElementById('modalSlika');
+const modalSlika = document.getElementById('modalSlika'); // To je verjetno div/element z background-image
 const modalIme = document.getElementById('modalIme');
 const modalKuhinja = document.getElementById('modalKuhinja');
 const modalLokacija = document.getElementById('modalLokacija');
@@ -119,10 +119,19 @@ function prikaziPodrobnosti(restavracija) {
     // 1. Mapiranje podatkov iz API strukture:
     const id = restavracija._id;
     
-    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena za MODAL
+    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime.
     const ime = restavracija.ime || restavracija.name || 'Neznano Ime'; 
-    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje slike za MODAL
-    const slika = restavracija.urlSlike || restavracija.mainImageUrl || 'placeholder.jpg'; 
+    
+    // 🔥 POPRAVLJENO: Robustna logika za pridobitev URL slike iz galerije za MODAL
+    let slikaUrlZaModal = 'placeholder.jpg';
+    if (restavracija.galerija_slik && restavracija.galerija_slik.length > 0) {
+        slikaUrlZaModal = restavracija.galerija_slik[0]; // Vzemi prvo sliko iz galerije
+    } else if (restavracija.urlSlike) {
+         slikaUrlZaModal = restavracija.urlSlike;
+    } else if (restavracija.mainImageUrl) {
+         slikaUrlZaModal = restavracija.mainImageUrl;
+    }
+    // -------------------------------------------------------------
     
     const kuhinja = restavracija.cuisine && restavracija.cuisine.length > 0 ? restavracija.cuisine[0] : 'Razno';
     const lokacija = restavracija.location && restavracija.location.city ? restavracija.location.city : 'Neznana lokacija';
@@ -131,7 +140,7 @@ function prikaziPodrobnosti(restavracija) {
     const opis = restavracija.description && restavracija.description.sl ? restavracija.description.sl : 'Opis ni na voljo.';
     // Predpostavimo, da je ponudba pod specialOffer.sl
     const aktualna_ponudba = restavracija.specialOffer && restavracija.specialOffer.sl ? restavracija.specialOffer.sl : null;
-    // Predpostavimo, da so slike galerije pod galleryImageUrls (array)
+    // Predpostavimo, da so slike galerije pod galerija_slik (array)
     const galerija = restavracija.galerija_slik || [];
     // Predpostavimo, da so koordinate pod location.coordinates (string 'lat,lng' ali podobno)
     const gps_lokacija = restavracija.location && restavracija.location.coordinates ? restavracija.location.coordinates : null;
@@ -146,7 +155,9 @@ function prikaziPodrobnosti(restavracija) {
     if (reservIdField) reservIdField.value = id;
 
     // 2. Polnjenje Glavnih podrobnosti
-    modalSlika.style.backgroundImage = `url(${slika})`;
+    // 🔥 POPRAVLJENO: Nastavitev Slike za Modal
+    modalSlika.style.backgroundImage = `url(${slikaUrlZaModal})`;
+    // ----------------------------------------
     modalIme.textContent = ime;
     modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
     modalLokacija.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${lokacija}`;
@@ -192,7 +203,8 @@ function prikaziPodrobnosti(restavracija) {
     // 6. Vdelan Zemljevid (Google Maps Embed API)
     if (gps_lokacija) {
         // Predpostavljamo format 'latitude, longitude' (npr. '46.056946, 14.505751')
-        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(ime + ', ' + lokacija)}&hl=sl&z=14&t=m&output=embed`;
+        // POZOR: Poti so lahko problematične! (https://maps.google.com/maps?q=$) je sumljiva pot. Uporabimo standardno embed pot:
+        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(gps_lokacija)}&hl=sl&z=14&t=m&output=embed`;
         modalZemljevid.src = mapUrl;
     } else {
         modalZemljevid.src = 'about:blank';
@@ -234,9 +246,17 @@ function renderCard(restavracija) {
     card.className = 'kartica restavracija-kartica';
     card.setAttribute('data-id', restavracija._id);
 
-    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena in URL slike za kartico
+    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime na kartici
     const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
-    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    // ----------------------------------------------------------------------
+    
+    // Logika za sliko na kartici je že robustna, če se je kartica prej prikazala
+    let slikaUrl;
+    if (restavracija.galerija_slik && restavracija.galerija_slik.length > 0) {
+        slikaUrl = restavracija.galerija_slik[0];
+    } else {
+        slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    }
     
     const ocena_povprecje = restavracija.ocena_povprecje || 0;
     const ratingDisplay = `${generateStarsHTML(ocena_povprecje)} <span class="ocena-stevilka">(${ocena_povprecje.toFixed(1)})</span>`;
@@ -297,9 +317,17 @@ function renderFeaturedCard(restavracija) {
     card.className = 'kartica kartica-izpostavljeno';
     card.setAttribute('data-id', restavracija._id);
 
-    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena in URL slike za IZPOSTAVLJENO kartico
+    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime na izpostavljeni kartici
     const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
-    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    // -----------------------------------------------------------------------------
+    
+    // Logika za sliko na izpostavljeni kartici
+    let slikaUrl;
+    if (restavracija.galerija_slik && restavracija.galerija_slik.length > 0) {
+        slikaUrl = restavracija.galerija_slik[0];
+    } else {
+        slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    }
     
     // Listener za celotno kartico
     card.addEventListener('click', () => poglejDetajle(restavracija._id));
@@ -418,7 +446,8 @@ async function naloziInPrikaziRestavracije() {
             throw new Error(`API Napaka ${response.status}: ${errorText}`);
         }
 
-        const restavracije = await response.json();
+        // 🔥 POPRAVLJENO: API vrne Array restavracij v formatu JSON, kar je pričakovano.
+        const restavracije = await response.json(); 
 
         // 🔥 KLJUČNO: Shranimo podatke v globalno spremenljivko
         allRestavracije = restavracije;
