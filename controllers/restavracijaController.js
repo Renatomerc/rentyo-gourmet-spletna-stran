@@ -843,13 +843,12 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
 };
 
 // =================================================================
-// 💥 6. FUNKCIJA ZA ISKANJE (IMPLEMENTIRANO)
+// 💥 6. FUNKCIJA ZA ISKANJE (Popravljena implementacija)
 // =================================================================
 
 /**
  * 🚀 FUNKCIJA ISKANJA (POST /isci)
  * Iskanje restavracij na podlagi mesta, števila oseb in kuhinje.
- * POZOR: Iskanje po času in datumu je kompleksno (vključuje preverjanje razpoložljivosti miz) in je tukaj zaenkrat izpuščeno.
  */
 exports.isciRestavracije = async (req, res) => {
     // Vsi iskalni parametri so v req.body
@@ -859,30 +858,44 @@ exports.isciRestavracije = async (req, res) => {
     // Zgradimo objekt pogojev za MongoDB
     const iskalniPogoji = {};
     
-    // 1. Iskanje po mestu/imenu restavracije (Uporabimo $or za iskanje po več poljih)
+    // 1. Iskanje po mestu/imenu restavracije (GLAVNI POPRAVEK JE TUKAJ)
     if (mesto && mesto.trim() !== '') {
         // Uporabimo Regular Expression za iskanje, ki ni občutljivo na velike/male črke (case-insensitive 'i')
-        const regexMesto = new RegExp(mesto.trim(), 'i');
-        // Iskanje po poljih 'ime' in 'naslov' (če je mesto vključeno v naslov)
+        const regexImeMesto = new RegExp(mesto.trim(), 'i');
+        
+        // 🔥🔥🔥 POPRAVEK: Uporabimo $or za iskanje imena restavracije in/ali imena mesta
         iskalniPogoji.$or = [
-            { ime: regexMesto }, 
-            { 'lokacija.naslov': regexMesto }
+            // Ime restavracije (polje 'ime' v shemi)
+            { ime: { $regex: regexImeMesto } },
+            // Mesto/Kraj (polje 'lokacija.mesto' v shemi, če obstaja)
+            { 'lokacija.mesto': { $regex: regexImeMesto } }
+            // Lahko dodate tudi: { 'lokacija.naslov': { $regex: regexImeMesto } }
         ];
     }
     
     // 2. Iskanje po kuhinji (Cuisine)
     if (kuhinja && kuhinja.trim() !== '') {
         // Iskanje natančne kuhinje znotraj arraya 'cuisine'
-        iskalniPogoji.cuisine = kuhinja.trim();
+        // Predpostavka: cuisine je array stringov.
+        iskalniPogoji.cuisine = { $in: [kuhinja.trim()] };
     }
     
-    // 🔥🔥 OPOZORILO: Število oseb, datum in čas zahtevajo kompleksno logiko rezervacij, 
-    // ki je enaka preverjanju prostih ur, zato zaenkrat ta iskanja izpustimo, da se fokusiramo na delovanje.
+    // 3. Iskanje po minimalnem številu oseb (Ni del glavne težave, ampak je dobro imeti)
+    const stOseb = parseInt(stevilo_oseb);
+    if (!isNaN(stOseb) && stOseb > 0) {
+         // Zaenkrat iščemo samo restavracije, ki imajo katero koli mizo s takšno kapaciteto.
+         // POZOR: To ne preverja, ali je miza prosta. To bomo dodali kasneje.
+         iskalniPogoji['mize.kapaciteta'] = { $gte: stOseb };
+    }
+
 
     try {
-        // Izvedba poizvedbe z uporabo najdenih pogojev
+        
+        console.log("🔥 MongoDB Iskalni Pogoji:", JSON.stringify(iskalniPogoji));
+
+        // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
-            // Uporabimo isto agregacijsko projekcijo kot pri /privzeto, da frontend dobi ustrezne podatke za kartice
+            // Uporabimo select za optimizacijo in ustrezne podatke za frontend kartice
             .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
             .limit(50); // Omejimo število rezultatov
         
@@ -896,7 +909,7 @@ exports.isciRestavracije = async (req, res) => {
         res.status(200).json(rezultati);
         
     } catch (error) {
-        console.error("Napaka pri iskanju restavracij:", error);
+        console.error("❌ Napaka pri iskanju restavracij:", error);
         res.status(500).json({ msg: "Napaka strežnika pri iskanju.", error: error.message });
     }
 };
