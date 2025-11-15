@@ -3,6 +3,7 @@
 // ===============================================
 
 // Definirajte bazni URL za vaš API
+// API_BASE_URL: https://rentyo-gourmet-spletna-stran.onrender.com/api/restavracije
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/restavracije';
 
 // ===============================================
@@ -39,6 +40,14 @@ const modalMeni = document.getElementById('modalMeni');
 const galerijaSlikeDiv = document.getElementById('galerijaSlike');
 const modalZemljevid = document.getElementById('modalZemljevid');
 const modalAktualnaPonudbaOpis = document.getElementById('modalAktualnaPonudbaOpis');
+
+// Elementi za Formular Iskanja (Predpostavimo, da obstaja FORM z ID="search-form")
+const searchForm = document.getElementById('search-form');
+const mestoInput = document.getElementById('mesto');
+const datumInput = document.getElementById('datum');
+const casInput = document.getElementById('cas');
+const steviloOsebInput = document.getElementById('stevilo_oseb');
+const kuhinjaInput = document.getElementById('kuhinja');
 
 
 // ===============================================
@@ -369,7 +378,7 @@ function handleFilterClick(e) {
 // ===============================================
 
 async function naloziInPrikaziRestavracije() {
-    console.log("Začenjam nalaganje restavracij iz API-ja...");
+    console.log("Začenjam nalaganje restavracij iz API-ja (/privzeto)...");
 
     if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
     if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
@@ -394,7 +403,7 @@ async function naloziInPrikaziRestavracije() {
                 errorText = response.statusText;
             }
             // 🚨 Izpišemo napako v konzolo za pomoč pri razhroščevanju
-            console.error(`Napaka API klice: Status ${response.status}`, errorText);
+            console.error(`Napaka API klice /privzeto: Status ${response.status}`, errorText);
             throw new Error(`API Napaka ${response.status}: ${errorText}`);
         }
 
@@ -425,7 +434,7 @@ async function naloziInPrikaziRestavracije() {
         if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
 
     } catch (error) {
-        console.error("Kritična napaka pri Fetch klicu:", error);
+        console.error("Kritična napaka pri Fetch klicu /privzeto:", error);
         const errorMessage = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri nalaganju restavracij. Preverite konzolo za podrobnosti.';
 
         // Prikažemo specifično sporočilo na spletni strani
@@ -436,9 +445,67 @@ async function naloziInPrikaziRestavracije() {
     }
 }
 
+// ===============================================
+// V. FUNKCIJA ZA ISKANJE (DOPOLNJENO)
+// ===============================================
+
+async function obdelajIskanje(searchData) {
+    console.log("Začenjam iskanje restavracij z API-jem (/isci)...");
+
+    if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: searchData.mesto || '' }) : `Iščem ${searchData.mesto}...`;
+    if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '<p class="text-center w-full col-span-full">Iščem restavracije...</p>';
+    // Skrijemo featured sekcijo med iskanjem
+    if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.innerHTML = ''; 
+
+    try {
+        // 🔥 KRITIČNA TOČKA: Uporabljamo API_BASE_URL (ki vsebuje '/restavracije') + '/isci'
+        const response = await fetch(`${API_BASE_URL}/isci`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(searchData)
+        });
+
+        if (!response.ok) {
+            let errorText;
+            try {
+                const errorData = await response.json();
+                errorText = errorData.msg || errorData.message || JSON.stringify(errorData);
+            } catch {
+                errorText = response.statusText;
+            }
+            console.error(`Napaka API klice /isci: Status ${response.status}`, errorText);
+            throw new Error(`API Napaka ${response.status}: ${errorText}`);
+        }
+
+        const rezultati = await response.json();
+
+        // 🔥 KLJUČNO: Posodobimo globalno spremenljivko z rezultati iskanja
+        allRestavracije = rezultati;
+        currentFilterKuhinja = ''; // Resetiramo filter, da se prikažejo vsi rezultati iskanja
+
+        console.log("Uspešno iskanje. Najdeno restavracij:", allRestavracije.length);
+
+        // Prikaz rezultatov
+        filterAndRenderRestavracije(); // Uporabimo isto funkcijo za render
+        
+        // Prikaz statusa iskanja
+        if (allRestavracije.length === 0) {
+             if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.';
+        } else {
+            if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.search_results_found', { count: allRestavracije.length }) : `Najdeno ${allRestavracije.length} restavracij.`;
+        }
+
+
+    } catch (error) {
+        console.error("Kritična napaka pri Fetch klicu /isci:", error);
+        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center; width: 100%; padding: 20px;">NAPAKA PRI ISKANJU: ${error.message}</p>`;
+        if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri iskanju restavracij.';
+    }
+}
+
 
 // ===============================================
-// V. LOGIKA MODALNEGA OPOZORILA
+// VI. LOGIKA MODALNEGA OPOZORILA
 // ===============================================
 
 function preveriInPrikaziOpozorilo() {
@@ -463,11 +530,30 @@ function preveriInPrikaziOpozorilo() {
 }
 
 // ===============================================
-// VI. ZAGON APLIKACIJE
+// VII. ZAGON APLIKACIJE IN LISTENERJI
 // ===============================================
 
 // Zaženemo nalaganje in preverjanje Modala, ko je stran naložena
 document.addEventListener('DOMContentLoaded', () => {
     naloziInPrikaziRestavracije();
     preveriInPrikaziOpozorilo();
+    
+    // 🔥 Listener za Formular Iskanja (Če Formular Obstaja)
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prepreči standardno osvežitev strani
+            
+            // Zberemo podatke iz formularja
+            const searchData = {
+                mesto: mestoInput ? mestoInput.value.trim() : '',
+                datum: datumInput ? datumInput.value.trim() : '',
+                cas: casInput ? casInput.value.trim() : '',
+                stevilo_oseb: steviloOsebInput ? parseInt(steviloOsebInput.value) : 1, // Vedno pošljemo številko
+                kuhinja: kuhinjaInput ? kuhinjaInput.value.trim() : ''
+            };
+            
+            // Izvedemo funkcijo iskanja
+            obdelajIskanje(searchData);
+        });
+    }
 });
