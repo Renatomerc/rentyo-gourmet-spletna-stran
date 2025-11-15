@@ -118,9 +118,12 @@ window.addEventListener('click', (e) => {
 function prikaziPodrobnosti(restavracija) {
     // 1. Mapiranje podatkov iz API strukture:
     const id = restavracija._id;
-    const ime = restavracija.ime || 'Neznano Ime';
-    // 🔥 POPRAVEK: Uporabimo urlSlike iz API odgovora za glavno sliko
-    const slika = restavracija.urlSlike || 'placeholder.jpg'; 
+    
+    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena za MODAL
+    const ime = restavracija.ime || restavracija.name || 'Neznano Ime'; 
+    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje slike za MODAL
+    const slika = restavracija.urlSlike || restavracija.mainImageUrl || 'placeholder.jpg'; 
+    
     const kuhinja = restavracija.cuisine && restavracija.cuisine.length > 0 ? restavracija.cuisine[0] : 'Razno';
     const lokacija = restavracija.location && restavracija.location.city ? restavracija.location.city : 'Neznana lokacija';
     const ocena_povprecje = restavracija.ocena_povprecje || 0;
@@ -231,6 +234,10 @@ function renderCard(restavracija) {
     card.className = 'kartica restavracija-kartica';
     card.setAttribute('data-id', restavracija._id);
 
+    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena in URL slike za kartico
+    const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
+    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    
     const ocena_povprecje = restavracija.ocena_povprecje || 0;
     const ratingDisplay = `${generateStarsHTML(ocena_povprecje)} <span class="ocena-stevilka">(${ocena_povprecje.toFixed(1)})</span>`;
 
@@ -261,9 +268,9 @@ function renderCard(restavracija) {
     `;
 
     card.innerHTML = `
-        <img src="${restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'}" alt="${restavracija.ime}" class="kartica-slika">
+        <img src="${slikaUrl}" alt="${imeRestavracije}" class="kartica-slika">
         <div class="kartica-vsebina">
-            <h3>${restavracija.ime}</h3>
+            <h3>${imeRestavracije}</h3>
             <div class="info-ocena-oddaljenost">
                 <p class="ocena">${ratingDisplay}</p>
                 <span class="oddaljenost"><i class="fas fa-location-arrow"></i> ${oddaljenostKm} km</span>
@@ -290,13 +297,17 @@ function renderFeaturedCard(restavracija) {
     card.className = 'kartica kartica-izpostavljeno';
     card.setAttribute('data-id', restavracija._id);
 
+    // 🔥 KRITIČNI POPRAVEK: Robustno preverjanje imena in URL slike za IZPOSTAVLJENO kartico
+    const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
+    const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    
     // Listener za celotno kartico
     card.addEventListener('click', () => poglejDetajle(restavracija._id));
 
     card.innerHTML = `
-        <div class="slika-kartice" style="background-image: url('${restavracija.urlSlike || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo'}')"></div>
+        <div class="slika-kartice" style="background-image: url('${slikaUrl}')"></div>
         <div class="vsebina-kartice-izpostavljeno">
-            <h3>${restavracija.ime}</h3>
+            <h3>${imeRestavracije}</h3>
         </div>
     `;
 
