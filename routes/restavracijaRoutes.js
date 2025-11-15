@@ -26,6 +26,17 @@ module.exports = (preveriGosta) => {
 
 
     // -----------------------------------------------------------------
+    // 🔥🔥 NOVO: RUTA ZA GLAVNO ISKANJE (POST /isci) 🔥🔥
+    // -----------------------------------------------------------------
+    /**
+     * POST /api/restavracije/isci 
+     * RUTA, ki jo kliče glavni iskalnik na frontend-u.
+     * Logika iskanja naj bo v funkciji restavracijaController.isciRestavracije.
+     */
+    router.post('/isci', restavracijaController.isciRestavracije); 
+    
+    
+    // -----------------------------------------------------------------
     // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI:
     // -----------------------------------------------------------------
     
