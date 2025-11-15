@@ -843,25 +843,56 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
 };
 
 // =================================================================
-// 🔥 MANJKAJOČA FUNKCIJA ZA ISKANJE (Začasni STUB, ki reši napako)
+// 💥 6. FUNKCIJA ZA ISKANJE (IMPLEMENTIRANO)
 // =================================================================
 
 /**
- * 🚧 Začasna funkcija iskanja (POST /isci) 
- * POZOR: Če ruto za iskanje v routes.js AKTIVIRATE, mora ta funkcija obstajati!
+ * 🚀 FUNKCIJA ISKANJA (POST /isci)
+ * Iskanje restavracij na podlagi mesta, števila oseb in kuhinje.
+ * POZOR: Iskanje po času in datumu je kompleksno (vključuje preverjanje razpoložljivosti miz) in je tukaj zaenkrat izpuščeno.
  */
 exports.isciRestavracije = async (req, res) => {
     // Vsi iskalni parametri so v req.body
-    const iskalniParametri = req.body; 
-    console.log("===> API klic za /isci prejet. Iskalni parametri:", iskalniParametri);
+    const { mesto, datum, cas, stevilo_oseb, kuhinja } = req.body; 
+    console.log("===> API klic za /isci prejet. Iskalni parametri:", req.body);
     
-    // 🔥 POZOR: TUKAJ MORATE DODATI LOGIKO ZA ISKANJE V MONGO DB!
-    // Za zdaj vrnemo prazen array, kar reši zrušitev strežnika.
+    // Zgradimo objekt pogojev za MongoDB
+    const iskalniPogoji = {};
+    
+    // 1. Iskanje po mestu/imenu restavracije (Uporabimo $or za iskanje po več poljih)
+    if (mesto && mesto.trim() !== '') {
+        // Uporabimo Regular Expression za iskanje, ki ni občutljivo na velike/male črke (case-insensitive 'i')
+        const regexMesto = new RegExp(mesto.trim(), 'i');
+        // Iskanje po poljih 'ime' in 'naslov' (če je mesto vključeno v naslov)
+        iskalniPogoji.$or = [
+            { ime: regexMesto }, 
+            { 'lokacija.naslov': regexMesto }
+        ];
+    }
+    
+    // 2. Iskanje po kuhinji (Cuisine)
+    if (kuhinja && kuhinja.trim() !== '') {
+        // Iskanje natančne kuhinje znotraj arraya 'cuisine'
+        iskalniPogoji.cuisine = kuhinja.trim();
+    }
+    
+    // 🔥🔥 OPOZORILO: Število oseb, datum in čas zahtevajo kompleksno logiko rezervacij, 
+    // ki je enaka preverjanju prostih ur, zato zaenkrat ta iskanja izpustimo, da se fokusiramo na delovanje.
 
     try {
-        // Klic na bazo z ustrezno filtracijo (npr. Restavracija.find({ ime: new RegExp(iskalniParametri.ime, 'i') }))
-        const rezultati = []; // Začasno prazen array
+        // Izvedba poizvedbe z uporabo najdenih pogojev
+        const rezultati = await Restavracija.find(iskalniPogoji)
+            // Uporabimo isto agregacijsko projekcijo kot pri /privzeto, da frontend dobi ustrezne podatke za kartice
+            .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
+            .limit(50); // Omejimo število rezultatov
         
+        if (rezultati.length === 0) {
+            return res.status(200).json({ 
+                msg: "Iskanje ni prineslo rezultatov.",
+                rezultati: []
+            });
+        }
+
         res.status(200).json(rezultati);
         
     } catch (error) {
