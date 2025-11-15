@@ -869,7 +869,6 @@ exports.isciRestavracije = async (req, res) => {
             { 'lokacija.mesto': { $regex: mestoTrim, $options: 'i' } },
             // Naslov
             { 'lokacija.naslov': { $regex: mestoTrim, $options: 'i' } }
-            // Lahko dodate: { email: { $regex: mestoTrim, $options: 'i' } }
         ];
     }
     
@@ -890,11 +889,25 @@ exports.isciRestavracije = async (req, res) => {
             .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
             .limit(50);
         
-        if (rezultati.length === 0) {
-            return res.status(200).json([]); 
+        // ====================================================================
+        // ⭐ KLJUČNO: ZAGOTOVITEV, DA JE ODGOVOR VEDNO ARRAY ZA FRONT-END
+        // ====================================================================
+        let restavracijeZaOdgovor = [];
+
+        if (Array.isArray(rezultati)) {
+            restavracijeZaOdgovor = rezultati;
+        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultati).length > 0) {
+            // Če je rezultat en sam objekt in ne array (kar se je dogajalo)
+            restavracijeZaOdgovor = [rezultati];
+        } else {
+            // Ni najdenih rezultatov
+            restavracijeZaOdgovor = [];
         }
 
-        res.status(200).json(rezultati);
+        console.log(`✅ Iskanje uspešno: Najdenih restavracij za vrnitev: ${restavracijeZaOdgovor.length}`);
+
+        // Odgovor v Front-end je VEDNO array (seštevka restavracij ali prazen array)
+        return res.status(200).json(restavracijeZaOdgovor);
         
     } catch (error) {
         console.error("❌ Napaka pri iskanju restavracij:", error);
