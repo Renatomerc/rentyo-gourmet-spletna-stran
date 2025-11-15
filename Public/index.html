@@ -3230,7 +3230,9 @@ function prikaziPodrobnosti(restavracija) {
     const reservIdInput = document.querySelector('[data-reserv-id]');
     if (reservIdInput) reservIdInput.value = currentRestaurantId; 
 
-    const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
+    // ⭐ POPRAVEK: Spremenjeno iz restavracija.imeRestavracije v restavracija.ime 
+    const restavracijaIme = restavracija.ime || 'Neznano Ime';
+    
     const kuhinja = restavracija.deviznaKuhinja || 'Neznano';
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
     const opis = restavracija.opis || restavracija.glavniOpis || ''; 
