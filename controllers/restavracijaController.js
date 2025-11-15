@@ -886,7 +886,8 @@ exports.isciRestavracije = async (req, res) => {
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
-            .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
+            // 🔥 POPRAVLJENO: Dodana polja 'name' in 'title', da se zagotovi prenos imena v Front-end.
+            .select('ime name title mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
             .limit(50);
         
         // ====================================================================

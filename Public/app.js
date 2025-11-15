@@ -119,8 +119,8 @@ function prikaziPodrobnosti(restavracija) {
     // 1. Mapiranje podatkov iz API strukture:
     const id = restavracija._id;
     
-    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime.
-    const ime = restavracija.ime || restavracija.name || 'Neznano Ime'; 
+    // 🔥 POPRAVEK ZA IME (Najbolj robustna verzija)
+    const ime = restavracija.ime || restavracija.name || restavracija.title || 'Neznano Ime'; 
     
     // 🔥 POPRAVLJENO: Robustna logika za pridobitev URL slike iz galerije za MODAL
     let slikaUrlZaModal = 'placeholder.jpg';
@@ -134,7 +134,8 @@ function prikaziPodrobnosti(restavracija) {
     // -------------------------------------------------------------
     
     const kuhinja = restavracija.cuisine && restavracija.cuisine.length > 0 ? restavracija.cuisine[0] : 'Razno';
-    const lokacija = restavracija.location && restavracija.location.city ? restavracija.location.city : 'Neznana lokacija';
+    // Prilagodite branje lokacije, da je robustnejše:
+    const lokacija = (restavracija.lokacija && restavracija.lokacija.mesto) || (restavracija.location && restavracija.location.city) || 'Neznana lokacija';
     const ocena_povprecje = restavracija.ocena_povprecje || 0;
     // Predpostavimo, da je slovenski opis pod description.sl
     const opis = restavracija.description && restavracija.description.sl ? restavracija.description.sl : 'Opis ni na voljo.';
@@ -142,8 +143,10 @@ function prikaziPodrobnosti(restavracija) {
     const aktualna_ponudba = restavracija.specialOffer && restavracija.specialOffer.sl ? restavracija.specialOffer.sl : null;
     // Predpostavimo, da so slike galerije pod galerija_slik (array)
     const galerija = restavracija.galerija_slik || [];
-    // Predpostavimo, da so koordinate pod location.coordinates (string 'lat,lng' ali podobno)
-    const gps_lokacija = restavracija.location && restavracija.location.coordinates ? restavracija.location.coordinates : null;
+    
+    // 🔥 POPRAVEK: Prilagoditev branja koordinat, da je robustnejše
+    const gps_lokacija = (restavracija.lokacija && restavracija.lokacija.coordinates) || (restavracija.location && restavracija.location.coordinates) || null;
+    
     // Predpostavimo, da je meni pod menuItems (array)
     const meni = restavracija.menuItems || [];
 
@@ -202,9 +205,9 @@ function prikaziPodrobnosti(restavracija) {
 
     // 6. Vdelan Zemljevid (Google Maps Embed API)
     if (gps_lokacija) {
-        // Predpostavljamo format 'latitude, longitude' (npr. '46.056946, 14.505751')
-        // POZOR: Poti so lahko problematične! (https://maps.google.com/maps?q=$) je sumljiva pot. Uporabimo standardno embed pot:
-        const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(gps_lokacija)}&hl=sl&z=14&t=m&output=embed`;
+        // 🔥 KRITIČNI POPRAVEK: Popravljena pot za Google Maps Embed API in URL Encoding.
+        // Odstranjen sumljiv del 'https://maps.google.com/maps?q=$'
+        const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(gps_lokacija)}&key=YOUR_GOOGLE_MAPS_API_KEY&zoom=14`;
         modalZemljevid.src = mapUrl;
     } else {
         modalZemljevid.src = 'about:blank';
@@ -246,8 +249,8 @@ function renderCard(restavracija) {
     card.className = 'kartica restavracija-kartica';
     card.setAttribute('data-id', restavracija._id);
 
-    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime na kartici
-    const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
+    // 🔥 POPRAVEK ZA IME (Najbolj robustna verzija)
+    const imeRestavracije = restavracija.ime || restavracija.name || restavracija.title || 'Neznano Ime';
     // ----------------------------------------------------------------------
     
     // Logika za sliko na kartici je že robustna, če se je kartica prej prikazala
@@ -317,8 +320,8 @@ function renderFeaturedCard(restavracija) {
     card.className = 'kartica kartica-izpostavljeno';
     card.setAttribute('data-id', restavracija._id);
 
-    // 🔥 POPRAVLJENO: Uporabite 'ime' iz MongoDB sheme za ime na izpostavljeni kartici
-    const imeRestavracije = restavracija.ime || restavracija.name || 'Neznano Ime';
+    // 🔥 POPRAVEK ZA IME (Najbolj robustna verzija)
+    const imeRestavracije = restavracija.ime || restavracija.name || restavracija.title || 'Neznano Ime';
     // -----------------------------------------------------------------------------
     
     // Logika za sliko na izpostavljeni kartici
