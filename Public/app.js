@@ -446,7 +446,7 @@ async function naloziInPrikaziRestavracije() {
 }
 
 // ===============================================
-// V. FUNKCIJA ZA ISKANJE (DOPOLNJENO)
+// V. FUNKCIJA ZA ISKANJE (POPRAVLJENO RAVNANJE Z REZULTATI)
 // ===============================================
 
 async function obdelajIskanje(searchData) {
@@ -477,7 +477,19 @@ async function obdelajIskanje(searchData) {
             throw new Error(`API Napaka ${response.status}: ${errorText}`);
         }
 
-        const rezultati = await response.json();
+        // 🔥 POPRAVEK: Preverimo, ali je odgovor Array ali posamezen objekt
+        const rawResult = await response.json();
+        
+        let rezultati;
+        if (Array.isArray(rawResult)) {
+            rezultati = rawResult; // Če je že Array, ga uporabimo
+        } else if (rawResult && typeof rawResult === 'object') {
+            // Če je en sam objekt (kar se je zgodilo pri iskanju 'Lipa'), ga ovijemo v Array
+            rezultati = [rawResult];
+        } else {
+            // Če ni niti Array niti objekt, je to prazen rezultat
+            rezultati = [];
+        }
 
         // 🔥 KLJUČNO: Posodobimo globalno spremenljivko z rezultati iskanja
         allRestavracije = rezultati;
