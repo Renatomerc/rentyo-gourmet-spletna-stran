@@ -843,7 +843,7 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
 };
 
 // =================================================================
-// 💥 6. FUNKCIJA ZA ISKANJE (Popravljena implementacija)
+// 💥 6. FUNKCIJA ZA ISKANJE (Končno popravljena implementacija z uporabo $options)
 // =================================================================
 
 /**
@@ -857,47 +857,45 @@ exports.isciRestavracije = async (req, res) => {
     
     // Zgradimo objekt pogojev za MongoDB
     const iskalniPogoji = {};
-    
-    // 1. Iskanje po mestu/imenu restavracije (GLAVNI POPRAVEK JE TUKAJ)
-    if (mesto && mesto.trim() !== '') {
-        // Uporabimo Regular Expression za iskanje, ki ni občutljivo na velike/male črke (case-insensitive 'i')
-        const regexImeMesto = new RegExp(mesto.trim(), 'i');
+    const mestoTrim = mesto ? mesto.trim() : '';
+
+    // 1. Iskanje po mestu/imenu restavracije (GLAVNI POPRAVEK JE TUKAJ!)
+    if (mestoTrim !== '') {
         
-        // 🔥🔥🔥 POPRAVEK: Uporabimo $or za iskanje imena restavracije in/ali imena mesta
+        // 🔥🔥🔥 POPRAVEK: Uporabimo STRING namesto RegExp objekta.
+        // To zagotavlja, da MongoDB dobi pravilen vzorec. '$options: "i"' pomeni 'case-insensitive'.
         iskalniPogoji.$or = [
-            // Ime restavracije (polje 'ime' v shemi)
-            { ime: { $regex: regexImeMesto } },
-            // Mesto/Kraj (polje 'lokacija.mesto' v shemi, če obstaja)
-            { 'lokacija.mesto': { $regex: regexImeMesto } }
-            // Lahko dodate tudi: { 'lokacija.naslov': { $regex: regexImeMesto } }
+            // Ime restavracije
+            { ime: { $regex: mestoTrim, $options: 'i' } },
+            // Mesto/Kraj
+            { 'lokacija.mesto': { $regex: mestoTrim, $options: 'i' } },
+            // Dodajmo še iskanje po naslovu
+            { 'lokacija.naslov': { $regex: mestoTrim, $options: 'i' } }
         ];
     }
     
     // 2. Iskanje po kuhinji (Cuisine)
-    if (kuhinja && kuhinja.trim() !== '') {
+    const kuhinjaTrim = kuhinja ? kuhinja.trim() : '';
+    if (kuhinjaTrim !== '') {
         // Iskanje natančne kuhinje znotraj arraya 'cuisine'
-        // Predpostavka: cuisine je array stringov.
-        iskalniPogoji.cuisine = { $in: [kuhinja.trim()] };
+        iskalniPogoji.cuisine = { $in: [kuhinjaTrim] };
     }
     
-    // 3. Iskanje po minimalnem številu oseb (Ni del glavne težave, ampak je dobro imeti)
+    // 3. Iskanje po minimalnem številu oseb
     const stOseb = parseInt(stevilo_oseb);
     if (!isNaN(stOseb) && stOseb > 0) {
-         // Zaenkrat iščemo samo restavracije, ki imajo katero koli mizo s takšno kapaciteto.
-         // POZOR: To ne preverja, ali je miza prosta. To bomo dodali kasneje.
          iskalniPogoji['mize.kapaciteta'] = { $gte: stOseb };
     }
 
 
     try {
         
-        console.log("🔥 MongoDB Iskalni Pogoji:", JSON.stringify(iskalniPogoji));
+        console.log("🔥 MongoDB Iskalni Pogoji (PO POPRAVKU):", JSON.stringify(iskalniPogoji));
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
-            // Uporabimo select za optimizacijo in ustrezne podatke za frontend kartice
             .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
-            .limit(50); // Omejimo število rezultatov
+            .limit(50);
         
         if (rezultati.length === 0) {
             return res.status(200).json({ 
