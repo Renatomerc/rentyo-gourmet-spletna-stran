@@ -843,12 +843,12 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
 };
 
 // =================================================================
-// 💥 6. FUNKCIJA ZA ISKANJE (ZAČASNI TEST NATANČNEGA UJEMANJA)
+// 💥 6. FUNKCIJA ZA ISKANJE (KONČNA REŠITEV - Vrnjeno na REGEX in $OR)
 // =================================================================
 
 /**
  * 🚀 FUNKCIJA ISKANJA (POST /isci)
- * ZAČASNI TEST: Išče samo natančno ime restavracije (npr. "Lipa").
+ * Iskanje restavracij na podlagi mesta/imena in kuhinje.
  */
 exports.isciRestavracije = async (req, res) => {
     // Vsi iskalni parametri so v req.body
@@ -861,23 +861,29 @@ exports.isciRestavracije = async (req, res) => {
 
     // 1. Iskanje po mestu/imenu restavracije
     if (mestoTrim !== '') {
-        // 🔥🔥🔥 KRITIČNI TEST: Iščemo SAMO natančno ujemanje imena, brez regexa in brez $or.
-        // Če to deluje, je problem v $regex ali strukturi lokacije.
-        iskalniPogoji.ime = mestoTrim;
-        console.log("⚠️ IZKLJUČEN REGEX IN $OR. Iščemo natančno ujemanje imena:", mestoTrim);
+        // Uporabimo STRING za regex in $options:'i' (case-insensitive)
+        iskalniPogoji.$or = [
+            // Ime restavracije (npr. "Lipa")
+            { ime: { $regex: mestoTrim, $options: 'i' } },
+            // Mesto/Kraj
+            { 'lokacija.mesto': { $regex: mestoTrim, $options: 'i' } },
+            // Naslov
+            { 'lokacija.naslov': { $regex: mestoTrim, $options: 'i' } }
+            // Lahko dodate: { email: { $regex: mestoTrim, $options: 'i' } }
+        ];
     }
     
-    // 2. Iskanje po kuhinji (Cuisine) - Ohranimo za vsak primer
+    // 2. Iskanje po kuhinji (Cuisine)
     const kuhinjaTrim = kuhinja ? kuhinja.trim() : '';
     if (kuhinjaTrim !== '') {
         iskalniPogoji.cuisine = { $in: [kuhinjaTrim] };
     }
     
-    // ⚠️ POGOJ ZA ŠTEVILO OSEB IN DATUM JE ŠE VEDNO IZKLJUČEN.
+    // ⚠️ POZOR: POGOJ ZA ŠTEVILO OSEB IN DATUM JE IZKLJUČEN.
     
     try {
         
-        console.log("🔥 MongoDB Iskalni Pogoji (TEST NATANČNO):", JSON.stringify(iskalniPogoji));
+        console.log("🔥 MongoDB Iskalni Pogoji (KONČNA REŠITEV):", JSON.stringify(iskalniPogoji));
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
@@ -885,7 +891,6 @@ exports.isciRestavracije = async (req, res) => {
             .limit(50);
         
         if (rezultati.length === 0) {
-            // Vrnite prazen array, če ni rezultatov, da se sproži frontend sporočilo
             return res.status(200).json([]); 
         }
 
