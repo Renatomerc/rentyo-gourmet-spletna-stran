@@ -95,17 +95,6 @@ module.exports = (preveriGosta) => {
      */
     router.put('/zakljuci_rezervacijo', preveriGosta, restavracijaController.oznaciRezervacijoKotZakljuceno);
     // -----------------------------------------------------------------
-    
-    
-    // -----------------------------------------------------------------
-    // 🔥🔥 DODAJANJE MANJKAJOČE RUTE ZA ISKANJE (POST /isci) 🔥🔥
-    // Vstavljeno na konec sekcije 1, da ne moti ostale logike.
-    // -----------------------------------------------------------------
-    /**
-     * POST /api/restavracije/isci 
-     * RUTA, ki jo kliče glavni iskalnik na frontend-u.
-     */
-    router.post('/isci', restavracijaController.isciRestavracije); 
 
 
     // =================================================================
