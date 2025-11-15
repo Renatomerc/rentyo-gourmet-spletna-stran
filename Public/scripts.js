@@ -174,6 +174,7 @@ const prikaziSporocilo = (msg, tip = 'info') => {
     if (!container) {
         container = document.createElement('div');
         container.id = 'sporocila-container';
+        container.className = 'fixed top-4 right-4 z-[1000] space-y-2';
         document.body.prepend(container);
     }
 
@@ -184,10 +185,19 @@ const prikaziSporocilo = (msg, tip = 'info') => {
         style = 'bg-green-100 text-green-800';
     }
 
-    container.innerHTML = `<div class="p-3 mb-3 text-sm rounded ${style} shadow-md transition-opacity duration-300">${msg}</div>`;
+    const msgElement = document.createElement('div');
+    msgElement.className = `p-3 mb-3 text-sm rounded ${style} shadow-md transition-opacity duration-300 opacity-0`;
+    msgElement.textContent = msg;
+    container.appendChild(msgElement);
+    
+    // Fade in
+    setTimeout(() => msgElement.classList.remove('opacity-0'), 10);
 
     setTimeout(() => {
-        container.innerHTML = '';
+        // Fade out
+        msgElement.classList.add('opacity-0');
+        // Remove after fade out
+        msgElement.addEventListener('transitionend', () => msgElement.remove());
     }, 5000); 
 };
 
@@ -207,8 +217,9 @@ const formatirajDatumZaBackend = (datum) => {
  * Pomožna funkcija za pretvorbo decimalne ure v HH:MM.
  */
 const convertDecimalToTime = (decimalHour) => {
-    const roundedDecimalHour = Math.round(decimalHour * 10) / 10;
-    const totalMinutes = Math.round(roundedDecimalHour * 60); 
+    // Zagotovimo, da je ura z zaokroženostjo na 5 minut (0.0833333 = 5/60)
+    const nearestFiveMinutes = Math.round(decimalHour * 12) / 12; 
+    const totalMinutes = Math.round(nearestFiveMinutes * 60); 
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     const formattedHours = String(hours).padStart(2, '0');
@@ -301,20 +312,29 @@ function setupRestavracijaTabs() {
  * Funkcija za obravnavo klika na zavihek.
  */
 function handleTabClick(e) {
-    const targetId = e.target.dataset.tab;
+    const targetElement = e.target.closest('.modal-tab');
+    if (!targetElement) return;
 
-    const tabs = document.querySelectorAll('.restavracija-vsebina .modal-tab');
-    const contents = document.querySelectorAll('.restavracija-vsebina .modal-vsebina-skrol .tab-content');
+    const targetId = targetElement.dataset.tab;
+    
+    const container = document.getElementById('restavracijaModal');
+    if (!container) return;
 
+    const tabs = container.querySelectorAll('.modal-tab');
+    const contents = container.querySelectorAll('.modal-vsebina-skrol .tab-content');
+
+    // Odstranimo active z vseh
     tabs.forEach(t => t.classList.remove('active'));
     contents.forEach(c => c.classList.remove('active'));
 
-    e.target.classList.add('active');
+    // Aktivivamo tarčni zavihek in vsebino
+    targetElement.classList.add('active'); 
     const targetContent = document.getElementById(targetId);
     if (targetContent) {
         targetContent.classList.add('active');
     }
     
+    // Če je Rezervacija, ponovno nastavimo poslušalce in preverimo pogoje
     if (targetId === 'tabRezervacija') {
         setupReservationFormListeners();
     }
@@ -363,8 +383,12 @@ function setupReservationFormListeners() {
         }
     };
     
-    datumInput.onchange = autoCheck;
-    osebeInput.onchange = autoCheck;
+    // Za preprečitev dvojnega vezanja poslušalcev:
+    datumInput.removeEventListener('change', autoCheck);
+    osebeInput.removeEventListener('change', autoCheck);
+    
+    datumInput.addEventListener('change', autoCheck);
+    osebeInput.addEventListener('change', autoCheck);
 }
 
 
@@ -372,6 +396,7 @@ function setupReservationFormListeners() {
  * Pridobi ID iz kartice, pokliče API in odpre modal s podatki.
  */
 async function handleOdpriModalPodrobnosti(e) {
+    // Ignoriramo klike, če je cilj gumb za rezervacijo (da preprečimo odpiranje modala)
     if (e.target.closest('[data-rezervacija-gumb]')) {
         return;
     }
@@ -397,10 +422,13 @@ async function handleOdpriModalPodrobnosti(e) {
             
             setupRestavracijaTabs();
             
-            const activeTab = document.querySelector('.modal-tab.active');
-            if (activeTab && activeTab.dataset.tab === 'tabRezervacija') {
-                setupReservationFormListeners();
+            // KRITIČEN POPRAVEK: Eksplicitno aktiviraj zavihek "Opis"
+            const opisTab = document.querySelector('.modal-tab[data-tab="tabOpis"]');
+            if (opisTab) {
+                // Manually trigger the handler function using the target element
+                handleTabClick({ target: opisTab });
             }
+
 
         } else {
             prikaziSporocilo(data.msg || i18next.t('messages.search_error'), 'error');
@@ -475,7 +503,7 @@ function prikaziModalPodrobnosti(restavracija) {
         tabGalerija.innerHTML = ustvariGalerijeHTML(restavracija.galleryUrls, lat, lng);
     }
     
-    // 4. Nastavimo zavihek Rezervacija
+    // 4. Nastavimo zavihek Rezervacija (resetiramo proste ure)
     const tabRezervacija = document.getElementById('tabRezervacija');
     if (tabRezervacija) {
         const rezultatiContainer = document.getElementById('prosteUreRezultati');
@@ -702,7 +730,7 @@ function prikaziRezultate(restavracije) {
         const slikaUrl = prvaSlika || restavracija.imageUrl || restavracija.mainImageUrl || 'https://via.placeholder.com/400x300/CCCCCC/808080?text=Slika+ni+na+voljo';
 
         karticeHtml += `
-            <div class="kartica" onclick="handleOdpriModalPodrobnosti(event)" data-restavracija-id="${restavracija._id}">
+            <div class="kartica" data-restavracija-id="${restavracija._id}">
                 <img src="${slikaUrl}" alt="${ime}">
                 <div class="podrobnosti">
                     <h3>${ime}</h3>
@@ -711,12 +739,20 @@ function prikaziRezultate(restavracije) {
                         <span>⭐ ${ocena}</span>
                         <span>(${stOcen} ${i18next.t('messages.reviews_internal')})</span>
                     </div>
+                    <button class="gumb-rezervacija" data-rezervacija-gumb>${i18next.t('search.reserve')}</button>
                 </div>
             </div>
         `;
     });
 
     container.insertAdjacentHTML('beforeend', karticeHtml);
+    
+    // Dodamo poslušalce za klike na kartice
+    document.querySelectorAll('#rezultatiIskanja .kartica').forEach(kartica => {
+         kartica.removeEventListener('click', handleOdpriModalPodrobnosti);
+         kartica.addEventListener('click', handleOdpriModalPodrobnosti);
+    });
+    
     updateContent(); 
 }
 
@@ -766,7 +802,7 @@ async function naloziPrivzeteRestavracije() {
 
 
                 karticeHtml += `
-                    <div class="kartica" onclick="handleOdpriModalPodrobnosti(event)" data-restavracija-id="${restavracija._id}">
+                    <div class="kartica" data-restavracija-id="${restavracija._id}">
                         <img src="${slikaUrl}" alt="${ime}">
                         <div class="podrobnosti">
                             <h3>${ime}</h3>
@@ -781,6 +817,12 @@ async function naloziPrivzeteRestavracije() {
                 `;
             });
             container.insertAdjacentHTML('beforeend', karticeHtml);
+            
+            // Dodamo poslušalce za klike na kartice
+            document.querySelectorAll('#restavracije-container .kartica').forEach(kartica => {
+                 kartica.removeEventListener('click', handleOdpriModalPodrobnosti);
+                 kartica.addEventListener('click', handleOdpriModalPodrobnosti);
+            });
 
         } else {
             container.innerHTML = `<div class="p-4 text-center text-gray-600" style="grid-column: 1 / -1;">${i18next.t('messages.no_default_restaurants')}</div>`;
@@ -845,14 +887,14 @@ async function preveriProsteUre(rezervacijaPodatki) {
 /**
  * Prikazuje proste ure kot gumbe.
  */
-function prikaziProsteUre(mize, datum, steviloOseb) {
+function prikaziProsteUre(mize, datumPrikaz, steviloOseb) {
     const rezultatiContainer = document.getElementById('prosteUreRezultati');
     if (!rezultatiContainer) return;
     
     const danes = new Date();
     const datumDanesPrikaz = flatpickr.formatDate(danes, "d. m. Y"); 
     const trenutnaDecimalnaUra = danes.getHours() + danes.getMinutes() / 60;
-    const jeDanes = (datum === datumDanesPrikaz);
+    const jeDanes = (datumPrikaz === datumDanesPrikaz);
 
     const allAvailableTimes = new Map();
 
@@ -861,6 +903,7 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
             
             const fixedDecimal = Math.round(uraDecimal * 100) / 100;
 
+            // Preverjanje, ali je ura v preteklosti, če je izbran današnji datum
             if (jeDanes && fixedDecimal <= trenutnaDecimalnaUra) {
                 return; 
             }
@@ -895,7 +938,7 @@ function prikaziProsteUre(mize, datum, steviloOseb) {
                 data-cas-decimal="${uraDecimal}" 
                 data-miza-ime="${prostaMiza.mizaIme || ''}" 
                 data-miza-id="${prostaMiza.mizaId || ''}" 
-                data-datum="${datum}"
+                data-datum="${datumPrikaz}"
                 data-osebe="${steviloOseb}"
                 data-ura-string="${casString}" 
                 data-time="${casString}"> 
@@ -940,6 +983,10 @@ function odpriPotrditveniModal(e) {
     window.globalSelectedMizaId = mizaId;
     window.globalSelectedMizaIme = mizaIme;
 
+    // Vizualno označimo izbrano uro
+    document.querySelectorAll('.gumb-ura').forEach(btn => btn.classList.remove('selected'));
+    gumb.classList.add('selected');
+
     odpriDurationModal();
 }
 
@@ -975,8 +1022,9 @@ const potrdiRezervacijo = () => {
         return;
     }
 
-    const imeGosta = localStorage.getItem('ime') || localStorage.getItem('imeGosta') || 'Spletni Gost'; 
-    const telefon = localStorage.getItem('telefon') || localStorage.getItem('telefonGosta') || '040123456'; 
+    // Uporabimo privzete gostinske podatke, saj nimamo prijave
+    const imeGosta = localStorage.getItem('ime') || 'Spletni Gost'; 
+    const telefon = localStorage.getItem('telefon') || '040123456'; 
     
     const rezervacijaPodatki = {
         restavracijaId: currentRestaurantId,
@@ -1017,11 +1065,15 @@ const odpriDurationModal = () => {
 const zapriDurationModal = document.getElementById('zapriDurationModal');
 if(zapriDurationModal) zapriDurationModal.addEventListener('click', () => {
     if(durationModal) durationModal.classList.remove('active');
+    if(restavracijaModal) restavracijaModal.classList.add('active'); 
 });
 
 // Zapiranje zunaj okna
 if(durationModal) window.addEventListener("click", (e) => {
-  if (e.target === durationModal) durationModal.classList.remove("active");
+  if (e.target === durationModal) {
+      durationModal.classList.remove("active");
+      if(restavracijaModal) restavracijaModal.classList.add('active');
+  }
 });
 
 // Vizualno označevanje izbrane opcije
@@ -1039,24 +1091,11 @@ if(durationOpcije) durationOpcije.querySelectorAll('.duration-opcija').forEach(o
 function setupTimeSlotListeners() {
     const timeButtons = document.querySelectorAll('#prosteUreRezultati .gumb-ura'); 
     timeButtons.forEach(button => {
-        button.removeEventListener('click', odpriDurationModalHandler); 
-        button.addEventListener('click', odpriDurationModalHandler);
+        // Ponovno vežemo samo na odpriPotrditveniModal
+        button.removeEventListener('click', odpriPotrditveniModal);
+        button.addEventListener('click', odpriPotrditveniModal);
     });
 }
-
-// Handler za izbiro ure
-const odpriDurationModalHandler = (e) => {
-    const button = e.currentTarget;
-    const timeButtons = document.querySelectorAll('#prosteUreRezultati .gumb-ura');
-    timeButtons.forEach(btn => btn.classList.remove('selected'));
-    
-    window.globalSelectedTime = parseFloat(button.getAttribute('data-cas-decimal')); 
-    window.globalSelectedMizaId = button.getAttribute('data-miza-id'); 
-    window.globalSelectedMizaIme = button.getAttribute('data-miza-ime'); 
-    button.classList.add('selected');
-    odpriDurationModal(); 
-};
-
 
 // =================================================================
 // 7. ZAGON IN ISKALNA LOGIKA (DOM Content Loaded)
