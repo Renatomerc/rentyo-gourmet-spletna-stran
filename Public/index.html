@@ -2834,7 +2834,7 @@ function renderCard(restavracija) {
     card.className = 'kartica';
     card.setAttribute('data-id', restavracija._id || restavracija.id);
     
-    const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
+    const restavracijaIme = restavracija.ime || restavracija.name || restavracija.title || restavracija.imeRestavracije || 'Neznano Ime';
     
     // Implementacija dinamične slike
     const urlGlavneSlike = (restavracija.galerija_slik && restavracija.galerija_slik.length > 0)
@@ -3284,7 +3284,15 @@ async function prikaziPodrobnosti(restavracija) {
     const restavracijaIme = popolnaRestavracija.ime || popolnaRestavracija.imeRestavracije || 'Neznano Ime'; 
     
     const kuhinja = popolnaRestavracija.deviznaKuhinja || 'Neznano';
-    const slikaUrl = popolnaRestavracija.urlSlike || popolnaRestavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    
+    // 🔥 POPRAVEK: ROBUSTNA LOGIKA ZA PRIDOBIVANJE GLAVNE SLIKE IZ GALERIJE
+    const prvaSlikaIzGalerije = popolnaRestavracija.galerija_slik && popolnaRestavracija.galerija_slik.length > 0
+        ? popolnaRestavracija.galerija_slik[0]
+        : null;
+
+    const slikaUrl = popolnaRestavracija.mainImageUrl || popolnaRestavracija.urlSlike || prvaSlikaIzGalerije || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
+    // --------------------------------------------------------------------
+    
     const opis = popolnaRestavracija.opis || popolnaRestavracija.glavniOpis || ''; 
     
     // Lokacija restavracije (uporaba popolneRestavracije)
