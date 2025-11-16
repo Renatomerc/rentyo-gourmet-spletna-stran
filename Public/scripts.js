@@ -745,7 +745,7 @@ function prikaziRezultate(restavracije) {
         const slikaUrl = prvaSlika || restavracija.imageUrl || restavracija.mainImageUrl || 'https://via.placeholder.com/400x300/CCCCCC/808080?text=Slika+ni+na+voljo';
 
         karticeHtml += `
-            <div class="kartica" data-restavracija-id="${restavracija._id}">
+            <div class="kartica" data-restavracija-id="${restavracija._id}" onclick="handleOdpriModalPodrobnosti(event, '${restavracija._id}')">
                 <img src="${slikaUrl}" alt="${ime}">
                 <div class="podrobnosti">
                     <h3>${ime}</h3>
@@ -763,6 +763,9 @@ function prikaziRezultate(restavracije) {
     container.insertAdjacentHTML('beforeend', karticeHtml);
     
     // Dodamo poslušalce za klike na kartice
+    // Uporaba onclick v zgoraj ustvarjenem HTML-ju je bolj zanesljiva, 
+    // kot dinamično dodajanje poslušalcev, ki lahko povzroči podvajanje.
+    // Če pa želite ohraniti poslušalce:
     document.querySelectorAll('#rezultatiIskanja .kartica').forEach(kartica => {
          kartica.removeEventListener('click', handleOdpriModalPodrobnosti);
          kartica.addEventListener('click', handleOdpriModalPodrobnosti);
@@ -826,7 +829,7 @@ async function naloziPrivzeteRestavracije() {
 
 
                 karticeHtml += `
-                    <div class="kartica" data-restavracija-id="${restavracija._id}">
+                    <div class="kartica" data-restavracija-id="${restavracija._id}" onclick="handleOdpriModalPodrobnosti(event, '${restavracija._id}')">
                         <img src="${slikaUrl}" alt="${ime}">
                         <div class="podrobnosti">
                             <h3>${ime}</h3>
@@ -854,6 +857,32 @@ async function naloziPrivzeteRestavracije() {
         container.innerHTML = `<div class="p-4 text-center text-red-500" style="grid-column: 1 / -1;">${i18next.t('messages.server_connection_error')}</div>`;
     }
 }
+
+// =================================================================
+// VII. ZAGON IN INICIALIZACIJA 
+// =================================================================
+
+// ⭐ POMEMBNO: Če te kode še nimate, jo dodajte!
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // ⭐ KLJUČNO: Sekcija z rezultati iskanja mora biti skrita ob zagonu!
+    // To rešuje problem, da se naslov vidi, preden je iskanje sproženo.
+    const searchSection = document.getElementById('rezultatiIskanjaSekcija');
+    if (searchSection) {
+        searchSection.style.display = 'none'; 
+    }
+
+    // Naložite privzete restavracije
+    naloziPrivzeteRestavracije();
+    
+    // Naloži i18n
+    // Če imate initializei18n drugje, poskrbite, da se to izvede
+    // initializei18n().then(() => {
+    //     updateContent();
+    // });
+
+    // ... (druge funkcije za poslušalce dogodkov) ...
+});
 
 
 // =================================================================
