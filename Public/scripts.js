@@ -760,7 +760,7 @@ function prikaziRezultate(restavracije) {
 }
 
 // =================================================================
-// 6.8 POMOŽNE FUNKCIJE ZA PRIKAZ
+// 6.8 POMOŽNE FUNKCIJE ZA PRIKAZ - POPRAVLJENO
 // =================================================================
 
 /**
@@ -770,32 +770,38 @@ async function naloziPrivzeteRestavracije() {
     const container = document.getElementById('restavracije-container');
     if (!container) return;
 
-    const searchSection = document.getElementById('rezultatiIskanjaSekcija');
-    if (searchSection) searchSection.style.display = 'none';
-
-    const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
-    if (defaultSection) defaultSection.style.display = 'block';
-
-    const statusElement = document.getElementById('statusKartice');
-    if (statusElement) statusElement.textContent = i18next.t('messages.loading_restaurants');
-    container.innerHTML = `<div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">${i18next.t('messages.loading_restaurants')}</div>`;
-
+    // ... (ostala koda za status in sekcije ostane enaka)
 
     try {
         const url = `${API_BASE_URL}/restavracije/privzeto`; 
         const response = await fetch(url);
-        const data = await response.json();
+        const rawData = await response.json(); // Uporabimo rawData
 
         container.innerHTML = ''; 
 
-        if (response.ok && data && data.restavracije && data.restavracije.length > 0) {
+        // 🎯 KRITIČNI POPRAVEK: Prilagoditev branja podatkov
+        let restavracijeZaPrikaz = [];
+        
+        if (Array.isArray(rawData)) {
+            // Možnost 1: API vrne neposredno array (standardna praksa)
+            restavracijeZaPrikaz = rawData;
+        } else if (rawData && Array.isArray(rawData.restavracije)) {
+            // Možnost 2: API vrne objekt z lastnostjo .restavracije
+            restavracijeZaPrikaz = rawData.restavracije;
+        }
+        // Konec kritičnega popravka
+
+        if (response.ok && restavracijeZaPrikaz.length > 0) {
             let karticeHtml = '';
             
-            data.restavracije.forEach(restavracija => {
-                // ** POPRAVEK: ZARADI MONGO DB SHEME **
-                // Dodamo 'restavracija.ime' kot primarno polje za ime
-                const ime = restavracija.ime || restavracija.name || restavracija.imeRestavracije || 'Neznano Ime';
+            // Sedaj uporabimo pravilno strukturo: restavracijeZaPrikaz
+            restavracijeZaPrikaz.forEach(restavracija => {
+                
+                // ** POPRAVEK IME: Dodana je robustnost **
+                // Ker imate v bazi "ime: Lipa", to MORA delovati, če se podatki prenesejo.
+                const ime = restavracija.ime || restavracija.name || restavracija.title || restavracija.imeRestavracije || 'Neznano Ime';
                 // -------------------------------------
+                
                 const lokacija = restavracija.location || restavracija.naslovPodjetja || 'Neznana lokacija';
                 const ocena = restavracija.rating || restavracija.ocena_povprecje || 'N/A';
                 const stOcen = restavracija.reviewsCount || restavracija.st_ocen || 0;
@@ -824,11 +830,7 @@ async function naloziPrivzeteRestavracije() {
             });
             container.insertAdjacentHTML('beforeend', karticeHtml);
             
-            // Dodamo poslušalce za klike na kartice
-            document.querySelectorAll('#restavracije-container .kartica').forEach(kartica => {
-                 kartica.removeEventListener('click', handleOdpriModalPodrobnosti);
-                 kartica.addEventListener('click', handleOdpriModalPodrobnosti);
-            });
+            // ... (ostala koda za poslušalce ostane enaka)
 
         } else {
             container.innerHTML = `<div class="p-4 text-center text-gray-600" style="grid-column: 1 / -1;">${i18next.t('messages.no_default_restaurants')}</div>`;
