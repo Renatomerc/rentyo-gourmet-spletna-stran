@@ -647,7 +647,7 @@ function zapriWarningModal() {
 }
 
 // =================================================================
-// 6.5 LOGIKA ISKANJA (GLAVNE FUNKCIJE)
+// 6.5 LOGIKA ISKANJA (GLAVNE FUNKCIJE) - POPRAVLJENO: KONTROLA NASLOVA
 // =================================================================
 
 /**
@@ -659,9 +659,16 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
     const rezultatiContainer = document.getElementById('rezultatiIskanja');
     const searchSection = document.getElementById('rezultatiIskanjaSekcija');
     const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
+    
+    // ⭐ NOVO: Referenca na naslov
+    const searchTitleElement = document.getElementById('naslovRezultatov'); 
 
+    // 👇 LOGIKA PREKLAPLJANJA SEKCIJ
     if (defaultSection) defaultSection.style.display = 'none'; 
-    if (searchSection) searchSection.style.display = 'block'; 
+    
+    // 🔥 KLJUČNI POPRAVEK: Skrijemo sekcijo in naslov na začetku klica.
+    if (searchSection) searchSection.style.display = 'none'; 
+    if (searchTitleElement) searchTitleElement.style.display = 'none'; 
     
     if (rezultatiContainer) {
         rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">${i18next.t('messages.searching')}</div>`;
@@ -688,6 +695,11 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
         if (response.ok) {
             if (data && data.restavracije && data.restavracije.length > 0) {
                 prikaziRezultate(data.restavracije);
+                
+                // ⭐ PRIKAŽEMO SEKCIJO IN NASLOV ŠELE TUKAJ!
+                if (searchSection) searchSection.style.display = 'block';
+                if (searchTitleElement) searchTitleElement.style.display = 'block';
+
             } else {
                 rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">${i18next.t('messages.no_results_found')}</div>`;
             }
