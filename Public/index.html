@@ -3053,7 +3053,9 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
 
     // 👇 LOGIKA PREKLAPLJANJA SEKCIJ
     if (defaultSection) defaultSection.classList.add('hidden');    // Skrijemo privzeto
-    if (searchSection) searchSection.classList.remove('hidden'); // Prikažemo rezultate iskanja
+    
+    // ⭐ KLJUČNA SPREMEMBA: Sekcijo rezultatov skrijemo, dokler niso potrjeni rezultati.
+    if (searchSection) searchSection.classList.add('hidden'); 
     
     if (rezultatiContainer) {
         // Prikaz sporočila, da potrdimo, da se klic izvaja
@@ -3084,13 +3086,16 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
 
         // =======================================================
         // ⭐ POPRAVEK LOGIKE FRONT-ENDA ⭐
-        // Odgovor je array, ne objekt z lastnostjo .restavracije.
         // =======================================================
         if (response.ok) {
             // Preverimo, ali je 'data' array in ima več kot 0 elementov
             if (Array.isArray(data) && data.length > 0) {
                 // Če API vrne restavracije, jih prikažemo.
                 prikaziRezultate(data); // Pošljemo celoten 'data' array funkciji prikaziRezultate
+                
+                // ⭐ KLJUČNO: Pokažemo celotno sekcijo z rezultati šele TUKAJ!
+                if (searchSection) searchSection.classList.remove('hidden'); 
+                
             } else {
                 rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.</div>`;
             }
