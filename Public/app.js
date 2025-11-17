@@ -111,7 +111,8 @@ function renderReviews(reviews) {
         const validOcena = typeof review.ocena === 'number' ? review.ocena : 0;
         const ratingHtml = generateStarsHTML(validOcena);
         
-        const ime = review.ime || (window.i18next ? i18next.t('modal.anonymous_user') : 'Neznan Uporabnik');
+        // ⭐ KRITIČNI POPRAVEK: Ključ 'ime' je zamenjan z 'uporabniskoIme'
+        const ime = review.uporabniskoIme || (window.i18next ? i18next.t('modal.anonymous_user') : 'Neznan Uporabnik');
 
         // Robustna obravnava datuma
         let datumPrikaz;

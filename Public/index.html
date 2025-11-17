@@ -3320,7 +3320,8 @@ async function prikaziPodrobnosti(restavracija) {
 
     // 1. PREVERJANJE IN PRIDOBIVANJE POPOLNIH PODATKOV
     let popolnaRestavracija = restavracija;
-    const isMissingDetails = !restavracija.meni || !restavracija.galerija_slik || !restavracija.ocene; 
+    // ⭐ POPRAVLJENO: Uporaba 'komentarji' namesto 'ocene' za preverjanje manjkajočih podrobnosti
+    const isMissingDetails = !restavracija.meni || !restavracija.galerija_slik || !restavracija.komentarji; 
 
     if (currentRestaurantId && isMissingDetails) {
         if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Nalaganje podrobnosti...'; 
@@ -3500,7 +3501,8 @@ async function prikaziPodrobnosti(restavracija) {
     }
     
     // ⭐ KLJUČNO: Klic funkcije za prikaz vseh ocen
-    renderReviews(popolnaRestavracija.ocene); 
+    // ⭐ POPRAVLJENO: Uporaba ključa 'komentarji', ki ga vrne API.
+    renderReviews(popolnaRestavracija.komentarji); 
     
 
     // Resetiraj prikaz prostih ur
