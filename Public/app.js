@@ -278,32 +278,27 @@ function prikaziPodrobnosti(restavracija) {
     }
     
     // 🔥 NOVO: 6. Generiranje Komentarjev in Ocen (Zavihek Ocene)
-if (tabOcene) {
-    // KRITIČNA PREVERBA: Uporabimo mapiranje, ki se ujema z bazo, in vključimo debug izpise
-    const mapiraniKomentarji = komentarji.map(komentar => ({
-        // Preslikava ključev iz API-ja na ključe, ki jih pričakuje renderReviews
-        ocena: komentar.ocena || 0,
-        komentar: komentar.komentar || '',
-        datum: komentar.datum,
-        ime: komentar.uporabniskoIme || komentar.ime || 'Gost' // Uporabite uporabniskoIme, sicer ime, sicer 'Gost'
-    }));
+    // KRITIČEN POPRAVEK: Uporabimo mapiranje podatkov, da se ključi API-ja ujemajo z renderReviews
+    if (tabOcene) {
+        // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
+        console.log("Prejeti komentarji iz API-ja (komentarji):", komentarji); 
+        // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
 
-    // 👇👇👇 SPREMEMBE ZA LAŽJE RAZHROŠČEVANJE V PREGLEDALNIKU 👇👇👇
-    console.log("Prejeti komentarji iz API-ja (komentarji):", komentarji); 
-    console.log("Mapirani komentarji (poslani v renderReviews):", mapiraniKomentarji);
+        const mapiraniKomentarji = komentarji.map(komentar => ({
+            // Ključi za renderReviews:
+            ocena: komentar.ocena || komentar.rating || 0, // Poskusimo z 'ocena' in 'rating', sicer 0
+            komentar: komentar.komentar || '',
+            datum: komentar.datum,
+            ime: komentar.uporabniskoIme || komentar.ime, // Poskusimo z 'uporabniskoIme' in 'ime'
+        }));
+        
+        // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
+        console.log("Mapirani komentarji (poslani v renderReviews):", mapiraniKomentarji);
+        // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
 
-    if (mapiraniKomentarji.length === 0) {
-        console.warn("Front-end: Prejeti komentarji so prazni, renderReviews ne bo prikazal ničesar.");
-    } else if (!mapiraniKomentarji[0].ime || mapiraniKomentarji[0].ime === 'Gost' || !mapiraniKomentarji[0].datum) {
-        // Ta preverba se sproži, če je ime prazno, se je uporabilo nadomestno ime 'Gost', ali datum manjka
-        console.error("Front-end: KRITIČNA NAPAKA PRI PRESKRIVI KOMENTARJEV! Manjka 'ime', 'datum' ali 'ocena'.");
-        console.error("Podatki prvega komentarja, ki je povzročil potencialno napako:", mapiraniKomentarji[0]);
+        renderReviews(mapiraniKomentarji);
     }
-    // 👆👆👆 SPREMEMBE ZA LAŽJE RAZHROŠČEVANJE V PREGLEDALNIKU 👆👆👆
-
-    renderReviews(mapiraniKomentarji);
-}
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
 
     // 7. Vdelan Zemljevid (Google Maps Embed API)
     if (gps_lokacija) {
