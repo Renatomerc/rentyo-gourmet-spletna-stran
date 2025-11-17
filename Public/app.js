@@ -42,7 +42,8 @@ const modalZemljevid = document.getElementById('modalZemljevid');
 const modalAktualnaPonudbaOpis = document.getElementById('modalAktualnaPonudbaOpis');
 
 // 🔥 NOVO: Element za zavihek Ocene
-const tabOceneDiv = document.getElementById('tabOcene');
+// POPRAVEK: tabOceneDiv spremenjen v tabOcene, da se ujema s funkcijo renderReviews
+const tabOcene = document.getElementById('tabOcene');
 
 // Elementi za Formular Iskanja (Predpostavimo, da obstaja FORM z ID="search-form")
 const searchForm = document.getElementById('search-form');
@@ -86,6 +87,60 @@ function formatDatum(datumNiz) {
     } catch {
         return 'Neznan datum';
     }
+}
+// -------------------------------------------------------------
+
+// 🔥 DODANO: 8. LOGIKA PRIKAZA OCEN
+function renderReviews(reviews) {
+    // Spremenljivka tabOcene je že globalno definirana v I. GLOBALNE SPREMENLJIVKE
+    if (!tabOcene) return; 
+
+    tabOcene.innerHTML = ''; // Počisti prejšnje ocene
+    
+    if (!reviews || reviews.length === 0) {
+        const noReviewsText = window.i18next ? i18next.t('modal.no_reviews') : 'Ta restavracija še nima ocen.';
+        tabOcene.innerHTML = `<p class="p-4 text-center text-gray-500" data-i18n="modal.no_reviews">${noReviewsText}</p>`;
+        if (typeof updateContent === 'function') updateContent();
+        return;
+    }
+    
+    reviews.forEach(review => {
+        const reviewElement = document.createElement('div');
+        reviewElement.className = 'review-card border-b pb-4 mb-4'; 
+        
+        const validOcena = typeof review.ocena === 'number' ? review.ocena : 0;
+        const ratingHtml = generateStarsHTML(validOcena);
+        
+        const ime = review.ime || (window.i18next ? i18next.t('modal.anonymous_user') : 'Neznan Uporabnik');
+
+        // Robustna obravnava datuma
+        let datumPrikaz;
+        try {
+            datumPrikaz = new Date(review.datum).toLocaleDateString('sl-SI', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        } catch (e) {
+            datumPrikaz = 'Neznan datum';
+        }
+        
+        reviewElement.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <strong class="text-lg">${ime}</strong>
+                <span class="text-sm text-gray-500">${datumPrikaz}</span>
+            </div>
+            <div class="flex items-center mb-2">
+                <span class="star-rating mr-2">${ratingHtml}</span>
+                <span class="text-sm font-semibold text-gray-700">(${validOcena.toFixed(1)})</span>
+            </div>
+            <p class="review-text text-gray-800">${review.komentar || (window.i18next ? i18next.t('modal.no_comment_provided') : '')}</p>
+        `;
+        
+        tabOcene.appendChild(reviewElement);
+    });
+    
+    if (typeof updateContent === 'function') updateContent();
 }
 // -------------------------------------------------------------
 
@@ -223,33 +278,17 @@ function prikaziPodrobnosti(restavracija) {
     }
     
     // 🔥 NOVO: 6. Generiranje Komentarjev in Ocen (Zavihek Ocene)
-    if (tabOceneDiv) {
-        let htmlKomentarjev = '';
+    // KRITIČEN POPRAVEK: Uporabimo mapiranje podatkov, da se ključi API-ja ujemajo z renderReviews
+    if (tabOcene) {
+        const mapiraniKomentarji = komentarji.map(komentar => ({
+            // Ključi za renderReviews:
+            ocena: komentar.ocena || komentar.rating || 0, // Poskusimo z 'ocena' in 'rating', sicer 0
+            komentar: komentar.komentar || '',
+            datum: komentar.datum,
+            ime: komentar.uporabniskoIme || komentar.ime, // Poskusimo z 'uporabniskoIme' in 'ime'
+        }));
 
-        if (komentarji.length > 0) {
-            komentarji.forEach(komentar => {
-                const uporabniskoIme = komentar.uporabniskoIme || 'Anonimni uporabnik';
-                const datum = komentar.datum ? formatDatum(komentar.datum) : 'Neznan datum';
-                
-                // Opomba: Če imate oceno v komentarju (npr. komentar.ocena), jo lahko vključite tukaj
-                
-                htmlKomentarjev += `
-                    <div class="komentar-entry p-4 border-b border-gray-200">
-                        <div class="komentar-header flex justify-between items-center mb-1">
-                            <span class="komentar-ime font-semibold">${uporabniskoIme}</span>
-                            <span class="komentar-datum text-sm text-gray-500">${datum}</span>
-                        </div>
-                        <p class="komentar-besedilo text-gray-700">${komentar.komentar}</p>
-                    </div>
-                `;
-            });
-        } else {
-            // Če ni komentarjev, prikaže privzeto sporočilo
-            htmlKomentarjev = '<p data-i18n="modal.no_reviews" class="p-4">Trenutno ni na voljo podrobnih ocen za prikaz.</p>';
-        }
-
-        // Vstavljanje generiranega HTML-ja v DOM
-        tabOceneDiv.innerHTML = htmlKomentarjev;
+        renderReviews(mapiraniKomentarji);
     }
     // -------------------------------------------------------------
 
@@ -596,7 +635,7 @@ async function obdelajIskanje(searchData) {
         console.log("Uspešno iskanje. Najdeno restavracij:", allRestavracije.length);
 
         // Prikaz rezultatov
-        filterAndRenderRestavracije(); // Uporabimo isto funkcijo za render
+        filterAndRenderRestavracije(); // Uporabimo isto funkciju za render
         
         // Prikaz statusa iskanja
         if (allRestavracije.length === 0) {
