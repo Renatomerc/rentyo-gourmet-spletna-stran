@@ -189,7 +189,7 @@ a:hover {
     border: 1px solid #737373;
     border-radius: 20px;
     font-size: 1em;
-    background-color: #ffffff;
+    background-color: #fff;
     width: 100%;
     
     
@@ -509,7 +509,7 @@ a:hover {
 
 /* Odzivnost: Na manjših zaslonih se stolpci naložijo vertikalno */
 @media (max-width: 768px) {
-    .logotip img {
+        .logotip img {
     max-height: 25px; 
     width: auto;     
     display: block;  
@@ -606,6 +606,8 @@ a:hover {
         /* Zagotovimo, da se margin-top ne podvoji in ostane 0 */
         margin-top: 0 !important; 
     }
+
+
 
     
     /* ---------------------------------------------------- */
@@ -761,4 +763,8 @@ a:hover {
     .mreza-kartic {
         grid-template-columns: repeat(5, 1fr); 
     }
+}
+/* Dodajte to pravilo v vaš CSS (lahko z !important, če je potrebno) */
+.hidden {
+    display: none !important; /* Uporabite !important, da zagotovite skrivanje ob zagonu */
 }

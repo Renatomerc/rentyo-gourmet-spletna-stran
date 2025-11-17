@@ -513,7 +513,6 @@ exports.ustvariRezervacijo = async (req, res) => {
     }
 };
 
-
 /**
  * 🟢 POPRAVLJENO: Brisanje rezervacije (DELETE /izbrisi_rezervacijo)
  * Izvaja TRDO BRISANJE ($pull), ki rezervacijo v celoti odstrani iz zbirke podatkov.
@@ -579,7 +578,7 @@ exports.izbrisiRezervacijo = async (req, res) => {
  */
 exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
     // ID uporabnika dobimo iz avtentikacijskega žetona
-    const userId = req.uporabnik.id; 
+    const userId = req.uporabnik ? req.uporabnik.id : null; 
 
     if (!userId) {
         return res.status(401).json({ msg: "Neavtorizirano: ID uporabnika manjka v žetonu." });
@@ -647,7 +646,7 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
  * GET /api/restavracije/uporabnik/zgodovina
  */
 exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
-    const userId = req.uporabnik.id; 
+    const userId = req.uporabnik ? req.uporabnik.id : null; 
 
     if (!userId) {
         return res.status(401).json({ msg: "Neavtorizirano: ID uporabnika manjka v žetonu." });
@@ -757,7 +756,7 @@ exports.posodobiAdminVsebino = async (req, res) => {
 
 
 // =================================================================
-// 💥 5. OPERACIJE Z AKCIJSKO DODELITVIJO TOČK
+// 💥 5. OPERACIJE Z AKCIJSKO DODELITVIJO TOČK IN OCENJEVANJEM
 // =================================================================
 
 /**
@@ -841,6 +840,107 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
         res.status(500).json({ msg: 'Napaka strežnika pri zaključku rezervacije.' });
     }
 };
+
+// 🌟 NOVO: FUNKCIJA ZA ODDAJO OCENE IN KOMENTARJA 
+/**
+ * @route POST /api/restavracije/oceni/:restavracijaId
+ * @desc Shrani komentar v polje 'komentarji' in posodobi povprečje ocen.
+ * @access Private (Gost se mora prijaviti)
+ */
+exports.oddajOcenoInKomentar = async (req, res, next) => {
+    try {
+        const restavracijaId = req.params.restavracijaId;
+        const { ocena, komentar } = req.body;
+        
+        // 1. Preverjanje avtorizacije
+        const userId = req.uporabnik ? req.uporabnik.id : null; 
+        
+        if (!userId) {
+            return res.status(401).json({ msg: 'Neavtorizirano: Za ocenjevanje morate biti prijavljeni.' });
+        }
+        
+        // 2. Preverjanje vnosa
+        if (!ocena || ocena < 1 || ocena > 5) {
+            return res.status(400).json({ success: false, error: 'Ocena je obvezna in mora biti med 1 in 5.' });
+        }
+        
+        if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
+            return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+        }
+
+        // 3. Najdi restavracijo in uporabnika hkrati (za ime uporabnika)
+        const [restavracija, uporabnik] = await Promise.all([
+            Restavracija.findById(restavracijaId, 'ocena_povprecje st_ocen komentarji'), 
+            Uporabnik.findById(userId, 'ime priimek') // Predpostavlja Uporabnik model iz dbUsers
+        ]);
+
+        if (!restavracija) {
+            return res.status(404).json({ success: false, error: 'Restavracija ni najdena.' });
+        }
+        if (!uporabnik) {
+            console.warn(`Opozorilo: Uporabnik z ID ${userId} ni bil najden. Ocena bo pripisana anonimnemu gostu.`);
+        }
+        
+        // Določitev imena uporabnika za prikaz
+        const uporabniskoIme = uporabnik 
+            ? `${uporabnik.ime || ''} ${uporabnik.priimek || ''}`.trim() || 'Gost'
+            : 'Gost';
+
+
+        // 4. Preprečevanje dvojnih ocen istega uporabnika
+        const jeUporabnikZeOcenil = restavracija.komentarji.find(k => k.userId.toString() === userId.toString());
+
+        if (jeUporabnikZeOcenil) {
+             return res.status(409).json({ success: false, error: 'Te restavracije ste že ocenili.' });
+        }
+
+        // 5. Priprava novega komentarja/ocene
+        const novKomentar = {
+            userId: new mongoose.Types.ObjectId(userId),
+            uporabniskoIme: uporabniskoIme, 
+            ocena: Number(ocena),
+            komentar: komentar || '', 
+            datum: new Date()
+        };
+        
+        // 6. Izračun in posodobitev ocen
+        
+        // Nastavitev začetnih vrednosti (za primer, če je model brez njih)
+        const staraSkupnaOcena = (restavracija.ocena_povprecje || 0) * (restavracija.st_ocen || 0);
+        const novoSteviloOcen = (restavracija.st_ocen || 0) + 1; 
+        const novaSkupnaOcena = staraSkupnaOcena + Number(ocena);
+        const novoPovprecje = (novaSkupnaOcena / novoSteviloOcen);
+        
+        // Posodobitev restavracije
+        const posodobljeno = await Restavracija.findByIdAndUpdate(
+            restavracijaId,
+            {
+                $push: { komentarji: novKomentar }, // Dodaj komentar v array
+                $set: { 
+                    st_ocen: novoSteviloOcen, 
+                    ocena_povprecje: novoPovprecje.toFixed(1) // Shrani zaokroženo povprečje
+                }
+            },
+            { new: true }
+        );
+
+
+        res.status(201).json({ 
+            success: true, 
+            message: 'Ocena in komentar uspešno shranjena!',
+            data: {
+                ocena_povprecje: posodobljeno.ocena_povprecje,
+                st_ocen: posodobljeno.st_ocen,
+                komentar: novKomentar
+            }
+        });
+
+    } catch (error) {
+        console.error('Napaka pri oddaji ocene:', error);
+        res.status(500).json({ success: false, error: 'Napaka strežnika pri oddaji ocene.', details: error.message });
+    }
+};
+
 
 // =================================================================
 // 💥 6. FUNKCIJA ZA ISKANJE (KONČNA REŠITEV - Vrnjeno na REGEX in $OR)

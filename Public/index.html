@@ -1753,6 +1753,59 @@
 .toast-icon {
     margin-right: 10px;
 }
+/* ========================================= */
+/* POPRAVLJEN STIL ZA GUMB NAZAJ (Kot na profilni strani) */
+/* ========================================= */
+
+.gumb-nazaj {
+    /* Za vsak primer, da se prepisjo obstojeca pravila */
+    all: unset; /* Odstrani vsa obstoječa stila brskalnika/predloge */
+    
+    /* Postavitev */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    
+    /* Velikost in oblika kroga */
+    width: 35px; /* Malce manjši krog */
+    height: 35px;
+    border-radius: 50%; /* Naredi krog */
+    
+    /* Barve in obroba */
+    background-color: #333; /* Prosojno ozadje */
+    border: 1px solid #333; /* Tanek črn okvir */
+    color: #ffffff; /* Črna puščica */
+    
+    /* Pisava in velikost puščice */
+    font-family: Arial, sans-serif; /* Ali pisava, ki jo uporabljate drugje */
+    font-size: 18px; /* Malce manjša puščica */
+    font-weight: normal; /* Manj debela puščica */
+    
+    /* Preprečimo izbiro teksta (puščice) */
+    user-select: none;
+    
+    /* Dodamo malo razmika od robov, da ni stisnjen */
+    margin: 0 10px; /* Ali prilagodite po potrebi */
+
+    /* Omogočimo pozicioniranje, če bo potrebno */
+    position: relative;
+    z-index: 10;
+}
+
+/* Ob pritisku */
+.gumb-nazaj:hover {
+    background-color: #717171; /* Rahlo sivo ozadje ob hoverju */
+    border-color: #717171; /* Malce temnejši okvir */
+    color: #ffffff; /* Malce temnejša puščica */
+}
+
+/* Stil za vsebnik, da gumb ni na levi stisnjen do konca (opcijsko) */
+.gumb-nazaj-vsebnik {
+    padding-left: 20px; /* Ali kakorkoli drugače centrirate/poravnate */
+    padding-bottom: 10px;
+    /* Če je treba, lahko dodate 'position: relative;' ali 'display: flex;' za boljše pozicioniranje */
+}
 
   </style>
 </head>
@@ -1878,9 +1931,16 @@
 </section>
 
 <section class="kartice-restavracij hidden" id="rezultatiIskanjaSekcija">
+    
+    <div class="gumb-nazaj-vsebnik">
+<button id="gumbNazaj" class="gumb-nazaj ikona-nazaj" onclick="handlePrikaziPrivzete()">
+    <i class="fas fa-arrow-left"></i>
+</button>
+    </div>
+    
     <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
     <div class="mreza-kartic" id="rezultatiIskanja">
-        </div>
+    </div>
 </section>
 
 <section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
@@ -3767,6 +3827,26 @@ if(typeof flatpickr !== "undefined") {
       dateFormat: "d. m. Y",
       minDate: "today",
     });
+}
+function handlePrikaziPrivzete() {
+    const searchSection = document.getElementById('rezultatiIskanjaSekcija');
+    const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
+    
+    // 1. Skrij sekcijo z rezultati iskanja
+    if (searchSection) {
+        searchSection.classList.add('hidden');
+    }
+    
+    // 2. Prikaži sekcijo s priljubljenimi
+    if (defaultSection) {
+        // Dodajemo odstranjevanje razreda 'hidden'
+        defaultSection.classList.remove('hidden'); 
+        
+        // Odstranite morebitne inline style, ki so nastavljeni na 'none'
+        defaultSection.style.display = ''; 
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
     
 </script>

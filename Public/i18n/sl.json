@@ -48,7 +48,8 @@
     "search_results": "Rezultati iskanja",
     "available_tomorrow": "Jutri ob {{time}}",
     "unavailable": "Ni prostih miz",
-    "available_today": "Na voljo danes" 
+    "available_today": "Na voljo danes",
+    "search_title": "Rezultati iskanja"
   },
   "messages": {
     "enter_search_criteria": "Prosimo, vnesite mesto ali vrsto kuhinje za iskanje.",

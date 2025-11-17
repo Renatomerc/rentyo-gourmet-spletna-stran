@@ -1,6 +1,6 @@
 // ===============================================
 // 🗄️ RESTAVRACIJA MODEL (Mongoose Shema)
-// POPRAVLJENO: Dodano Geospatial polje 'lokacija' za iskanje po bližini
+// POPRAVLJENO: Dodana podshema za komentarje in popravljeni setterji za ocene
 // ===============================================
 const mongoose = require('mongoose');
 
@@ -41,6 +41,38 @@ const LocalizedDescriptionSchema = new mongoose.Schema({
 }, { _id: false });
 
 
+// =======================================================
+// 🟢 NOVO: Podshema za Komentarje
+// =======================================================
+const KomentarShema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Uporabnik', // Povezava na vaš model uporabnika
+        required: true
+    },
+    uporabniskoIme: {
+        type: String,
+        required: true,
+        default: 'Anonimni gost'
+    },
+    ocena: {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: true
+    },
+    komentar: {
+        type: String,
+        trim: true,
+        maxlength: 500
+    },
+    datum: {
+        type: Date,
+        default: Date.now
+    }
+}, { _id: true }); 
+
+
 // 4. GLAVNA Shema za Restavracijo 
 const RestavracijaSchema = new mongoose.Schema({
     // ----- OSNOVNA POLJA -----
@@ -79,8 +111,20 @@ const RestavracijaSchema = new mongoose.Schema({
 
     // ----- DODATNA POLJA ZA FRONTEND IN GEO-ISKANJE -----
     
-    ocena_povprecje: { type: Number, default: 0 },
-    st_ocen: { type: Number, default: 0 },
+    // 🔥 POPRAVLJENO: Dodan setter za pravilno shranjevanje decimalne vrednosti
+    ocena_povprecje: { 
+        type: Number, 
+        default: 0,
+        min: 0,
+        max: 5,
+        // Setter poskrbi, da se vrednost shranjuje na eno decimalno mesto
+        set: v => parseFloat(v).toFixed(1) 
+    },
+    st_ocen: { type: Number, default: 0, min: 0 },
+    
+    // 🌟 NOVO: Polje za shranjevanje vseh komentarjev in ocen
+    komentarji: [KomentarShema], 
+    
     priceRange: { type: Number, default: 1, min: 1, max: 3 }, 
     
     description: LocalizedDescriptionSchema, 
@@ -91,7 +135,6 @@ const RestavracijaSchema = new mongoose.Schema({
         type: [String], // Array stringov
         default: []
     },
-    // galleryUrls: [String], // Originalno polje, ki je sedaj komentirano/odstranjeno.
 
     menu: {
         sl: Object, 

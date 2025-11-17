@@ -647,7 +647,7 @@ function zapriWarningModal() {
 }
 
 // =================================================================
-// 6.5 LOGIKA ISKANJA (GLAVNE FUNKCIJE) - POPRAVLJENO: KONTROLA NASLOVA
+// 6.5 LOGIKA ISKANJA (GLAVNE FUNKCIJE) - KONČNI POPRAVEK: ZANESLJIV PRIKAZ BREZ !IMPORTANT
 // =================================================================
 
 /**
@@ -659,14 +659,12 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
     const rezultatiContainer = document.getElementById('rezultatiIskanja');
     const searchSection = document.getElementById('rezultatiIskanjaSekcija');
     const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
-    
-    // ⭐ NOVO: Referenca na naslov
     const searchTitleElement = document.getElementById('naslovRezultatov'); 
 
     // 👇 LOGIKA PREKLAPLJANJA SEKCIJ
     if (defaultSection) defaultSection.style.display = 'none'; 
     
-    // 🔥 KLJUČNI POPRAVEK: Skrijemo sekcijo in naslov na začetku klica.
+    // ⭐ Skrijemo sekcijo:
     if (searchSection) searchSection.style.display = 'none'; 
     if (searchTitleElement) searchTitleElement.style.display = 'none'; 
     
@@ -696,7 +694,8 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
             if (data && data.restavracije && data.restavracije.length > 0) {
                 prikaziRezultate(data.restavracije);
                 
-                // ⭐ PRIKAŽEMO SEKCIJO IN NASLOV ŠELE TUKAJ!
+                // 🔥 NOVI POPRAVEK: Prikazemo sekcijo. 
+                // Uporaba style.display = 'block' bi morala delovati, ker smo odstranili !important iz CSS-a.
                 if (searchSection) searchSection.style.display = 'block';
                 if (searchTitleElement) searchTitleElement.style.display = 'block';
 
@@ -763,9 +762,6 @@ function prikaziRezultate(restavracije) {
     container.insertAdjacentHTML('beforeend', karticeHtml);
     
     // Dodamo poslušalce za klike na kartice
-    // Uporaba onclick v zgoraj ustvarjenem HTML-ju je bolj zanesljiva, 
-    // kot dinamično dodajanje poslušalcev, ki lahko povzroči podvajanje.
-    // Če pa želite ohraniti poslušalce:
     document.querySelectorAll('#rezultatiIskanja .kartica').forEach(kartica => {
          kartica.removeEventListener('click', handleOdpriModalPodrobnosti);
          kartica.addEventListener('click', handleOdpriModalPodrobnosti);
@@ -775,7 +771,7 @@ function prikaziRezultate(restavracije) {
 }
 
 // =================================================================
-// 6.8 POMOŽNE FUNKCIJE ZA PRIKAZ - POPRAVLJENO
+// 6.8 POMOŽNE FUNKCIJE ZA PRIKAZ - OSTALE
 // =================================================================
 
 /**
@@ -813,7 +809,6 @@ async function naloziPrivzeteRestavracije() {
             restavracijeZaPrikaz.forEach(restavracija => {
                 
                 // ** POPRAVEK IME: Dodana je robustnost **
-                // Ker imate v bazi "ime: Lipa", to MORA delovati, če se podatki prenesejo.
                 const ime = restavracija.ime || restavracija.name || restavracija.title || restavracija.imeRestavracije || 'Neznano Ime';
                 // -------------------------------------
                 
@@ -858,31 +853,31 @@ async function naloziPrivzeteRestavracije() {
     }
 }
 
+
 // =================================================================
-// VII. ZAGON IN INICIALIZACIJA 
+// 6.9 NOVA FUNKCIJA: NAZDAJ NA PRIVZETE (GLOBALNA DEFINICIJA)
 // =================================================================
 
-// ⭐ POMEMBNO: Če te kode še nimate, jo dodajte!
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // ⭐ KLJUČNO: Sekcija z rezultati iskanja mora biti skrita ob zagonu!
-    // To rešuje problem, da se naslov vidi, preden je iskanje sproženo.
+/**
+ * Pripelje uporabnika nazaj na sekcijo s privzetimi restavracijami.
+ */
+function handlePrikaziPrivzete() {
     const searchSection = document.getElementById('rezultatiIskanjaSekcija');
-    if (searchSection) {
-        searchSection.style.display = 'none'; 
-    }
-
-    // Naložite privzete restavracije
-    naloziPrivzeteRestavracije();
+    const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
     
-    // Naloži i18n
-    // Če imate initializei18n drugje, poskrbite, da se to izvede
-    // initializei18n().then(() => {
-    //     updateContent();
-    // });
-
-    // ... (druge funkcije za poslušalce dogodkov) ...
-});
+    // Skrij iskalne rezultate
+    if (searchSection) {
+        searchSection.classList.add('hidden');
+    }
+    
+    // Prikaži privzete restavracije
+    if (defaultSection) {
+        defaultSection.style.display = 'block'; 
+    }
+    
+    // Premakni pogled na vrh
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 
 // =================================================================
@@ -1147,7 +1142,7 @@ function setupTimeSlotListeners() {
 }
 
 // =================================================================
-// 7. ZAGON IN ISKALNA LOGIKA (DOM Content Loaded)
+// 7. ZAGON IN ISKALNA LOGIKA (DOM Content Loaded) - OČIŠČENA VERZIJA
 // =================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1155,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // A. PRIDOBITEV OSNOVNIH ELEMENTOV
     const isciForm = document.querySelector('.iskalnik');
     const hitraIskanjaGumbi = document.querySelectorAll('.gumb-kategorija');
-
+    
     // B. Nastavitev poslušalcev za ISKANJE
     if (isciForm) {
         isciForm.addEventListener('submit', (e) => {
@@ -1190,6 +1185,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // KLIC NA ZAGONU STRANI: Nalaganje privzetih restavracij takoj ob zagonu
     naloziPrivzeteRestavracije();
 
+    // GUMB NAZAJ: Ni potreben poslušalec tukaj, saj se funkcija kliče direktno iz HTML (onclick).
+    
     // Nastavitev zapiranja modala za restavracijo
     setupRestavracijaModalClosure();
     

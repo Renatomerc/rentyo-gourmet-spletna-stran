@@ -97,6 +97,16 @@ module.exports = (preveriGosta) => {
     
     
     // -----------------------------------------------------------------
+    // 🌟 NOVO: RUTA ZA ODDAJO OCENE IN KOMENTARJA (POST /oceni/:restavracijaId)
+    // -----------------------------------------------------------------
+    /**
+     * POST /api/restavracije/oceni/:restavracijaId
+     * Shrani komentar v polje 'komentarji' in posodobi 'ocena_povprecje' in 'st_ocen'.
+     */
+    router.post('/oceni/:restavracijaId', preveriGosta, restavracijaController.oddajOcenoInKomentar); // <-- NOVA RUTA
+    
+    
+    // -----------------------------------------------------------------
     // ✅ POPRAVLJENO: RUTA ZA ISKANJE - DODAJE preveriGosta ZA VARNOST
     // -----------------------------------------------------------------
     /**

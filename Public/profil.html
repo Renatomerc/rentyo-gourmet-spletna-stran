@@ -22,102 +22,97 @@
 
     /* ===== GLAVA IN SKRIVANJE ELEMENTOV ===== */
     .logotip {
-        display: none !important; /* SKRIJ LOGOTIP NA VSEH NAPRAVAH */
+        display: none !important; 
     }
     .jezik-ovoj {
-        display: none !important; /* SKRIJ IZBIRNIK JEZIKA NA VSEH NAPRAVAH */
+        display: none !important; 
     }
     
-    /* 🆕 NOVI STIL: Skrije element, privzeto za formular kartice */
+    /* SKRIVANJE ELEMENTOV */
     .skrij-formular {
         display: none;
+    }
+    /* Modal za oceno na začetku ni viden */
+    .skrij-modal { 
+        display: none !important; 
     }
 
 
     /* ===== STIIL ZA GUMBE V GLAVI (HEADER) IN RAZMIKE (PRENESENO Z INDEX.HTML) ===== */
     
-    /* Skupni stil za gumbe (Nazaj, Profil, Odjava) */
     .gumb-prijava, 
     .gumb-profil, 
-    .gumb-odjava, /* DODAN TUDI GUMB ODJAVA, čeprav je zdaj v vsebini */
-    .kartica-podatkov button { /* STIL ZA VSE GUMBE V KARTICAH */
+    .gumb-odjava, 
+    .kartica-podatkov button,
+    .modal-vsebina button[type="submit"] { /* Dodan stil za gumb v modal-u */
       display: inline-flex;
       align-items: center;
       gap: 5px; 
-      padding: 8px 15px; /* Povečan padding za gumbe v vsebini */
+      padding: 8px 15px; 
       border-radius: 20px;
       font-weight: bold;
       text-decoration: none;
       transition: background-color 0.2s, color 0.2s, border-color 0.2s;
       white-space: nowrap;
       font-size: 14px;
-      cursor: pointer; /* Dodan kazalec */
-      margin-top: 15px; /* Dodan razmik od prejšnjih elementov v kartici */
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+      cursor: pointer; 
+      margin-top: 15px; 
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
 
-    /* Stil za "Prijava" in "Moj Profil" (Primarni gumb) */
+    /* Primarni stil za gumbe */
     .gumb-prijava,
     .gumb-profil,
-    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici) /* Vsi gumbi razen odjava IN prekliči */ {
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici),
+    .modal-vsebina button[type="submit"] /* Stil za gumb Oddaj oceno */ {
       background-color: #575757;
       color: white;
       border: 1px solid #575757;
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
 
     .gumb-prijava:hover, 
     .gumb-profil:hover,
-    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):hover {
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):hover,
+    .modal-vsebina button[type="submit"]:hover {
       background-color: #787878;
       border-color: #787878;
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     
-    /* Stil za "Odjava" (Sekundarni/Outline gumb) */
+    /* Sekundarni/Outline gumb */
     .gumb-odjava {
       background-color: transparent; 
-      color: #3e3e3e; /* Rdeča barva za odjavo */
+      color: #3e3e3e; 
       border: 1px solid #3e3e3e;
-      margin-left: 10px; /* Razmik, če je zraven drugega gumba */
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+      margin-left: 10px; 
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     
     .gumb-odjava:hover {
-      background-color: #d3d3d3; /* Svetlo rdeča podlaga */
+      background-color: #d3d3d3; 
       color: #424242;
       border-color: #424242;
     }
 
-    /* 🆕 NOVI STIL: Gumb za Preklic (Poudarjena rdeča za nevarnost) */
+    /* Gumb za Preklic (Nevarnost) */
     .gumb-preklici {
-      background-color: #e74c3c; /* Močna rdeča barva za nevarnost/preklic */
+      background-color: #e74c3c; 
       color: white;
       font-size: 14px;
       border: 1px solid #e74c3c;
-      padding: 8px 15px; /* Povečan padding za gumbe v vsebini */
+      padding: 8px 15px; 
       border-radius: 20px;
-      margin-left: 10px; /* Razmik od prejšnjih elementov */
-      /* Prekrije margin-top iz generičnega stila, da je poravnan z besedilom */
+      margin-left: 10px; 
       margin-top: 0; 
-      align-self: flex-start; /* Za poravnavo v liniji s textom, če je v flex kontejnerju */
-      cursor: pointer; /* Dodan kazalec */
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+      align-self: flex-start; 
+      cursor: pointer; 
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     
     .gumb-preklici:hover {
@@ -125,19 +120,19 @@
       border-color: #c0392b;
     }
 
-    /* OVOJ ZA PROFIL: Poskrbi za poravnavo in razmik (dihanje) */
+    /* OVOJ ZA PROFIL */
     .profil-ovoj {
         display: flex; 
         align-items: center;
         gap: 10px; 
     }
 
-    /* ===== STYLING ZA GUMB NAZAJ (NI SPREMENJENO) ===== */
+    /* GUMB NAZAJ */
     .gumb-nazaj {
       text-decoration: none;
       color: white;
       background-color: #333;
-      border-radius: 50%; /* Oblika kroga */
+      border-radius: 50%; 
       width: 35px;
       height: 35px;
       display: flex;
@@ -146,10 +141,8 @@
       font-size: 16px;
       margin-right: 15px;
       transition: background-color 0.2s;
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     
     .gumb-nazaj:hover {
@@ -166,22 +159,22 @@
       border-bottom: 1px solid #ccc;
       overflow-x: auto; 
       white-space: nowrap;
-      flex-direction: row; /* Poskrbimo, da je horizontalno na namizju */
+      flex-direction: row; 
     }
 
     .profil-zavihek {
       padding: 15px 25px;
       cursor: pointer;
       font-weight: bold;
-      border-bottom: 3px solid transparent; /* Aktivna črta spodaj */
+      border-bottom: 3px solid transparent; 
       transition: 0.2s;
-      text-align: center; /* Vsebina v zavihku na sredini */
-      border-left: none; /* Odstrani morebitno levi rob iz mobilnega */
+      text-align: center; 
+      border-left: none; 
       border-right: none;
     }
 
     .profil-zavihek.active {
-      border-bottom-color:none ; /* Aktivna barva za spodnji rob */
+      border-bottom-color:none ; 
       color: #20c0bd;
     }
 
@@ -193,7 +186,6 @@
       display: block;
     }
 
-    /* Dodajte stajling za obliko vsebine, kartic, formularjev itd. */
     .kartica-podatkov {
         background: #f9f9f9;
         padding: 20px;
@@ -201,7 +193,6 @@
         margin-bottom: 20px;
     }
 
-    /* Stilizacija elementov formularja za lepši videz */
     .kartica-formular label {
         display: block;
         margin-top: 10px;
@@ -217,7 +208,7 @@
         margin-bottom: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
-        box-sizing: border-box; /* Ključno za padding! */
+        box-sizing: border-box; 
     }
 
     .flex-vrsta {
@@ -228,6 +219,98 @@
     .flex-vrsta > div {
         flex: 1;
     }
+    
+    /* Stil za klikljive pretekle rezervacije */
+    .kartica-rezervacije.pretekla { 
+        cursor: pointer; 
+        transition: background-color 0.2s; 
+    }
+    .kartica-rezervacije.pretekla:hover { 
+        background-color: #f0f0f0 !important; 
+    }
+
+
+    /* 🆕 NOVO: Stil za Modal (Okno za oceno) */
+    #modal-ocena { 
+        position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; 
+        overflow: auto; background-color: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-vsebina { 
+        background-color: #fefefe; 
+        margin: 0; 
+        padding: 30px; 
+        border: 1px solid #888; 
+        width: 90%; 
+        max-width: 500px; 
+        border-radius: 12px;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .zapri-gumb { 
+        color: #aaa; 
+        position: absolute; 
+        top: 10px; 
+        right: 20px;
+        font-size: 32px; 
+        font-weight: bold; 
+        cursor: pointer;
+        line-height: 1;
+    }
+    .zapri-gumb:hover, .zapri-gumb:focus { 
+        color: black; 
+        text-decoration: none; 
+        cursor: pointer; 
+    }
+    #formular-ocena select, #formular-ocena textarea {
+        padding: 10px; 
+        border-radius: 6px; 
+        border: 1px solid #ccc; 
+        width: 100%; 
+        margin-top: 5px; 
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+    
+    /* 🌟 NOVO: Stil za Sporočilno polje */
+    #sporocilo-ovoj {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        max-width: 350px;
+        transition: opacity 0.3s, transform 0.3s;
+        transform: translateY(-100px); /* Skrito zgoraj */
+        opacity: 0;
+    }
+
+    .sporocilo {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+    }
+
+    .sporocilo.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .sporocilo.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .sporocilo.visible {
+        transform: translateY(0); /* Prikazano */
+        opacity: 1;
+    }
+
     
     /* ================================== */
     /* ===== PRAVILA ZA MOBILNE NAPRAVE (do 768px) ===== */
@@ -249,47 +332,43 @@
 
         /* 2. MENU ZAVIHKA (Vertikalno na mobilnem) */
         .profil-menu {
-            flex-direction: column; /* Ključno: zavihki vertikalno */
-            margin-bottom: 0; /* Odstranimo spodnji rob */
-            border-bottom: none; /* Odstranimo spodnjo črto */
-            /* Stil menija kot kontejnerja */
+            flex-direction: column; 
+            margin-bottom: 0; 
+            border-bottom: none; 
             background-color: white;
-            border: 1px solid white; /* Lahek rob okoli celotnega menija */
+            border: 1px solid white; 
             border-radius: 8px;
             margin-bottom: 25px;
-            overflow: hidden; /* Odstrani scrollbar */
+            overflow: hidden; 
         }
 
         .profil-zavihek {
             width: 70%;
-            padding: 5px 20px; /* Malo večji padding za boljše tapkanje */
+            padding: 5px 20px; 
             border-radius: 25px;
             text-align: left;
-            border-bottom: 0px solid #f4f4f9; /* Ločilna črta med zavihki */
+            border-bottom: 0px solid #f4f4f9; 
             border-right: none; 
-            border-left: 3px solid transparent; /* Priprava za aktivni levi rob */
-            font-weight: normal; /* Manj poudarjen font na mobilnem */
+            border-left: 3px solid transparent; 
+            font-weight: normal; 
         }
         
-        /* Odstranimo zadnjo ločilno črto */
         .profil-zavihek:last-child {
             border-bottom: none;
         }
         
         /* Aktivni zavihek (Mobilni) */
         .profil-zavihek.active {
-            border-left-color: #1BC0BB; /* Aktivna barva na levi */
+            border-left-color: #1BC0BB; 
             color: #333;
             border-radius: 25px;
             background-color: #1BC0BB;
-            border-bottom-color: #1BC0BB; /* Da skrije spodnjo črto pod sabo */
-                      /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+            border-bottom-color: #1BC0BB; 
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
         }
         
-        /* 4. SKRIJEMO NASLOV, da ne pride do podvajanja, če je vsebina zavihka očitna */
+        /* 4. SKRIJEMO NASLOV */
         .vsebina-zavihek h3 {
              display: none; 
         }
@@ -302,7 +381,7 @@
 
         .kartica-formular input[type="text"],
         .kartica-formular input[type="month"] {
-             margin-bottom: 5px; /* Manj razmika na mobilnem */
+             margin-bottom: 5px; 
         }
     }
   </style>
@@ -320,6 +399,9 @@
   </header>
 
   <main>
+    <!-- 🌟 NOVO: Sporočilno polje za zamenjavo alert() -->
+    <div id="sporocilo-ovoj"></div>
+    
     <section class="profil-sekcija">
       <h2 data-i18n="profile.title">Moj Uporabniški Profil</h2>
       
@@ -347,13 +429,12 @@
 
       <div class="vsebina-zavihek" id="aktualne-rezervacije">
         <h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>
-        <p>Restavracija Pri Mariji, 27. 11. 2025 ob 19:00 (2 osebi) <button class="gumb-preklici" data-i18n="profile.cancel_button">Prekliči</button></p>
+        <!-- Vsebina se bo naložila z JS -->
       </div>
 
       <div class="vsebina-zavihek" id="zgodovina">
         <h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>
-        <p>Restavracija XXX, 1. 10. 2025 ob 18:30 (4 osebe)</p>
-        <p>Restavracija YYY, 15. 9. 2025 ob 20:00 (2 osebi)</p>
+        <!-- Vsebina se bo naložila z JS -->
       </div>
 
       <div class="vsebina-zavihek" id="tocke-kartica">
@@ -407,6 +488,39 @@
       </div>
       
     </section>
+    
+    <!-- Modal za oceno in komentar. -->
+    <div id="modal-ocena" class="skrij-modal">
+        <div class="modal-vsebina">
+            <span class="zapri-gumb">&times;</span>
+            <h3 id="modal-ocena-naslov" data-i18n="profile.rate_title">Ocenite Restavracijo</h3>
+            
+            <form id="formular-ocena">
+                <input type="hidden" id="ocena-restavracija-id" name="restavracijaId">
+                <input type="hidden" id="ocena-rezervacija-id" name="rezervacijaId">
+
+                <div>
+                    <label for="ocena" data-i18n="profile.rating_label">Ocena (1-5):</label>
+                    <select id="ocena" name="ocena" required>
+                        <option value="5">⭐⭐⭐⭐⭐ Odlično</option>
+                        <option value="4">⭐⭐⭐⭐ Zelo dobro</option>
+                        <option value="3">⭐⭐⭐ Povprečno</option>
+                        <option value="2">⭐⭐ Slabo</option>
+                        <option value="1">⭐ Grozno</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="komentar" data-i18n="profile.comment_label">Komentar:</label>
+                    <textarea id="komentar" name="komentar" rows="4" placeholder="Vaš komentar..."></textarea>
+                </div>
+                
+                <button type="submit" data-i18n="profile.submit_review">Oddaj Oceno</button>
+            </form>
+        </div>
+    </div>
+    <!-- Konec Modala -->
+    
   </main>
 
   <footer class="noga">
@@ -421,14 +535,62 @@
         // ===========================================
         const BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/';
         
-        // 🔴 KLJUČNI POPRAVEK: Popravljene in dodane API poti
+        // API poti
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
         const ZGODOVINA_REZERVACIJ_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`;
-        const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`; // Uporabimo DELETE pot
+        const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
+        // 🚨 POPRAVLJENO: Spremenjena pot iz 'oceni' v 'ocenite' na podlagi napake 404
+        const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/ocenite`; 
 
         // ===========================================
-        // 1. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
+        // Elementi modala in podatki
+        // ===========================================
+        const modalOcena = document.getElementById('modal-ocena');
+        const modalZapriGumb = document.querySelector('#modal-ocena .zapri-gumb');
+        const formularOcena = document.getElementById('formular-ocena');
+        // 🚨 POPRAVLJENO: Spodaj sem obrnil ID-ja, da sta v vrstnem redu polj v HTML
+        const ocenaRestavracijaIdInput = document.getElementById('ocena-restavracija-id'); 
+        const ocenaRezervacijaIdInput = document.getElementById('ocena-rezervacija-id'); 
+        const modalOcenaNaslov = document.getElementById('modal-ocena-naslov');
+        const sporociloOvoj = document.getElementById('sporocilo-ovoj'); // 🌟 NOVO: Ovoj za sporočila
+
+        // Elemente za prikaz podatkov
+        const podatkiImeElement = document.getElementById('profil-ime'); 
+        const podatkiEmailElement = document.getElementById('profil-email'); 
+        const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
+        const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
+        const tockeStatusElement = document.getElementById('tocke-status-prikaz');
+
+
+        // ===========================================
+        // 1. FUNKCIJA ZA PRIKAZ SPOROČIL (ZAMENJAVA ZA alert())
+        // ===========================================
+        
+        /**
+         * Prikazuje sporočilo o uspehu ali napaki na vrhu strani.
+         * @param {string} tip 'success' ali 'error'
+         * @param {string} sporocilo Besedilo sporočila
+         */
+        const prikaziSporocilo = (tip, sporocilo) => {
+            const sporociloDiv = document.createElement('div');
+            sporociloDiv.classList.add('sporocilo', tip);
+            sporociloDiv.textContent = sporocilo;
+
+            sporociloOvoj.appendChild(sporociloDiv);
+            
+            // Pokaži sporočilo
+            setTimeout(() => sporociloDiv.classList.add('visible'), 10);
+
+            // Skrij in odstrani po 5 sekundah
+            setTimeout(() => {
+                sporociloDiv.classList.remove('visible');
+                setTimeout(() => sporociloOvoj.removeChild(sporociloDiv), 300);
+            }, 5000);
+        };
+
+        // ===========================================
+        // 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
         // ===========================================
         const zavihki = document.querySelectorAll(".profil-zavihek");
         const vsebine = document.querySelectorAll(".vsebina-zavihek");
@@ -444,34 +606,17 @@
         });
 
         // ===========================================
-        // 2. AVTENTIKACIJA IN NALAGANJE PODATKOV
+        // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
         // ===========================================
 
         const zeton = localStorage.getItem('zeton');
-        const akcijeDiv = document.querySelector('.akcije');
         
-        // Elemente za prikaz podatkov
-        const podatkiImeElement = document.getElementById('profil-ime'); 
-        const podatkiEmailElement = document.getElementById('profil-email'); 
-        // 🆕 NOVO: Kontejnerji za rezervacije
-        const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
-        const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
-        // 🟢 NOVO: Element za prikaz točk
-        const tockeStatusElement = document.getElementById('tocke-status-prikaz');
-
-        /**
-         * Prikaz gumba za odjavo in gumba nazaj
-         */
         const updateHeader = () => {
             if (!zeton) {
-                // Če ni žetona, uporabnika preusmerimo nazaj
                 window.location.href = 'index.html';
             }
         };
         
-        /**
-         * Logika za odjavo
-         */
         const odjava = (e) => {
             if (e) e.preventDefault();
             localStorage.removeItem('zeton'); 
@@ -479,12 +624,6 @@
             window.location.href = 'index.html'; 
         };
         
-        /**
-         * Posodobi prikaz imena in priimka/e-pošte
-         * @param {HTMLElement} element - Element, ki ga posodabljamo
-         * @param {string} labelKey - i18n ključ za labelo (npr. 'profile.name_label')
-         * @param {string} value - Dejanska vrednost (ime ali e-pošta)
-         */
         const posodobiPrikazPodatka = (element, labelKey, value) => {
             if (element) {
                 const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
@@ -501,13 +640,9 @@
             }
         };
 
-        /**
-         * Pokliče zaščiten endpoint in napolni osebne podatke IN točke
-         */
         const naloziPodatkeProfila = async () => {
             if (!zeton) return;
 
-            // Dodajanje event listenerja za gumb ODJAVA
             const gumbOdjava = document.getElementById('gumb-odjava');
             if (gumbOdjava) {
                 gumbOdjava.addEventListener('click', odjava);
@@ -530,26 +665,21 @@
                         posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
                         posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
                         
-                        // 🟢 NOVO: Logika za točke zvestobe
                         if (tockeStatusElement && uporabnik.tockeZvestobe !== undefined) {
                             const tocke = uporabnik.tockeZvestobe;
-                            
-                            // To razmerje (45 točk = 1€) morate prilagoditi, če je v backendu drugače
                             const tockeZaEuro = 45; 
                             const vrednostVPopustu = (tocke / tockeZaEuro).toFixed(2); 
                             
-                            // 💥 POPRAVLJENO: Uporabimo parameter 'count', saj sl.json definira {{count}}
                             const statusText = i18next.t('profile.points_status_dynamic', {
-                                count: tocke, // KLJUČNA ZAMENJAVA: tocke -> count
+                                count: tocke, 
                                 popust: vrednostVPopustu 
                             });
 
-                            // Prikaz
                             tockeStatusElement.innerHTML = statusText; 
 
                         } else if (tockeStatusElement) {
-                             // Če točke niso vrnjene, prikažemo statično sporočilo (ki bo po defaultu i18n prevod)
-                             tockeStatusElement.textContent = i18next.t('profile.points_status');
+                             // 🌟 POPRAVEK: Uporaba translation key
+                             tockeStatusElement.textContent = i18next.t('profile.points_loading');
                         }
                         
                     } else {
@@ -569,14 +699,13 @@
         };
 
         // ===========================================
-        // 3. LOGIKA ZA REZERVACIJE (NOVO)
+        // 4. LOGIKA ZA REZERVACIJE IN OCENJEVANJE 
         // ===========================================
         
-        /**
-         * Klic API-ja za preklic rezervacije
-         */
         const prekliciRezervacijo = async (restavracijaId, mizaId, rezervacijaId) => {
-            if (!confirm(i18next.t('profile.cancel_confirmation'))) return;
+            
+            // 🌟 POPRAVEK: Zamenjaj alert() z window.confirm() (ki se ne izvede v iframu, a je boljša praksa kot alert)
+            if (!window.confirm(i18next.t('profile.cancel_confirmation'))) return;
             
             try {
                 const response = await fetch(PREKLIC_REZERVACIJE_API_URL, {
@@ -593,26 +722,22 @@
                 });
 
                 if (response.ok) {
-                    alert(i18next.t('profile.cancel_success'));
-                    // Ponovno nalaganje obeh seznamov po uspešnem preklicu
+                    prikaziSporocilo('success', i18next.t('profile.cancel_success')); // 🌟 POPRAVEK: Uporaba sporočilnega polja
                     naloziAktivneRezervacije(); 
                     naloziZgodovinoRezervacij();
                 } else {
-                    const errorData = await response.json();
-                    alert(`${i18next.t('profile.cancel_error')}: ${errorData.msg || response.statusText}`);
+                    // 🌟 IZBOLJŠAVA: Dodano podrobno logiranje napake
+                    const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+                    console.error("SERVER RESPONSE ERROR on cancellation:", response.status, errorData);
+                    prikaziSporocilo('error', `${i18next.t('profile.cancel_error')}: ${errorData.msg || response.statusText}. Prosimo, preverite konzolo za podrobnosti.`);
                 }
             } catch (error) {
                 console.error("Napaka pri preklicu rezervacije:", error);
-                alert(i18next.t('profile.server_error'));
+                prikaziSporocilo('error', i18next.t('profile.server_error')); // 🌟 POPRAVEK: Uporaba sporočilnega polja
             }
         };
 
-        /**
-         * Pomožna funkcija za renderiranje rezervacij
-         * 💥 KLJUČNO POPRAVLJENO: Logika za status v Zgodovini.
-         */
         const renderRezervacije = (rezervacije, kontejnerElement, jeAktivnaLista) => {
-            // Ponastavi vsebino kontejnerja (hrani samo h3 naslov)
             const h3 = kontejnerElement.querySelector('h3');
             kontejnerElement.innerHTML = '';
             if (h3) kontejnerElement.appendChild(h3);
@@ -632,27 +757,38 @@
             }
 
             rezervacije.forEach(rez => {
-                // 💥 POPRAVEK: Uporabimo <div> za boljšo strukturo 'kartice'
                 const kartica = document.createElement('div');
-                kartica.classList.add('kartica-rezervacije'); 
-                kartica.classList.add('kartica-podatkov'); 
+                kartica.classList.add('kartica-rezervacije', 'kartica-podatkov'); 
                 kartica.style.padding = '15px 20px';
                 kartica.style.marginBottom = '10px';
                 kartica.style.border = '1px solid #ccc';
                 kartica.style.borderRadius = '8px';
                 kartica.style.display = 'flex';
-                kartica.style.flexDirection = 'row'; /* Osnovni prikaz v vrsti */
-                kartica.style.justifyContent = 'space-between'; /* Razmak med vsebino in gumbom */
+                kartica.style.flexDirection = 'row'; 
+                kartica.style.justifyContent = 'space-between'; 
                 kartica.style.alignItems = 'center';
                 kartica.style.gap = '15px';
                 kartica.style.backgroundColor = '#fff';
                 
-                // --- 1. Podatki o rezervaciji (Text Content) ---
-
-                // Formatiranje časa (npr. 19.5 -> 19:30)
+                if (!jeAktivnaLista) {
+                    kartica.classList.add('pretekla');
+                    // 🚨 PREVERJENO: Tole je pravilno. restavracijaId in _id (rezervacijaId) se pobirata.
+                    kartica.dataset.restavracijaId = rez.restavracijaId;
+                    kartica.dataset.rezervacijaId = rez._id; 
+                    kartica.dataset.imeRestavracije = rez.ime_restavracije;
+                    
+                    // 🌟 KLJUČNA LOGIKA: Event listener za odpiranje modala
+                    kartica.addEventListener('click', (e) => {
+                        if (e.target.tagName !== 'BUTTON') { 
+                            // 🚨 PREVERJENO: Kličemo z ID-jema, ki sta v redu
+                            odpriModalOcena(rez.restavracijaId, rez._id, rez.ime_restavracije);
+                        }
+                    });
+                }
+                
+                // --- 1. Podatki o rezervaciji ---
                 const cas = rez.cas_rezervacije;
-                const ura = Math.floor(cas); // 19.5 -> 19
-                // Izboljšana pretvorba decimal v minute:
+                const ura = Math.floor(cas); 
                 const minute = Math.round((cas - ura) * 60); 
                 const casIzpis = `${ura.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 
@@ -664,18 +800,15 @@
                     <p style="margin: 5px 0 0 0;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${rez.datum_rezervacije} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1 ml-4"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${casIzpis} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1 ml-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>${rez.stevilo_oseb}</p>
                 `;
 
-                // 🌟 KLJUČNI POPRAVEK: Robustnejša logika za zgodovino
+                // Logika za status v zgodovini
                 if (!jeAktivnaLista) {
-                    const currentStatus = rez.status ? rez.status.toUpperCase() : 'POTRJENO'; // Privzeto POTRJENO, če polje manjka
-
-                    // Če smo prešli na trdo brisanje, je v zgodovini le POTRJENO/ZAKLJUČENO (pretekle)
-                    // Vendar, če boste v bazi ohranili preklicane rezervacije (za zgodovino!), potrebujete to logiko.
+                    const currentStatus = rez.status ? rez.status.toUpperCase() : 'POTRJENO'; 
                     const isCancelled = currentStatus === 'PREKLICANO'; 
                     const statusText = isCancelled
                         ? i18next.t('profile.status_cancelled') 
-                        : i18next.t('profile.status_completed'); // Ostale pretekle (potrjeno/zaključeno)
-                    const color = isCancelled ? 'orange' : 'grey';
-                    
+                        : i18next.t('profile.status_completed');
+                    const color = isCancelled ? 'orange' : 'green'; 
+
                     htmlContent += `<p style="margin: 5px 0 0 0; font-weight: bold; color: ${color};">${statusText}</p>`;
                 }
                 
@@ -687,15 +820,12 @@
                     const preklicGumb = document.createElement('button');
                     preklicGumb.classList.add('gumb-preklici');
                     preklicGumb.textContent = i18next.t('profile.cancel_button');
-                    preklicGumb.style.flexShrink = '0'; // Ne skrči se
+                    preklicGumb.style.flexShrink = '0'; 
 
-                    // 🟢 POPRAVEK: Uporabimo dejanski mizaId, ki ga posreduje backend
                     const mizaId = rez.mizaId; 
                     
                     preklicGumb.addEventListener('click', (e) => {
                         e.stopPropagation(); 
-                        console.log(`[FRONTEND] Poskus preklica: RezervacijaID: ${rez._id}, RestavracijaID: ${rez.restavracijaId}, MizaID: ${mizaId}`);
-                        // 🟢 POPRAVLJEN KLIC
                         prekliciRezervacijo(rez.restavracijaId, mizaId, rez._id);
                     });
                     
@@ -706,9 +836,6 @@
             });
         };
 
-        /**
-         * Klic API-ja za aktivne rezervacije
-         */
         const naloziAktivneRezervacije = async () => {
             try {
                 const response = await fetch(AKTIVNE_REZERVACIJE_API_URL, {
@@ -721,7 +848,6 @@
                     renderRezervacije(rezervacije, aktivneRezervacijeKontejner, true);
                 } else if (response.status === 401 || response.status === 403) {
                     renderRezervacije([], aktivneRezervacijeKontejner, true);
-                    console.error("Dostop do aktivnih rezervacij zavrnjen.");
                 } else {
                     console.error("Napaka pri nalaganju aktivnih rezervacij:", response.status);
                     aktivneRezervacijeKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
@@ -731,9 +857,6 @@
             }
         };
 
-        /**
-         * Klic API-ja za zgodovino rezervacij
-         */
         const naloziZgodovinoRezervacij = async () => {
             try {
                 const response = await fetch(ZGODOVINA_REZERVACIJ_API_URL, {
@@ -743,12 +866,9 @@
 
                 if (response.ok) {
                     const rezervacije = await response.json();
-                    // 🌟 KLJUČNO: Dodan console.log za preverjanje statusov
-                    console.log("Podatki zgodovine rezervacij (za preverjanje statusov):", rezervacije); 
                     renderRezervacije(rezervacije, zgodovinaRezervacijKontejner, false);
                 } else if (response.status === 401 || response.status === 403) {
                     renderRezervacije([], zgodovinaRezervacijKontejner, false);
-                    console.error("Dostop do zgodovine rezervacij zavrnjen.");
                 } else {
                     console.error("Napaka pri nalaganju zgodovine rezervacij:", response.status);
                     zgodovinaRezervacijKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
@@ -760,7 +880,97 @@
 
 
         // ===========================================
-        // 4. i18next IN ZAGON
+        // 5. LOGIKA ZA OCENJEVANJE
+        // ===========================================
+        
+        /**
+         * Odpre modal za ocenjevanje in napolni polja
+         */
+        const odpriModalOcena = (restavracijaId, rezervacijaId, imeRestavracije) => {
+            modalOcenaNaslov.textContent = `${i18next.t('profile.rate_title')} ${imeRestavracije}`;
+            // 🚨 PREVERJENO: Pravilno napolnjeno
+            ocenaRestavracijaIdInput.value = restavracijaId; 
+            ocenaRezervacijaIdInput.value = rezervacijaId; 
+            
+            // Počisti vnosna polja
+            document.getElementById('ocena').value = '5';
+            document.getElementById('komentar').value = '';
+
+            modalOcena.classList.remove('skrij-modal');
+        };
+
+        /**
+         * Zapre modal za ocenjevanje
+         */
+        const zapriModalOcena = () => {
+            modalOcena.classList.add('skrij-modal');
+        };
+
+        /**
+         * Pošlje oceno in komentar na API
+         */
+        const oddajOcenoInKomentar = async (e) => {
+            e.preventDefault();
+
+            // 🚨 PREVERJENO: Pobiramo pravilne vrednosti
+            const restavracijaId = ocenaRestavracijaIdInput.value;
+            const rezervacijaId = ocenaRezervacijaIdInput.value;
+            const ocena = document.getElementById('ocena').value;
+            const komentar = document.getElementById('komentar').value;
+            
+            if (!restavracijaId || !rezervacijaId || !ocena) {
+                prikaziSporocilo('error', i18next.t('profile.review_missing_data'));
+                return;
+            }
+
+            try {
+                const response = await fetch(ODDAJ_OCENO_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}`
+                    },
+                    body: JSON.stringify({ 
+                        // 🚨 PREVERJENO: Sendamo kot restavracijaId in rezervacijaId
+                        restavracijaId, 
+                        rezervacijaId, 
+                        ocena: parseInt(ocena, 10), 
+                        komentar 
+                    })
+                });
+
+                if (response.ok) {
+                    prikaziSporocilo('success', i18next.t('profile.review_success')); // 🌟 POPRAVEK: Uporaba sporočilnega polja
+                    zapriModalOcena();
+                } else {
+                    // 🌟 IZBOLJŠAVA: Dodano podrobno logiranje napake
+                    const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+                    console.error("SERVER RESPONSE ERROR on review submission (Preverite ID-je!):", response.status, errorData);
+                    prikaziSporocilo('error', `${i18next.t('profile.review_error')}: ${errorData.msg || response.statusText}. Prosimo, preverite konzolo za podrobnosti.`);
+                }
+
+            } catch (error) {
+                console.error("Napaka pri oddaji ocene (Network Error):", error);
+                prikaziSporocilo('error', i18next.t('profile.server_error')); // 🌟 POPRAVEK: Uporaba sporočilnega polja
+            }
+        };
+        
+        // Event listenerji za modal (Zapiranje)
+        if(modalZapriGumb) {
+            modalZapriGumb.addEventListener('click', zapriModalOcena);
+        }
+        window.addEventListener('click', (event) => {
+            if (event.target === modalOcena) {
+                zapriModalOcena();
+            }
+        });
+        if(formularOcena) {
+             formularOcena.addEventListener('submit', oddajOcenoInKomentar);
+        }
+
+
+        // ===========================================
+        // 6. i18next IN ZAGON
         // ===========================================
 
         const updateContent = () => {
@@ -777,7 +987,6 @@
           
           document.title = i18next.t("app.profile_title");
 
-          // Ponovno posodobimo labele po nalaganju jezika
           const imeLabel = i18next.t('profile.name_label');
           const emailLabel = i18next.t('profile.email_label');
 
@@ -789,14 +998,10 @@
               const content = podatkiEmailElement.querySelector('span')?.textContent || '';
               podatkiEmailElement.innerHTML = `<strong>${emailLabel}:</strong> <span class="placeholder-text">${content}</span>`;
           }
-
-          // Posodobimo tudi status točk, če je statičen (za primere, ko JS še ni dobil podatka iz APIja)
-          if (tockeStatusElement) {
-             tockeStatusElement.textContent = tockeStatusElement.textContent.includes('Nalaganje') 
-                ? i18next.t('profile.points_loading') // Če imate poseben ključ
-                : i18next.t('profile.points_status'); // Privzeti statični ključ (450 točk)
-          }
           
+          if (modalOcenaNaslov) {
+             modalOcenaNaslov.textContent = i18next.t('profile.rate_title');
+          }
         };
 
         const loadLanguage = () => {
@@ -808,7 +1013,6 @@
                 lng: loadLanguage(), 
                 fallbackLng: "sl",
                 backend: { loadPath: "./i18n/{{lng}}.json" }, 
-                // 💥 KLJUČNI DODATEK: Konfiguracija interpolacije
                 interpolation: {
                     escapeValue: false, 
                 }
@@ -819,18 +1023,17 @@
                 updateContent();
                 updateHeader();
                 
-                // 🚀 ZAGON NALAGANJA PODATKOV IN REZERVACIJ
+                // ZAGON NALAGANJA PODATKOV IN REZERVACIJ
                 naloziPodatkeProfila(); 
-                naloziAktivneRezervacije(); // 🆕 KLJUČNO
-                naloziZgodovinoRezervacij(); // 🆕 KLJUČNO
+                naloziAktivneRezervacije(); 
+                naloziZgodovinoRezervacij(); 
                 
-                // 🆕 KLJUČNA LOGIKA: Prikaz/skrivanje formularja za kartico
+                // Logika: Prikaz/skrivanje formularja za kartico
                 const gumbDodajKartico = document.getElementById('gumb-dodaj-kartico');
                 const formularKartice = document.getElementById('kartica-formular');
                 const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
                 
                 // POČISTIMO STATIČNO VSEBINO v "Aktualne rezervacije" in "Zgodovina rezervacij"
-                // saj jo bomo dinamično naložili
                 aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>`;
                 zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>`;
 
@@ -850,7 +1053,7 @@
                     if (form) {
                         form.addEventListener('submit', (e) => {
                             e.preventDefault();
-                            console.log('Podatki kartice shranjeni! (Implementacija pošiljanja na strežnik še sledi)');
+                            prikaziSporocilo('success', i18next.t('profile.card_saved')); // 🌟 POPRAVEK: Uporaba sporočilnega polja
                             preklopiPrikazFormularja();
                         });
                     }
