@@ -768,3 +768,9 @@ a:hover {
 .hidden {
     display: none !important; /* Uporabite !important, da zagotovite skrivanje ob zagonu */
 }
+/* Dodajte to v style.css ali ustrezen CSS blok */
+
+.review-separator {
+    /* To ustvari tanko sivo črto na dnu elementa */
+    border-bottom: 1px solid #d1d5db; /* Svetlo siva barva (Tailwind's gray-300) */
+}

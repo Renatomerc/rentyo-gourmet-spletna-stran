@@ -104,14 +104,25 @@ function renderReviews(reviews) {
         return;
     }
     
-    reviews.forEach(review => {
+    // ⭐ SPREMENJENO: Dodan 'index' za preverjanje zadnjega elementa
+    reviews.forEach((review, index) => {
         const reviewElement = document.createElement('div');
-        reviewElement.className = 'review-card border-b pb-4 mb-4'; 
+        
+        // Osnovni razredi za polnilni prostor in kartico
+        reviewElement.className = 'review-card pb-4'; 
+        
+        // ⭐ NOVI LOGIKA ZA LOČILO: Dodamo ločilo, če komentar NI zadnji na seznamu
+        if (index < reviews.length - 1) {
+            // Uporabite lahko Tailwind razrede ali definiran 'review-separator'
+            reviewElement.classList.add('review-separator', 'mb-4'); 
+        } else {
+             // Zadnji element ima samo spodnji rob, brez ločila
+            reviewElement.classList.add('mb-4');
+        }
         
         const validOcena = typeof review.ocena === 'number' ? review.ocena : 0;
         const ratingHtml = generateStarsHTML(validOcena);
         
-        // ⭐ KRITIČNI POPRAVEK: Ključ 'ime' je zamenjan z 'uporabniskoIme'
         const ime = review.uporabniskoIme || (window.i18next ? i18next.t('modal.anonymous_user') : 'Neznan Uporabnik');
 
         // Robustna obravnava datuma

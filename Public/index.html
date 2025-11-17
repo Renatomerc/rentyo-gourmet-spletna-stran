@@ -1114,7 +1114,6 @@
         animation: tabFadeIn 0.3s ease;
         padding-top: 10px;
     }
-
     .tab-content.active {
         display: block;
     }
@@ -3225,7 +3224,7 @@ function renderReviews(reviews) {
         reviewElement.className = 'review-card border-b pb-4 mb-4'; 
         
         const ratingHtml = generateStarsHTML(review.ocena);
-        const ime = review.ime || i18next.t('modal.anonymous_user') || 'Neznan Uporabnik';
+        const ime = review.uporabniskoIme || i18next.t('modal.anonymous_user') || 'Neznan Uporabnik';
         
         reviewElement.innerHTML = `
             <div class="flex items-center justify-between mb-2">
