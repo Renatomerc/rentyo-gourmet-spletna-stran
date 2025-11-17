@@ -540,8 +540,8 @@
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
         const ZGODOVINA_REZERVACIJ_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`;
         const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
-        // 🚨 POPRAVLJENO: Spremenjena pot iz 'oceni' v 'ocenite' na podlagi napake 404
-        const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/ocenite`; 
+        // ✅ Popravljeno: Ujema se z routerjem '/oceni'
+        const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
 
         // ===========================================
         // Elementi modala in podatki
@@ -549,7 +549,7 @@
         const modalOcena = document.getElementById('modal-ocena');
         const modalZapriGumb = document.querySelector('#modal-ocena .zapri-gumb');
         const formularOcena = document.getElementById('formular-ocena');
-        // 🚨 POPRAVLJENO: Spodaj sem obrnil ID-ja, da sta v vrstnem redu polj v HTML
+        // 🚨 PREVERJENO: Obrnjena ID-ja sta ohranjena
         const ocenaRestavracijaIdInput = document.getElementById('ocena-restavracija-id'); 
         const ocenaRezervacijaIdInput = document.getElementById('ocena-rezervacija-id'); 
         const modalOcenaNaslov = document.getElementById('modal-ocena-naslov');
@@ -923,15 +923,20 @@
                 return;
             }
 
+            // 🚀 KLJUČNA SPREMEMBA: Dodajanje restavracijaId na konec URL-ja
+            const urlZKlicem = `${ODDAJ_OCENO_API_URL}/${restavracijaId}`;
+
             try {
-                const response = await fetch(ODDAJ_OCENO_API_URL, {
+                const response = await fetch(urlZKlicem, { // Uporaba novega URL-ja z ID-jem
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${zeton}`
                     },
                     body: JSON.stringify({ 
-                        // 🚨 PREVERJENO: Sendamo kot restavracijaId in rezervacijaId
+                        // restavracijaId je sedaj v URL-ju, vendar ga pustimo v bodyju, če ga backend pričakuje na obeh mestih.
+                        // Glede na standardni Express router, kjer ID v URL služi za iskanje, ostale podatke pošljemo v bodyju.
+                        // Pošiljanje restavracijaId v bodyju ni nujno, a ne škodi, če backend to potrebuje. Pustimo ga!
                         restavracijaId, 
                         rezervacijaId, 
                         ocena: parseInt(ocena, 10), 

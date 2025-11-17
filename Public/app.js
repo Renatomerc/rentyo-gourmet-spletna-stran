@@ -41,6 +41,9 @@ const galerijaSlikeDiv = document.getElementById('galerijaSlike');
 const modalZemljevid = document.getElementById('modalZemljevid');
 const modalAktualnaPonudbaOpis = document.getElementById('modalAktualnaPonudbaOpis');
 
+// 🔥 NOVO: Element za zavihek Ocene
+const tabOceneDiv = document.getElementById('tabOcene');
+
 // Elementi za Formular Iskanja (Predpostavimo, da obstaja FORM z ID="search-form")
 const searchForm = document.getElementById('search-form');
 const mestoInput = document.getElementById('mesto');
@@ -72,6 +75,19 @@ function generateStarsHTML(rating) {
     }
     return starsHTML;
 }
+
+// 🔥 NOVO: Pomožna funkcija za formatiranje datuma
+function formatDatum(datumNiz) {
+    // Sprejme "2025-11-17T08:24:25.818+00:00" in vrne "17. 11. 2025"
+    try {
+        const datum = new Date(datumNiz);
+        // Uporabimo slovenski format
+        return datum.toLocaleDateString('sl-SI', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch {
+        return 'Neznan datum';
+    }
+}
+// -------------------------------------------------------------
 
 // Funkcija za logiko zavihkov
 modalTabs.forEach(tab => {
@@ -149,6 +165,9 @@ function prikaziPodrobnosti(restavracija) {
     
     // Predpostavimo, da je meni pod menuItems (array)
     const meni = restavracija.menuItems || [];
+    
+    // 🔥 NOVO: Pridobitev komentarjev
+    const komentarji = restavracija.komentarji || [];
 
 
     currentRestaurantId = id;
@@ -202,32 +221,68 @@ function prikaziPodrobnosti(restavracija) {
     } else {
         galerijaSlikeDiv.innerHTML = '<p class="text-gray-500">Ni dodatnih slik za prikaz.</p>';
     }
+    
+    // 🔥 NOVO: 6. Generiranje Komentarjev in Ocen (Zavihek Ocene)
+    if (tabOceneDiv) {
+        let htmlKomentarjev = '';
 
-    // 6. Vdelan Zemljevid (Google Maps Embed API)
+        if (komentarji.length > 0) {
+            komentarji.forEach(komentar => {
+                const uporabniskoIme = komentar.uporabniskoIme || 'Anonimni uporabnik';
+                const datum = komentar.datum ? formatDatum(komentar.datum) : 'Neznan datum';
+                
+                // Opomba: Če imate oceno v komentarju (npr. komentar.ocena), jo lahko vključite tukaj
+                
+                htmlKomentarjev += `
+                    <div class="komentar-entry p-4 border-b border-gray-200">
+                        <div class="komentar-header flex justify-between items-center mb-1">
+                            <span class="komentar-ime font-semibold">${uporabniskoIme}</span>
+                            <span class="komentar-datum text-sm text-gray-500">${datum}</span>
+                        </div>
+                        <p class="komentar-besedilo text-gray-700">${komentar.komentar}</p>
+                    </div>
+                `;
+            });
+        } else {
+            // Če ni komentarjev, prikaže privzeto sporočilo
+            htmlKomentarjev = '<p data-i18n="modal.no_reviews" class="p-4">Trenutno ni na voljo podrobnih ocen za prikaz.</p>';
+        }
+
+        // Vstavljanje generiranega HTML-ja v DOM
+        tabOceneDiv.innerHTML = htmlKomentarjev;
+    }
+    // -------------------------------------------------------------
+
+    // 7. Vdelan Zemljevid (Google Maps Embed API)
     if (gps_lokacija) {
-        // 🔥 KRITIČNI POPRAVEK: Popravljena pot za Google Maps Embed API in URL Encoding.
-        // Odstranjen sumljiv del 'https://maps.google.com/maps?q=$'
-        const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(gps_lokacija)}&key=YOUR_GOOGLE_MAPS_API_KEY&zoom=14`;
+        // 🔥 POPRAVLJENO: Popravljena pot za Google Maps Embed API in URL Encoding.
+        // Predpostavljamo, da je format [dolgost (lon), širina (lat)]
+        const lat = gps_lokacija[1];
+        const lon = gps_lokacija[0];
+        
+        // Uporabljamo standardni Google Maps Embed API format, s popravljenim URL-jem.
+        const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}&key=YOUR_GOOGLE_MAPS_API_KEY&zoom=14`;
+        
         modalZemljevid.src = mapUrl;
     } else {
         modalZemljevid.src = 'about:blank';
     }
 
-    // 7. Resetiraj prikaz prostih ur
+    // 8. Resetiraj prikaz prostih ur
     const prosteUreDiv = document.getElementById('prosteUreRezultati');
     if (prosteUreDiv) {
         prosteUreDiv.innerHTML = window.i18next ? i18next.t('messages.check_availability_prompt') : 'Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.';
     }
     // globalSelectedTime = null; // Ponastavimo izbrano uro (predpostavimo, da je globalno definirana)
 
-    // 8. Resetiraj na prvi zavihek (Meni) ob odpiranju
+    // 9. Resetiraj na prvi zavihek (Meni) ob odpiranju
     const meniTab = document.querySelector('.modal-tab[data-tab="meni"]');
     if (meniTab) meniTab.click();
 
-    // 9. Odpri modal
+    // 10. Odpri modal
     restavracijaModal.classList.add('active');
 
-    // 10. Posodobi prevode znotraj modala (predpostavljamo, da obstaja `updateContent`)
+    // 11. Posodobi prevode znotraj modala (predpostavljamo, da obstaja `updateContent`)
     if (typeof updateContent === 'function') updateContent();
 }
 
