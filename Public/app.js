@@ -280,6 +280,10 @@ function prikaziPodrobnosti(restavracija) {
     // 🔥 NOVO: 6. Generiranje Komentarjev in Ocen (Zavihek Ocene)
     // KRITIČEN POPRAVEK: Uporabimo mapiranje podatkov, da se ključi API-ja ujemajo z renderReviews
     if (tabOcene) {
+        // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
+        console.log("Prejeti komentarji iz API-ja (komentarji):", komentarji); 
+        // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
+
         const mapiraniKomentarji = komentarji.map(komentar => ({
             // Ključi za renderReviews:
             ocena: komentar.ocena || komentar.rating || 0, // Poskusimo z 'ocena' in 'rating', sicer 0
@@ -287,6 +291,10 @@ function prikaziPodrobnosti(restavracija) {
             datum: komentar.datum,
             ime: komentar.uporabniskoIme || komentar.ime, // Poskusimo z 'uporabniskoIme' in 'ime'
         }));
+        
+        // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
+        console.log("Mapirani komentarji (poslani v renderReviews):", mapiraniKomentarji);
+        // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
 
         renderReviews(mapiraniKomentarji);
     }
