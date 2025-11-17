@@ -57,12 +57,13 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
-                meni: 1, // <--- SEDAJ PRAVILNO
+                meni: 1, 
                 
-                // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE GALERIJA_SLIK
-                galerija_slik: 1, // <--- TO JE MANJKALO!
+                // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE KOMENTARJI
+                komentarji: 1, // <--- DODANO ZA REŠITEV PROBLEMA Z OCENAMI
                 
                 // Ostala polja
+                galerija_slik: 1, 
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
                 
                 // 🔥 NOVO: Polja za Google oceno in število mnenj
@@ -986,8 +987,8 @@ exports.isciRestavracije = async (req, res) => {
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
-            // 🔥 POPRAVLJENO: Dodana polja 'name' in 'title', da se zagotovi prenos imena v Front-end.
-            .select('ime name title mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija')
+            // 🔥 KRITIČNI POPRAVEK: DODANO POLJE 'komentarji'
+            .select('ime name title mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija komentarji') 
             .limit(50);
         
         // ====================================================================
