@@ -1,6 +1,6 @@
 // ===============================================
 // 🗄️ RESTAVRACIJA MODEL (Mongoose Shema)
-// POPRAVLJENO: Dodana podshema za komentarje in popravljeni setterji za ocene
+// POPRAVLJENO: Dodan rezervacijaId v shemo Komentarjev
 // ===============================================
 const mongoose = require('mongoose');
 
@@ -42,7 +42,7 @@ const LocalizedDescriptionSchema = new mongoose.Schema({
 
 
 // =======================================================
-// 🟢 NOVO: Podshema za Komentarje
+// 🟢 POPRAVLJENO: Podshema za Komentarje - Dodan rezervacijaId
 // =======================================================
 const KomentarShema = new mongoose.Schema({
     userId: {
@@ -65,6 +65,13 @@ const KomentarShema = new mongoose.Schema({
         type: String,
         trim: true,
         maxlength: 500
+    },
+    // ⭐ KLJUČNA SPREMEMBA: DODAJANJE rezervacijaId
+    rezervacijaId: { 
+        type: mongoose.Schema.Types.ObjectId,
+        required: true, 
+        // Unique index na tej ravni sheme ne bo deloval v vdelanem dokumentu,
+        // vendar je pomemben za logiko preverjanja na Express routerju.
     },
     datum: {
         type: Date,

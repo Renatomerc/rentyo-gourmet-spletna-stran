@@ -851,7 +851,8 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
 exports.oddajOcenoInKomentar = async (req, res, next) => {
     try {
         const restavracijaId = req.params.restavracijaId;
-        const { ocena, komentar } = req.body;
+        // ⭐ POPRAVEK: VZAMEMO TUDI rezervacijaId IZ TELESA ZAHTEVE
+        const { ocena, komentar, rezervacijaId } = req.body; 
         
         // 1. Preverjanje avtorizacije
         const userId = req.uporabnik ? req.uporabnik.id : null; 
@@ -865,14 +866,21 @@ exports.oddajOcenoInKomentar = async (req, res, next) => {
             return res.status(400).json({ success: false, error: 'Ocena je obvezna in mora biti med 1 in 5.' });
         }
         
+        // ⭐ NOVO: Preverjanje rezervacijaId
+        if (!rezervacijaId || !mongoose.Types.ObjectId.isValid(rezervacijaId)) {
+            return res.status(400).json({ success: false, error: 'Rezervacija ID je obvezen in mora biti veljaven.' });
+        }
+        
         if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
             return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
         }
 
         // 3. Najdi restavracijo in uporabnika hkrati (za ime uporabnika)
+        // Dovolj je samo najti restavracijo
         const [restavracija, uporabnik] = await Promise.all([
+            // Dodamo rezervacijaId v iskalne pogoje, da hitreje najdemo obstoječ komentar
             Restavracija.findById(restavracijaId, 'ocena_povprecje st_ocen komentarji'), 
-            Uporabnik.findById(userId, 'ime priimek') // Predpostavlja Uporabnik model iz dbUsers
+            Uporabnik.findById(userId, 'ime priimek')
         ]);
 
         if (!restavracija) {
@@ -888,11 +896,15 @@ exports.oddajOcenoInKomentar = async (req, res, next) => {
             : 'Gost';
 
 
-        // 4. Preprečevanje dvojnih ocen istega uporabnika
-        const jeUporabnikZeOcenil = restavracija.komentarji.find(k => k.userId.toString() === userId.toString());
+        // 4. ⭐ KRITIČNI POPRAVEK: Preprečevanje dvojnih ocen iste REZERVACIJE
+        // Sedaj preverjamo, ali komentar z ID te rezervacije že obstaja
+        const jeRezervacijaZeOcenjena = restavracija.komentarji.find(k => 
+            k.rezervacijaId && k.rezervacijaId.toString() === rezervacijaId.toString()
+        );
 
-        if (jeUporabnikZeOcenil) {
-             return res.status(409).json({ success: false, error: 'Te restavracije ste že ocenili.' });
+        if (jeRezervacijaZeOcenjena) {
+             // Sporočilo je sedaj specifično za rezervacijo
+             return res.status(409).json({ success: false, error: 'To rezervacijo ste že ocenili. Vsaka rezervacija se lahko oceni samo enkrat.' });
         }
 
         // 5. Priprava novega komentarja/ocene
@@ -901,12 +913,12 @@ exports.oddajOcenoInKomentar = async (req, res, next) => {
             uporabniskoIme: uporabniskoIme, 
             ocena: Number(ocena),
             komentar: komentar || '', 
-            datum: new Date()
+            datum: new Date(),
+            rezervacijaId: new mongoose.Types.ObjectId(rezervacijaId) // ⭐ SHRANIMO ID REZERVACIJE
         };
         
         // 6. Izračun in posodobitev ocen
         
-        // Nastavitev začetnih vrednosti (za primer, če je model brez njih)
         const staraSkupnaOcena = (restavracija.ocena_povprecje || 0) * (restavracija.st_ocen || 0);
         const novoSteviloOcen = (restavracija.st_ocen || 0) + 1; 
         const novaSkupnaOcena = staraSkupnaOcena + Number(ocena);
