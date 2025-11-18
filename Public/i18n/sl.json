@@ -121,7 +121,7 @@
       "duration_1_5h": "1 ura in pol (90 min)",
       "duration_2h": "2 uri",
       "confirm_button": "Potrdi trajanje in rezerviraj",
-      "qr_reminder": "Ne pozabite ob prihodu skenirajte QR kodo restavracije in pridobite točke in ugodnosti!" 
+      "qr_reminder": "Ne pozabite ob prihodu skenirajet QR kodo restavracije in pridobite točke in ugodnosti!" 
     }
   },
   "footer": {
@@ -181,7 +181,18 @@
     "notifications_subtitle": "Vaša obvestila",
     "status_completed": "Hvala za rezervacijo",
     "cancel_confirmation": "Ali res želite preklicati rezervacijo?",
-    "cancel_success": "Rezervacija je bila uspešno preklicana." 
+    "cancel_success": "Rezervacija je bila uspešno preklicana.",
+    
+    
+    "status_rated": "Že ocenjeno", 
+    "status_rate_now": "Kliknite za oceno", 
+    "rate_title": "Oceni Restavracijo",
+    "rating_label": "Vaša Ocena",
+    "comment_label": "Komentar (Neobvezno)",
+    "submit_review": "Oddaj Oceno",
+    "review_missing_data": "Napaka: Manjkajo podatki za oddajo ocene.",
+    "review_success": "Ocena uspešno oddana! Hvala.",
+    "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova."
   },
   "warning": {
       "title": "Opozorilo",
