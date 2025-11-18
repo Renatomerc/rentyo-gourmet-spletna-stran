@@ -576,14 +576,14 @@
 
                 <div class="rating-wrapper">
                     <div style="display:none;">
-                        <label for="ocena-skrita" data-i18n="profile.rating_label">Ocena (1-5):</label>
-                        <select id="ocena-skrita" name="ocena" required>
-                            <option value="5">⭐⭐⭐⭐⭐ Odlično</option>
-                            <option value="4">⭐⭐⭐⭐ Zelo dobro</option>
-                            <option value="3">⭐⭐⭐ Povprečno</option>
-                            <option value="2">⭐⭐ Slabo</option>
-                            <option value="1">⭐ Grozno</option>
-                        </select>
+                   <label for="ocena-skrita" data-i18n="profile.rating_label">Ocena (1-5):</label>
+<select id="ocena-skrita" name="ocena" required>
+    <option value="5" data-i18n-ignore>⭐⭐⭐⭐⭐</option>
+    <option value="4" data-i18n-ignore>⭐⭐⭐⭐</option>
+    <option value="3" data-i18n-ignore>⭐⭐⭐</option>
+    <option value="2" data-i18n-ignore>⭐⭐</option>
+    <option value="1" data-i18n-ignore>⭐</option>
+</select>
                     </div>
 
                     <label data-i18n="profile.rating_label" style="display: block; margin-bottom: 5px;">Ocena (1-5):</label>
@@ -595,12 +595,12 @@
                             <span data-value="2">★</span>
                             <span data-value="1">★</span>
                         </div>
-                        <span id="rating-text" class="rating-text">Odlično</span>
+                        <span id="rating-text" class="rating-text"></span>
                     </div>
                 </div>
                 <div>
                     <label for="komentar" data-i18n="profile.comment_label">Komentar:</label>
-                    <textarea id="komentar" name="komentar" rows="4" placeholder="Vaš komentar..."></textarea>
+                    <textarea id="komentar" name="komentar" rows="4" placeholder="..."></textarea>
                 </div>
                 
                 <button type="submit" data-i18n="profile.submit_review">Oddaj Oceno</button>
@@ -900,10 +900,29 @@
                 const podatkiDiv = document.createElement('div');
                 podatkiDiv.classList.add('rezervacija-podatki');
                 
-                let htmlContent = `
-                    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
-                    <p style="margin: 5px 0 0 0;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${rez.datum_rezervacije} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1 ml-4"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${casIzpis} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-1 ml-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>${rez.stevilo_oseb}</p>
-                `;
+               let htmlContent = `
+    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
+    
+    <p style="margin: 5px 0 0 0; display: flex; align-items: center;">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2"> 
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg> 
+        <span class="mr-4">${rez.datum_rezervacije}</span> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2 ml-4">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg> 
+        <span class="mr-4">${casIzpis}</span> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2 ml-4">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>${rez.stevilo_oseb}</span> </p>
+`;
 
                 // Logika za status v zgodovini
                 if (!jeAktivnaLista) {
@@ -924,7 +943,7 @@
                                         </p>`;
                     } else {
                         // 🌟 IZPIS "KLIKNITE ZA OCENO"
-                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color: green;">
+                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#20c0bd;">
                                             ${i18next.t('profile.status_rate_now')}
                                         </p>`;
                     }
@@ -1084,11 +1103,11 @@
         // ===========================================
 
         const ratingDescriptions = {
-            '5': 'Odlično',
-            '4': 'Zelo dobro',
-            '3': 'Povprečno',
-            '2': 'Slabo',
-            '1': 'Grozno'
+            '5': '',
+            '4': '',
+            '3': '',
+            '2': '',
+            '1': ''
         };
 
         /**

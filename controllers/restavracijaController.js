@@ -645,6 +645,8 @@ exports.pridobiAktivneRezervacijeUporabnika = async (req, res) => {
 /**
  * Pridobitev zgodovine (preteklih/preklicanih/zaključenih) rezervacij za prijavljenega uporabnika
  * GET /api/restavracije/uporabnik/zgodovina
+ * * @param {object} req - Express zahteva
+ * @param {object} res - Express odgovor
  */
 exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
     const userId = req.uporabnik ? req.uporabnik.id : null; 
@@ -663,37 +665,38 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
     const casKoncaAktivne = trenutnaUraFloat + buffer;
 
     try {
-        const zgodovina = await Restavracija.aggregate([
+        // --- 1. IZVEDBA AGREGACIJE: Pridobitev zgodovine ---
+        const zgodovinaNepreverjena = await Restavracija.aggregate([
             { $match: { "mize": { $exists: true, $ne: [] } } },
             { $unwind: "$mize" },
             { $unwind: "$mize.rezervacije" },
             
-            // 🔥 POPRAVLJENO FILTRIRANJE ZGODOVINE
+            // FILTRIRANJE ZGODOVINE
             { $match: { 
                 "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
                 $or: [
-                    // 🟢 NOVO: Vključimo rezervacije, ki so bile ročno zaključene
+                    // 🟢 Vključimo rezervacije, ki so bile ročno zaključene
                     { "mize.rezervacije.status": "ZAKLJUČENO" }, 
 
-                    // 1. Pretekli datumi (datum je že pretekel)
+                    // 1. Pretekli datumi
                     { "mize.rezervacije.datum": { $lt: danesISO } },
                     
                     // 2. Rezervacije na DANAŠNJI dan, ki so ŽE pretekle
                     { 
                         "mize.rezervacije.datum": danesISO, 
-                        "mize.rezervacije.casStart": { $lt: casKoncaAktivne } // CAS < Trenutni CAS (plus buffer)
+                        "mize.rezervacije.casStart": { $lt: casKoncaAktivne }
                     },
                     
-                    // 3. Rezervacije, ki so bile preklicane (ne glede na datum)
+                    // 3. Rezervacije, ki so bile preklicane
                     { "mize.rezervacije.status": "PREKLICANO" } 
                  ]
             }},
 
-            // PROJEKCIJA
+            // PROJEKCIJA (Rezervacija se projecira kot svoj objekt)
             { $project: {
-                _id: "$mize.rezervacije._id", // ID rezervacije
+                _id: "$mize.rezervacije._id", // ID rezervacije (ObjectId)
                 ime_restavracije: "$ime", // Ime restavracije
-                restavracijaId: "$_id",
+                restavracijaId: "$_id",   // ID restavracije
                 mizaId: "$mize._id", 
                 datum_rezervacije: "$mize.rezervacije.datum",
                 cas_rezervacije: "$mize.rezervacije.casStart",
@@ -701,10 +704,43 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
                 status: "$mize.rezervacije.status"
             }},
             
-            { $sort: { datum_rezervacije: -1, cas_rezervacije: -1 } } // Najnovejše pretekle na vrh
+            { $sort: { datum_rezervacije: -1, cas_rezervacije: -1 } }
         ]);
 
-        res.status(200).json(zgodovina);
+        // --- 2. PREVERJANJE OCEN IN DODAJANJE POLJA 'ocenjeno' ---
+
+        // Zberemo vse ID-je restavracij iz rezultatov
+        const restavracijaIds = [...new Set(zgodovinaNepreverjena.map(r => r.restavracijaId))];
+        
+        // Pridobimo vse komentarje iz ustreznih restavracij
+        const restavracijeSKomentarji = await Restavracija.find(
+            { _id: { $in: restavracijaIds } },
+            { komentarji: 1 } // Pridobimo samo polje komentarji
+        ).lean();
+
+        // Ustvarimo "slovar" vseh ID-jev rezervacij, ki so bile Ocenjene
+        const vseOcenjeneRezervacije = new Set();
+        restavracijeSKomentarji.forEach(restavracija => {
+            restavracija.komentarji.forEach(komentar => {
+                // Preverimo, če obstaja ID rezervacije in ga pretvorimo v String za lažjo primerjavo
+                if (komentar.rezervacijaId) {
+                    vseOcenjeneRezervacije.add(komentar.rezervacijaId.toString());
+                }
+            });
+        });
+
+        // --- 3. Dopolnitev rezultatov in pošiljanje na frontend ---
+        const zgodovinaZOceno = zgodovinaNepreverjena.map(rezervacija => {
+            // Pretvorimo _id rezervacije (ki jo vrne agregacija) v String za primerjavo
+            const rezervacijaIdString = rezervacija._id.toString(); 
+            
+            // Če je ID rezervacije v Setu, je ocenjeno!
+            rezervacija.ocenjeno = vseOcenjeneRezervacije.has(rezervacijaIdString);
+            
+            return rezervacija;
+        });
+
+        res.status(200).json(zgodovinaZOceno);
 
     } catch (error) {
         console.error("Napaka pri pridobivanju zgodovine rezervacij uporabnika:", error);

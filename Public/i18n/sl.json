@@ -76,7 +76,6 @@
     "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti.",
     "login_required": "Za rezervacijo je potrebna prijava. Prosimo, prijavite se.",
     "google_reviews": "Google"
-  
   },
   "duration": {
     "one_hour": "1 ura",
@@ -103,7 +102,7 @@
     "tab_menu": "Meni",
     "tab_gallery": "Slike & Zemljevid",
     "tab_reviews": "Ocene",
-    "tab_special_offer": "Aktualna Ponudba", 
+    "tab_special_offer": "Aktualna Ponudba",
     "special_offer_title": "Posebna ponudba restavracije",
     "special_offer_default": "Trenutno ni aktivne posebne ponudbe ali sezonskega menija.",
     "no_reviews": "Trenutno ni na voljo podrobnih ocen za prikaz.",
@@ -121,27 +120,27 @@
       "duration_1_5h": "1 ura in pol (90 min)",
       "duration_2h": "2 uri",
       "confirm_button": "Potrdi trajanje in rezerviraj",
-      "qr_reminder": "Ne pozabite ob prihodu skenirajet QR kodo restavracije in pridobite točke in ugodnosti!" 
+      "qr_reminder": "Ne pozabite ob prihodu skenirajet QR kodo restavracije in pridobite točke in ugodnosti!"
     }
   },
   "footer": {
     "about_company_title": "O Rentyo Gourmet",
     "about_us": "O nas",
-    "about_us_href": "/sl/o-nas.html", 
+    "about_us_href": "/sl/o-nas.html",
     "contact": "Kontakt",
     "contact_href": "/sl/kontakt.html",
     "career": "Kariera",
-    "career_href": "/sl/kariera.html", 
+    "career_href": "/sl/kariera.html",
     "media_press": "Mediji / Press kotiček",
     "media_press_href": "/sl/mediji-press.html",
     "legal_info_title": "Pravne informacije",
-    "legal_info_href": "/sl/pravne-informacije.html", 
+    "legal_info_href": "/sl/pravne-informacije.html",
     "privacy_policy": "Politika zasebnosti",
-    "privacy_policy_href": "/sl/politika-zasebnosti.html", 
+    "privacy_policy_href": "/sl/politika-zasebnosti.html",
     "cookie_policy": "Piškotki",
-    "cookie_policy_href": "/sl/politika-kolacici.html", 
+    "cookie_policy_href": "/sl/politika-kolacici.html",
     "terms_of_use": "Pogoji uporabe",
-    "terms_of_use_href": "/sl/uvjeti-koristenja.html", 
+    "terms_of_use_href": "/sl/uvjeti-koristenja.html",
     "legal_notice": "Pravno obvestilo",
     "legal_notice_href": "/sl/pravna-obavijest.html",
     "partnerships_title": "Partnerstva",
@@ -159,7 +158,7 @@
     "tab_current": "Aktualne Rezervacije",
     "tab_history": "Zgodovina Rezervacij",
     "tab_points_payment": "Točke in Plačilo",
-    "tab_notifications": "Obvestila", 
+    "tab_notifications": "Obvestila",
     "data_subtitle": "Vaši podatki",
     "name_label": "Ime in priimek:",
     "email_label": "E-pošta:",
@@ -176,16 +175,14 @@
     "card_title": "Shranjena kreditna kartica",
     "card_info": "Visa končnica: **** 1234",
     "add_card_button": "Dodaj/Posodobi kartico",
-    "save_card_button": "Shrani kartico", 
-    "hide_card_button": "Odstrani kartico", 
+    "save_card_button": "Shrani kartico",
+    "hide_card_button": "Odstrani kartico",
     "notifications_subtitle": "Vaša obvestila",
     "status_completed": "Hvala za rezervacijo",
     "cancel_confirmation": "Ali res želite preklicati rezervacijo?",
     "cancel_success": "Rezervacija je bila uspešno preklicana.",
-    
-    
-    "status_rated": "Že ocenjeno", 
-    "status_rate_now": "Kliknite za oceno", 
+    "status_rated": "Že ocenjeno",
+    "status_rate_now": "Kliknite za oceno",
     "rate_title": "Oceni Restavracijo",
     "rating_label": "Vaša Ocena",
     "comment_label": "Komentar (Neobvezno)",
@@ -193,11 +190,12 @@
     "review_missing_data": "Napaka: Manjkajo podatki za oddajo ocene.",
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova."
+
   },
   "warning": {
-      "title": "Opozorilo",
-      "default_message": "Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.",
-      "understand_button": "Razumem"
+    "title": "Opozorilo",
+    "default_message": "Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.",
+    "understand_button": "Razumem"
   },
   "registration": {
     "pogoji_strinjanje": "Strinjam se s ",
