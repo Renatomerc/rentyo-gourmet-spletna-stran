@@ -1810,12 +1810,21 @@
 </head>
 
 <body>
-  <header class="glava">
-    <div class="logotip">
-      <a href="#">
-        <img src="Logo Rentyo gourmet.png" alt="Logotip Rentyo Gourmet" />
-      </a>
+ <header class="glava">
+<div class="logotip">
+    <a href="#" id="map-icon-link" class="icon-link">
+        <i class="fas fa-map-marked-alt map-icon" aria-label="Prikaži zemljevid"></i>
+        </a>
+</div>
+
+<div id="map-modal" class="map-overlay">
+    <div class="map-content">
+        <button id="close-map-btn" class="close-btn">&times;</button>
+        <div id="large-map-container">
+            <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktivni zemljevid.</p>
+        </div>
     </div>
+</div>
     
     <div class="akcije" id="desktopAkcije"> 
       <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
@@ -3814,8 +3823,43 @@ document.addEventListener('DOMContentLoaded', () => {
           minDate: "today",
         });
     }
+    
+    // =========================================================
+    // X. LOGIKA ZA ZEMLJEVID (MAP MODAL) - VKLJUČENO TUKAJ!
+    // =========================================================
+    const mapIcon = document.getElementById('map-icon-link');
+    const mapModal = document.getElementById('map-modal');
+    const closeBtn = document.getElementById('close-map-btn');
+
+    // 1. Odpiranje modalnega okna ob kliku na ikono
+    if (mapIcon && mapModal) {
+        mapIcon.addEventListener('click', function(e) {
+            e.preventDefault(); // Prepreči skok na vrh strani
+            mapModal.style.display = "block";
+            console.log("Modalno okno z zemljevidom odprto.");
+        });
+    }
+
+    // 2. Zapiranje modalnega okna ob kliku na gumb 'X'
+    if (closeBtn && mapModal) {
+        closeBtn.addEventListener('click', function() {
+            mapModal.style.display = "none";
+            console.log("Modalno okno z zemljevidom zaprto.");
+        });
+    }
+
+    // 3. Zapiranje modalnega okna ob kliku izven vsebine (na temno ozadje)
+    if (mapModal) {
+        window.addEventListener('click', function(event) {
+            if (event.target === mapModal) {
+                mapModal.style.display = "none";
+                console.log("Modalno okno z zemljevidom zaprto (klik izven).");
+            }
+        });
+    }
 
 }); // Konec glavnega DOMContentLoaded bloka
+
 
 // Pomožna funkcija za vrnitev na privzeto sekcijo
 function handlePrikaziPrivzete() {
