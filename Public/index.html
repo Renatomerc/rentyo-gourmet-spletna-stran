@@ -2289,6 +2289,9 @@ let currentRestaurantId = null;
 let globalSelectedMizaId = null; 
 let globalSelectedMizaIme = null; 
 
+// 🔥 NOVA GLOBALNA SPREMENLJIVKA ZA ZEMLJEVID (Leaflet)
+let map = null; 
+
 // 🔥 NOVA GLOBALNA SPREMENLJIVKA ZA LOKACIJO UPORABNIKA
 let userLocation = null; 
 const DEFAULT_LAT = 46.0569; // Ljubljana, kot privzeto, če ni lokacije
@@ -2338,7 +2341,6 @@ const gumbRezervirajModal = document.querySelector('.gumb-rezerviraj-modal');
 const iskalnik = document.querySelector('.iskalnik');
 const prosteUreRezultati = document.getElementById('prosteUreRezultati'); 
 const tabOcene = document.getElementById('tabOcene'); // Element za ocene
-
 
 // =================================================================
 // I. POMOŽNE FUNKCIJE IN GEOLOKACIJA 
@@ -3824,42 +3826,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // =========================================================
-    // X. LOGIKA ZA ZEMLJEVID (MAP MODAL) - VKLJUČENO TUKAJ!
-    // =========================================================
-    const mapIcon = document.getElementById('map-icon-link');
-    const mapModal = document.getElementById('map-modal');
-    const closeBtn = document.getElementById('close-map-btn');
+// =========================================================
+// X. LOGIKA ZA ZEMLJEVID (MAP MODAL) - VKLJUČENO Z LEAFLETOM!
+// =========================================================
+const mapIcon = document.getElementById('map-icon-link');
+const mapModal = document.getElementById('map-modal');
+// Uporabimo closeBtnMap, da ne pride do konflikta z morebitno globalno spremenljivko 'closeBtn'
+const closeBtnMap = document.getElementById('close-map-btn'); 
 
-    // 1. Odpiranje modalnega okna ob kliku na ikono
-    if (mapIcon && mapModal) {
-        mapIcon.addEventListener('click', function(e) {
-            e.preventDefault(); // Prepreči skok na vrh strani
-            mapModal.style.display = "block";
-            console.log("Modalno okno z zemljevidom odprto.");
-        });
-    }
+// 1. Odpiranje modalnega okna ob kliku na ikono
+if (mapIcon && mapModal) {
+    mapIcon.addEventListener('click', function(e) {
+        e.preventDefault(); // Prepreči skok na vrh strani
+        mapModal.style.display = "block";
+        
+        // KLJUČNA LOGIKA: Inicializacija Leaflet se zgodi samo enkrat
+        if (map === null) {
+            // Središče Slovenije in začetni zoom (uporaba globalnih konstant)
+            const centerCoordinates = [DEFAULT_LAT, DEFAULT_LON]; 
+            const initialZoom = 8;
+            
+            // Inicializiramo zemljevid v divu 'large-map-container'
+            map = L.map('large-map-container').setView(centerCoordinates, initialZoom);
+            
+            // Dodamo OpenStreetMap ploščice
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-    // 2. Zapiranje modalnega okna ob kliku na gumb 'X'
-    if (closeBtn && mapModal) {
-        closeBtn.addEventListener('click', function() {
-            mapModal.style.display = "none";
-            console.log("Modalno okno z zemljevidom zaprto.");
-        });
-    }
-
-    // 3. Zapiranje modalnega okna ob kliku izven vsebine (na temno ozadje)
-    if (mapModal) {
-        window.addEventListener('click', function(event) {
-            if (event.target === mapModal) {
-                mapModal.style.display = "none";
-                console.log("Modalno okno z zemljevidom zaprto (klik izven).");
+            // 🔥 NOV KLIC FUNKCIJE TUKAJ: Dodajanje markerjev s podatki iz allRestavracije
+            if (allRestavracije.length > 0) {
+                dodajMarkerjeRestavracij(map);
+            } else {
+                // Če podatki niso naloženi, dodamo vsaj privzeti marker
+                L.marker(centerCoordinates).addTo(map).bindPopup('Podatki se nalagajo...').openPopup();
             }
-        });
-    }
+            
+            console.log("Leaflet zemljevid inicializiran.");
+        }
+        
+        // POMEMBNO: Prisili Leaflet, da se prerise (ker je bil prej skrit)
+        setTimeout(() => {
+             map.invalidateSize();
+        }, 100); 
+
+        console.log("Modalno okno z zemljevidom odprto.");
+    });
+}
+
+// 2. Zapiranje modalnega okna ob kliku na gumb 'X'
+if (closeBtnMap && mapModal) {
+    closeBtnMap.addEventListener('click', function() {
+        mapModal.style.display = "none";
+        console.log("Modalno okno z zemljevidom zaprto.");
+    });
+}
+
+// 3. Zapiranje modalnega okna ob kliku izven vsebine (na temno ozadje)
+if (mapModal) {
+    window.addEventListener('click', function(event) {
+        if (event.target === mapModal) {
+            mapModal.style.display = "none";
+            console.log("Modalno okno z zemljevidom zaprto (klik izven).");
+        }
+    });
+}
 
 }); // Konec glavnega DOMContentLoaded bloka
 
+
+// =================================================================
+// POMOŽNE FUNKCIJE (IZVEN DOMContentLoaded BLOKA)
+// =================================================================
 
 // Pomožna funkcija za vrnitev na privzeto sekcijo
 function handlePrikaziPrivzete() {
@@ -3877,11 +3916,120 @@ function handlePrikaziPrivzete() {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// 🔥 POPRAVLJENA FUNKCIJA: Dodajanje markerjev z ločeno logiko za Ime in Opis (Tooltip/Popup)
+// =================================================================
+// POMOŽNA FUNKCIJA: Dodajanje markerjev na Leaflet zemljevid
+// =================================================================
+function dodajMarkerjeRestavracij(leafletMap) {
+    // 1. Očistimo stare markerje, če obstajajo (dobra praksa)
+    // Uporaba L.featureGroup za lažje upravljanje
+    if (leafletMap.markers) {
+        leafletMap.markers.clearLayers();
+    } else {
+        leafletMap.markers = L.featureGroup().addTo(leafletMap);
+    }
     
+    // Tabela za shranjevanje koordinat vseh markerjev (za "fit bounds")
+    let bounds = []; 
+
+    // 2. Iteriramo skozi vse restavracije (shranjene v globalni spremenljivki allRestavracije)
+    allRestavracije.forEach(restavracija => {
+        // Preverimo, ali obstajajo veljavne koordinate v MongoDB GeoJSON formatu
+        if (restavracija.lokacija && restavracija.lokacija.coordinates && restavracija.lokacija.coordinates.length === 2) {
+            
+            // MongoDB je [LNG, LAT], Leaflet potrebuje [LAT, LNG]
+            const lng = parseFloat(restavracija.lokacija.coordinates[0]); // Zemljepisna dolžina
+            const lat = parseFloat(restavracija.lokacija.coordinates[1]); // Zemljepisna širina
+            
+            
+            // 🔥 LOGIKA ZA PRIDOBITEV OPISA: Opis je celotna vsebina iz meni.OPIS
+            const opis = (restavracija.meni && restavracija.meni.OPIS) ? restavracija.meni.OPIS : 'Podroben opis ni na voljo.';
+
+            // 🔥 LOGIKA ZA PRIDOBITEV IMENA: Prioriteta: 1. ime 2. name 3. Prva beseda iz OPISA
+            let restavracijaIme = restavracija.ime || restavracija.name;
+
+            // Če 'ime' še vedno ni določeno, vzamemo prvo besedo iz opisa (npr. "Restavracija")
+            if (!restavracijaIme && opis !== 'Podroben opis ni na voljo.') {
+                // Vzame prvo besedo iz opisa in jo shrani kot Ime, da ni 'Neznano Ime'
+                restavracijaIme = opis.split(' ')[0] + '...'; 
+            } else if (!restavracijaIme) {
+                // Končni povratni mehanizem
+                restavracijaIme = 'Neznano Ime';
+            }
+
+
+            // LOGIKA ZA LOKACIJO:
+            const restavracijaLokacija = restavracija.location || restavracija.drzava || 'Neznana Lokacija';
+            
+            // Pridobitev in formatiranje ocene
+            const ocena = parseFloat(restavracija.ocena_povprecje || restavracija.googleRating || 0);
+            const ocenaPrikaz = ocena > 0 ? ocena.toFixed(1) : 'N/A';
+            
+            // LOGIKA ZA "YOU MUST TRY!" (Za oceno >= 4.5)
+            let poudarek = '';
+            if (ocena >= 4.5) {
+                // Ta HTML je oblikovan v CSS-u, ki ga dodate v styles.css
+                poudarek = '<span style="color: #c90000; font-weight: bold;">YOU MUST TRY!</span>';
+            }
+            
+            // --- POPUP VSEBINA (za klik) ---
+            const popupContent = `
+                <div style="font-family: sans-serif; max-width: 250px;">
+                    <h5 style="font-weight: bold; margin-bottom: 5px;">${restavracijaIme}</h5>
+                    <p style="margin: 0; font-size: 0.9em;">⭐ Ocena: ${ocenaPrikaz}</p>
+                    <p style="margin: 3px 0 8px 0; font-size: 0.8em; color: #555;">Lokacija: ${restavracijaLokacija}</p>
+                    <p style="margin: 3px 0 8px 0; font-size: 0.9em; font-style: italic;">Opis: ${opis}</p>
+                    <button 
+                        class="leaflet-popup-gumb-detajli" 
+                        data-id="${restavracija._id}" 
+                        onclick="prikaziDetajleRestavracije('${restavracija._id}')"
+                        style="background-color: var(--rmlk-modra); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                        Ogled Detajlov
+                    </button>
+                </div>
+            `;
+
+            // --- TOOLTIP VSEBINA (za trajno prikažanje - samo IME in OCENA) ---
+            // Opis je odstranjen in zamenjan s poudarkom 'YOU MUST TRY!'
+            const tooltipContent = `
+                <div class="map-tooltip-content">
+                    <p class="tooltip-name">${restavracijaIme}</p>
+                    <p class="tooltip-rating">
+                        <span style="color: gold;">★</span> 
+                        <span style="font-weight: 500;">${ocenaPrikaz}</span>
+                    </p>
+                    ${poudarek}
+                </div>
+            `;
+            
+            const marker = L.marker([lat, lng]) // Leaflet potrebuje [LAT, LNG]
+                .bindPopup(popupContent)
+                .bindTooltip(tooltipContent, {
+                    permanent: true,     
+                    direction: 'top',    
+                    offset: [0, -10],    
+                    className: 'map-restaurant-tooltip' 
+                });
+                
+            leafletMap.markers.addLayer(marker);
+            
+            // 3. Shranimo koordinate za centriranje zemljevida
+            bounds.push([lat, lng]);
+        }
+    });
+
+    // 4. Prilagoditev pogleda (Zoom & Center)
+    if (bounds.length > 0) {
+        // Ustvari meje, ki vključujejo vse markerje in jih prilagodi
+        leafletMap.fitBounds(bounds, {
+            padding: [50, 50] // Dodaten rob okoli markerjev
+        });
+    }
+}
 </script>
-    
     <div id="toaster-container">
-        </div>
+    </div>
 
 </body>
 </html>

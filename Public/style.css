@@ -776,8 +776,8 @@ a:hover {
 }
 /* Stilizacija ikone v glavi */
 .map-icon {
-    font-size: 2.5rem; /* Povečanje velikosti ikone */
-    color: var(--rmlk-modra); /* Uporaba vaše modre barve */
+    font-size: 1.8rem; /* Povečanje velikosti ikone */
+    color: #20c0bd; /* Uporaba vaše modre barve */
     cursor: pointer;
     transition: color 0.3s ease;
     padding: 0 1rem; /* Dodajanje malo prostora okoli ikone */
@@ -816,7 +816,7 @@ a:hover {
 
 /* Gumb za zapiranje */
 .close-btn {
-    color: #aaa;
+    color: #333;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -826,6 +826,7 @@ a:hover {
     position: absolute; /* Postavitev v kot modalnega okna */
     top: 10px;
     right: 25px;
+    z-index: 9999; /* Popravljeno: Zelo visoka vrednost, da je gumb nad zemljevidi */
 }
 
 .close-btn:hover,
