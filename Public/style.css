@@ -777,14 +777,14 @@ a:hover {
 /* Stilizacija ikone v glavi */
 .map-icon {
     font-size: 1.8rem; /* Povečanje velikosti ikone */
-    color: #20c0bd; /* Uporaba vaše modre barve */
+    color: #333; /* Uporaba vaše modre barve */
     cursor: pointer;
     transition: color 0.3s ease;
     padding: 0 1rem; /* Dodajanje malo prostora okoli ikone */
 }
 
 .map-icon:hover {
-    color: #000;
+    color: #20c0bd;
 }
 
 /* Modalno okno/Prekrivni sloj za zemljevid */
@@ -805,7 +805,9 @@ a:hover {
 .map-content {
     background-color: #fefefe;
     margin: 5% auto; /* 5% od zgoraj in centrirano horizontalno */
-    padding: 20px;
+    /* 🔥 POPRAVEK ZA ODSTRANITEV BELEGA ROBA */
+    padding: 0; /* ODSTRANIMO NOTRANJI ROB */
+    /* Konec POPRAVKA */
     border: 1px solid #888;
     width: 90%; /* Večja širina za zemljevid */
     height: 85%;
@@ -838,6 +840,93 @@ a:hover {
 
 #large-map-container {
     width: 100%;
-    height: 95%; /* Zapolnitev večine modalnega okna */
+    /* 🔥 POPRAVEK ZA ODSTRANITEV BELEGA ROBA */
+    height: 100%; /* Nastavimo na 100%, saj starš nima več paddinga */
+    /* Konec POPRAVKA */
     /* Dodajte rob, če je potrebno, in poskrbite, da je zemljevid interaktiven. */
+}
+
+/* 🔥 DODAN STIL ZA GUMB ZNOTRAJ LEAFLET POPUPA */
+.leaflet-popup-gumb-detajli {
+    background-color: var(--rmlk-modra); /* Uporaba vaše modre barve */
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 4px; 
+    cursor: pointer;
+    margin-top: 10px; 
+    display: block; 
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.leaflet-popup-gumb-detajli:hover {
+    /* Efekt ob prehodu miške: temnejša modra */
+    background-color: #0b325c;
+}
+
+/* ========================================================= */
+/* 🔥 CSS ZA KONTROLO PRIKAZA NA ZEMLJEVIDU (VAŠA POSODOBITEV) */
+/* ========================================================= */
+
+.map-restaurant-tooltip {
+    /* ODSTRANIMO Leaflet ozadje, vendar OHRANIMO border/box-shadow za okvir */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    opacity: 1 !important; 
+    white-space: nowrap; 
+}
+
+/* Kontejner, ki obdaja vsebino, sedaj dobi belo ozadje in okvir */
+/* Ta razred je definiran v JS, okoli ocene in imena. */
+.map-tooltip-content {
+    background-color: white; /* Belo ozadje */
+    border: 2px solid var(--rmlk-modra); /* Beli okvir okoli celotne vsebine */
+    border-radius: 8px; /* Zaobljeni robovi */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Lahka senca */
+    padding: 5px 10px; /* Notranji rob za lepši videz */
+}
+
+/* 1. Privzeto skrijemo ime restavracije (.tooltip-name je v JS kodi) */
+.map-restaurant-tooltip .tooltip-name {
+    display: none; 
+    transition: opacity 0.2s ease;
+    /* Dodamo malo notranjega roba, ko je prikazano */
+    padding-bottom: 5px; 
+    border-bottom: 1px solid #ddd; /* Tanko ločilo med imenom in oceno */
+}
+
+/* 2. Poudarek na oceni (vedno viden) */
+.map-restaurant-tooltip .tooltip-rating {
+    /* Prepričamo se, da je ocena lepo poravnana */
+    padding-top: 5px; 
+    line-height: 1;
+}
+
+.map-restaurant-tooltip .tooltip-rating span:first-child { /* Zvezdica */
+    color: #20c0bd !important; /* Zagotovimo, da je zvezdica zlata */
+    font-size: 1.3em; 
+}
+.map-restaurant-tooltip .tooltip-rating span:last-child { /* Ocena (številka) */
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+/* 3. PRIKAZ IMENA OB HOVERJU */
+/* Ko se miška premakne nad ikono markerja (.leaflet-marker-icon), prikažemo ime (.tooltip-name) */
+.leaflet-marker-icon:hover + .leaflet-tooltip .tooltip-name {
+    display: block; 
+    opacity: 1;
+}
+
+/* Dodatna prilagoditev za poudarek "YOU MUST TRY!" */
+.map-restaurant-tooltip .map-poudarek {
+    font-size: 0.9em !important; 
+    line-height: 1.1;
+    margin-top: 5px !important;
+    /* Poudarek naj se prikazuje znotraj belega okvirja */
 }

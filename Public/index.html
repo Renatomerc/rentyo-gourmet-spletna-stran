@@ -653,9 +653,9 @@
 
         .gumb-prijava,
         .gumb-profil {
-          background-color: #575757;
+          background-color: #333;
           color: white;
-          border: 1px solid #575757;
+          border: 1px solid #333;
         }
 
         .gumb-prijava:hover, 
@@ -666,8 +666,8 @@
         
         .gumb-odjava {
           background-color: transparent;
-          color: #575757;
-          border: 1px solid #575757;
+          color: #333;
+          border: 1px solid #333;
         }
         
         .gumb-odjava:hover {
@@ -3759,10 +3759,97 @@ if (potrdiTrajanjeGumb) {
 }
 
 // =================================================================
+// 🔥 FUNKCIJA ZA FOKUSIRANJE KARTICE IZ ZEMLJEVIDA
+// OPOMBA: Ta funkcija je sedaj verjetno odvečna, če se namesto nje kliče handleOdpriModalPodrobnosti,
+// vendar jo puščamo, če jo še kličete kje drugje.
+// =================================================================
+function fokusirajKartico(restavracijaId) {
+    if (!restavracijaId) {
+        console.error("Napaka: Manjka ID restavracije za fokusiranje kartice.");
+        return;
+    }
+
+    // 1. Poiščemo kontejner kartic
+    const mrezaKarticDiv = document.getElementById('mrezaKarticDiv') || document.querySelector('.mreza-restavracij'); 
+
+    if (!mrezaKarticDiv) {
+        console.error("Fokus: Manjka kontejner kartic (ID: mrezaKarticDiv).");
+        return;
+    }
+    
+    // 2. Poiščemo ustrezno kartico po data-id
+    const ciljnaKartica = mrezaKarticDiv.querySelector(`[data-id="${restavracijaId}"]`);
+    
+    if (ciljnaKartica) {
+        
+        // --- Vizualni poudarek (za nekaj sekund) ---
+        ciljnaKartica.classList.add('fokus-animacija');
+        
+        // Odstranimo animacijo po 3 sekundah
+        setTimeout(() => {
+            ciljnaKartica.classList.remove('fokus-animacija');
+        }, 3000); 
+
+        // --- Pomik na kartico ---
+        ciljnaKartica.scrollIntoView({
+            behavior: 'smooth', 
+            block: 'nearest',   
+            inline: 'start'     
+        });
+        
+        console.log(`Fokusirana kartica za ID: ${restavracijaId}`);
+        
+    } else {
+        console.warn(`Kartica z ID: ${restavracijaId} ni najdena za fokusiranje.`);
+    }
+}
+
+
+// =================================================================
+// 🔥 NOVA FUNKCIJA: Pošiljanje rezervacije v bazo (Mini Rezervacija)
+// Tukaj integrirajte kodo za komunikacijo z vašim backendom in MongoDB.
+// =================================================================
+function posljirezervacijo(restavracijaId, datum, cas, stOseb) {
+    if (!restavracijaId || !datum || !stOseb) {
+        // Čas (cas) nastavimo na privzeto vrednost, če ni input polja, zato ga ne preverjamo
+        alert("Prosimo, izpolnite število oseb in datum za rezervacijo.");
+        return;
+    }
+    
+    // Priprava formata datuma (če želite pošiljati v standardnem formatu YYYY-MM-DD)
+    // Opomba: Input type="date" že vrne YYYY-MM-DD.
+    
+    console.log(`Poskus rezervacije za ID: ${restavracijaId}, Datum: ${datum}, Čas: ${cas}, Oseb: ${stOseb}`);
+
+    // 🔥🔥 DODAJTE SVOJO FETCH KODO TUKAJ (npr. POST na /api/rezervacija) 🔥🔥
+    
+    /*
+    fetch('/api/rezervacija', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            restavracijaId: restavracijaId,
+            datum: datum,
+            cas: cas, // Npr. '19:00'
+            stOseb: parseInt(stOseb) 
+        })
+    })
+    // ... obdelava odgovora ...
+    */
+    
+    // Za DEMO/Testiranje:
+    alert(`Rezervacija za ${stOseb} oseb, ${datum} ob ${cas} (simulirano) uspešna!`);
+    
+    // Opcijsko: osvežite prikaz
+}
+
+
+// =================================================================
 // IX. ZAGON IN INITIALIZATION
 // =================================================================
 
 const setupLanguageSwitcher = () => {
+// ... (Ostala koda funkcije setupLanguageSwitcher ostane nespremenjena) ...
   const selectDesktop = document.getElementById("izbiraJezikaDesktop");
   const selectMobilni = document.getElementById("izbiraJezikaMobilni");
   
@@ -3792,9 +3879,7 @@ const setupLanguageSwitcher = () => {
 
 // Glavna inicializacija, zagnana po nalaganju DOM-a, da ujame vse elemente
 document.addEventListener('DOMContentLoaded', () => { 
-    // Odstranimo ponovljene listenerje iz prejšnjih delov, ki so sedaj na vrhu DOMContentLoaded bloka
-    // ...
-
+    // ... (Inicializacija i18next, flatpickr in logika za map modal ostane nespremenjena) ...
     // ZAGON i18next
     if (typeof i18next !== 'undefined' && typeof i18nextHttpBackend !== 'undefined') {
         i18next.use(i18nextHttpBackend).init(
@@ -3826,6 +3911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    
 // =========================================================
 // X. LOGIKA ZA ZEMLJEVID (MAP MODAL) - VKLJUČENO Z LEAFLETOM!
 // =========================================================
@@ -3847,7 +3933,9 @@ if (mapIcon && mapModal) {
             const initialZoom = 8;
             
             // Inicializiramo zemljevid v divu 'large-map-container'
-            map = L.map('large-map-container').setView(centerCoordinates, initialZoom);
+            map = L.map('large-map-container', { 
+                zoomControl: false // 🔥🔥🔥 DODANA NASTAVITEV ZA SKRIVANJE GUMBOV +/-
+            }).setView(centerCoordinates, initialZoom);
             
             // Dodamo OpenStreetMap ploščice
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -3855,12 +3943,10 @@ if (mapIcon && mapModal) {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // 🔥 NOV KLIC FUNKCIJE TUKAJ: Dodajanje markerjev s podatki iz allRestavracije
-            if (allRestavracije.length > 0) {
-                dodajMarkerjeRestavracij(map);
-            } else {
-                // Če podatki niso naloženi, dodamo vsaj privzeti marker
-                L.marker(centerCoordinates).addTo(map).bindPopup('Podatki se nalagajo...').openPopup();
+            // Če so restavracije ŽE naložene, jih dodaj ob inicializaciji mape
+            if (typeof allRestavracije !== 'undefined' && allRestavracije.length > 0) {
+                console.log("Dodajanje markerjev ob inicializaciji mape (podatki že naloženi).");
+                dodajMarkerjeRestavracij(map); // Klic brez drugega argumenta
             }
             
             console.log("Leaflet zemljevid inicializiran.");
@@ -3869,6 +3955,12 @@ if (mapIcon && mapModal) {
         // POMEMBNO: Prisili Leaflet, da se prerise (ker je bil prej skrit)
         setTimeout(() => {
              map.invalidateSize();
+             
+             // DODATNO ZAGOTOVILO: Ponovno preverimo in dodamo markerje, če jih še ni
+             if (map !== null && typeof allRestavracije !== 'undefined' && allRestavracije.length > 0 && (!map.markers || map.markers.getLayers().length === 0)) {
+                 console.log("Naknadno dodajanje markerjev, ker so podatki na voljo.");
+                 dodajMarkerjeRestavracij(map);
+             }
         }, 100); 
 
         console.log("Modalno okno z zemljevidom odprto.");
@@ -3893,12 +3985,317 @@ if (mapModal) {
     });
 }
 
+// =========================================================
+// 🛑 ODSTRANJENA CELOTNA LOGIKA ZA ZAVIHKI V MODALU RESTAVRACIJE
+// (Ta logika je pripadala modalu, ki ga sedaj ne potrebujemo)
+// =========================================================
+
+
 }); // Konec glavnega DOMContentLoaded bloka
 
 
 // =================================================================
-// POMOŽNE FUNKCIJE (IZVEN DOMContentLoaded BLOKA)
+// VI. LOGIKA MODALA RESTAVRACIJE (VAŠA ORIGINALNA FUNKCIJA)
 // =================================================================
+
+async function prikaziPodrobnosti(restavracija) {
+    
+    currentRestaurantId = restavracija._id || restavracija.id; 
+    const reservIdInput = document.querySelector('[data-reserv-id]');
+    if (reservIdInput) reservIdInput.value = currentRestaurantId; 
+
+    // 1. PREVERJANJE IN PRIDOBIVANJE POPOLNIH PODATKOV
+    let popolnaRestavracija = restavracija;
+    // ⭐ POPRAVLJENO: Uporaba 'komentarji' namesto 'ocene' za preverjanje manjkajočih podrobnosti
+    const isMissingDetails = !restavracija.meni || !restavracija.galerija_slik || !restavracija.komentarji; 
+
+    if (currentRestaurantId && isMissingDetails) {
+        if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Nalaganje podrobnosti...'; 
+
+        const fullData = await getFullRestaurantDetails(currentRestaurantId);
+        
+        if (fullData) {
+            popolnaRestavracija = fullData; 
+        } else {
+            if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Neznano Ime';
+            prikaziSporocilo('Napaka pri nalaganju celotnih podrobnosti restavracije.', 'error');
+        }
+    }
+
+    
+    const restavracijaIme = popolnaRestavracija.ime || popolnaRestavracija.imeRestavracije || 'Neznano Ime'; 
+    const kuhinja = popolnaRestavracija.deviznaKuhinja || 'Neznano';
+    
+    const prvaSlikaIzGalerije = popolnaRestavracija.galerija_slik && popolnaRestavracija.galerija_slik.length > 0
+        ? popolnaRestavracija.galerija_slik[0]
+        : null;
+
+    const slikaUrl = popolnaRestavracija.mainImageUrl || popolnaRestavracija.urlSlike || prvaSlikaIzGalerije || FALLBACK_IMAGE_URL;
+    
+    const opis = popolnaRestavracija.opis || popolnaRestavracija.glavniOpis || ''; 
+    
+    const lon = popolnaRestavracija.lokacija?.coordinates?.[0] || DEFAULT_LON; 
+    const lat = popolnaRestavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
+    const gpsString = `${lat.toFixed(4)},${lon.toFixed(4)}`; 
+
+    // IZRAČUN RAZDALJE ZA MODALNO OKNO
+    let prikazLokacije = '';
+
+    if (userLocation) {
+        const distance = getDistance(
+            userLocation.lat, 
+            userLocation.lon, 
+            lat, 
+            lon
+        );
+        
+        const oddaljenostKm = Math.round(distance); 
+        prikazLokacije = `<i class="fas fa-location-arrow"></i> ${oddaljenostKm} km`;
+        
+    } else {
+        prikazLokacije = `<i class="fas fa-map-marker-alt"></i> ${gpsString}`;
+    }
+    
+    // Polnjenje Glavnih podrobnosti
+    if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
+    if(modalIme) modalIme.textContent = restavracijaIme;
+    if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+
+    if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
+
+    if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
+    if(modalOpis) modalOpis.textContent = opis;
+
+    // Generiranje Menija (Uporaba POPOLNA_RESTAVRACIJ A)
+    if(modalMeni) {
+        modalMeni.innerHTML = '';
+        const menuObj = popolnaRestavracija.meni || {}; 
+        
+        let hasMenu = false;
+        
+        for (const kategorija in menuObj) {
+            const items = menuObj[kategorija]; 
+            
+            if (kategorija === 'tedenska_ponudba') {
+                continue; 
+            }
+            
+            if (Array.isArray(items) && items.length > 0) {
+                hasMenu = true;
+                if (kategorija !== 'osnovni_meni') {
+                    const categoryHeader = document.createElement('h4');
+                    categoryHeader.textContent = kategorija;
+                    modalMeni.appendChild(categoryHeader);
+                }
+
+                const ul = document.createElement('ul');
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    
+                    let desnaVrednost = '';
+                    if (item.cena !== undefined && item.cena !== null) {
+                        desnaVrednost = `${item.cena} €`; 
+                    } else if (item.opis) {
+                        desnaVrednost = item.opis; 
+                    } else {
+                        desnaVrednost = ''; 
+                    }
+
+                    li.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <strong style="flex-shrink: 1;">${item.jed || 'Jed'}</strong> 
+                            <span style="flex-shrink: 0; margin-left: 15px;">${desnaVrednost}</span>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+                modalMeni.appendChild(ul);
+            }
+        }
+        
+        if (!hasMenu) {
+            modalMeni.innerHTML = '<li class="text-gray-500"><span data-i18n="modal.no_menu">Meni še ni na voljo.</span></li>';
+        }
+    }
+    
+    // Polnjenje zavihka Aktualna Ponudba 
+    const ponudbaItems = popolnaRestavracija.meni?.tedenska_ponudba || [];
+    const modalAktualnaPonudbaDiv = document.getElementById('tabAktualnaPonudba'); 
+    
+    if (modalAktualnaPonudbaDiv) {
+        if (ponudbaItems.length > 0) {
+            const ul = document.createElement('ul');
+            ul.style.paddingLeft = '0';
+            ponudbaItems.forEach(item => {
+                let desnaVrednost = '';
+                if (item.cena !== undefined && item.cena !== null) {
+                    desnaVrednost = `${item.cena} €`;
+                } else if (item.opis) {
+                    desnaVrednost = item.opis;
+                } else {
+                    desnaVrednost = '';
+                }
+
+                const li = document.createElement('li');
+                li.style.listStyle = 'none';
+                li.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <strong style="flex-shrink: 1;">${item.jed || 'Jed'}</strong> 
+                        <span style="flex-shrink: 0; margin-left: 15px;">${desnaVrednost}</span>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            modalAktualnaPonudbaDiv.innerHTML = '';
+            modalAktualnaPonudbaDiv.appendChild(ul);
+        } else {
+            modalAktualnaPonudbaDiv.innerHTML = '<p class="text-gray-500"><span data-i18n="modal.no_special_offer">Aktualna ponudba trenutno ni na voljo.</span></p>';
+        }
+    }
+    
+  // Generiranje Galerije 
+    if(galerijaSlikeDiv) {
+        const galerijaSlikaURLS = popolnaRestavracija.galerija_slik || []; 
+        
+        let galerijaHTML = ''; 
+
+        if (galerijaSlikaURLS.length > 0) {
+            
+            galerijaSlikaURLS.forEach(url => {
+                galerijaHTML += `
+                    <div class="relative rounded-lg overflow-hidden shadow-md">
+                        <img 
+                            src="${url}" 
+                            alt="Slika restavracije" 
+                            class="absolute top-0 left-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition duration-300"
+                            onclick="openFullSizeImage('${url}')"
+                        >
+                    </div>
+                `;
+            });
+
+            galerijaSlikeDiv.innerHTML = galerijaHTML; 
+
+        } else {
+            galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni slik za prikaz.</p>';
+        }
+    }
+
+// Generiranje Zemljevida (OPOMBA: URL popravljen, vendar morate preveriti format, ki ga zahteva vaš strežnik)
+    if (modalZemljevid) {
+       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`; 
+    }
+    
+    // ⭐ KLJUČNO: Klic funkcije za prikaz vseh ocen
+    // ⭐ POPRAVLJENO: Uporaba ključa 'komentarji', ki ga vrne API.
+    renderReviews(popolnaRestavracija.komentarji); 
+    
+
+    // Resetiraj prikaz prostih ur
+    if(prosteUreRezultati) prosteUreRezultati.innerHTML = 
+        '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+        
+    globalSelectedTime = null; 
+    globalSelectedMizaId = null; 
+    
+    // Resetiraj na prvi zavihek (Opis je bolj logičen)
+    const defaultTab = document.querySelector('.modal-tab[data-tab="opis"]');
+    if(defaultTab) defaultTab.click();
+
+    // Odpri modal
+    if(restavracijaModal) restavracijaModal.classList.add('active');
+    updateContent(); 
+}
+
+
+// Zapiranje modala (Ostane enako)
+if(zapriRestavracijaModal) zapriRestavracijaModal.addEventListener('click', () => {
+    if(restavracijaModal) restavracijaModal.classList.remove('active');
+    if(modalZemljevid) modalZemljevid.src = 'about:blank';
+    currentRestaurantId = null; 
+    globalSelectedMizaId = null; 
+});
+
+if(restavracijaModal) window.addEventListener('click', (e) => {
+    if (e.target === restavracijaModal) {
+        restavracijaModal.classList.remove('active');
+        if(modalZemljevid) modalZemljevid.src = 'about:blank';
+        currentRestaurantId = null; 
+        globalSelectedMizaId = null; 
+    }
+});
+
+// LOGIKA ZAVIHKOV (Ostane enako)
+modalTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        modalTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        const targetElementId = `tab${targetTab.charAt(0).toUpperCase() + targetTab.slice(1)}`;
+        const targetElement = document.getElementById(targetElementId);
+        if (targetElement) targetElement.classList.add('active');
+    });
+});
+
+
+// =================================================================
+// POMOŽNE FUNKCIJE (IZVEN DOMContentLoaded BLOKA) - TUKAJ JIH MORAMO IMETI!
+// =================================================================
+
+/**
+ * 🔥🔥 NOVA POVEZOVALNA FUNKCIJA: handleOdpriModalPodrobnosti
+ * PREMAKNJENA SEM, DA JE DOSTOPNA Leaflet markerjem in ne sproža napake!
+ * Poišče celoten objekt restavracije in pokliče vašo funkcijo prikaziPodrobnosti(objekt).
+ * @param {Event | null} event - Dogodek klika (lahko je null za klic z zemljevida).
+ * @param {string} restavracijaId - ID restavracije.
+ */
+function handleOdpriModalPodrobnosti(event, restavracijaId) {
+    if (event) {
+        event.preventDefault(); 
+    }
+    
+    if (!restavracijaId) {
+        console.error("Napaka: Manjka ID restavracije za odpiranje modala.");
+        return;
+    }
+
+    // 1. Poiščemo objekt restavracije v globalnem polju allRestavracije
+    const restavracijaObj = allRestavracije.find(r => (r._id === restavracijaId || r.id === restavracijaId));
+    
+    if (restavracijaObj) {
+        console.log(`Prikazujem podrobnosti za restavracijo: ${restavracijaObj.ime || restavracijaObj.imeRestavracije}`);
+        
+        // 2. Kličemo vašo originalno funkcijo za prikaz modala
+        prikaziPodrobnosti(restavracijaObj);
+        
+    } else {
+        console.error(`Napaka: Objekt restavracije z ID ${restavracijaId} ni bil najden v allRestavracije.`);
+        if (typeof prikaziSporocilo === 'function') {
+             prikaziSporocilo('Napaka: Podatki restavracije niso na voljo.', 'error');
+        }
+    }
+}
+
+
+/**
+ * Pomožna funkcija za zagotavljanje pravilne poti do slike.
+ * Preveri, ali pot vsebuje 'images/', če ne, jo doda, razen če je že polna pot (npr. http/https).
+ * @param {string} url - Relativna pot do slike.
+ * @returns {string} Absolutna ali popravljena relativna pot.
+ */
+function getAbsoluteImageUrl(url) {
+    if (!url || url.startsWith('http')) {
+        return url;
+    }
+    // Preverite, ali pot že vsebuje "images/" ali je to že del poti
+    if (url.startsWith('images/') || url.startsWith('/images/')) {
+        return url;
+    }
+    // V primeru, da je podatek iz hotels.json (bled-mp-1.jpg)
+    return `images/${url}`;
+}
+
 
 // Pomožna funkcija za vrnitev na privzeto sekcijo
 function handlePrikaziPrivzete() {
@@ -3917,113 +4314,122 @@ function handlePrikaziPrivzete() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 🔥 POPRAVLJENA FUNKCIJA: Dodajanje markerjev z ločeno logiko za Ime in Opis (Tooltip/Popup)
+
+/**
+ * 🛑 ODSTRANJENA KLJUČNA FUNKCIJA: prikaziMeniPodatke
+ */
+/*
+function prikaziMeniPodatke(restavracijaObjekt) { 
+    // ... Stara logika za menije je odstranjena ...
+}
+*/
+
+
+/**
+ * 🛑 ODSTRANJENA IMPLEMENTACIJA ZA PRIKAZ MODALNEGA OKNA
+ */
+/*
+function prikaziRestavracijoModal(restavracijaObjekt) {
+    // ... Stara logika modala je odstranjena ...
+}
+*/
+
+
 // =================================================================
-// POMOŽNA FUNKCIJA: Dodajanje markerjev na Leaflet zemljevid
+// 🔥 POSODOBLJENA POMOŽNA FUNKCIJA: Dodajanje markerjev (Tooltips + Odpiranje Modala)
+// Markerji sedaj ob kliku odprejo modal s podrobnostmi (handleOdpriModalPodrobnosti).
 // =================================================================
 function dodajMarkerjeRestavracij(leafletMap) {
-    // 1. Očistimo stare markerje, če obstajajo (dobra praksa)
-    // Uporaba L.featureGroup za lažje upravljanje
+    const dataToUse = (typeof allRestavracije !== 'undefined' ? allRestavracije : []);
+    
+    if (!leafletMap || dataToUse.length === 0) {
+        return;
+    }
+
+    // 1. Očistimo stare markerje in inicializiramo featureGroup
     if (leafletMap.markers) {
         leafletMap.markers.clearLayers();
     } else {
         leafletMap.markers = L.featureGroup().addTo(leafletMap);
     }
     
-    // Tabela za shranjevanje koordinat vseh markerjev (za "fit bounds")
     let bounds = []; 
 
-    // 2. Iteriramo skozi vse restavracije (shranjene v globalni spremenljivki allRestavracije)
-    allRestavracije.forEach(restavracija => {
-        // Preverimo, ali obstajajo veljavne koordinate v MongoDB GeoJSON formatu
+    // 2. Iteriramo skozi vse restavracije
+    dataToUse.forEach(restavracija => {
         if (restavracija.lokacija && restavracija.lokacija.coordinates && restavracija.lokacija.coordinates.length === 2) {
             
-            // MongoDB je [LNG, LAT], Leaflet potrebuje [LAT, LNG]
-            const lng = parseFloat(restavracija.lokacija.coordinates[0]); // Zemljepisna dolžina
-            const lat = parseFloat(restavracija.lokacija.coordinates[1]); // Zemljepisna širina
+            const lng = parseFloat(restavracija.lokacija.coordinates[0]); 
+            const lat = parseFloat(restavracija.lokacija.coordinates[1]); 
             
+            // 🔥 ID, ki ga uporablja funkcija handleOdpriModalPodrobnosti
+            const restavracijaId = restavracija._id || restavracija.id; 
+            const restavracijaIme = restavracija.imeRestavracije || restavracija.ime || restavracija.title || 'Neznano Ime';
             
-            // 🔥 LOGIKA ZA PRIDOBITEV OPISA: Opis je celotna vsebina iz meni.OPIS
-            const opis = (restavracija.meni && restavracija.meni.OPIS) ? restavracija.meni.OPIS : 'Podroben opis ni na voljo.';
-
-            // 🔥 LOGIKA ZA PRIDOBITEV IMENA: Prioriteta: 1. ime 2. name 3. Prva beseda iz OPISA
-            let restavracijaIme = restavracija.ime || restavracija.name;
-
-            // Če 'ime' še vedno ni določeno, vzamemo prvo besedo iz opisa (npr. "Restavracija")
-            if (!restavracijaIme && opis !== 'Podroben opis ni na voljo.') {
-                // Vzame prvo besedo iz opisa in jo shrani kot Ime, da ni 'Neznano Ime'
-                restavracijaIme = opis.split(' ')[0] + '...'; 
-            } else if (!restavracijaIme) {
-                // Končni povratni mehanizem
-                restavracijaIme = 'Neznano Ime';
-            }
-
-
-            // LOGIKA ZA LOKACIJO:
-            const restavracijaLokacija = restavracija.location || restavracija.drzava || 'Neznana Lokacija';
-            
-            // Pridobitev in formatiranje ocene
             const ocena = parseFloat(restavracija.ocena_povprecje || restavracija.googleRating || 0);
             const ocenaPrikaz = ocena > 0 ? ocena.toFixed(1) : 'N/A';
             
-            // LOGIKA ZA "YOU MUST TRY!" (Za oceno >= 4.5)
-            let poudarek = '';
-            if (ocena >= 4.5) {
-                // Ta HTML je oblikovan v CSS-u, ki ga dodate v styles.css
-                poudarek = '<span style="color: #c90000; font-weight: bold;">YOU MUST TRY!</span>';
-            }
+            // Dodan CSS razred 'map-poudarek' za lažje stiliziranje v CSS-ju
+            let poudarek = ocena >= 4.5 ? '<p class="map-poudarek" style="color: #c90000; font-weight: bold; margin-top: 5px; margin-bottom: 0; font-size: 0.80em;">YOU MUST TRY</p>' : '';
             
-            // --- POPUP VSEBINA (za klik) ---
-            const popupContent = `
-                <div style="font-family: sans-serif; max-width: 250px;">
-                    <h5 style="font-weight: bold; margin-bottom: 5px;">${restavracijaIme}</h5>
-                    <p style="margin: 0; font-size: 0.9em;">⭐ Ocena: ${ocenaPrikaz}</p>
-                    <p style="margin: 3px 0 8px 0; font-size: 0.8em; color: #555;">Lokacija: ${restavracijaLokacija}</p>
-                    <p style="margin: 3px 0 8px 0; font-size: 0.9em; font-style: italic;">Opis: ${opis}</p>
-                    <button 
-                        class="leaflet-popup-gumb-detajli" 
-                        data-id="${restavracija._id}" 
-                        onclick="prikaziDetajleRestavracije('${restavracija._id}')"
-                        style="background-color: var(--rmlk-modra); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-                        Ogled Detajlov
-                    </button>
-                </div>
-            `;
-
-            // --- TOOLTIP VSEBINA (za trajno prikažanje - samo IME in OCENA) ---
-            // Opis je odstranjen in zamenjan s poudarkom 'YOU MUST TRY!'
+            // --- TOOLTIP VSEBINA (Vizualni prikaz nad markerjem) ---
             const tooltipContent = `
-                <div class="map-tooltip-content">
-                    <p class="tooltip-name">${restavracijaIme}</p>
-                    <p class="tooltip-rating">
-                        <span style="color: gold;">★</span> 
-                        <span style="font-weight: 500;">${ocenaPrikaz}</span>
+                <div class="map-tooltip-content" style="text-align: center; padding: 5px;">
+                    <p class="tooltip-name" style="font-weight: bold; margin: 0 0 5px 0; font-size: 1em;">${restavracijaIme}</p>
+                    
+                    <p class="tooltip-rating" style="margin: 0;">
+                        <span style="color: gold; font-size: 1.2em;">★</span> 
+                        <span style="font-weight: 700; font-size: 1.4em;">${ocenaPrikaz}</span>
                     </p>
+                    
                     ${poudarek}
                 </div>
             `;
             
-            const marker = L.marker([lat, lng]) // Leaflet potrebuje [LAT, LNG]
-                .bindPopup(popupContent)
+            const marker = L.marker([lat, lng]) 
+                // Povežemo Tooltip za prikaz imena/ocene
                 .bindTooltip(tooltipContent, {
                     permanent: true,     
                     direction: 'top',    
-                    offset: [0, -10],    
-                    className: 'map-restaurant-tooltip' 
+                    offset: [0, -15], 
+                    className: 'map-restaurant-tooltip' // Ključni razred za CSS
                 });
                 
             leafletMap.markers.addLayer(marker);
             
-            // 3. Shranimo koordinate za centriranje zemljevida
+            // 🔥 KLJUČNO: Dodamo poslušalca za klik za odpiranje modala!
+            marker.on('click', function(e) {
+                // Če funkcija handleOdpriModalPodrobnosti ni definirana, preprečimo, da se stran osveži/skoči na vrh.
+                if (typeof handleOdpriModalPodrobnosti !== 'function') {
+                    console.error("Napaka: Funkcija handleOdpriModalPodrobnosti ni dosegljiva. Preverite obseg definicije.");
+                    return; // Prekinemo, če funkcija ne obstaja
+                }
+
+                // Preprečimo morebitne privzete Leaflet dogodke za ta klik 
+                if (e.originalEvent) {
+                    e.originalEvent.stopPropagation();
+                }
+
+                // 1. ZAPIRANJE MODALA Z ZEMLJEVIDOM JE ODSTRANJENO! (Da ostane odprt)
+                /* const mapModal = document.getElementById('map-modal');
+                if (mapModal) {
+                    mapModal.style.display = "none";
+                }
+                */
+                
+                // 2. Pokličemo funkcijo za odpiranje modala podrobnosti
+                // Sedaj je ta funkcija globalno dostopna in bo poklicala prikaziPodrobnosti
+                handleOdpriModalPodrobnosti(null, restavracijaId); 
+            });
+            
             bounds.push([lat, lng]);
         }
     });
 
-    // 4. Prilagoditev pogleda (Zoom & Center)
+    // 3. Prilagoditev pogleda (Zoom & Center)
     if (bounds.length > 0) {
-        // Ustvari meje, ki vključujejo vse markerje in jih prilagodi
         leafletMap.fitBounds(bounds, {
-            padding: [50, 50] // Dodaten rob okoli markerjev
+            padding: [0, 0] // 🔥 POPRAVLJENO: Padding nastavljen na 0, da se odstrani beli rob okoli zemljevida
         });
     }
 }
