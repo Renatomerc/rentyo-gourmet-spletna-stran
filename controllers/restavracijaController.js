@@ -41,7 +41,7 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 
     try {
         const restavracije = await Restavracija.aggregate([
-            { $limit: 10 },
+            // 🔥 POPRAVLJENO: ODSTRANJENA OMEJITEV $limit: 10
             { $project: {
                 _id: 1, 
                 // Ključni podatki kartice
