@@ -826,7 +826,7 @@ a:hover {
     border: none;
     cursor: pointer;
     position: absolute; /* Postavitev v kot modalnega okna */
-    top: 10px;
+    top: 25px;
     right: 25px;
     z-index: 9999; /* Popravljeno: Zelo visoka vrednost, da je gumb nad zemljevidi */
 }

@@ -1445,18 +1445,37 @@
         
     }
 
-    .input-rezervacija {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 20px;
-        font-size: 16px;
-        cursor: pointer;
-        background-color: white;
-        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+   .input-rezervacija {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px; /* Ohranimo zaobljene robove */
+    font-size: 16px;
+    cursor: pointer;
+    background-color: white;
+    
+    /* 👇 DODANE LASTNOSTI ZA STANDARDIZACIJO VIDEZA SELECT ELEMENTA 👇 */
+    
+    /* 1. Odstranitev privzetega videza (Kriv za razliko med Safarijem in Chromom) */
+    -webkit-appearance: none; /* Za Safari/Chrome */
+    -moz-appearance: none;    /* Za Firefox */
+    appearance: none;         /* Standard */
+    
+    /* 2. Dodajanje puščice po meri (ker je bila privzeta odstranjena) */
+    /* Uporabimo puščico SVG v Base64 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center; /* Premaknjeno nekoliko levo od roba */
+    background-size: 12px;
+    
+    /* 3. Preprečitev, da padding vpliva na velikost (preventivno) */
+    box-sizing: border-box; 
+    
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */ 
+    
+    /* 👇 DODATKI, KI STE JIH ŽE IMELI 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */ 
-    }
+}
 
     .vnosno-polje label {
         font-weight: bold;
@@ -1968,95 +1987,98 @@
     
 </main>
     
-    <div id="restavracijaModal" class="restavracija-modal">
-        <div class="restavracija-vsebina">
-            <span class="gumb-zapri-restavracija" id="zapriRestavracijaModal">×</span>
+   <div id="restavracijaModal" class="restavracija-modal">
+    <div class="restavracija-vsebina">
+        <span class="gumb-zapri-restavracija" id="zapriRestavracijaModal">×</span>
+        
+        <div id="modalSlika" class="slika-glava"></div>
+        
+        <div class="podrobnosti-tekst">
+            <h2 id="modalIme">Ime Restavracije</h2>
             
-            <div id="modalSlika" class="slika-glava"></div>
-            
-            <div class="podrobnosti-tekst">
-                <h2 id="modalIme">Ime Restavracije</h2>
-                
-                <div class="info-vrstica">
-                    <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
-                    <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
-                    <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
-                </div>
-                
-                <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
+            <div class="info-vrstica">
+                <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
+                <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
+                <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
             </div>
             
-            <div class="rezervacija-vnosna-polja">
-                <div class="vnosno-polje">
-                    <label for="modalOsebe" data-i18n="modal.reservation_persons">Št. oseb:</label>
-                    <select id="modalOsebe" class="input-rezervacija">
-                        <option value="1">1</option>
-                        <option value="2" selected>2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                    </select>
-                </div>
-
-                <div class="vnosno-polje">
-                    <label for="modalDatum" data-i18n="modal.reservation_date">Datum:</label>
-                    <input type="text" id="modalDatum" class="input-rezervacija" placeholder="" readonly>
-                </div>
-
-                <input type="hidden" data-reserv-id="" value="">
-                
-                </div>
-            <div class="modal-tabs">
-                <div class="modal-tab active" data-tab="meni" data-i18n="modal.tab_menu">Meni</div>
-                <div class="modal-tab" data-tab="aktualnaPonudba" data-i18n="modal.tab_special_offer">Aktualna Ponudba</div> <div class="modal-tab" data-tab="galerija" data-i18n="modal.tab_gallery">Slike & Zemljevid</div>
-                <div class="modal-tab" data-tab="ocene" data-i18n="modal.tab_reviews">Ocene (0)</div>
+            <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
+        </div>
+        
+        <div class="rezervacija-vnosna-polja">
+            <div class="vnosno-polje">
+                <label for="modalOsebe" data-i18n="modal.reservation_persons">Št. oseb:</label>
+                <select id="modalOsebe" class="input-rezervacija">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
             </div>
 
-            <div class="modal-vsebina-ovoj">
-                <div class="modal-vsebina-skrol">
-                    <div id="tabMeni" class="tab-content active">
-                        <div class="meni-seznam">
-                            <ul id="modalMeni">
-                                </ul>
-                        </div>
-                    </div>
+            <div class="vnosno-polje">
+                <label for="modalDatum" data-i18n="modal.reservation_date">Datum:</label>
+                <input type="text" id="modalDatum" class="input-rezervacija" placeholder="" readonly>
+            </div>
 
-                    <div id="tabAktualnaPonudba" class="tab-content">
-                        <h4 data-i18n="modal.special_offer_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Posebna ponudba restavracije</h4>
-                        <p id="modalAktualnaPonudbaOpis" data-i18n="modal.special_offer_default">
-                            Trenutno ni aktivne posebne ponudbe ali sezonskega menija.
-                        </p>
-                        </div>
-
-                    <div id="tabGalerija" class="tab-content">
-                        <h4 data-i18n="modal.gallery_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Galerija slik</h4>
-                        <div id="galerijaSlike" class="galerija-slike">
-                            </div>
-                        
-                        <h4 data-i18n="modal.map_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; margin-top: 20px;">Zemljevid Lokacije</h4>
-                        <div class="zemljevid-ovoj">
-                            <iframe id="modalZemljevid" src="about:blank" allowfullscreen="" loading="lazy" aria-label="Zemljevid lokacije restavracije"></iframe>
-                        </div>
-                    </div>
-
-                    <div id="tabOcene" class="tab-content">
-                        <p data-i18n="modal.no_reviews">Trenutno ni na voljo podrobnih ocen za prikaz.</p>
-                    </div>
-                </div>
+            <input type="hidden" data-reserv-id="" value="">
+            
+        </div>
+        
+        <div style="padding: 0 25px 25px 25px;">
+            <div id="prosteUreRezultati" class="proste-ure-rezultati" style="margin-bottom: 15px; padding-top: 15px; text-align: center;">
+                <p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>
             </div>
             
-            <div style="padding: 0 25px 25px 25px;">
-                <div id="prosteUreRezultati" class="proste-ure-rezultati" style="margin-bottom: 15px; border-top: 1px solid #eee; padding-top: 15px; text-align: center;">
-                    <p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>
+            <button class="gumb-rezerviraj-modal" data-i18n="modal.reserve_button">Rezerviraj mizo</button>
+        </div>
+        
+        <div class="modal-tabs">
+            <div class="modal-tab active" data-tab="meni" data-i18n="modal.tab_menu">Meni</div>
+            <div class="modal-tab" data-tab="aktualnaPonudba" data-i18n="modal.tab_special_offer">Aktualna Ponudba</div> 
+            <div class="modal-tab" data-tab="galerija" data-i18n="modal.tab_gallery">Slike & Zemljevid</div>
+            <div class="modal-tab" data-tab="ocene" data-i18n="modal.tab_reviews">Ocene (0)</div>
+        </div>
+
+        <div class="modal-vsebina-ovoj">
+            <div class="modal-vsebina-skrol">
+                <div id="tabMeni" class="tab-content active">
+                    <div class="meni-seznam">
+                        <ul id="modalMeni">
+                            </ul>
+                    </div>
                 </div>
-                
-                <button class="gumb-rezerviraj-modal" data-i18n="modal.reserve_button">Rezerviraj mizo</button>
+
+                <div id="tabAktualnaPonudba" class="tab-content">
+                    <h4 data-i18n="modal.special_offer_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Posebna ponudba restavracije</h4>
+                    <p id="modalAktualnaPonudbaOpis" data-i18n="modal.special_offer_default">
+                        Trenutno ni aktivne posebne ponudbe ali sezonskega menija.
+                    </p>
+                    </div>
+
+                <div id="tabGalerija" class="tab-content">
+                    <h4 data-i18n="modal.gallery_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Galerija slik</h4>
+                    <div id="galerijaSlike" class="galerija-slike">
+                        </div>
+                    
+                    <h4 data-i18n="modal.map_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; margin-top: 20px;">Zemljevid Lokacije</h4>
+                    <div class="zemljevid-ovoj">
+                        <iframe id="modalZemljevid" src="about:blank" allowfullscreen="" loading="lazy" aria-label="Zemljevid lokacije restavracije"></iframe>
+                    </div>
+                </div>
+
+                <div id="tabOcene" class="tab-content">
+                    <p data-i18n="modal.no_reviews">Trenutno ni na voljo podrobnih ocen za prikaz.</p>
+                </div>
             </div>
         </div>
-    </div>
+        
+        </div>
+</div>
     
 <div class="login-modal" id="loginModal">
     <div class="login-content">
