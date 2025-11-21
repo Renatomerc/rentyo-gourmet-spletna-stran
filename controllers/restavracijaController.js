@@ -655,6 +655,17 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
         return res.status(401).json({ msg: "Neavtorizirano: ID uporabnika manjka v žetonu." });
     }
 
+    // 🟢 POPRAVEK: Pretvori userId v ObjectId tukaj, da prepreči notranjo napako 500
+    let userIdObj;
+    try {
+        // Poskusimo pretvoriti ID, če to ne uspe, Mongoose sproži napako in jo ujame try-catch
+        userIdObj = new mongoose.Types.ObjectId(userId);
+    } catch (e) {
+        // Če je ID v žetonu neveljaven (kar bi bil vzrok za napako v agregaciji)
+        console.error("Napaka: Neveljaven format userId v žetonu:", userId);
+        return res.status(400).json({ msg: "Neveljaven ID uporabnika v žetonu." });
+    }
+    
     // Čas in datum
     const danes = new Date();
     // Odrezani datum (YYYY-MM-DD) za primerjavo stringov
@@ -673,7 +684,8 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             
             // FILTRIRANJE ZGODOVINE
             { $match: { 
-                "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
+                // 🟢 UPORABA PRETVORJENEGA ID OBJEKTA
+                "mize.rezervacije.uporabnikId": userIdObj, 
                 $or: [
                     // 🟢 Vključimo rezervacije, ki so bile ročno zaključene
                     { "mize.rezervacije.status": "ZAKLJUČENO" }, 
