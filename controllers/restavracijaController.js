@@ -658,21 +658,17 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
     // 🟢 POPRAVEK A: Pretvori userId v ObjectId tukaj, da prepreči notranjo napako 500
     let userIdObj;
     try {
-        // Poskusimo pretvoriti ID, če to ne uspe, Mongoose sproži napako in jo ujame try-catch
         userIdObj = new mongoose.Types.ObjectId(userId);
     } catch (e) {
-        // Če je ID v žetonu neveljaven (kar bi bil vzrok za napako v agregaciji)
         console.error("Napaka: Neveljaven format userId v žetonu:", userId);
         return res.status(400).json({ msg: "Neveljaven ID uporabnika v žetonu." });
     }
     
     // Čas in datum
     const danes = new Date();
-    // Odrezani datum (YYYY-MM-DD) za primerjavo stringov
     const danesISO = danes.toISOString().slice(0, 10); 
-    // Trenutna ura v float obliki (npr. 14.67) + majhen buffer (npr. 0.5 ure)
     const trenutnaUraFloat = danes.getHours() + danes.getMinutes() / 60;
-    const buffer = 0.5; // Rezervacija se šteje kot zaključena po preteku določene ure plus buffer
+    const buffer = 0.5; 
     const casKoncaAktivne = trenutnaUraFloat + buffer;
 
     try {
@@ -684,22 +680,14 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             
             // FILTRIRANJE ZGODOVINE
             { $match: { 
-                // 🟢 UPORABA PRETVORJENEGA ID OBJEKTA
                 "mize.rezervacije.uporabnikId": userIdObj, 
                 $or: [
-                    // 🟢 Vključimo rezervacije, ki so bile ročno zaključene
                     { "mize.rezervacije.status": "ZAKLJUČENO" }, 
-
-                    // 1. Pretekli datumi
                     { "mize.rezervacije.datum": { $lt: danesISO } },
-                    
-                    // 2. Rezervacije na DANAŠNJI dan, ki so ŽE pretekle
                     { 
                         "mize.rezervacije.datum": danesISO, 
                         "mize.rezervacije.casStart": { $lt: casKoncaAktivne }
                     },
-                    
-                    // 3. Rezervacije, ki so bile preklicane
                     { "mize.rezervacije.status": "PREKLICANO" } 
                  ]
             }},
@@ -719,7 +707,7 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             { $sort: { datum_rezervacije: -1, cas_rezervacije: -1 } }
         ]);
 
-        // 🟢 POPRAVEK B: Prekini, če ni najdenih rezervacij. To prepreči napake v točki 2, če je seznam prazen.
+        // 🟢 POPRAVEK B: Prekini, če ni najdenih rezervacij.
         if (zgodovinaNepreverjena.length === 0) {
             console.log(`[ZGODOVINA] Število najdenih rezervacij: 0. Vrnitev praznega seznama.`); 
             return res.status(200).json([]);
@@ -739,12 +727,15 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
         // Ustvarimo "slovar" vseh ID-jev rezervacij, ki so bile Ocenjene
         const vseOcenjeneRezervacije = new Set();
         restavracijeSKomentarji.forEach(restavracija => {
-            restavracija.komentarji.forEach(komentar => {
-                // Preverimo, če obstaja ID rezervacije in ga pretvorimo v String za lažjo primerjavo
-                if (komentar.rezervacijaId) {
-                    vseOcenjeneRezervacije.add(komentar.rezervacijaId.toString());
-                }
-            });
+            // 🔥 KRITIČNI POPRAVEK: Preveri, ali komentarji obstajajo in so Array (uporaba Array.isArray)
+            if (Array.isArray(restavracija.komentarji)) {
+                restavracija.komentarji.forEach(komentar => {
+                    // Preverimo, če obstaja ID rezervacije in ga pretvorimo v String za lažjo primerjavo
+                    if (komentar.rezervacijaId) {
+                        vseOcenjeneRezervacije.add(komentar.rezervacijaId.toString());
+                    }
+                });
+            }
         });
 
         // --- 3. Dopolnitev rezultatov in pošiljanje na frontend ---
