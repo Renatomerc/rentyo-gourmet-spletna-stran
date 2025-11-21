@@ -655,7 +655,7 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
         return res.status(401).json({ msg: "Neavtorizirano: ID uporabnika manjka v žetonu." });
     }
 
-    // 🟢 POPRAVEK: Pretvori userId v ObjectId tukaj, da prepreči notranjo napako 500
+    // 🟢 POPRAVEK A: Pretvori userId v ObjectId tukaj, da prepreči notranjo napako 500
     let userIdObj;
     try {
         // Poskusimo pretvoriti ID, če to ne uspe, Mongoose sproži napako in jo ujame try-catch
@@ -719,6 +719,12 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             { $sort: { datum_rezervacije: -1, cas_rezervacije: -1 } }
         ]);
 
+        // 🟢 POPRAVEK B: Prekini, če ni najdenih rezervacij. To prepreči napake v točki 2, če je seznam prazen.
+        if (zgodovinaNepreverjena.length === 0) {
+            console.log(`[ZGODOVINA] Število najdenih rezervacij: 0. Vrnitev praznega seznama.`); 
+            return res.status(200).json([]);
+        }
+        
         // --- 2. PREVERJANJE OCEN IN DODAJANJE POLJA 'ocenjeno' ---
 
         // Zberemo vse ID-je restavracij iz rezultatov
