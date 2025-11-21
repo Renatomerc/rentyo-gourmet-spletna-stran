@@ -88,9 +88,17 @@ module.exports = (preveriGosta) => {
     // -----------------------------------------------------------------
     // 💥 NOVO: RUTA ZA ZAKLJUČEVANJE REZERVACIJ IN TOČKE ZVESTOBE
     // -----------------------------------------------------------------
+    
+    // 🟢 NOVA POT: Potrdi prihod s QR kodo in dodeli točke (Uporabnik)
+    /**
+     * POST /api/restavracije/potrdi_prihod
+     * Potrdi prihod in dodeli točke.
+     */
+    router.post('/potrdi_prihod', preveriGosta, restavracijaController.potrdiPrihodInDodelitevTock);
+
     /**
      * PUT /api/restavracije/zakljuci_rezervacijo
-     * Uporablja se za zaključevanje rezervacije in pripis 50 točk zvestobe.
+     * Uporablja se za zaključevanje rezervacije.
      * (Običajno za admina ali lastnika restavracije)
      */
     router.put('/zakljuci_rezervacijo', preveriGosta, restavracijaController.oznaciRezervacijoKotZakljuceno);
