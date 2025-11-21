@@ -655,13 +655,6 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
         return res.status(401).json({ msg: "Neavtorizirano: ID uporabnika manjka v žetonu." });
     }
 
-    // 🔥 Odstranimo preverjanje, ali je userId veljaven ObjectId, saj polje v bazi ni ObjectId.
-    // Če pa je user ID v žetonu shranjen kot 24-znakovni ObjectId in se ujema s String poljem v bazi, 
-    // se tukaj ID-ja ne dotaknemo in ga pustimo takšnega, kot je. 
-    // Če želite najrobustnejšo rešitev, bi morali vedno predpostaviti, da je v bazi String:
-
-    // const userObjectId = new mongoose.Types.ObjectId(userId); // <-- ODSTRANJENO!
-
     // Čas in datum
     const danes = new Date();
     // Odrezani datum (YYYY-MM-DD) za primerjavo stringov
@@ -680,8 +673,7 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
             
             // FILTRIRANJE ZGODOVINE
             { $match: { 
-                // 🔥 KRITIČNI POPRAVEK: Uporabimo userId (String) namesto pretvorjenega ObjectId.
-                "mize.rezervacije.uporabnikId": userId, 
+                "mize.rezervacije.uporabnikId": new mongoose.Types.ObjectId(userId),
                 $or: [
                     // 🟢 Vključimo rezervacije, ki so bile ročno zaključene
                     { "mize.rezervacije.status": "ZAKLJUČENO" }, 
