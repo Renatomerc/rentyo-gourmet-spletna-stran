@@ -5,9 +5,18 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const AppleStrategy = require('passport-apple'); 
-// ODSTRANIMO 'path' in KRITIČNE ABSOLUTNE POTI, ker se datoteka nahaja v korenu.
-// Uporabljamo preprosto relativno pot, ki je pravilna, če je models/ v istem imeniku kot passportConfig.js.
-const Uporabnik = require('../models/Uporabnik');
+
+// 🛑 KLJUČNI KORAK ZA DIAGNOSTIKO NA RENDERJU 🛑
+// Ti logi nam bodo povedali, zakaj poti ne delujejo.
+console.log('--- DIAGNOSTIKA POTI (Render) ---');
+console.log('Trenutna delovna mapa (process.cwd()):', process.cwd());
+console.log('Mapa te datoteke (__dirname):', __dirname);
+console.log('Poskus uvoza modela s potjo:', '../models/Uporabnik');
+console.log('---------------------------------');
+
+// Uporabljamo matematično pravilno pot glede na vašo GitHub strukturo:
+// (Iz /src/ pojdi nazaj v koren, in nato v /models/ )
+const Uporabnik = require('../models/Uporabnik'); 
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk
