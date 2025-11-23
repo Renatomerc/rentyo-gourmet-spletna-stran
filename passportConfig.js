@@ -1,32 +1,26 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js (KRITIČNI UVOZ Z GLOBALNO POTJO)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (GOOGLE IN APPLE)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-// const path = require('path'); // Ni več potrebno
+const AppleStrategy = require('passport-apple'); // 🚨 NOVO: UVOZ ZA APPLE
 
-// 🚨 KRITIČEN UVOZ: Uporabljamo ne-relativno pot, ki se zanaša na nastavitve 
-// module.paths, dodane v server.js. To bi moralo rešiti Renderjevo težavo z potmi.
+// KRITIČEN UVOZ: Uporabljamo ne-relativno pot, ki se zanaša na nastavitve 
+// module.paths, dodane v server.js, kar rešuje težavo Renderja.
 const Uporabnik = require('models/uporabnik'); 
 
-
-// ----------------------------------------
-// PREOSTALI DEL KODE JE ENAK
-// ----------------------------------------
-
 function setupPassport(app) {
-    // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
+    // Uvoz okoljskih spremenljivk
     require('dotenv').config();
 
-    // 1. Serizacija in Deserializacija
+    // 1. Serizacija in Deserializacija (Vodenje seje)
     passport.serializeUser((user, done) => {
         done(null, user.id);
     });
 
     passport.deserializeUser(async (id, done) => {
         try {
-            // Pomembno: Uporabnik model mora biti dostopen tukaj
             const user = await Uporabnik.findById(id); 
             done(null, user);
         } catch (err) {
@@ -34,20 +28,20 @@ function setupPassport(app) {
         }
     });
 
-    // 2. Google Strategija
+    // ========================================
+    // 2. GOOGLE Strategija
+    // ========================================
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        // Ta pot mora ustrezati poti, ki jo boste uporabili v uporabnikRouter.js (tj. /api/auth/google/callback)
         callbackURL: "/api/auth/google/callback" 
     },
     async (accessToken, refreshToken, profile, done) => {
-        // Ta funkcija se izvede, ko se Google uspešno avtenticira
         try {
             let currentUser = await Uporabnik.findOne({ googleId: profile.id });
 
             if (currentUser) {
-                console.log('Uporabnik je že registriran:', currentUser.ime);
+                console.log('Google uporabnik že registriran:', currentUser.ime);
                 done(null, currentUser);
             } else {
                 const newUser = await Uporabnik.create({
@@ -55,7 +49,7 @@ function setupPassport(app) {
                     ime: profile.displayName,
                     email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : 'ni-emaila@google.com',
                 });
-                console.log('Nov uporabnik ustvarjen:', newUser.ime);
+                console.log('Nov Google uporabnik ustvarjen:', newUser.ime);
                 done(null, newUser);
             }
         } catch (err) {
@@ -63,6 +57,53 @@ function setupPassport(app) {
             done(err, null);
         }
     }));
+
+    // ========================================
+    // 3. APPLE Strategija
+    // ========================================
+    // Preverimo, ali so v okoljskih spremenljivkah nastavljeni ključi za Apple
+    if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID) {
+        passport.use(new AppleStrategy({
+            clientID: process.env.APPLE_CLIENT_ID, 
+            teamID: process.env.APPLE_TEAM_ID,
+            keyIdentifier: process.env.APPLE_KEY_ID,
+            // Uporabimo string ključa (.p8 vsebino), da se izognemo težavam s potjo na Renderju
+            privateKeyString: process.env.APPLE_PRIVATE_KEY_STRING, 
+            callbackURL: "/api/auth/apple/callback",
+            passReqToCallback: true 
+        },
+        async (req, accessToken, refreshToken, profile, done) => {
+            try {
+                // Apple ID je edinstven identifikator
+                const appleId = profile.id;
+                let currentUser = await Uporabnik.findOne({ appleId: appleId });
+
+                if (currentUser) {
+                    console.log('Apple uporabnik že registriran:', currentUser.ime);
+                    done(null, currentUser);
+                } else {
+                    // Apple lahko skrije email in ime. Če jih dobi, jih uporabi.
+                    const email = profile.email || 'skrit-email@apple.com';
+                    const name = (req.body && req.body.user && req.body.user.name && req.body.user.name.firstName) 
+                                 ? `${req.body.user.name.firstName} ${req.body.user.name.lastName}`
+                                 : 'Apple Uporabnik';
+                                 
+                    const newUser = await Uporabnik.create({
+                        appleId: appleId,
+                        ime: name,
+                        email: email,
+                    });
+                    console.log('Nov Apple uporabnik ustvarjen:', newUser.ime);
+                    done(null, newUser);
+                }
+            } catch (err) {
+                console.error("Napaka pri avtentikaciji Apple uporabnika:", err);
+                done(err, null);
+            }
+        }));
+    } else {
+        console.warn("⚠️ OPOZORILO: Apple spremenljivke v .env niso nastavljene, Apple prijava je onemogočena.");
+    }
 }
 
 module.exports = setupPassport;
