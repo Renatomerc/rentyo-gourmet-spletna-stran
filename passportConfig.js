@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (FINALNI POPRAVEK POTI Z RESOLVE)
+// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (POPRAVLJENO IME DATOTEKE)
 // ========================================
 
 const passport = require('passport');
@@ -7,10 +7,11 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.resolve za določitev absolutne poti od korenskega direktorija projekta.
-// To rešuje problem, kjer Render premakne datoteke v podimenik 'src/' in zamenja relativne poti.
-// Predpostavljamo, da je mapa 'models' v KORENU vašega GITA.
-const Uporabnik = require(path.resolve('models', 'uporabnikModel')); 
+// 🚨 KRITIČEN POPRAVEK: Popravljeno ime datoteke modela iz 'uporabnikModel' v 'uporabnik'
+// Uporabljamo path.join(__dirname, '..', 'models', 'uporabnik')
+// Ta pot poskuša najti mapo 'models' en nivo nad trenutno datoteko, kar je pogosto potrebno,
+// ko Render premakne 'server.js' in 'passportConfig.js' v podmapo 'src/'.
+const Uporabnik = require(path.join(__dirname, '..', 'models', 'uporabnik')); 
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
@@ -52,6 +53,7 @@ function setupPassport(app) {
                 done(null, currentUser);
             } else {
                 // Uporabnik je nov - ustvari ga v bazi
+                // P.S.: Model Uporabnik sedaj pravilno izvaža Mongoose model, ne samo Shemo.
                 const newUser = await Uporabnik.create({
                     googleId: profile.id,
                     ime: profile.displayName,

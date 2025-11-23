@@ -1,3 +1,7 @@
+// ========================================
+// 🟢 uporabnik.js — Uporabnik model (POPRAVLJEN IZVOZ)
+// ========================================
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
 
@@ -10,7 +14,6 @@ const UporabnikShema = new mongoose.Schema({
     geslo: { type: String, required: true },
     
     // 🟢 NOVO: Polje za shranjevanje Google ID-ja
-    // sparse: true omogoča, da je večina dokumentov brez Google ID-ja (če niso prijavljeni z Googlom)
     googleId: { type: String, unique: true, sparse: true }, 
 
     jeLastnik: { type: Boolean, default: false },
@@ -25,11 +28,8 @@ const UporabnikShema = new mongoose.Schema({
 
 // Metoda za primerjavo gesla
 UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
-    // 🚨 KLJUČNI POPRAVEK: Prepreči primerjanje gesla za uporabnike, ustvarjene z Google OAuth.
-    // V passportConfig.js smo predvideli, da se geslo nastavi kot 'google_oauth_user_no_password_set_...'
+    // Prepreči primerjanje gesla za uporabnike, ustvarjene z Google OAuth.
     if (this.googleId || this.geslo.startsWith('google_oauth_user_no_password_set_')) {
-        // Če je uporabnik prijavljen z Googlom, vedno vrnemo FALSE,
-        // s čimer preprečimo prijavo preko navadne /prijava rute.
         return false; 
     }
     
@@ -38,5 +38,7 @@ UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
 };
 
 
-// ⭐ KLJUČNA SPREMEMBA: Izvozimo SAMO shemo.
-module.exports = UporabnikShema;
+// ⭐ KRITIČEN POPRAVEK: Ustvarimo in izvozimo MODEL (Uporabnik) iz sheme (UporabnikShema).
+// Sedaj lahko kličemo Uporabnik.findById, Uporabnik.create itd.
+const Uporabnik = mongoose.model('Uporabnik', UporabnikShema);
+module.exports = Uporabnik;
