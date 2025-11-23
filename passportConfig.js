@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (POPRAVLJENO IME DATOTEKE)
+// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (NAKZANESLJIVEJŠI UVOZ MODELA)
 // ========================================
 
 const passport = require('passport');
@@ -7,11 +7,25 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KRITIČEN POPRAVEK: Popravljeno ime datoteke modela iz 'uporabnikModel' v 'uporabnik'
-// Uporabljamo path.join(__dirname, '..', 'models', 'uporabnik')
-// Ta pot poskuša najti mapo 'models' en nivo nad trenutno datoteko, kar je pogosto potrebno,
-// ko Render premakne 'server.js' in 'passportConfig.js' v podmapo 'src/'.
-const Uporabnik = require(path.join(__dirname, '..', 'models', 'uporabnik')); 
+// 🚨 KRITIČEN POPRAVEK: Uvoz modela. Poskušali bomo tri možnosti, da zagotovimo delovanje na Renderju.
+// Ta robustna rešitev poskuša naložiti model iz treh možnih poti,
+// dokler ena ne uspe, s čimer se izogne napaki 'Cannot find module'.
+let Uporabnik;
+try {
+    // POSKUS 1: Standardna pot v Node.js/Express projektih. 
+    // Išče mapo 'models' en nivo nad to datoteko (npr. /koren/models/uporabnik.js)
+    Uporabnik = require('../models/uporabnik'); 
+} catch (e) {
+    try {
+        // POSKUS 2: Pot, ki jo predlagajo logi Renderja (datoteka premaknjena v isti src/ dir)
+        // Išče v isti mapi (/src/uporabnik)
+        Uporabnik = require('./uporabnik');
+    } catch (e) {
+        // POSKUS 3: Absolutna pot (prejšnji poskus, path.join)
+        Uporabnik = require(path.join(__dirname, '..', 'models', 'uporabnik')); 
+    }
+}
+
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
@@ -53,7 +67,6 @@ function setupPassport(app) {
                 done(null, currentUser);
             } else {
                 // Uporabnik je nov - ustvari ga v bazi
-                // P.S.: Model Uporabnik sedaj pravilno izvaža Mongoose model, ne samo Shemo.
                 const newUser = await Uporabnik.create({
                     googleId: profile.id,
                     ime: profile.displayName,
