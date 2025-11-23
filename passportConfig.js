@@ -1,36 +1,36 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js (ULTIMATIVNA REŠITEV POTI Z VEČKRATNIM POSKUSOM)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (PREGLED POTI ZA RENDER)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path'); 
 
-// 🚨 KRITIČEN UVOZ: Preizkusimo vse kritične poti, dokler ena ne deluje.
+// 🚨 KRITIČEN UVOZ: Preizkusimo 2 najverjetnejši poti
+// Glede na to, da Render VSE datoteke postavi v SRC, poskusimo s potjo, ki predpostavlja:
+// 1. Model je v "models" (relativno na koren)
+// 2. Model je v "models" (relativno na SRC)
 let Uporabnik;
 
-// 1. POSKUS (NAJBOLJ LOGIČEN GLEDE NA LOGE): passportConfig se virtualno izvaja iz src/
-// Če se passportConfig izvaja iz src/, potem je model v models/ dosegljiv z ../models/.
-// Ker je to propadlo, poskusimo pot, ki predpostavlja, da je models/ v src/.
+// 1. POSKUS (Fizično logična pot v Korenu):
 try {
-    Uporabnik = require('../models/uporabnik'); // To je pot, ki bi morala delati, če je passportConfig v src/
+    // Potrebno, ker je passportConfig.js in models/ v KORENU
+    Uporabnik = require('./models/uporabnik'); 
 } catch (e1) {
-    // 2. POSKUS (Pot, ki je Render vztrajno zahteval na začetku):
+    // 2. POSKUS (Virtualna pot za Render):
     try {
-        Uporabnik = require('./uporabnik');
+        // Potrebno, ker Render misli, da je koda v SRC/ (tj. gor iz SRC in potem v models/)
+        Uporabnik = require('../models/uporabnik'); 
     } catch (e2) {
-        // 3. POSKUS (Fizično logična pot v Korenu, ki je propadla):
+        // 3. POSKUS (Absolutna pot na Renderju)
         try {
-            Uporabnik = require('./models/uporabnik'); 
+            // Poskusimo z absolutno potjo, ki jo uporablja Render
+            Uporabnik = require('/opt/render/project/models/uporabnik');
         } catch (e3) {
-            // 4. POSKUS (Absolutna pot s process.cwd()):
-            try {
-                Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
-            } catch (e4) {
-                 // Če noben poskus ne uspe, se ustavi z originalno napako 1. poskusa (za lažje debugiranje)
-                console.error("KRITIČNA NAPAKA: Ne morem najti modela 'uporabnik' na nobeni preizkušeni poti.");
-                throw e1;
-            }
+            // Če noben poskus ne uspe, prikažemo obe napaki
+            console.error("KRITIČNA NAPAKA: 1. poskus (./models/uporabnik) je propadel. Napaka:", e1.message);
+            console.error("KRITIČNA NAPAKA: 2. poskus (../models/uporabnik) je propadel. Napaka:", e2.message);
+            throw new Error("Kritična napaka: Modela 'uporabnik' ni bilo mogoče naložiti z nobene preizkušene poti.");
         }
     }
 }
@@ -44,12 +44,10 @@ function setupPassport(app) {
     require('dotenv').config();
 
     // 1. Serizacija in Deserializacija
-    // Shrani user.id (Mongo _id) v sejo (session cookie)
     passport.serializeUser((user, done) => {
         done(null, user.id);
     });
 
-    // Uporabi id za iskanje uporabnika v bazi, ko je zahteva poslana
     passport.deserializeUser(async (id, done) => {
         try {
             // Pomembno: Uporabnik model mora biti dostopen tukaj
@@ -70,15 +68,12 @@ function setupPassport(app) {
     async (accessToken, refreshToken, profile, done) => {
         // Ta funkcija se izvede, ko se Google uspešno avtenticira
         try {
-            // Preverimo, ali uporabnik že obstaja v naši bazi
             let currentUser = await Uporabnik.findOne({ googleId: profile.id });
 
             if (currentUser) {
-                // Uporabnik že obstaja
                 console.log('Uporabnik je že registriran:', currentUser.ime);
                 done(null, currentUser);
             } else {
-                // Uporabnik je nov - ustvari ga v bazi
                 const newUser = await Uporabnik.create({
                     googleId: profile.id,
                     ime: profile.displayName,
