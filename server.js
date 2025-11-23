@@ -15,6 +15,11 @@ const fallback = require('connect-history-api-fallback');
 const passport = require('passport');
 const session = require('express-session');
 
+// ⭐ KLJUČNO: Uvoz funkcije za inicializacijo Passporta
+// 🚨 POPRAVEK: MORA BITI UVOŽENA PRED KLICEM setupPassport(app)
+// PREDPOSTAVKA POTI: Preverite, ali je pot `./passportConfig` pravilna!
+const setupPassport = require('./passportConfig'); 
+
 // ⭐ KLJUČNO: Uvoz ločene povezave za uporabnike.
 const dbUsers = require('./dbUsers'); // Predvidevamo, da ta poskrbi za svojo povezavo
 
@@ -112,7 +117,7 @@ function startApp() {
         zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
 
         // Klic setupPassport
-        setupPassport(app);
+        setupPassport(app); // Sedaj je funkcija definirana zgoraj!
 
         // Uvoz routerjev, ki uporabljajo Mongoose modele
         restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
