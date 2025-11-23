@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (ZADNJA REŠITEV POTI)
+// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (ZADNJA ABSOLUTNA POT)
 // ========================================
 
 const passport = require('passport');
@@ -7,12 +7,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KONČNI POPRAVEK POTI (na podlagi logov Renderja):
-// Render vztrajno išče modul brez mape 'models' in brez končnice '.js'
-// To pomeni, da bi morala delovati najkrajša relativna pot do iste mape.
-// Če se 'uporabnik.js' nahaja v mapi 'models' in 'passportConfig.js' v 'src', 
-// je to izjemno neobičajno, vendar je edina preostala logična pot, ki ustreza logom.
-const Uporabnik = require('./uporabnik'); 
+// 🚨 KONČNI ABSOLUTNI POPRAVEK: Uporaba proces.cwd() in path.join
+// To ustvari absolutno pot do mape 'models' od korenskega imenika projekta.
+const Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
 
 
 function setupPassport(app) {
