@@ -1,16 +1,42 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (ZADNJA ABSOLUTNA POT)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (ULTIMATIVNA REŠITEV POTI Z VEČKRATNIM POSKUSOM)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-// ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KONČNI ABSOLUTNI POPRAVEK: Uporaba proces.cwd() in path.join
-// To ustvari absolutno pot do mape 'models' od korenskega imenika projekta.
-const Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
+// 🚨 KRITIČEN UVOZ: Preizkusimo vse kritične poti, dokler ena ne deluje.
+// Ker se passportConfig.js nahaja v KORENU, je standardna pot './models/uporabnik'.
+let Uporabnik;
 
+// 1. POSKUS (NAJBOLJ LOGIČEN): passportConfig v korenu, model v models/
+try {
+    Uporabnik = require('./models/uporabnik'); 
+} catch (e1) {
+    // 2. POSKUS: Absolutna pot (preverjeno, da je process.cwd() koren)
+    try {
+        Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
+    } catch (e2) {
+        // 3. POSKUS: Pot, ki jo Render vztrajno zahteva (kot da bi bil passportConfig v src/)
+        try {
+            Uporabnik = require('../models/uporabnik');
+        } catch (e3) {
+            // 4. POSKUS: Vsiljena pot Renderja (kot da je vse premaknjeno v src/ in ga kliče)
+            try {
+                Uporabnik = require('./uporabnik');
+            } catch (e4) {
+                 // Če noben poskus ne uspe, se ustavi z originalno napako 1. poskusa (za lažje debugiranje)
+                console.error("KRITIČNA NAPAKA: Ne morem najti modela 'uporabnik' na nobeni preizkušeni poti.");
+                throw e1;
+            }
+        }
+    }
+}
+
+// ----------------------------------------
+// PREOSTALI DEL KODE JE ENAK
+// ----------------------------------------
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
