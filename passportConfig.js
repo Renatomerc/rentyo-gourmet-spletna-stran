@@ -7,24 +7,25 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path'); 
 
 // 🚨 KRITIČEN UVOZ: Preizkusimo vse kritične poti, dokler ena ne deluje.
-// Ker se passportConfig.js nahaja v KORENU, je standardna pot './models/uporabnik'.
 let Uporabnik;
 
-// 1. POSKUS (NAJBOLJ LOGIČEN): passportConfig v korenu, model v models/
+// 1. POSKUS (NAJBOLJ LOGIČEN GLEDE NA LOGE): passportConfig se virtualno izvaja iz src/
+// Če se passportConfig izvaja iz src/, potem je model v models/ dosegljiv z ../models/.
+// Ker je to propadlo, poskusimo pot, ki predpostavlja, da je models/ v src/.
 try {
-    Uporabnik = require('./models/uporabnik'); 
+    Uporabnik = require('../models/uporabnik'); // To je pot, ki bi morala delati, če je passportConfig v src/
 } catch (e1) {
-    // 2. POSKUS: Absolutna pot (preverjeno, da je process.cwd() koren)
+    // 2. POSKUS (Pot, ki je Render vztrajno zahteval na začetku):
     try {
-        Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
+        Uporabnik = require('./uporabnik');
     } catch (e2) {
-        // 3. POSKUS: Pot, ki jo Render vztrajno zahteva (kot da bi bil passportConfig v src/)
+        // 3. POSKUS (Fizično logična pot v Korenu, ki je propadla):
         try {
-            Uporabnik = require('../models/uporabnik');
+            Uporabnik = require('./models/uporabnik'); 
         } catch (e3) {
-            // 4. POSKUS: Vsiljena pot Renderja (kot da je vse premaknjeno v src/ in ga kliče)
+            // 4. POSKUS (Absolutna pot s process.cwd()):
             try {
-                Uporabnik = require('./uporabnik');
+                Uporabnik = require(path.join(process.cwd(), 'models', 'uporabnik')); 
             } catch (e4) {
                  // Če noben poskus ne uspe, se ustavi z originalno napako 1. poskusa (za lažje debugiranje)
                 console.error("KRITIČNA NAPAKA: Ne morem najti modela 'uporabnik' na nobeni preizkušeni poti.");
