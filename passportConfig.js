@@ -4,7 +4,12 @@
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const Uporabnik = require('./models/uporabnikModel'); // Predpostavljamo, da je model v ./models/uporabnikModel
+// ⭐ NOVO: Uvozimo modul 'path' za ustvarjanje robustne absolutne poti
+const path = require('path'); 
+
+// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.join, da zagotovimo pravilno nalaganje modela
+// Ne glede na to, kje na strežniku se datoteka dejansko izvaja, najde model
+const Uporabnik = require(path.join(__dirname, 'models', 'uporabnikModel')); 
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
@@ -19,7 +24,7 @@ function setupPassport(app) {
     // Uporabi id za iskanje uporabnika v bazi, ko je zahteva poslana
     passport.deserializeUser(async (id, done) => {
         try {
-            // Pomembno: Uporabnik model mora biti dostopen tukaj (pravilno iz ./models/uporabnikModel)
+            // Pomembno: Uporabnik model mora biti dostopen tukaj
             const user = await Uporabnik.findById(id); 
             done(null, user);
         } catch (err) {
