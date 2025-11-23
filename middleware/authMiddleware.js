@@ -1,19 +1,19 @@
 const jwt = require('jsonwebtoken');
 
 // ⭐ Uvozi shemo in sekundarno povezavo
-// POPRAVEK: Spremenjena pot na '../models/Uporabnik', če je authMiddleware v /middleware in Uporabnik v /models
+// Pot: '../models/Uporabnik' (predpostavljena standardna pot)
 const UporabnikShema = require('../models/Uporabnik'); 
-const dbUsers = require('./dbUsers'); // Predpostavljam, da je dbUsers pravilna Mongoose povezava
+
+// 🚨 KRITIČEN POPRAVEK: Pot do dbUsers mora biti '../dbUsers', če je middleware v mapi /middleware
+const dbUsers = require('../dbUsers'); 
 
 // ⭐ KLJUČNO: Inicializiraj Mongoose Model enkrat, povezan s sekundarno povezavo
-// To je ključen blok. Zdaj, ko UporabnikShema pravilno izvaža Shemo, bo ta blok deloval.
 let Uporabnik;
 try {
-    // Poskusimo dobiti že obstoječi model, če je bil registriran na sekundarni povezavi
+    // Poskusimo dobiti že obstoječi model na dbUsers povezavi.
     Uporabnik = dbUsers.model('Uporabnik');
 } catch (e) {
     // Če model še ne obstaja, ga registriramo z izvoženo Shemo.
-    // POZOR: To bo delovalo SAMO, če ../models/Uporabnik izvaža Mongoose Schema objekt!
     Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
 }
 
@@ -32,14 +32,12 @@ module.exports = (JWT_SECRET_KEY) => {
     
     // Pomožna funkcija za varno branje lastnosti iz req.body
     const preberiAnonimnePodatke = (req) => {
-        // 🚨 POPRAVEK: Zagotovi, da je req.body vedno objekt, če ni definiran (npr. pri OPTIONS klicih ali preden deluje body-parser)
+        // Zagotovi, da je req.body vedno objekt, če ni definiran
         const body = req.body && typeof req.body === 'object' ? req.body : {}; 
         
         return {
             ime: body.imeGosta || 'Anonimni gost',
-            // POPRAVEK: Dodaj varno branje lastnosti
             telefon: body.telefon && typeof body.telefon === 'string' ? body.telefon : 'N/A', 
-            // Dodatek: Anonimni gost NIKOLI ni prijavljen. KLJUČNO ZA zahtevajPrijavo
             jePrijavljen: false 
         };
     };
@@ -74,7 +72,7 @@ module.exports = (JWT_SECRET_KEY) => {
 
                 if (!uporabnik) {
                     console.log("DEBUG: Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
-                    // 🚨 V primeru, da je piškotek prisoten, a neveljaven, ga IZBRIŠEMO
+                    // V primeru, da je piškotek prisoten, a neveljaven, ga IZBRIŠEMO
                     res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
                     
                     req.uporabnik = preberiAnonimnePodatke(req);
@@ -95,7 +93,7 @@ module.exports = (JWT_SECRET_KEY) => {
                 // Žeton je neveljaven (potekel, napačen podpis, 'malformed')
                 console.error("❌ Napaka JWT avtentikacije (Žeton):", error.message);
                 
-                // 🚨 POPRAVEK: Izbrišemo neveljaven piškotek PRED klicem next()
+                // Izbrišemo neveljaven piškotek PRED klicem next()
                 res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0), signed: true }); 
 
                 // Nadaljujemo kot anonimni gost (in se izognemo TypeError)
@@ -121,7 +119,7 @@ module.exports = (JWT_SECRET_KEY) => {
             next(); // Uporabnik je prijavljen, nadaljuj.
         } else {
             console.log("❌ ZAVRNJENO: Klic na zaščiteno pot brez veljavne seje/žetona. Vračam 401.");
-            // 🛑 KLJUČNO: Vrni 401 in NE kliči next(). To ustavi izvajanje.
+            // Vrni 401 in NE kliči next(). To ustavi izvajanje.
             return res.status(401).json({ 
                 error: 'Unauthorized', 
                 message: 'Seja je potekla ali ste neavtorizirani. Prosimo, prijavite se ponovno.' 
