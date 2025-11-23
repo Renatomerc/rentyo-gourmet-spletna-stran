@@ -14,6 +14,16 @@ const fallback = require('connect-history-api-fallback');
 // ⭐ Uvoz Passport.js in Express Session
 const passport = require('passport');
 const session = require('express-session');
+
+// ===============================================
+// 🚨 KRITIČNO: DODAJANJE GLOBALNE POTI ZA ISKANJE MODELOV ZA RENDER
+// To omogoča, da require() najde 'models/uporabnik', ne glede na to,
+// kje Render izvaja passportConfig.js (npr. znotraj 'src').
+// Path.resolve() se uporabi, da se ustvari absolutna pot do korenskega imenika (..).
+// Pričakuje se, da se server.js nahaja v 'src', models pa v korenu.
+module.paths.push(path.resolve(__dirname, '..')); 
+// ===============================================
+
 // Prepričajte se, da je ta pot pravilna (npr. če je datoteka v korenu projekta)
 const setupPassport = require('./passportConfig'); 
 

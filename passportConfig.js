@@ -1,15 +1,14 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js (ČISTA RELATIVNA POT ZA RENDER)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (KRITIČNI UVOZ Z GLOBALNO POTJO)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // const path = require('path'); // Ni več potrebno
 
-// 🚨 KRITIČEN UVOZ: Uporabimo čisto relativno pot, ki predpostavlja, 
-// da se passportConfig.js izvaja iz mape 'src/', kjer je tudi mapa 'models/'.
-// To je poskus, da se ujame z logi Renderja.
-const Uporabnik = require('./models/uporabnik'); 
+// 🚨 KRITIČEN UVOZ: Uporabljamo ne-relativno pot, ki se zanaša na nastavitve 
+// module.paths, dodane v server.js. To bi moralo rešiti Renderjevo težavo z potmi.
+const Uporabnik = require('models/uporabnik'); 
 
 
 // ----------------------------------------
