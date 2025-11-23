@@ -1,21 +1,36 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js (GOOGLE IN APPLE)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (POPRAVLJENO)
 // ========================================
+
+// 1. NALOŽI OKOLJSKE SPREMENLJIVKE TAKOJ!
+require('dotenv').config(); 
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const AppleStrategy = require('passport-apple'); 
 
-// ⭐ KRITIČEN IN KONČEN POPRAVEK: 
-// Na podlagi logov Renderja je __dirname (src) enak process.cwd().
-// To pomeni, da je mapa 'models' premaknjena v isti imenik kot ta datoteka (src).
-// Zato uporabimo pot "./models/Uporabnik" (kar pomeni: iz te mape pojdi v 'models').
-const Uporabnik = require('./models/Uporabnik'); 
+// ⭐ KLJUČNO POPRAVLJENO: Uvozimo Shemo (ne modela), da se izognemo Mongoose napaki.
+const UporabnikShema = require('./models/Uporabnik'); 
+// Uvozimo sekundarno povezavo
+const dbUsers = require('./dbUsers'); 
+
+// 🚨 Definiramo model na SEKUNDARNI POVEZAVI.
+let Uporabnik;
+try {
+    // Poskusimo dobiti že obstoječi model (če je bil ustvarjen v authMiddleware.js)
+    Uporabnik = dbUsers.model('Uporabnik');
+} catch (e) {
+    // Če model še ne obstaja na tej povezavi, ga registriramo s shemo
+    Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+}
+
+// Globalni ključi za lažje preverjanje
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
 
 function setupPassport(app) {
-    // Uvoz okoljskih spremenljivk
-    require('dotenv').config();
-
+    
     // 1. Serizacija in Deserializacija (Vodenje seje)
     passport.serializeUser((user, done) => {
         done(null, user.id);
@@ -23,6 +38,7 @@ function setupPassport(app) {
 
     passport.deserializeUser(async (id, done) => {
         try {
+            // Uporabljamo model Uporabnik, povezan s sekundarno bazo
             const user = await Uporabnik.findById(id); 
             done(null, user);
         } catch (err) {
@@ -33,50 +49,59 @@ function setupPassport(app) {
     // ========================================
     // 2. GOOGLE Strategija
     // ========================================
-    passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "/api/auth/google/callback" 
-    },
-    async (accessToken, refreshToken, profile, done) => {
-        try {
-            let currentUser = await Uporabnik.findOne({ googleId: profile.id });
+    // 🚨 KRITIČNA PREVERBA PRED UPORABO KLJUC̆EV
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+        console.warn("⚠️ OPOZORILO: Manjkajo GOOGLE_CLIENT_ID ali SECRET. Google Auth je onemogočen.");
+    } else {
+        passport.use(new GoogleStrategy({
+            clientID: GOOGLE_CLIENT_ID, // Ključi so sedaj na voljo!
+            clientSecret: GOOGLE_CLIENT_SECRET, // Ključi so sedaj na voljo!
+            callbackURL: "/api/auth/google/callback" 
+        },
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                let currentUser = await Uporabnik.findOne({ googleId: profile.id });
 
-            if (currentUser) {
-                console.log('Google uporabnik že registriran:', currentUser.ime);
-                done(null, currentUser);
-            } else {
-                const newUser = await Uporabnik.create({
-                    googleId: profile.id,
-                    ime: profile.displayName,
-                    email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : 'ni-emaila@google.com',
-                });
-                console.log('Nov Google uporabnik ustvarjen:', newUser.ime);
-                done(null, newUser);
+                if (currentUser) {
+                    console.log('Google uporabnik že registriran:', currentUser.ime);
+                    done(null, currentUser);
+                } else {
+                    // Dodajanje privzetega gesla za Google uporabnike, da se izognemo Mongoose validaciji
+                    const novoGeslo = 'google_oauth_user_no_password_set_' + profile.id; 
+                    
+                    const newUser = await Uporabnik.create({
+                        googleId: profile.id,
+                        ime: profile.displayName,
+                        email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : 'ni-emaila@google.com',
+                        geslo: novoGeslo, // Dodano, da model Uporabnik Shema ni prekršena
+                        tockeZvestobe: 100 // Dodana privzeta vrednost
+                    });
+                    console.log('Nov Google uporabnik ustvarjen:', newUser.ime);
+                    done(null, newUser);
+                }
+            } catch (err) {
+                console.error("Napaka pri avtentikaciji Google uporabnika:", err);
+                done(err, null);
             }
-        } catch (err) {
-            console.error("Napaka pri avtentikaciji Google uporabnika:", err);
-            done(err, null);
-        }
-    }));
+        }));
+    }
 
     // ========================================
     // 3. APPLE Strategija
     // ========================================
     // Preverimo, ali so v okoljskih spremenljivkah nastavljeni ključi za Apple
-    if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID) {
+    if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_PRIVATE_KEY_STRING) {
         passport.use(new AppleStrategy({
             clientID: process.env.APPLE_CLIENT_ID, 
             teamID: process.env.APPLE_TEAM_ID,
             keyIdentifier: process.env.APPLE_KEY_ID,
-            // Uporabimo string ključa (.p8 vsebino), da se izognemo težavam s potjo na Renderju
+            // Uporabimo string ključa (.p8 vsebino)
             privateKeyString: process.env.APPLE_PRIVATE_KEY_STRING, 
             callbackURL: "/api/auth/apple/callback",
             passReqToCallback: true 
         },
         async (req, accessToken, refreshToken, profile, done) => {
             try {
-                // Apple ID je edinstven identifikator
                 const appleId = profile.id;
                 let currentUser = await Uporabnik.findOne({ appleId: appleId });
 
@@ -84,16 +109,19 @@ function setupPassport(app) {
                     console.log('Apple uporabnik že registriran:', currentUser.ime);
                     done(null, currentUser);
                 } else {
-                    // Apple lahko skrije email in ime. Če jih dobi, jih uporabi.
                     const email = profile.email || 'skrit-email@apple.com';
                     const name = (req.body && req.body.user && req.body.user.name && req.body.user.name.firstName) 
                                  ? `${req.body.user.name.firstName} ${req.body.user.name.lastName}`
                                  : 'Apple Uporabnik';
+
+                    const novoGeslo = 'apple_oauth_user_no_password_set_' + appleId;
                                  
                     const newUser = await Uporabnik.create({
                         appleId: appleId,
                         ime: name,
                         email: email,
+                        geslo: novoGeslo, // Dodano
+                        tockeZvestobe: 100 // Dodano
                     });
                     console.log('Nov Apple uporabnik ustvarjen:', newUser.ime);
                     done(null, newUser);
