@@ -11,6 +11,11 @@ require('dotenv').config();
 const path = require('path');
 const fallback = require('connect-history-api-fallback'); 
 
+// ⭐ NOVO: Uvoz Passport.js in Express Session
+const passport = require('passport');
+const session = require('express-session');
+const setupPassport = require('./passportConfig'); // Predpostavljamo, da imate to datoteko
+
 // 2️⃣ Uvoz sekundarne povezave (uporabniki)
 const dbUsers = require('./dbUsers');
 
@@ -20,13 +25,14 @@ let userRoutes;
 let uploadRouter; 
 let authMiddleware; 
 let preveriGosta; 
-// ⭐ NOVO: Uvozimo tudi zahtevajPrijavo
 let zahtevajPrijavo; 
 
 // 🟢 KLJUČNO: Preverjanje tajnih ključev
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-// 🔥 POPRAVLJENO: Zagotovimo, da COOKIE_SECRET ni null/undefined (dodamo fallback vrednost)
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'fallback_secret_for_cookies'; 
+// ⭐ NOVO: Skrivnost za Session (Passport uporablja seje)
+const SESSION_SECRET = process.env.SESSION_SECRET || 'super_session_secret_123'; 
+
 
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
@@ -35,11 +41,12 @@ if (!JWT_SECRET_KEY) {
 try {
     authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
     preveriGosta = authMiddleware.preveriGosta; 
-    // ⭐ KLJUČNO POPRAVILO: Uvozimo zahtevajPrijavo
     zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
 
+    // ⭐ KLJUČNO: Inicializiramo Passport konfiguracijo TUKAJ
+    setupPassport(app); // To mora biti klicano, da se definira Google strategija
+
     restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
-    // ⭐ KLJUČNO POPRAVILO: Posredujemo zahtevajPrijavo uporabnikRouterju
     userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
     uploadRouter = require('./routes/uploadRoutes'); 
 
@@ -55,25 +62,35 @@ const PORT = process.env.PORT || 5000;
 // 🟢 5️⃣ Middleware in POPRAVLJEN CORS
 // ========================================
 
-// 🔥 Dovoljeni izvori za CORS
 const allowedOrigins = [
-    // Opomba: Ta seznam ni več kritičen zaradi origin: true, a je ohranjen za lažjo vrnitev k varnosti.
-    'https://www.rentyo.eu', // Tvoja primarna domena (Frontend)
-    'http://www.rentyo.eu',  // Dodan tudi HTTP (čeprav bi moralo biti HTTPS)
-    'https://rentyo-gourmet-spletna-stran.onrender.com', // Tvoj Render URL
-    'http://localhost:5000' // Za lokalni razvoj
+    'https://www.rentyo.eu', 
+    'http://www.rentyo.eu',  
+    'https://rentyo-gourmet-spletna-stran.onrender.com', 
+    'http://localhost:5000' 
 ];
 
 app.use(cors({
-    // 🔥 KLJUČNI POPRAVEK ZA TESTIRANJE: NASTAVIMO ORIGIN NA TRUE.
     origin: true,
     credentials: true // Nujno, ker uporabljate piškotke (JWT)
 })); 
 
 app.use(express.json());
 
-// 🔥 Vključitev Cookie Parserja (uporaba COOKIE_SECRET z zagotovljeno vrednostjo)
+// 🔥 Vključitev Cookie Parserja
 app.use(cookieParser(COOKIE_SECRET));
+
+// ⭐ NOVO: Dodajanje Express Session (MORA BITI PRED Passport.initialize())
+app.use(session({
+    secret: SESSION_SECRET, 
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// ⭐ NOVO: Inicializacija Passporta (MORA BITI PO Session)
+app.use(passport.initialize());
+app.use(passport.session()); 
+// ========================================
 
 
 // ========================================
@@ -87,6 +104,7 @@ if (restavracijaRouter) {
 }
 
 if (userRoutes) {
+    // 🎉 TUKAJ SE BO SEDAJ NAŠLA RUTA /api/auth/google
     app.use('/api/auth', userRoutes); 
     console.log("✅ API Pot za Avtentikacijo (/api/auth) je uspešno priključena.");
 }

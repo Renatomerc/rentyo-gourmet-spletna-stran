@@ -1020,7 +1020,7 @@
         margin-bottom: 20px;
     }
 
-    .gumb-rezerviraj-modal {
+ .gumb-rezerviraj-modal {
         display: block;
         width: 60%;
         padding: 10px;
@@ -1034,10 +1034,19 @@
         text-decoration: none;
         transition: background-color 0.2s;
         cursor: pointer;
+        /* 👇 DODAJTE TA KLJUČNI AGRESIVNI POPRAVEK ZA ANDROID 👇 */
+        border: none !important; /* Odstrani morebitne robove */
+        outline: none !important; /* Odstrani fokusni obroč */
+        box-shadow: none !important; /* Odstrani morebitno senco ob pritisku */
+        -moz-appearance: none; /* Za Firefox/Starejše brskalnike */
+        -webkit-appearance: none; /* Za Chrome/Android */
+        appearance: none; /* Standardno */
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        
         /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
     .gumb-rezerviraj-modal:hover {
         background-color: #148a86;
@@ -1045,6 +1054,12 @@
         font-size: 1rem;
         font-weight: 600;
     }
+    /* 👇 Tega NE potrebujete več, saj so pravila že v osnovnem bloku! 👇 */
+    /* .gumb-rezerviraj-modal:focus {
+        outline: none; 
+        box-shadow: none; 
+    } */
+    /* 👆 ZAKLJUČEK: ODSTRANITE TA BLOK 👆 */
 
     /* ======================================================= */
     /* ZAVIHKE (TABS) - OSTANE NESPREMENJENO */
@@ -1824,6 +1839,91 @@
     padding-bottom: 10px;
     /* Če je treba, lahko dodate 'position: relative;' ali 'display: flex;' za boljše pozicioniranje */
 }
+/* ODSTRANI MODER OKVIR PRI DOTIKU V NATIVE ANDROIDU */
+/* To pravilo odstrani privzeti highlight, ki ga ustvarja WebView na Androidu */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    /* Opomba: Če zgornje ne deluje, poskusite dodati še spodnje */
+    outline: none !important;
+}
+/* ============================================= */
+/* STILIRANJE MODALNEGA OKNA (Socialna Prijava)  */
+/* ============================================= */
+
+/* Stil za ločilno črto "Ali pa se prijavite z:" */
+.social-login-separator {
+    text-align: center;
+    margin: 15px 0;
+    font-size: 0.9em;
+    color: #888;
+    position: relative;
+}
+
+.social-login-separator span {
+    background-color: #fff;
+    padding: 0 10px;
+    position: relative;
+    z-index: 10;
+}
+
+.social-login-separator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #ddd;
+    z-index: 5;
+}
+
+/* Stil za container gumbov */
+.social-login-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+/* Splošni stil socialnih gumbov */
+.gumb-prijava-social {
+    flex: 1; /* Omogoči, da se gumba razdelita enakomerno */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Razmik med ikono in besedilom */
+}
+
+.gumb-prijava-social:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Stil za Google gumb (ikona) */
+.gumb-prijava-social i.fa-google {
+    color: #fafafa; /* Google rdeča */
+}
+
+/* Stil za Apple gumb */
+.gumb-prijava-social.apple {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.gumb-prijava-social.apple i.fa-apple {
+    color: #fff;
+}
+
+
 
   </style>
 </head>
@@ -2093,6 +2193,29 @@
         <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
         <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
         <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
+        
+        <!-- ============================================= -->
+        <!-- NOV DODATEK: GUMBI ZA SOCIALNO PRIJAVO -->
+        <!-- ============================================= -->
+        <div class="social-login-separator">
+            <span data-i18n="modal.or_sign_in_with">Ali pa se prijavite z:</span>
+        </div>
+        
+        <div class="social-login-buttons">
+            <!-- GUMB ZA GOOGLE PRIJAVO -->
+            <button type="button" class="gumb-prijava-social" id="google-sign-in-btn">
+                <i class="fab fa-google"></i> Google
+            </button>
+            
+            <!-- GUMB ZA APPLE PRIJAVO (Za iOS je nujen) -->
+            <button type="button" class="gumb-prijava-social apple" id="apple-sign-in-btn">
+                <i class="fab fa-apple"></i> Apple
+            </button>
+            
+            <!-- Opomba: Načeloma bi lahko dodali še Facebook, če želite -->
+        </div>
+        <!-- ============================================= -->
+        
       </form>
 
       <form class="login-form" id="formRegistracija">
@@ -2113,7 +2236,7 @@
         <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
       </form>
     </div>
-  </div>
+</div>
   
  <div class="duration-modal" id="durationModal">
       <div class="duration-content">
@@ -2255,7 +2378,7 @@
     </div>
 </footer>
 
-<div id="cookie-consent-banner" class="cookie-banner hidden">
+<div id="cookie-consent-banner" class="cookie-banner hidden" style="display: none !important;" data-capacitor-remove-on-native="true">
     <div class="banner-content">
         
         <div class="banner-text-group">
@@ -2282,6 +2405,8 @@
             <button id="accept-cookies" class="btn-accept" data-i18n="cookieConsent.buttons.1.text">
                 </button>
         </div>
+    </div>
+</div>
 
     </div>
 </div>
@@ -2363,6 +2488,10 @@ const gumbRezervirajModal = document.querySelector('.gumb-rezerviraj-modal');
 const iskalnik = document.querySelector('.iskalnik');
 const prosteUreRezultati = document.getElementById('prosteUreRezultati'); 
 const tabOcene = document.getElementById('tabOcene'); // Element za ocene
+// 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
+const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
+const appleLoginBtn = document.getElementById('apple-sign-in-btn');   
+
 
 // =================================================================
 // I. POMOŽNE FUNKCIJE IN GEOLOKACIJA 
@@ -2538,9 +2667,8 @@ function getUserLocation() {
     }
 }
 
-
 // =================================================================
-// II. LOGIKA PRIJAVE/ODJAVE IN MODALOV ZA UPORABNIKE
+// II. LOGIKA PRIJAVE/ODJAVE, MODALOV IN SOCIALNA PRIJAVA
 // =================================================================
 
 const setLoginStatus = (isLoggedIn) => {
@@ -2570,9 +2698,74 @@ const checkInitialLoginStatus = () => {
 };
 checkInitialLoginStatus(); 
 
+/**
+ * Skupna funkcija za obravnavo socialne prijave (Google/Apple)
+ * @param {string} provider - 'google' ali 'apple'
+ */
+const handleSocialLogin = (provider) => {
+    const callbackUrl = encodeURIComponent(window.location.href);
+
+    // Klic na API za začetek Oauth2 procesa
+    // Strežnik (API_BASE_URL) naj bi nato sam poskrbel za preusmeritev na Oauth portal
+    // in nazaj na vašo spletno stran z žetonom.
+    window.location.href = `${API_BASE_URL}/auth/${provider}?redirectUrl=${callbackUrl}`;
+};
+
+/**
+ * Preveri URL ob nalaganju strani za podatke o prijavi (če nas je strežnik preusmeril nazaj).
+ */
+const checkUrlForAuthToken = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const zeton = urlParams.get('zeton');
+    const jeLastnik = urlParams.get('jeLastnik');
+    const ime = urlParams.get('ime');
+    const telefon = urlParams.get('telefon');
+    const status = urlParams.get('status');
+
+    if (zeton) {
+        localStorage.setItem('zeton', zeton);
+        // Pretvori jeLastnik v boolean
+        if (jeLastnik !== null) {
+            localStorage.setItem('jeLastnik', jeLastnik === 'true' || jeLastnik === '1');
+        } else {
+            localStorage.removeItem('jeLastnik');
+        }
+        if (ime) localStorage.setItem('ime', ime);
+        if (telefon) localStorage.setItem('telefon', telefon);
+
+        setLoginStatus(true);
+        prikaziSporocilo(i18next.t('messages.login_success') || 'Uspešna prijava!', 'success');
+        
+        // Očisti URL parametre
+        const newUrl = window.location.pathname; 
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // Ponovno nalaganje restavracij ali kaj podobnega, če je potrebno
+        // filterAndRenderRestavracije(); 
+    } else if (status === 'error') {
+        const msg = urlParams.get('msg') || i18next.t('messages.social_login_failed') || 'Prijava z zunanjim ponudnikom neuspešna.';
+        prikaziSporocilo(msg, 'error');
+        // Očisti URL parametre
+        const newUrl = window.location.pathname; 
+        window.history.replaceState({}, document.title, newUrl);
+    }
+};
+
+
 // --- LISTENERJI (Se izvedejo ob DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => { 
     
+    // Preveri, ali so v URL-ju parametri prijave (Za social login)
+    checkUrlForAuthToken();
+
+    // Dodaj poslušalce za Google in Apple z uporabo pravilnih ID-jev
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => handleSocialLogin('google'));
+    }
+    if (appleLoginBtn) {
+        appleLoginBtn.addEventListener('click', () => handleSocialLogin('apple'));
+    }
+
     const openModalListeners = [openBtnDesktop, openBtnMobilni].filter(btn => btn !== null);
     openModalListeners.forEach(btn => {
         btn.addEventListener("click", (e) => {
@@ -2864,6 +3057,9 @@ const CONSENT_COOKIE_NAME = 'user_consent_given';
 const BANNER_ID = 'cookie-consent-banner';
 const EXPIRATION_DAYS = 365; 
 
+// ---------------------------------------------
+// Pomožne funkcije
+// ---------------------------------------------
 function getCookie(name) {
     const nameEQ = name + "=";
     const ca = document.cookie.split(';');
@@ -2882,14 +3078,25 @@ function setCookie(value) {
     document.cookie = CONSENT_COOKIE_NAME + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
 }
 
+// ---------------------------------------------
+// Glavna funkcija za inicializacijo
+// ---------------------------------------------
 function initializeCookieConsent() {
     const banner = document.getElementById(BANNER_ID);
-    const existingConsent = getCookie(CONSENT_COOKIE_NAME);
-
     if (!banner) return console.error("Cookie banner element not found.");
 
+    // ⭐ KLJUČNA IZBOLJŠAVA: Pasica ostane skrita v Native APP
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        return; 
+    }
+
+    // Nadaljnja koda se izvaja SAMO, če je to spletna stran (WEB)
+    const existingConsent = getCookie(CONSENT_COOKIE_NAME);
+
     if (!existingConsent) {
+        // Pasica se prikaže (odstrani se razred 'hidden')
         banner.classList.remove('hidden');
+        
         const content = banner.querySelector('.banner-content'); 
         if (content) {
             content.classList.add('slide-in-up');
@@ -2913,7 +3120,30 @@ function initializeCookieConsent() {
         banner.classList.add('hidden');
     }
 }
-window.onload = initializeCookieConsent;
+
+
+// ⭐ IZVAJANJE: AGRESIVNA NATIVE LOGIKA + OBRATNA LOGIKA ZA WEB
+
+document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById(BANNER_ID);
+    if (!banner) return;
+    
+    // 1. AGRESIVNO SKRIVANJE ZA NATIVE:
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        banner.remove(); 
+        console.log("Native detected. Pasica prisilno odstranjena iz DOM-a.");
+        return; 
+    }
+    
+    // 2. PRIKAZ ZA WEB: Če smo na spletu, ročno odstranimo prisilni inline stil.
+    banner.style.display = ''; 
+    
+    // Zaženemo obstoječo logiko, ki preveri piškotke in jo prikaže/skrije po potrebi.
+    initializeCookieConsent();
+
+    console.log("Web detected. Inline stil odstranjen, nadaljujemo z logiko piškotkov.");
+});
+
 
 
 // =================================================================

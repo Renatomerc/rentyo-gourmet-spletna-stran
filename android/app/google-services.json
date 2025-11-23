@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "906832682874",
+    "project_id": "rentyo-74ca5",
+    "storage_bucket": "rentyo-74ca5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906832682874:android:85d534463db6157764c0c3",
+        "android_client_info": {
+          "package_name": "eu.rentyo.rentyo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVTDlXGNeZLwyOU5b2wzD237rr7PWZ-vU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

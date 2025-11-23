@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rentyo</string>
+    <string name="title_activity_main">Rentyo</string>
+    <string name="package_name">eu.rentyo.rentyo</string>
+    <string name="custom_url_scheme">eu.rentyo.rentyo</string>
+</resources>

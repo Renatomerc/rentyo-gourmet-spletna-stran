@@ -930,3 +930,38 @@ a:hover {
     margin-top: 5px !important;
     /* Poudarek naj se prikazuje znotraj belega okvirja */
 }
+/* POPRAVEK: Fiksna, Obarvana Glava za Native Android (Največja višina) */
+.platform-android header {
+    /* Fiksna pozicija in barva ostanejo enake */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: #20c0bd !important;
+    z-index: 1000;
+    
+    /* KLJUČNO: POVEČANJE ROBE */
+    /* Zgornji rob: 130px (Dodatno povečano za več prostora nad logotipom) */
+    padding-top: 130px !important; 
+    
+    /* Spodnji rob: 6rem (Dodatno povečano za več prostora pod logotipom) */
+    padding-bottom: 6rem !important; 
+
+    /* Stranski robovi ostanejo enaki */
+    padding-right: 3rem !important;
+    padding-left: 3rem !important;
+    color: white !important; 
+}
+
+/* POMEMBNO: Vsebino pod glavo (main) je treba ustrezno premakniti navzdol! */
+/* Sedaj mora biti padding-top za main še večji. Poskusimo z 350px. */
+.platform-android main {
+    padding-top: 350px !important; 
+}
+/* ODSTRANI MODER OKVIR PRI DOTIKU V NATIVE ANDROIDU */
+/* To pravilo odstrani privzeti highlight, ki ga ustvarja WebView na Androidu */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    /* Opomba: Če zgornje ne deluje, poskusite dodati še spodnje */
+    outline: none !important;
+}
