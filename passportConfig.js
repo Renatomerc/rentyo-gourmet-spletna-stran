@@ -1,15 +1,15 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth
+// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (FINALNI POPRAVEK POTI)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-// ⭐ NOVO: Uvozimo modul 'path' za ustvarjanje robustne absolutne poti
+// ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.join, da zagotovimo pravilno nalaganje modela
-// Ne glede na to, kje na strežniku se datoteka dejansko izvaja, najde model
-const Uporabnik = require(path.join(__dirname, 'models', 'uporabnikModel')); 
+// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.resolve za določitev absolutne poti od korenskega direktorija Node.js procesa.
+// To je ključno za Render, kjer se poti pogosto zamenjajo.
+const Uporabnik = require(path.resolve('models', 'uporabnikModel')); 
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk (Google Client ID in Secret)
