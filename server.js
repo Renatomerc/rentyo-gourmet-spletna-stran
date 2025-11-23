@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 SERVER.JS — Rentyo Gourmet Backend
+// 🟢 SERVER.JS — Rentyo Gourmet Backend (POPRAVLJENO)
 // ========================================
 
 // 1️⃣ Uvoz potrebnih modulov
@@ -11,52 +11,30 @@ require('dotenv').config();
 const path = require('path');
 const fallback = require('connect-history-api-fallback'); 
 
-// ⭐ NOVO: Uvoz Passport.js in Express Session
+// ⭐ Uvoz Passport.js in Express Session
 const passport = require('passport');
 const session = require('express-session');
-const setupPassport = require('./passportConfig'); // Predpostavljamo, da imate to datoteko
+// Prepričajte se, da je ta pot pravilna (npr. če je datoteka v korenu projekta)
+const setupPassport = require('./passportConfig'); 
 
 // 2️⃣ Uvoz sekundarne povezave (uporabniki)
 const dbUsers = require('./dbUsers');
 
-// 3️⃣ Uvoz routerjev in middleware-a
-let restavracijaRouter;
-let userRoutes;
-let uploadRouter; 
-let authMiddleware; 
-let preveriGosta; 
-let zahtevajPrijavo; 
+// 4️⃣ Inicializacija aplikacije (PREMAKNJENO GOR)
+const app = express();
+const PORT = process.env.PORT || 5000;
+
 
 // 🟢 KLJUČNO: Preverjanje tajnih ključev
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'fallback_secret_for_cookies'; 
-// ⭐ NOVO: Skrivnost za Session (Passport uporablja seje)
+// ⭐ Skrivnost za Session (Passport uporablja seje)
 const SESSION_SECRET = process.env.SESSION_SECRET || 'super_session_secret_123'; 
 
 
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
 }
-
-try {
-    authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
-    preveriGosta = authMiddleware.preveriGosta; 
-    zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
-
-    // ⭐ KLJUČNO: Inicializiramo Passport konfiguracijo TUKAJ
-    setupPassport(app); // To mora biti klicano, da se definira Google strategija
-
-    restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
-    userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
-    uploadRouter = require('./routes/uploadRoutes'); 
-
-} catch (e) {
-    console.error("❌ Kritična napaka pri nalaganju routerjev:", e.message);
-}
-
-// 4️⃣ Inicializacija aplikacije
-const app = express();
-const PORT = process.env.PORT || 5000;
 
 // ========================================
 // 🟢 5️⃣ Middleware in POPRAVLJEN CORS
@@ -79,12 +57,16 @@ app.use(express.json());
 // 🔥 Vključitev Cookie Parserja
 app.use(cookieParser(COOKIE_SECRET));
 
+// 1️⃣ Middleware za Session in Passport - MORA BITI V TEM VRSTNEM REDU!
 // ⭐ NOVO: Dodajanje Express Session (MORA BITI PRED Passport.initialize())
 app.use(session({
     secret: SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dni
+    }
 }));
 
 // ⭐ NOVO: Inicializacija Passporta (MORA BITI PO Session)
@@ -92,9 +74,33 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 // ========================================
 
+// 3️⃣ Uvoz routerjev in middleware-a
+let restavracijaRouter;
+let userRoutes;
+let uploadRouter; 
+let authMiddleware; 
+let preveriGosta; 
+let zahtevajPrijavo; 
+
+try {
+    authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
+    preveriGosta = authMiddleware.preveriGosta; 
+    zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
+
+    // 2️⃣ Klic setupPassport - MORA BITI PO TEM, KO JE 'app' DEFINIRAN IN PO PASSPORT.SESSION()
+    setupPassport(app); // Sedaj se pokliče TUKAJ, ko so vsi middleware-i nastavljeni
+
+    restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
+    userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
+    uploadRouter = require('./routes/uploadRoutes'); 
+
+} catch (e) {
+    console.error("❌ Kritična napaka pri nalaganju routerjev:", e.message);
+}
+
 
 // ========================================
-// 🔗 API POTI (POSODOBLJENO PREVERJANJE)
+// 🔗 API POTI
 // ========================================
 if (restavracijaRouter) {
     app.use('/api/restavracije', restavracijaRouter);
