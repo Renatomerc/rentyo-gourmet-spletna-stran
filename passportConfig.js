@@ -4,11 +4,12 @@
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const AppleStrategy = require('passport-apple'); // 🚨 NOVO: UVOZ ZA APPLE
+const AppleStrategy = require('passport-apple'); 
+const path = require('path'); // 🚨 KRITIČNO: UVOZIMO MODUL ZA POTI
 
-// KRITIČEN UVOZ: Uporabljamo ne-relativno pot, ki se zanaša na nastavitve 
-// module.paths, dodane v server.js, kar rešuje težavo Renderja.
-const Uporabnik = require('models/uporabnik'); 
+// KRITIČEN UVOZ: Uporabljamo absolutno pot, da zagotovimo, da Render vedno najde model.
+// __dirname je mapa 'src'. Moramo se premakniti na '..', nato pa v 'models'.
+const Uporabnik = require(path.join(__dirname, '..', 'models', 'uporabnik')); 
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk
