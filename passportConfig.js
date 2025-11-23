@@ -1,36 +1,38 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js (PREGLED POTI ZA RENDER)
+// 🟢 passportConfig.js — Konfiguracija Passport.js (ULTIMATIVNA REŠITEV - PATH ABSOLUTNI Z __dirname)
 // ========================================
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path'); 
 
-// 🚨 KRITIČEN UVOZ: Preizkusimo 2 najverjetnejši poti
-// Glede na to, da Render VSE datoteke postavi v SRC, poskusimo s potjo, ki predpostavlja:
-// 1. Model je v "models" (relativno na koren)
-// 2. Model je v "models" (relativno na SRC)
+// 🚨 KRITIČEN UVOZ: Preizkusimo vse kritične poti z uporabo __dirname
 let Uporabnik;
 
-// 1. POSKUS (Fizično logična pot v Korenu):
+// 1. POSKUS (models je v Korenu, vendar je passportConfig v src/): ../models/uporabnik
 try {
-    // Potrebno, ker je passportConfig.js in models/ v KORENU
-    Uporabnik = require('./models/uporabnik'); 
+    // __dirname je /opt/render/project/src/
+    // Path.join premakne gor in najde models/uporabnik
+    Uporabnik = require(path.join(__dirname, '..', 'models', 'uporabnik')); 
+    console.log("Uporabnik model naložen s potjo 1: ../models/uporabnik");
 } catch (e1) {
-    // 2. POSKUS (Virtualna pot za Render):
+    // 2. POSKUS (models je v src/, tj. src/models/uporabnik): ./models/uporabnik
     try {
-        // Potrebno, ker Render misli, da je koda v SRC/ (tj. gor iz SRC in potem v models/)
-        Uporabnik = require('../models/uporabnik'); 
+        // Path.join ostane v src/ in najde models/uporabnik
+        Uporabnik = require(path.join(__dirname, 'models', 'uporabnik')); 
+        console.log("Uporabnik model naložen s potjo 2: ./models/uporabnik (Znotraj src/)");
     } catch (e2) {
-        // 3. POSKUS (Absolutna pot na Renderju)
+        // 3. POSKUS (Model je neposredno v Korenu):
         try {
-            // Poskusimo z absolutno potjo, ki jo uporablja Render
-            Uporabnik = require('/opt/render/project/models/uporabnik');
+            Uporabnik = require(path.join(__dirname, '..', 'uporabnik')); 
+            console.log("Uporabnik model naložen s potjo 3: ../uporabnik (Neposredno v korenu)");
         } catch (e3) {
-            // Če noben poskus ne uspe, prikažemo obe napaki
-            console.error("KRITIČNA NAPAKA: 1. poskus (./models/uporabnik) je propadel. Napaka:", e1.message);
-            console.error("KRITIČNA NAPAKA: 2. poskus (../models/uporabnik) je propadel. Napaka:", e2.message);
-            throw new Error("Kritična napaka: Modela 'uporabnik' ni bilo mogoče naložiti z nobene preizkušene poti.");
+            // Če noben poskus ne uspe, prikažemo napake za debugiranje
+            console.error("KRITIČNA NAPAKA: Ne morem najti modela 'uporabnik' na nobeni preizkušeni poti (Absolutno).");
+            console.error("Napaka 1:", e1.message);
+            console.error("Napaka 2:", e2.message);
+            console.error("Napaka 3:", e3.message);
+            throw new Error("Kritična napaka: Modela 'uporabnik' ni bilo mogoče naložiti z nobeno preizkušeno potjo.");
         }
     }
 }
@@ -50,7 +52,6 @@ function setupPassport(app) {
 
     passport.deserializeUser(async (id, done) => {
         try {
-            // Pomembno: Uporabnik model mora biti dostopen tukaj
             const user = await Uporabnik.findById(id); 
             done(null, user);
         } catch (err) {
@@ -62,11 +63,9 @@ function setupPassport(app) {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        // Ta pot mora ustrezati poti, ki jo boste uporabili v uporabnikRouter.js (tj. /api/auth/google/callback)
         callbackURL: "/api/auth/google/callback" 
     },
     async (accessToken, refreshToken, profile, done) => {
-        // Ta funkcija se izvede, ko se Google uspešno avtenticira
         try {
             let currentUser = await Uporabnik.findOne({ googleId: profile.id });
 
