@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (FINALNI POPRAVEK POTI)
+// 🟢 passportConfig.js — Konfiguracija Passport.js za Google OAuth (FINALNI POPRAVEK POTI Z RESOLVE)
 // ========================================
 
 const passport = require('passport');
@@ -7,8 +7,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // ⭐ Uvozimo modul 'path'
 const path = require('path'); 
 
-// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.resolve za določitev absolutne poti od korenskega direktorija Node.js procesa.
-// To je ključno za Render, kjer se poti pogosto zamenjajo.
+// 🚨 KRITIČEN POPRAVEK POTI: Uporabimo path.resolve za določitev absolutne poti od korenskega direktorija projekta.
+// To rešuje problem, kjer Render premakne datoteke v podimenik 'src/' in zamenja relativne poti.
+// Predpostavljamo, da je mapa 'models' v KORENU vašega GITA.
 const Uporabnik = require(path.resolve('models', 'uporabnikModel')); 
 
 function setupPassport(app) {
