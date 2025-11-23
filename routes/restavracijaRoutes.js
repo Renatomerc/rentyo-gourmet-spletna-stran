@@ -8,7 +8,7 @@ module.exports = (preveriGosta) => {
     const router = express.Router();
     
     // 🔥 KLJUČNO: Uvozimo vse funkcije iz controllerja
-    const restavracijaController = require('../controllers/restavracijaController');
+    const restavracijaController = require('./controllers/restavracijaController');
     
     
     // =================================================================

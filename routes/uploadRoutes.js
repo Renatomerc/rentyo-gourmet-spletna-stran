@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const cloudinary = require('../config/cloudinaryConfig'); // Uvoz Cloudinary konfiguracije
+const cloudinary = require('./config/cloudinaryConfig'); // Uvoz Cloudinary konfiguracije
 const multer = require('multer');
 const fs = require('fs'); // Za brisanje začasne datoteke
 
 // 🔥🔥🔥 POMEMBNO: Uvoz Mongoose modela restavracije
-const Restavracija = require('../models/Restavracija'); 
+const Restavracija = require('./models/Restavracija'); 
 // OPOZORILO: Pot '../models/Restavracija' morda ni pravilna za vaš projekt, 
 // preverite, kje se nahaja datoteka vašega modela (npr. Restavracija.js)!
 

@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 uporabnik.js — Uporabnik model (POPRAVLJEN IZVOZ)
+// 🟢 uporabnik.js — Uporabnik model (Sedaj izvaža samo SHEMO!)
 // ========================================
 
 const mongoose = require('mongoose');
@@ -11,9 +11,9 @@ const UporabnikShema = new mongoose.Schema({
     telefon: { type: String },
     
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    geslo: { type: String, required: true },
+    // Pomembno: geslo ni obvezno, če je prisoten googleId
+    geslo: { type: String, required: function() { return !this.googleId; } }, 
     
-    // 🟢 NOVO: Polje za shranjevanje Google ID-ja
     googleId: { type: String, unique: true, sparse: true }, 
 
     jeLastnik: { type: Boolean, default: false },
@@ -21,24 +21,20 @@ const UporabnikShema = new mongoose.Schema({
     
     tockeZvestobe: {
         type: Number,
-        default: 100 // KLJUČNO POPRAVLJENO: Začetnih 100 točk
+        default: 100
     }
 
 }, { timestamps: true });
 
 // Metoda za primerjavo gesla
 UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
-    // Prepreči primerjanje gesla za uporabnike, ustvarjene z Google OAuth.
-    if (this.googleId || this.geslo.startsWith('google_oauth_user_no_password_set_')) {
+    if (!this.geslo || this.googleId) {
         return false; 
     }
-    
-    // Za navadne uporabnike uporabimo bcrypt primerjavo
     return bcrypt.compare(vnesenoGeslo, this.geslo);
 };
 
 
-// ⭐ KRITIČEN POPRAVEK: Ustvarimo in izvozimo MODEL (Uporabnik) iz sheme (UporabnikShema).
-// Sedaj lahko kličemo Uporabnik.findById, Uporabnik.create itd.
-const Uporabnik = mongoose.model('Uporabnik', UporabnikShema);
-module.exports = Uporabnik;
+// ⭐ KRITIČEN POPRAVEK: Izvažamo SAMO Shemo, ne modela.
+// Model bo definiran ločeno na primarni (mongoose) in sekundarni (dbUsers) povezavi.
+module.exports = UporabnikShema;

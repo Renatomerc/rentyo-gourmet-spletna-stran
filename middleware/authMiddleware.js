@@ -1,16 +1,19 @@
 const jwt = require('jsonwebtoken');
 
 // ⭐ Uvozi shemo in sekundarno povezavo
+// POPRAVEK: Spremenjena pot na '../models/Uporabnik', če je authMiddleware v /middleware in Uporabnik v /models
 const UporabnikShema = require('../models/Uporabnik'); 
-const dbUsers = require('../dbUsers'); 
+const dbUsers = require('./dbUsers'); // Predpostavljam, da je dbUsers pravilna Mongoose povezava
 
 // ⭐ KLJUČNO: Inicializiraj Mongoose Model enkrat, povezan s sekundarno povezavo
+// To je ključen blok. Zdaj, ko UporabnikShema pravilno izvaža Shemo, bo ta blok deloval.
 let Uporabnik;
 try {
-    // Poskusimo dobiti že obstoječi model, če je bil registriran
+    // Poskusimo dobiti že obstoječi model, če je bil registriran na sekundarni povezavi
     Uporabnik = dbUsers.model('Uporabnik');
 } catch (e) {
-    // Če model še ne obstaja, ga registriramo
+    // Če model še ne obstaja, ga registriramo z izvoženo Shemo.
+    // POZOR: To bo delovalo SAMO, če ../models/Uporabnik izvaža Mongoose Schema objekt!
     Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
 }
 
