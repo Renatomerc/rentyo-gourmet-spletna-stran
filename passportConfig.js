@@ -7,7 +7,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const AppleStrategy = require('passport-apple'); 
 // ODSTRANIMO 'path' in KRITIČNE ABSOLUTNE POTI, ker se datoteka nahaja v korenu.
 // Uporabljamo preprosto relativno pot, ki je pravilna, če je models/ v istem imeniku kot passportConfig.js.
-const Uporabnik = require('./models/uporabnik'); // 🚨 Popravljena pot
+const Uporabnik = require('../models/uporabnik');
 
 function setupPassport(app) {
     // Uvoz okoljskih spremenljivk
