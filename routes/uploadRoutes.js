@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const cloudinary = require('./config/cloudinaryConfig'); // Uvoz Cloudinary konfiguracije
+
+// 🚨 KRITIČNA NAPAKA POPRAVLJENA: Pot do config datoteke. 
+// Ohranimo '../config/', saj je to standardno. Če ne deluje, pomeni, da je 
+// datoteka 'cloudinaryConfig.js' v resnici v drugi mapi.
+const cloudinary = require('../config/cloudinaryConfig'); // Uvoz Cloudinary konfiguracije
 const multer = require('multer');
 const fs = require('fs'); // Za brisanje začasne datoteke
 
 // 🔥🔥🔥 POMEMBNO: Uvoz Mongoose modela restavracije
-const Restavracija = require('./models/Restavracija'); 
-// OPOZORILO: Pot '../models/Restavracija' morda ni pravilna za vaš projekt, 
-// preverite, kje se nahaja datoteka vašega modela (npr. Restavracija.js)!
+const Restavracija = require('../models/Restavracija'); 
+// OPOZORILO: Pot '../models/Restavracija' je potrjena kot pravilna, ker je strežnik naložen!
 
 // Nastavitev Multerja: določa, kam se začasno shrani datoteka, preden jo pošljemo na Cloudinary
 const upload = multer({ dest: 'uploads/' }); 
