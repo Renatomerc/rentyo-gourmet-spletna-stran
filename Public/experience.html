@@ -15,9 +15,20 @@
             font-family: 'Poppins', sans-serif; 
         }
         
-        /* Ohranil sem vaše stile */
-        /*
+        /* * ======================================
+         * 1. ODSTRANITEV SVETLO MODREGA KVADRATA (FOCUS OUTLINE)
          * ======================================
+         */
+        button:focus,
+        a:focus,
+        .offer-card:focus,
+        .round-back-button:focus,
+        .offer-reserve-button:focus {
+            outline: none !important; /* Odstrani standardni fokus obroba */
+            -webkit-tap-highlight-color: transparent; /* Odstrani sivi/modri poudarek na dotik (iOS/Android) */
+        }
+
+        /* * ======================================
          * NOVI STILI ZA GUMB NAZAJ IN HEADER
          * ======================================
          */
@@ -59,7 +70,7 @@
 
         /*
          * ======================================
-         * STILI ZA NASLOVNO SLIKO 
+         * STILI ZA NASLOVNO SLIKO IN PRILAGODITEV
          * ======================================
          */
         
@@ -74,20 +85,17 @@
             height: 500px; 
             overflow: hidden;
             position: relative; 
-            /* * PRVOTNO: border-radius: 30px; 
-             * NOVO: Individualno spreminjanje vogalov (npr. zgoraj močno zaobljeno, spodaj ostro)
-             */
             border-top-left-radius: 100px; 
             border-top-right-radius: 200px; 
             border-bottom-left-radius: 200px;
             border-bottom-right-radius: 20px;
-            
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
         }
 
         .hero-image-exp img {
             width: 100%;
             height: 100%;
+            /* ⭐ 3. PRILAGODITEV: Zagotovi, da se slika pravilno zmanjša (object-fit: cover ohrani razmerje) */
             object-fit: cover;
         }
         
@@ -108,7 +116,6 @@
             color: var(--rmlk-modra);
             font-size: 2.2rem;
             margin-bottom: 10px;
-            /* Font je zdaj podedovan iz novega body stila (Poppins) */
         }
         
         .exp-text-info {
@@ -120,7 +127,7 @@
             box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
         }
         
-        /* Mobilni prilagoditve */
+        /* Mobilni prilagoditve za glavni del (spodnji del slike povleče čez rob) */
         @media (min-width: 768px) {
             .exp-text-info {
                 margin-top: 0;
@@ -136,6 +143,8 @@
              .hero-image-exp {
                 border-radius: 0;
                 box-shadow: none;
+                /* ⭐ 3. PRILAGODITEV: Nižja višina za boljšo mobilno izkušnjo */
+                height: 300px; 
              }
              .header-back-only {
                 top: 20px;
@@ -145,11 +154,40 @@
         
         /*
          * ======================================
-         * STILI ZA KARTICE POSEBNIH PONUDB (NOVO)
+         * STILI ZA KARTICE POSEBNIH PONUDB
          * ======================================
          */
         
+        /* ⭐ 2. PRILAGODITEV: Postavitev kartic na mobilnem telefonu - VODORAVNO POMIKANJE */
+        .offers-scroll-wrapper {
+            /* Skrijemo grid in preklopimo na Flexbox */
+            display: flex;
+            overflow-x: scroll; /* Omogoči vodoravno drsenje */
+            scroll-snap-type: x mandatory; /* Gladko drsenje in zaskok na vsaki kartici */
+            padding-top: 15px;
+            padding-bottom: 25px; /* Dodaten prostor za senčke */
+            -webkit-overflow-scrolling: touch; /* Izboljša drsenje na iOS */
+        }
+        
+        /* Odstranimo horizontalni scrollbar na Chrome/Safari/Opera */
+        .offers-scroll-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+        /* Skrijemo horizontalni scrollbar na Firefox */
+        .offers-scroll-wrapper {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+
         .offer-card {
+            /* ⭐ Nastavi fiksno širino za mobilno drsenje */
+            min-width: 85vw; /* Kartica zasede 85% širine zaslona */
+            max-width: 350px; /* Največja širina za tablice */
+            
+            margin-right: 20px; /* Razmik med karticami */
+            scroll-snap-align: start; /* Kartica se ustavi na začetku */
+            
             background-color: #fff;
             border-radius: 12px;
             overflow: hidden;
@@ -157,6 +195,22 @@
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
             position: relative; 
+        }
+
+        /* Na večjih zaslonih se vrnemo na standardno mrežno postavitev */
+        @media (min-width: 768px) {
+            .offers-scroll-wrapper {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 25px;
+                overflow-x: hidden; /* Skrij drsenje na desktopu */
+                scroll-snap-type: none;
+                padding: 15px 0; /* Odstrani padding za drsenje */
+            }
+            .offer-card {
+                min-width: auto;
+                margin-right: 0;
+            }
         }
         
         .offer-card:hover {
@@ -166,7 +220,7 @@
 
         .offer-image-wrapper {
             width: 100%;
-            height: 250px; /* Višja slika */
+            height: 250px; 
             overflow: hidden;
         }
 
@@ -195,9 +249,8 @@
 
         .offer-info {
             display: flex;
-            /* SPREMENJENO: postavi elemente enega pod drugega na mobilnih napravah */
             flex-direction: column; 
-            align-items: flex-start; /* Poravnaj vsebino na začetek */
+            align-items: flex-start; 
             font-size: 0.9rem;
             color: #777;
             margin-top: 10px; 
@@ -205,7 +258,6 @@
             border-top: 1px solid #eee;
         }
 
-        /* Dodatni stil za razmik med datumom in ceno, ko sta pod seboj */
         .offer-info > * {
             margin-bottom: 5px; 
         }
@@ -215,16 +267,15 @@
             color: #e67e22; 
         }
         
-        .offer-date { /* Stil za datum dogodka */
+        .offer-date { 
             font-weight: 500;
             color: var(--rmlk-modra);
             display: flex;
             align-items: center;
         }
         
-        /* SPREMENJENA BARVA GUMBA za REZERVIRAJ (uporablja se samo v modalu) */
         .offer-reserve-button {
-            background-color: #20c0bd; /* Nova barva */
+            background-color: #20c0bd; 
             color: white;
             padding: 8px 15px;
             border-radius: 25px;
@@ -234,7 +285,7 @@
         }
         
         .offer-reserve-button:hover {
-            background-color: #179c9a; /* Temnejša barva ob hoverju */
+            background-color: #179c9a; 
         }
 
         /*
@@ -285,7 +336,6 @@
             object-fit: cover;
         }
 
-        /* X Gumb za zapiranje, premaknjen na sliko */
         .close-button {
             color: white; 
             position: absolute;
@@ -338,7 +388,8 @@
                 <div class="exp-additional-info" style="margin-top: 20px;">
                     <h3 data-i18n="experience.bestOffersTitle" style="color: var(--rmlk-modra); border-bottom: 2px solid #ddd; padding-bottom: 10px;">Naše najboljše ponudbe</h3>
                     
-                    <div id="offersContainer" class="mreza-kartic" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-top: 15px;">
+                    <!-- ⭐ SPREMEMBA: Uporabljamo offers-scroll-wrapper za vodoravno pomikanje na mobilnem telefonu -->
+                    <div id="offersContainer" class="offers-scroll-wrapper">
                         <p id="loadingStatus" data-i18n="global.loadingOffers">Nalaganje posebnih ponudb...</p>
                     </div>
                 </div>
@@ -558,8 +609,17 @@
                     const offersEntries = Object.entries(globalOffersData); 
 
                     if (offersEntries.length > 0) {
-                        // Uporabite bolj standardno mrežno postavitev
-                        if(offersContainer) offersContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+                        // Na desktopu poskrbi, da se mreža pravilno prikaže
+                         if (window.innerWidth >= 768) {
+                             if(offersContainer) {
+                                offersContainer.style.display = 'grid';
+                             }
+                         } else {
+                             // Na mobilnem telefonu ostane flexbox za drsenje
+                             if(offersContainer) {
+                                 offersContainer.style.display = 'flex';
+                             }
+                         }
                         
                         offersEntries.forEach(([key, offer]) => {
                             // Key je sedaj MongoDB ID
@@ -576,6 +636,17 @@
                     // data-i18n za status napake
                     if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;">❌ <span data-i18n="global.dataLoadError">NAPAKA PRI BRANJU PODATKOV</span>: ${error.message}. <span data-i18n="global.checkFile">Preverite API endpoint '/api/offers'.</span></p>`;
                 });
+                
+            // Poskrbi, da se ob spremembi velikosti zaslona (npr. obrnitvi telefona) preklopi nazaj na grid
+            window.addEventListener('resize', () => {
+                if (offersContainer) {
+                    if (window.innerWidth >= 768) {
+                        offersContainer.style.display = 'grid';
+                    } else {
+                        offersContainer.style.display = 'flex';
+                    }
+                }
+            });
         });
     </script>
 </body>
