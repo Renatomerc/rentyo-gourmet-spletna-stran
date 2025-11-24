@@ -2113,6 +2113,189 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     margin-top: 1rem;
     color: #333333;
 }
+/* Definirajte to spremenljivko na vrhu vaše datoteke :root {} */
+/* :root { --rmlk-siva: #f4f4f4; } */
+
+/* --- NOVI SLOGI ZA SEKCIJO GOURMET EXPLORE --- */
+.gourmet-explore {
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+    background-color: var(--rmlk-siva);
+}
+
+.gourmet-explore h2 {
+    color: var(--rmlk-modra);
+    margin-bottom: 2.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Nastavljiv border-radius za vsak vogal */
+.country-card {
+    --card-radius-tl: 20px;
+    --card-radius-tr: 20px;
+    --card-radius-bl: 20px;
+    --card-radius-br: 20px;
+
+    position: relative;
+    border-top-left-radius: var(--card-radius-tl);
+    border-top-right-radius: var(--card-radius-tr);
+    border-bottom-left-radius: var(--card-radius-bl);
+    border-bottom-right-radius: var(--card-radius-br);
+
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+
+    /* Popravek: proporcialna višina */
+    aspect-ratio: 4 / 3; /* širina : višina */
+    width: 100%;
+}
+
+/* Silhueta steklenice na levi strani kartice */
+.country-card[data-experience-code="wine"] .wine-silhouette {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 80px;        /* širina levega dela */
+    height: 100%;       /* pokrije celotno višino kartice */
+    background-image: url('steklenica.svg'); /* tvoja SVG/PNG datoteka */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.2;       /* diskretno */
+    pointer-events: none;
+    z-index: 1;         /* pod overlayjem */
+}
+
+/* Grid kartic */
+.country-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Hover efekt */
+.country-card:hover {
+    box-shadow: 0 8px 25px rgba(14, 43, 78, 0.25);
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+    position: relative;
+    z-index: 2; /* nad silhueto */
+}
+
+.country-card:hover .card-image {
+    transform: scale(1.03);
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.106);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s ease;
+    z-index: 3; /* nad sliko in silhueto */
+}
+
+.country-card:hover .card-overlay {
+    background: rgba(14, 43, 78, 0.55);
+}
+
+.card-title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 4;
+}
+
+/* --- RESPONSIVE: Na telefonih višina kartice manjša --- */
+@media (max-width: 768px) {
+    .country-card {
+        aspect-ratio: 1 / 1; /* kvadrat na mobilnih */
+    }
+
+    .country-cards-container {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    /* Silhueta manjša na telefonih */
+    .country-card[data-experience-code="wine"] .wine-silhouette {
+        width: 50px;
+    }
+}
+
+/* Stil za veliko sekcijo akcije */
+.velika-akcija-slika {
+    margin-bottom: 2rem;
+}
+
+/* --- NOVI SLOGI ZA REZULTATE V MODALU --- */
+.restavracija-vsebina #modalResultsContainer {
+    z-index: 10;
+    padding: 1rem 1rem 0 1rem;
+    padding-right: 0;
+}
+
+#modalResultsContainer h3 {
+    color: var(--rmlk-modra);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.mreza-rezultatov-modal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 15px;
+    padding-bottom: 1rem;
+}
+
+.mreza-rezultatov-modal .kartica {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restavracija-vsebina #modalSlika.hidden,
+.restavracija-vsebina .podrobnosti-tekst.hidden {
+    display: none !important;
+}
+
+/* Uporaba SVG clipPath za silhueto steklenice */
+.country-card[data-experience-code="wine"] .bottle-clipped {
+    clip-path: url(#maskBottle);
+    -webkit-clip-path: url(#maskBottle); /* za Chrome/Safari */
+}
+/* Dodajte to v vaš <style> blok ali styles.css */
+@keyframes highlight-flash {
+    0% { box-shadow: 0 0 0 0 rgba(32, 192, 189, 0.7); border: 2px solid rgba(32, 192, 189, 0.5); }
+    50% { box-shadow: 0 0 15px 5px rgba(32, 192, 189, 0.9); border: 2px solid #20c0bd; }
+    100% { box-shadow: 0 0 0 0 rgba(32, 192, 189, 0); border: 2px solid transparent; }
+}
+
+.highlighted-card {
+    animation: highlight-flash 1.5s ease-out;
+}
 
 
 
@@ -2120,173 +2303,242 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 </head>
 
 <body>
- <header class="glava">
-<div class="logotip">
-    <a href="#" id="map-icon-link" class="icon-link">
-        <i class="fas fa-map-marked-alt map-icon" aria-label="Prikaži zemljevid"></i>
-        </a>
-</div>
-
-<div id="map-modal" class="map-overlay">
-    <div class="map-content">
-        <button id="close-map-btn" class="close-btn">&times;</button>
-        <div id="large-map-container">
-            <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktiven zemljevid.</p>
+    <svg width="0" height="0" style="position:absolute">
+      <clipPath id="maskBottle" clipPathUnits="objectBoundingBox">
+        <path d="M0.45,0 L0.55,0 L0.55,0.15 L0.60,0.45 L0.60,1 L0.40,1 L0.40,0.45 L0.45,0.15 Z"/>
+      </clipPath>
+    </svg>
+    <header class="glava">
+        <div class="logotip">
+            <a href="#" id="map-icon-link" class="icon-link">
+                <i class="fas fa-map-marked-alt map-icon" aria-label="Prikaži zemljevid"></i>
+            </a>
         </div>
-    </div>
-</div>
-    
-    <div class="akcije" id="desktopAkcije"> 
-      <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
-        <i class="fas fa-user"></i> Prijava
-      </a>
 
-      <div class="profil-ovoj" id="profilMeniDesktop" style="display: none;">
-        <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
-          <i class="fas fa-user-circle"></i> Moj Profil
-        </a>
-        <a href="#" id="gumbOdjavaDesktop" class="gumb-odjava" data-i18n="header.logout">
-          <i class="fas fa-sign-out-alt"></i> Odjava
-        </a>
-      </div>
-      <div class="jezik-ovoj" id="jezikOvojDesktop">
-        <i class="fas fa-globe"></i>
-        <select class="izbira-jezika" id="izbiraJezikaDesktop">
-          <option value="sl">SL</option>
-          <option value="en">EN</option>
-          <option value="de">DE</option>
-          <option value="hr">HR</option>
-          <option value="it">IT</option>
-          <option value="fr">FR</option>
-        </select>
-      </div>
-    </div>
-    
-<button class="hamburger-gumb" id="hamburgerGumb">
-    <i class="fas fa-ellipsis-h"></i>
-</button>
-
-    <div class="mobilni-meni" id="mobilniMeni">
-        <a href="#" id="odpriPrijavoMobilni" class="gumb-prijava" data-i18n="header.login">
+        <div id="map-modal" class="map-overlay">
+            <div class="map-content">
+                <button id="close-map-btn" class="close-btn">&times;</button>
+                <div id="large-map-container">
+                    <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktiven zemljevid.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="akcije" id="desktopAkcije"> 
+          <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
             <i class="fas fa-user"></i> Prijava
-        </a>
+          </a>
 
-        <div class="profil-ovoj" id="profilMeniMobilni" style="display: none;">
+          <div class="profil-ovoj" id="profilMeniDesktop" style="display: none;">
             <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
-                <i class="fas fa-user-circle"></i> Moj Profil
+              <i class="fas fa-user-circle"></i> Moj Profil
             </a>
-            <a href="#" id="gumbOdjavaMobilni" class="gumb-odjava" data-i18n="header.logout">
-                <i class="fas fa-sign-out-alt"></i> Odjava
+            <a href="#" id="gumbOdjavaDesktop" class="gumb-odjava" data-i18n="header.logout">
+              <i class="fas fa-sign-out-alt"></i> Odjava
             </a>
-        </div>
-        
-        <div class="jezik-ovoj" id="jezikOvojMobilni">
+          </div>
+          <div class="jezik-ovoj" id="jezikOvojDesktop">
             <i class="fas fa-globe"></i>
-            <select class="izbira-jezika" id="izbiraJezikaMobilni">
-                <option value="sl">SL</option>
-                <option value="en">EN</option>
-                <option value="de">DE</option>
-                <option value="hr">HR</option>
-                <option value="it">IT</option>
-                <option value="fr">FR</option>
+            <select class="izbira-jezika" id="izbiraJezikaDesktop">
+              <option value="sl">SL</option>
+              <option value="en">EN</option>
+              <option value="de">DE</option>
+              <option value="hr">HR</option>
+              <option value="it">IT</option>
+              <option value="fr">FR</option>
             </select>
+          </div>
         </div>
-    </div>
-
-  </header>
-
-  <main>
-    <section class="naslovna-slika">
-      <h1 data-i18n="hero.title">Gourmet & Experience</h1>
-    </section>
-
-    <section class="iskalnik-sekcija">
-      <form class="iskalnik">
-        <div class="iskalnik-polje">
-          <label for="restavracija_mesto" data-i18n="search.restaurant_city_label">Restavracija ali mesto</label>
-          <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
-        </div>
-
-        <div class="iskalnik-polje">
-          <label for="datum" data-i18n="search.date_label">Datum</label>
-          <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
-        </div>
-
-        <div class="iskalnik-polje">
-          <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
-          <select id="cas">
-            <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
-          </select>
-        </div>
-
-        <div class="iskalnik-polje">
-          <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
-          <select id="stevilo_oseb">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-          </select>
-        </div>
-
-        <button type="submit" class="gumb-isci" data-i18n="search.search_button">Išči</button>
-      </form>
-    </section>
-
-<section class="hitra-iskanja">
-    <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
-    <div class="gumbi-kategorij">
-        <a href="#" class="gumb-kategorija" data-kuhinja="Mesne" data-i18n="cuisine.meat">Mesne jedi</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Vegi" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Ribje" data-i18n="cuisine.fish">Ribje jedi</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Pijača" data-i18n="cuisine.drinks">Pijača</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Brunch" data-i18n="cuisine.brunch">Brunch</a>
-    </div>
-</section>
-
-<section class="kartice-restavracij hidden" id="rezultatiIskanjaSekcija">
-    
-    <div class="gumb-nazaj-vsebnik">
-<button id="gumbNazaj" class="gumb-nazaj ikona-nazaj" onclick="handlePrikaziPrivzete()">
-    <i class="fas fa-arrow-left"></i>
-</button>
-    </div>
-    
-    <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
-    <div class="mreza-kartic" id="rezultatiIskanja">
-    </div>
-</section>
-
-<section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
-    <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
-    <div class="mreza-kartic" id="restavracije-container">
-        <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
-        </div>
-</section>
-
-    <section class="kartice-restavracij kartice-izpostavljeno">
-        <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
         
-        <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
-            <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
-        </div>
-    </section>
-    
-<!-- NOV DODATEK: Velika sekcija za izpostavljene akcije -->
-<section class="velika-akcija-slika" id="akcijeBanner">
-    
-    <!-- DODANA IKONA V OSPREDJU: Ta slika je ločen element in bo postavljena 
-         z absolutnim pozicioniranjem nad glavno sliko ozadja. -->
-    <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
+    <button class="hamburger-gumb" id="hamburgerGumb">
+        <i class="fas fa-ellipsis-h"></i>
+    </button>
 
-    <div class="akcija-vsebina">
-        <h2 data-i18n="action_banner.title">Aktualne Akcije in Posebna Ponudba</h2>
+        <div class="mobilni-meni" id="mobilniMeni">
+            <a href="#" id="odpriPrijavoMobilni" class="gumb-prijava" data-i18n="header.login">
+                <i class="fas fa-user"></i> Prijava
+            </a>
+
+            <div class="profil-ovoj" id="profilMeniMobilni" style="display: none;">
+                <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
+                    <i class="fas fa-user-circle"></i> Moj Profil
+                </a>
+                <a href="#" id="gumbOdjavaMobilni" class="gumb-odjava" data-i18n="header.logout">
+                    <i class="fas fa-sign-out-alt"></i> Odjava
+                </a>
+            </div>
+            
+            <div class="jezik-ovoj" id="jezikOvojMobilni">
+                <i class="fas fa-globe"></i>
+                <select class="izbira-jezika" id="izbiraJezikaMobilni">
+                    <option value="sl">SL</option>
+                    <option value="en">EN</option>
+                    <option value="de">DE</option>
+                    <option value="hr">HR</option>
+                    <option value="it">IT</option>
+                    <option value="fr">FR</option>
+                </select>
+            </div>
+        </div>
+
+    </header>
+
+    <main>
+        <section class="naslovna-slika">
+          <h1 data-i18n="hero.title">Gourmet & Experience</h1>
+        </section>
+
+        <section class="iskalnik-sekcija">
+          <form class="iskalnik">
+            <div class="iskalnik-polje">
+              <label for="restavracija_mesto" data-i18n="search.restaurant_city_label">Restavracija ali mesto</label>
+              <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
+            </div>
+
+            <div class="iskalnik-polje">
+              <label for="datum" data-i18n="search.date_label">Datum</label>
+              <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
+            </div>
+
+            <div class="iskalnik-polje">
+              <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
+              <select id="cas">
+                <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
+              </select>
+            </div>
+
+            <div class="iskalnik-polje">
+              <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
+              <select id="stevilo_oseb">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+
+            <button type="submit" class="gumb-isci" data-i18n="search.search_button">Išči</button>
+          </form>
+        </section>
+
+        <section class="hitra-iskanja">
+            <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
+            <div class="gumbi-kategorij">
+                <a href="#" class="gumb-kategorija" data-kuhinja="Mesne" data-i18n="cuisine.meat">Mesne jedi</a>
+                <a href="#" class="gumb-kategorija" data-kuhinja="Vegi" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</a>
+                <a href="#" class="gumb-kategorija" data-kuhinja="Ribje" data-i18n="cuisine.fish">Ribje jedi</a>
+                <a href="#" class="gumb-kategorija" data-kuhinja="Pijača" data-i18n="cuisine.drinks">Pijača</a>
+                <a href="#" class="gumb-kategorija" data-kuhinja="Brunch" data-i18n="cuisine.brunch">Brunch</a>
+            </div>
+        </section>
+
+        <section class="kartice-restavracij hidden" id="rezultatiIskanjaSekcija">
+            
+            <div class="gumb-nazaj-vsebnik">
+                <button id="gumbNazaj" class="gumb-nazaj ikona-nazaj" onclick="handlePrikaziPrivzete()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            
+            <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
+            <div class="mreza-kartic" id="rezultatiIskanja">
+            </div>
+        </section>
+
+        <section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
+            <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
+            <div class="mreza-kartic" id="restavracije-container">
+                <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
+            </div>
+        </section>
+
+        <section class="kartice-restavracij kartice-izpostavljeno">
+            <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
+            
+            <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
+                <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
+            </div>
+        </section>
+        
+        <!-- NOV DODATEK: Velika sekcija za izpostavljene akcije -->
+        <section class="velika-akcija-slika" id="akcijeBanner">
+            
+            <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
+
+            <div class="akcija-vsebina">
+                <h2 data-i18n="action_banner.title">Aktualne Akcije in Posebna Ponudba</h2>
+            </div>
+        </section>
+
+        <section class="gourmet-explore" id="gourmetExploreSection">
+            <h2 data-i18n="gourmet_explore.title">Razišči nepozabna doživetja</h2>
+            <div class="country-cards-container">
+                
+               <a href="experience.html?code=fine-dining" class="country-card" data-experience-code="fine-dining">
+    <img src="Fine-dining.png" alt="Vrhunska kulinarika" class="card-image">
+    <div class="card-overlay">
+        <span class="card-title" data-i18n="experience.fine_dining">Vrhunska kulinarika</span>
     </div>
-</section>
+</a>
+
+                <div class="country-card" data-experience-code="wine">
+                    <div class="wine-silhouette"></div> <!-- NOVI DIV ZA SILHUETO -->
+                    <img src="Wine-tasting.png" alt="Wine tasting" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.wine">Wine tasting</span>
+                    </div>
+                </div>
+
+                <div class="country-card" data-experience-code="adventure">
+                    <img src="Outdoor-adventure.png" alt="Outdoor adventure" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.adventure">Outdoor adventure</span>
+                    </div>
+                </div>
+
+               <div class="country-card" data-experience-code="slepa-kuhinja">
+    <img src="Slepa-kuhinja.png" alt="Slepa kuhinja" class="card-image">
+    <div class="card-overlay">
+        <span class="card-title" data-i18n="experience.slepa-kuhinja">Slepa kuhinja</span>
+    </div>
+</div>
+
+                <div class="country-card" data-experience-code="sea">
+                    <img src="images/experiences/sea.jpg" alt="Morska doživetja" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.sea">Morska doživetja</span>
+                    </div>
+                </div>
+
+                <div class="country-card" data-experience-code="city">
+                    <img src="images/experiences/city.jpg" alt="City gourmet tour" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.city">City gourmet tour</span>
+                    </div>
+                </div>
+
+                <div class="country-card" data-experience-code="romantic">
+                    <img src="Romanticna-dozivetja.png" alt="Romantična doživetja" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.romantic">Romantična doživetja</span>
+                    </div>
+                </div>
+
+                <div class="country-card" data-experience-code="eco">
+                    <img src="images/experiences/eco.jpg" alt="Ekološka kulinarika" class="card-image">
+                    <div class="card-overlay">
+                        <span class="card-title" data-i18n="experience.eco">Ekološka kulinarika</span>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+
     
 </main>
     

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle" data-i18n="experience.pageTitle">Rentyo Gourmet - Posebne Ponudbe</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        /* Dodano pravilo, da preglasi font iz styles.css in zagotovi enoten videz z index.html */
+        body {
+            font-family: 'Poppins', sans-serif; 
+        }
+        
+        /* Ohranil sem vaše stile */
+        /*
+         * ======================================
+         * NOVI STILI ZA GUMB NAZAJ IN HEADER
+         * ======================================
+         */
+        
+        .header-back-only {
+            position: absolute; 
+            top: 40px; 
+            left: 40px; 
+            z-index: 10; 
+        }
+        
+        .round-back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: black; 
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s;
+        }
+
+        .round-back-button i {
+            color: white; 
+            font-size: 1.2rem;
+            margin: 0; 
+        }
+        
+        .round-back-button:hover {
+            background-color: #333;
+        }
+        
+        /* Skrijemo standardni header (Ohranimo, kot ste zahtevali, če je iskalnik v njem) */
+        .glava {
+            display: none; 
+        }
+
+        /*
+         * ======================================
+         * STILI ZA NASLOVNO SLIKO 
+         * ======================================
+         */
+        
+        .hero-image-exp-container {
+            padding: 20px; 
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-image-exp {
+            width: 100%;
+            height: 500px; 
+            overflow: hidden;
+            position: relative; 
+            /* * PRVOTNO: border-radius: 30px; 
+             * NOVO: Individualno spreminjanje vogalov (npr. zgoraj močno zaobljeno, spodaj ostro)
+             */
+            border-top-left-radius: 100px; 
+            border-top-right-radius: 200px; 
+            border-bottom-left-radius: 200px;
+            border-bottom-right-radius: 20px;
+            
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+        }
+
+        .hero-image-exp img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .experience-main {
+            padding-top: 0; 
+            padding-bottom: 50px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .experience-detail-section {
+            padding: 20px 20px 0 20px; 
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .exp-text-info h1 {
+            color: var(--rmlk-modra);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            /* Font je zdaj podedovan iz novega body stila (Poppins) */
+        }
+        
+        .exp-text-info {
+            margin-top: -30px; 
+            position: relative;
+            background-color: white;
+            padding-top: 20px;
+            border-radius: 15px 15px 0 0; 
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Mobilni prilagoditve */
+        @media (min-width: 768px) {
+            .exp-text-info {
+                margin-top: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+        
+        @media (max-width: 767px) {
+             .hero-image-exp-container {
+                 padding: 0; 
+             }
+             .hero-image-exp {
+                border-radius: 0;
+                box-shadow: none;
+             }
+             .header-back-only {
+                top: 20px;
+                left: 20px;
+             }
+        }
+        
+        /*
+         * ======================================
+         * STILI ZA KARTICE POSEBNIH PONUDB (NOVO)
+         * ======================================
+         */
+        
+        .offer-card {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative; 
+        }
+        
+        .offer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .offer-image-wrapper {
+            width: 100%;
+            height: 250px; /* Višja slika */
+            overflow: hidden;
+        }
+
+        .offer-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .offer-content {
+            padding: 15px;
+        }
+
+        .offer-content h3 {
+            color: var(--rmlk-modra);
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            line-height: 1.3;
+        }
+
+        .offer-content p {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .offer-info {
+            display: flex;
+            /* SPREMENJENO: postavi elemente enega pod drugega na mobilnih napravah */
+            flex-direction: column; 
+            align-items: flex-start; /* Poravnaj vsebino na začetek */
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 10px; 
+            padding-top: 10px; 
+            border-top: 1px solid #eee;
+        }
+
+        /* Dodatni stil za razmik med datumom in ceno, ko sta pod seboj */
+        .offer-info > * {
+            margin-bottom: 5px; 
+        }
+
+        .offer-price {
+            font-weight: bold;
+            color: #e67e22; 
+        }
+        
+        .offer-date { /* Stil za datum dogodka */
+            font-weight: 500;
+            color: var(--rmlk-modra);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* SPREMENJENA BARVA GUMBA za REZERVIRAJ (uporablja se samo v modalu) */
+        .offer-reserve-button {
+            background-color: #20c0bd; /* Nova barva */
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .offer-reserve-button:hover {
+            background-color: #179c9a; /* Temnejša barva ob hoverju */
+        }
+
+        /*
+         * ======================================
+         * STILI ZA MODALNO OKNO 
+         * ======================================
+         */
+        
+        .offer-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            padding-top: 20px;
+        }
+        
+        .offer-modal.active {
+            display: block; 
+        }
+
+        .offer-modal-content {
+            background-color: #fefefe;
+            margin: 0 auto; 
+            padding: 0; 
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden; 
+        }
+        
+        .modal-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 250px; 
+            overflow: hidden;
+        }
+
+        .modal-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* X Gumb za zapiranje, premaknjen na sliko */
+        .close-button {
+            color: white; 
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); 
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #ccc;
+            text-decoration: none;
+        }
+        
+        .modal-text-content {
+            padding: 20px; 
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="hero-image-exp-container">
+        <section class="hero-image-exp" id="heroImageExp">
+            <div class="header-back-only">
+                <a href="index.html" onclick="history.back(); return false;" class="round-back-button" data-i18n-aria-label="global.back" aria-label="Nazaj">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+            
+            <img id="heroMainImage" src="Fine-dining.png" alt="Glavna slika posebnih ponudb">
+        </section>
+    </div>
+    
+    <main class="experience-main">
+        
+        <section class="experience-detail-section">
+            
+            <div id="experienceContainer" class="experience-content-wrapper">
+                
+                <div class="exp-text-info">
+                    <h1 id="expTitle" data-i18n="experience.mainTitle">Ekskluzivne ponudbe in oglasi</h1>
+                    <p id="expSubtitle" class="exp-subtitle" data-i18n="experience.mainSubtitle">Odkrijte posebne akcije in priporočila naših partnerjev.</p>
+                </div>
+                
+                <div class="exp-additional-info" style="margin-top: 20px;">
+                    <h3 data-i18n="experience.bestOffersTitle" style="color: var(--rmlk-modra); border-bottom: 2px solid #ddd; padding-bottom: 10px;">Naše najboljše ponudbe</h3>
+                    
+                    <div id="offersContainer" class="mreza-kartic" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-top: 15px;">
+                        <p id="loadingStatus" data-i18n="global.loadingOffers">Nalaganje posebnih ponudb...</p>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </section>
+
+    </main>
+
+    <header class="glava">
+        <div class="logotip">
+            </div>
+        <div class="akcije" id="desktopAkcije">
+            <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
+                <i class="fas fa-user"></i> Prijava
+            </a>
+            <div class="profil-ovoj" id="profilMeniDesktop" style="display: none;">
+                <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
+                    <i class="fas fa-user-circle"></i> Moj Profil
+                </a>
+                <a href="#" id="gumbOdjavaDesktop" class="gumb-odjava" data-i18n="header.logout">
+                    <i class="fas fa-sign-out-alt"></i> Odjava
+                </a>
+            </div>
+            <div class="jezik-ovoj" id="jezikOvojDesktop">
+                <i class="fas fa-globe"></i>
+                <select class="izbira-jezika" id="izbiraJezikaDesktop">
+                    <option value="sl">SL</option>
+                    <option value="en">EN</option>
+                    <option value="de">DE</option>
+                </select>
+            </div>
+        </div>
+        <button class="hamburger-gumb" id="hamburgerGumb">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+        <div class="mobilni-meni" id="mobilniMeni">
+            <a href="#" id="odpriPrijavoMobilni" class="gumb-prijava" data-i18n="header.login">
+                <i class="fas fa-user"></i> Prijava
+            </a>
+        </div>
+    </header>
+
+    <div id="restavracijaModal" class="restavracija-modal"></div>
+    <div class="login-modal" id="loginModal"></div>
+    <div class="duration-modal" id="durationModal"></div>
+    <div class="warning-modal" id="warningModal"></div>
+    <footer class="noga" data-i18n="global.footerText"></footer> 
+    <div id="cookie-consent-banner" class="cookie-banner hidden"></div>
+    
+    <div id="offerDetailModal" class="offer-modal">
+        <div class="offer-modal-content">
+            <span class="close-button">&times;</span> 
+            <div id="modalContent">
+                </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // API BASE URL (Definiramo, ker se uporablja za prijavo)
+        const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+
+        // Globalna shramba podatkov o ponudbah in pomožna funkcija za sporočila
+        let globalOffersData = {};
+        
+        const prikaziSporocilo = (msg, type = 'info', duration = 4000) => { 
+            console.log(`[Toaster Sporočilo] ${type}: ${msg}`);
+            // Ta funkcija zahteva, da je v index.html definiran #toaster-container,
+            // ampak jo ohranim za console log.
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const offersContainer = document.getElementById('offersContainer');
+            const offerDetailModal = document.getElementById('offerDetailModal');
+            const modalContent = document.getElementById('modalContent');
+            const closeButton = offerDetailModal ? offerDetailModal.querySelector('.close-button') : null;
+            
+            // ===========================================
+            // LOGIKA MODALA ZA PONUDBO
+            // ===========================================
+            
+            if (closeButton) {
+                closeButton.onclick = () => {
+                    offerDetailModal.classList.remove('active');
+                };
+            }
+            if (offerDetailModal) {
+                window.onclick = (event) => {
+                    if (event.target === offerDetailModal) {
+                        offerDetailModal.classList.remove('active');
+                    }
+                };
+            }
+            
+
+            const createOfferCard = (offer, offerId) => {
+                const card = document.createElement('div');
+                card.className = 'offer-card';
+                card.setAttribute('data-offer-id', offerId); 
+                
+                card.onclick = (e) => {
+                    // Preverimo, ali je bil klik na gumbu (čeprav gumba ni več)
+                    if (e.target.classList.contains('offer-reserve-button')) {
+                         return true; 
+                    }
+                    // ID ponudbe iz baze je sedaj ID
+                    displayOfferModal(offer._id); 
+                };
+
+                let infoLine = '';
+
+                if (offer.type === 'event' && offer.date_info) {
+                    // Prikaz datuma
+                    infoLine = `<span class="offer-date"><i class="far fa-calendar-alt" style="margin-right: 5px;"></i> ${offer.date_info}</span>`;
+                } else {
+                    // Prikaz podnaslova, če ni dogodek
+                    infoLine = `<span style="font-style: italic;">${offer.subtitle_sl}</span>`;
+                }
+                
+                const priceOrDate = `<span class="offer-price">${offer.price_text}</span>`;
+
+
+                card.innerHTML = `
+                    <div class="offer-image-wrapper">
+                        <img src="${offer.image_url}" alt="${offer.title_sl}" onerror="this.src='placeholder.png';">
+                    </div>
+                    <div class="offer-content">
+                        <h3 class="offer-title">${offer.title_sl}</h3>
+                        <p><i class="fas fa-map-marker-alt" style="margin-right: 5px;"></i> ${offer.location}</p>
+                        <p>${offer.subtitle_sl}</p>
+                        <div class="offer-info">
+                            ${infoLine}
+                            ${priceOrDate}
+                        </div>
+                    </div>
+                `;
+                return card;
+            };
+            
+            // Funkcija za prikaz modalnega okna
+            const displayOfferModal = (offerId) => {
+                const offer = globalOffersData[offerId];
+                if (!offer) return;
+                
+                // 1. IZVLEČEMO ID RESTAVRACIJE iz podatkov o ponudbi
+                const restaurantId = offer.restaurant_id || ''; 
+                
+                // 2. USTVARIMO POVEZAVO ZA REZERVACIJO
+                const finalReservationLink = `index.html?highlightId=${restaurantId}#restavracije`; 
+                
+                // data-i18n za modalne tekste
+                const i18n_location = '<strong><i class="fas fa-map-marker-alt"></i> <span data-i18n="global.location">Lokacija:</span></strong>';
+                const i18n_dateTime = '<strong><i class="far fa-calendar-alt"></i> <span data-i18n="global.dateTime">Datum/Čas:</span></strong>';
+                const i18n_price = '<strong><i class="fas fa-tag"></i> <span data-i18n="global.price">Cena:</span></strong>';
+                const i18n_noDescription = '<span data-i18n="experience.noDescription">Podroben opis ponudbe ni na voljo.</span>';
+                const i18n_reserveButton = '<span data-i18n="experience.searchAndReserve">Poišči in rezerviraj</span>';
+                const i18n_notSpecified = '<span data-i18n="global.notSpecified">Ni določeno</span>';
+                
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="modal-image-wrapper">
+                            <img src="${offer.image_url}" alt="${offer.title_sl}">
+                        </div>
+                        <div class="modal-text-content">
+                            <h2 style="color: var(--rmlk-modra); margin-top: 5px;">${offer.title_sl}</h2>
+                            <p style="font-size: 1.1rem; color: #555;">${offer.subtitle_sl}</p>
+                            <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+                            
+                            <p>${i18n_location} ${offer.location}</p>
+                            <p>${i18n_dateTime} ${offer.date_info || i18n_notSpecified}</p>
+                            <p>${i18n_price} ${offer.price_text}</p>
+                            
+                            <p style="margin-top: 20px;">
+                                ${offer.description_sl || i18n_noDescription}
+                            </p>
+                            
+                            <div style="text-align: right; margin-top: 30px;">
+                                <a href="${finalReservationLink}" class="offer-reserve-button" style="padding: 10px 20px;">
+                                     ${i18n_reserveButton} 
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if(offerDetailModal) offerDetailModal.classList.add('active');
+            }
+
+
+            // ===========================================
+            // NALAGANJE PODATKOV
+            // ===========================================
+            // ⭐ KLJUČNA SPREMEMBA: Klic Backend API-ja namesto lokalne datoteke JSON
+            fetch(`${API_BASE_URL}/offers`) // ⭐ POSODOBLJENO
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Napaka pri nalaganju ponudb iz API-ja: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(dataArray => { // API zdaj vrne polje (Array) objektov!
+                    if(offersContainer) offersContainer.innerHTML = ''; 
+                    
+                    // Pretvori polje v format objekta za globalOffersData (offerId: offerObject)
+                    // MongoDB ID (_id) uporabimo kot ključ, ker je edinstven.
+                    globalOffersData = dataArray.reduce((acc, offer) => {
+                        // Preverimo, ali ima objekt MongoDB ID (vedno bi ga moral imeti)
+                        if (offer._id) {
+                            acc[offer._id] = offer;
+                        }
+                        return acc;
+                    }, {});
+                    
+                    const offersEntries = Object.entries(globalOffersData); 
+
+                    if (offersEntries.length > 0) {
+                        // Uporabite bolj standardno mrežno postavitev
+                        if(offersContainer) offersContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+                        
+                        offersEntries.forEach(([key, offer]) => {
+                            // Key je sedaj MongoDB ID
+                            const card = createOfferCard(offer, key);
+                            if(offersContainer) offersContainer.appendChild(card);
+                        });
+                    } else {
+                        // data-i18n za status praznih ponudb
+                        if(offersContainer) offersContainer.innerHTML = '<p data-i18n="experience.noActiveOffers">Trenutno ni aktivnih posebnih ponudb.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Napaka pri nalaganju ponudb:', error);
+                    // data-i18n za status napake
+                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;">❌ <span data-i18n="global.dataLoadError">NAPAKA PRI BRANJU PODATKOV</span>: ${error.message}. <span data-i18n="global.checkFile">Preverite API endpoint '/api/offers'.</span></p>`;
+                });
+        });
+    </script>
+</body>
+</html>

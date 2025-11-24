@@ -105,7 +105,8 @@ function startApp() {
     // ========================================
     let restavracijaRouter;
     let userRoutes;
-    let uploadRouter; 
+    let uploadRouter;
+    let offersRouter; // ⭐ NOVO: Deklaracija routerja za ponudbe
     let authMiddleware; 
     let preveriGosta; 
     let zahtevajPrijavo; 
@@ -122,7 +123,11 @@ function startApp() {
         // Uvoz routerjev, ki uporabljajo Mongoose modele
         restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
         userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
-        uploadRouter = require('./routes/uploadRoutes'); 
+        uploadRouter = require('./routes/uploadRoutes');
+        
+        // ⭐ NOVO: Uvoz routerja za ponudbe
+        // Predvidevamo, da je offersRoutes.js v mapi ./routes/
+        offersRouter = require('./routes/offersRoutes'); 
 
     } catch (e) {
         console.error("❌ Kritična napaka pri nalaganju routerjev. Preverite poti modelov znotraj routerjev:", e.message);
@@ -140,6 +145,12 @@ function startApp() {
         console.log("✅ API Pot za Restavracije (/api/restavracije) je uspešno priključena.");
     } else {
         console.error("❌ KRITIČNA NAPAKA: restavracijaRouter se ni uspel naložiti. Preverite napake v routes/restavracijaRoutes.js ali modelu!");
+    }
+    
+    // ⭐ NOVO: Priključitev API Poti za Ponudbe
+    if (offersRouter) {
+        app.use('/api/offers', offersRouter);
+        console.log("✅ API Pot za Ponudbe (/api/offers) je uspešno priključena.");
     }
 
     if (userRoutes) {
