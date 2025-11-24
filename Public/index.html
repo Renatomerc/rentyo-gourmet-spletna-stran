@@ -682,14 +682,22 @@
           gap: 10px; 
         }
         
-      /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
+     /* ===== KARTICA RESTAVRACIJE (PRILJUBLJENO - VEČJA KARTICA) ===== */
         .kartica {
             border: 1px solid #ececec;
-            border-radius: 10px;
+            
+            /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
+            border-top-left-radius: 10px;    /* Radius zgoraj levo */
+            border-top-right-radius: 10px;   /* Radius zgoraj desno */
+            border-bottom-right-radius: 20px; /* Radius spodaj desno */
+            border-bottom-left-radius: 20px;  /* Radius spodaj levo */
+            
+            /* Prejšnja enotna lastnost: border-radius: 10px; */
+            
             overflow: hidden; 
             box-shadow: 10 5px 5px rgb(0, 0, 0);
             transition: transform 0.0s, box-shadow 0.0s;
-            background-color: white;
+            background-color: rgb(255, 255, 255);
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -842,7 +850,7 @@
             background-color: #1a9e9a;
         }
         
-       /* ======================================================= */
+   /* ======================================================= */
     /* NOVO: KARTICA IZPOSTAVLJENO (MANJŠA KARTICA) */
     /* ======================================================= */
     .kartica-izpostavljeno {
@@ -850,7 +858,15 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        border-radius: 10px;
+        
+        /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
+        border-top-left-radius: 10px;    /* Radius zgoraj levo */
+        border-top-right-radius: 10px;   /* Radius zgoraj desno */
+        border-bottom-right-radius: 20px; /* Radius spodaj desno */
+        border-bottom-left-radius: 20px;  /* Radius spodaj levo */
+        
+        /* Prejšnja enotna lastnost: border-radius: 10px; */
+        
         width: 100%;
         height: 250px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -1922,6 +1938,181 @@
 .gumb-prijava-social.apple i.fa-apple {
     color: #fff;
 }
+/* ================================================= */
+/* 7. SLOGI ZA VELIKO AKCIJSKO SLIKO (NEW FEATURE) */
+/* ================================================= */
+
+.velika-akcija-slika {
+    /* OMEJITEV ŠIRINE: Namesto 100vw zdaj uporablja fiksno širino (npr. 90%) 
+       ali maksimalno širino (npr. 1200px) in avtomatski rob za centriranje. */
+    width: 90%; 
+    max-width: 1200px;
+    margin: 2rem auto; /* Centriranje z avtomatskim robom in dodajanje razmika */
+    
+    /* Višina (nastavljiva) */
+    height: 70vh; /* Višina na desktopu (prilagodite po želji) */
+    
+   /* DODATEK: Nastavljiv radius vsakega vogala posebej */
+
+/* Če želite nadzorovati vsak vogal posebej, uporabite te lastnosti:
+   Vrstni red je: Zgoraj levo, Zgoraj desno, Spodaj desno, Spodaj levo
+*/
+
+/* Primer nastavitve: */
+border-top-left-radius: 280px;
+border-top-right-radius: 280px;
+border-bottom-right-radius: 20px;
+border-bottom-left-radius: 280px;
+
+/* Prejšnja enotna vrednost je zdaj zakomentirana:
+   border-radius: 50px;
+*/
+
+overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
+    
+    background-image: url('Oglasna-slika.png'); /* Uporabite pravo sliko! */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* Flexbox za centriranje vsebine znotraj sekcije */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Dodamo temen prekrivni sloj za boljšo berljivost teksta (gradient od temnega proti bolj temnemu) */
+    position: relative; /* KLJUČNO: Nastavi element za referenco absolutno pozicioniranemu otroku (.ikona-ospredje) */
+    padding: 2rem;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0); /* Neobvezno: za lepši vizualni učinek */
+}
+
+/* DODATEK: Stil za IKONO (Slika-app.png) v ospredju */
+.ikona-ospredje {
+    /* Pozicionira element glede na najbližjega starša z position: relative (.velika-akcija-slika) */
+    position: absolute; 
+    
+    /* Postavitev v desni spodnji kot z 20px odmikom */
+    right: 20px; 
+    bottom: 20px; 
+    
+    /* Velikost ikone. Spreminjajte width/height za prilagoditev velikosti! */
+    width: 100px; /* Prilagodite širino za povečanje/zmanjšanje */
+    height: auto; 
+    
+    /* Z-index zagotovi, da je ikona vidna nad vso vsebino in prekrivnim slojem */
+    z-index: 10; 
+    
+    /* Neobvezno: Dodajte rahel radius, da ikona ni ostro kvadratna */
+    border-radius: 15px; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+.velika-akcija-slika::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(130, 247, 35, 0.078); /* Temen prekrivni sloj */
+    z-index: 1;
+}
+
+.akcija-vsebina {
+    position: relative;
+    z-index: 2; /* Postavi vsebino nad prekrivni sloj */
+    text-align: center;
+    max-width: 800px;
+    padding: 1rem;
+    margin-bottom: 0; /* Odstranjeno, ker gumba ni več */
+}
+
+.akcija-vsebina h2 {
+    font-size: clamp(1.5rem, 4vw, 3rem); /* Odzivna velikost naslova */
+    font-weight: 600;
+    color: #fefefe; /* Svetel tekst za kontrast */
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0);
+}
+
+.akcija-vsebina h3 {
+    font-size: clamp(1.5rem, 2vw, 1.8rem); /* Odzivna velikost podnaslova */
+    margin-bottom: 0; /* Odstranjeno, ker gumba ni več */
+    font-weight: 400;
+    color: #88d82d; /* Svetel tekst za kontrast */
+}
+
+/* ODSTRANJENA sta bila .gumb-odkrij in .gumb-odkrij:hover bloka */
+
+
+/* ======================================= */
+/* PRILAGODITEV ZA MOBILNE NAPRAVE (PWA) */
+/* ======================================= */
+
+@media (max-width: 768px) {
+    .velika-akcija-slika {
+        /* Povečamo višino, da je na mobilnih napravah bolj opazno */
+        height: 50vh; 
+        /* Na mobilnem lahko uporabimo skoraj polno širino, vendar pustimo majhen rob za PWA izgled */
+        width: 95%; 
+        margin-left: auto; /* Ponovno centriranje */
+        margin-right: auto; /* Ponovno centriranje */
+        padding: 1rem;
+    }
+    
+    /* Prilagoditev velikosti ikone za mobilne naprave */
+    .ikona-ospredje {
+        width: 100px; /* Manjša ikona na mobilnih napravah */
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .akcija-vsebina {
+        padding: 0.5rem;
+    }
+}
+/* Dodano oblikovanje za kartico z oceno (Review Card) */
+.review-card {
+    /* Uporaba tega stila je boljša kot samo 'border-b' */
+    border: 1px solid #b8b8b8; /* Lahka siva obroba okoli kartice */
+    border-radius: 20px; /* Zaobljeni robovi kartice */
+    padding: 1.5rem; /* Notranji rob znotraj okvirja */
+    margin-bottom: 1.5rem; /* Razmik med karticami */
+    background-color: #ffffff; /* Belo ozadje za vsako kartico */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Nežna senca za 'dvignjen' videz */
+}
+
+/* Stilizacija imena avtorja in datuma znotraj review-card */
+.review-card .author-name {
+    font-weight: bold;
+    color: var(--rmlk-modra); /* Uporabimo vašo modro barvo za poudarek */
+    font-size: 1.1em;
+    margin-bottom: 0.25rem;
+    display: block; /* Omogoča, da ime zavzame svojo vrstico */
+}
+
+.review-card .review-date {
+    color: #6c757d; /* Diskretna siva za datum */
+    font-size: 0.9em;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+/* Stilizacija zvezdic, če so v ločenem elementu (npr. <span class="stars">) */
+/* V vaši kodi je to verjetno že narejeno s slikami ali znaki, ki jih je treba preveriti */
+.review-card .stars {
+    color: #ffc107; /* Zlata barva za zvezdice */
+    font-size: 1.1em;
+    margin-right: 0.5rem;
+}
+
+/* Stilizacija besedila komentarja */
+.review-card .review-text {
+    margin-top: 1rem;
+    color: #333333;
+}
 
 
 
@@ -1940,7 +2131,7 @@
     <div class="map-content">
         <button id="close-map-btn" class="close-btn">&times;</button>
         <div id="large-map-container">
-            <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktivni zemljevid.</p>
+            <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktiven zemljevid.</p>
         </div>
     </div>
 </div>
@@ -2084,6 +2275,18 @@
             <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
         </div>
     </section>
+    
+<!-- NOV DODATEK: Velika sekcija za izpostavljene akcije -->
+<section class="velika-akcija-slika" id="akcijeBanner">
+    
+    <!-- DODANA IKONA V OSPREDJU: Ta slika je ločen element in bo postavljena 
+         z absolutnim pozicioniranjem nad glavno sliko ozadja. -->
+    <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
+
+    <div class="akcija-vsebina">
+        <h2 data-i18n="action_banner.title">Aktualne Akcije in Posebna Ponudba</h2>
+    </div>
+</section>
     
 </main>
     

@@ -812,7 +812,7 @@ a:hover {
     width: 90%; /* Večja širina za zemljevid */
     height: 85%;
     position: relative;
-    border-radius: 8px;
+    border-radius: 8px; /* Ta rob je za celotno modalno vsebino */
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
@@ -844,6 +844,10 @@ a:hover {
     height: 100%; /* Nastavimo na 100%, saj starš nima več paddinga */
     /* Konec POPRAVKA */
     /* Dodajte rob, če je potrebno, in poskrbite, da je zemljevid interaktiven. */
+    
+    /* ⭐ POPRAVEK: Dodajanje zaobljenih robov in skritja prelivanja za zemljevid ⭐ */
+    border-radius: 8px; 
+    overflow: hidden; 
 }
 
 /* 🔥 DODAN STIL ZA GUMB ZNOTRAJ LEAFLET POPUPA */

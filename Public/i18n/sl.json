@@ -11,6 +11,10 @@
   "hero": {
     "title": "Gourmet & Experience"
   },
+  "action_banner": {
+    "title": "Še vedno rezervirate restavracije preko telefona?",
+    "subtitle": "Z nami najdete svojo najljubšo restavracijo, jo rezervirate in uživate in to brez klica. Rentyo Gourmet & Experience"
+  },
   "search": {
     "restaurant_city_label": "Restavracija ali mesto",
     "restaurant_city_placeholder": "Vnesite ime ali mesto",
@@ -190,7 +194,6 @@
     "review_missing_data": "Napaka: Manjkajo podatki za oddajo ocene.",
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova."
-
   },
   "warning": {
     "title": "Opozorilo",
