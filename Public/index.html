@@ -1664,13 +1664,21 @@
 /* --------------------------------------------------- */
 @media screen and (max-width: 768px) {
     
+    /* 0. Osnovna noga (footer) */
+    footer {
+        /* Odstranimo črni rob, ki je bil prej viden */
+        border-top: none !important;
+        /* Nastavimo ozadje noge (ko je zaprta) na BELO */
+        background-color: #ffffff !important; /* <--- POPRAVEK: Da se znebiš črnega roba in skriješ nogo v belo */
+    }
+
     /* 1. Gumb za preklop (tri pike) */
     .footer-toggle-btn {
         display: block; 
         width: 100%;
         background: none;
         border: none;
-        color: white;
+        color: black; /* <--- POPRAVEK: Nastavi barvo teksta v gumbu na črno */
         text-align: right;
         padding: 10px 0;
         cursor: pointer;
@@ -1681,9 +1689,11 @@
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     /* 👆 ZAKLJUČEK DODATKOV 👆 */
     }
+    
+    /* Barva ikone (tri pikice) */
     .footer-toggle-btn svg {
         vertical-align: middle;
-        color: #cccccc; 
+        color: #000000; /* <--- POPRAVEK: Nastavi barvo ikone na ČRNO, da se vidi na belem ozadju */
         
     }
     
@@ -1694,14 +1704,19 @@
         transition: max-height 0.5s ease-in-out;
         padding: 0;
         border-top: none; 
+        
+        /* Barva vsebine noge, ko je skrita (za splošno uporabo, ni nujno potrebna) */
+        background-color: #000000; /* Barva ozadja, ko se odpre - verjetno črna, kot sedaj */
     }
 
-    /* Prikaz celotne vsebine, ko je gumb aktiven */
+    /* Prikaz celotne vsebine, ko je gumb aktiven (ODPRTA NOGA) */
     .noga-vsebina-skrita.active {
         max-height: 2000px; 
         padding-top: 15px;
         padding-bottom: 15px;
-        border-top: 1px solid #444; 
+        border-top: 1px solid #444; /* Standardna črna ločilna črta (kot sedaj) */
+        background-color: #000000; /* <--- POPRAVEK: Poskrbimo, da je ozadje ČRNO, ko se razširi */
+        color: white; /* <--- DODATEK: Tekst mora biti BEL, ko je ozadje črno */
     }
     
     /* 3. Preureditev vsebine znotraj skrite sekcije */
@@ -1711,9 +1726,9 @@
         padding-bottom: 0;
     }
     
-    /* Sekcije znotraj noge naj bodo med seboj ločene */
+    /* Sekcije znotraj noge naj bodo med seboj ločene (ločilne črte morajo biti vidne na črnem ozadju) */
     .noga-sekcija {
-        border-bottom: 1px solid #444; 
+        border-bottom: 1px solid #444; /* Črte so črne/temne */
         padding: 10px 0;
         padding-right: 0;
     }

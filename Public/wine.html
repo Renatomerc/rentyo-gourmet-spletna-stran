@@ -60,7 +60,7 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            background-color: black; 
+            background-color: #f0f0f0; 
             border-radius: 50%;
             text-decoration: none;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
@@ -68,7 +68,7 @@
         }
 
         .round-back-button i {
-            color: white; 
+            color: #1a1a1a; 
             font-size: 1.2rem;
             margin: 0; 
         }
@@ -99,6 +99,7 @@
             height: 500px; 
             overflow: hidden;
             position: relative; 
+            /* ASIMETRIČNA OBLIKA ZA VSE NAPRAVE */
             border-top-left-radius: 100px; 
             border-top-right-radius: 200px; 
             border-bottom-left-radius: 200px;
@@ -134,13 +135,13 @@
         .exp-text-info {
             margin-top: -30px; 
             position: relative;
-            background-color: white;
+            background-color: white; /* Ozadje, ki ustvari beli layer na mobilnih */
             padding-top: 20px;
             border-radius: 15px 15px 0 0; 
             box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
         }
         
-        /* Mobilni prilagoditve za glavni del (spodnji del slike povleče čez rob) */
+        /* Prilagoditev za Namizje (odstranimo mobilni efekt povlečenega teksta) */
         @media (min-width: 768px) {
             .exp-text-info {
                 margin-top: 0;
@@ -149,18 +150,32 @@
             }
         }
         
+        /* 📱 MOBILNE PRILAGODITVE (Popravljeno za odstranitev belega sloja) */
         @media (max-width: 767px) {
              .hero-image-exp-container {
                  padding: 0; 
              }
              .hero-image-exp {
-                border-radius: 0;
-                box-shadow: none;
-                height: 300px; 
+                 /* border-radius se OHRANI ASIMETRIČEN, odstranjena je le senca in zmanjšana višina */
+                 box-shadow: none;
+                 height: 300px; 
              }
              .header-back-only {
-                top: 20px;
-                left: 20px;
+                 top: 70px;
+                 left: 40px;
+             }
+             /* 🔥 POPRAVEK: Odstrani učinek preklivanja besedila */
+             .exp-text-info {
+                 margin-top: 0; /* Odstrani premik navzgor */
+                 background-color: transparent; /* Odstrani belo barvo ozadja */
+                 box-shadow: none; /* Odstrani senco */
+                 border-radius: 0; /* Odstrani robove */
+                 padding-top: 0; /* Odstrani padding na vrhu */
+             }
+             /* Doda se ustrezno polnilo, da bo besedilo ločeno pod sliko */
+             .experience-detail-section {
+                 padding: 20px; 
+                 padding-top: 20px; 
              }
         }
         
@@ -457,16 +472,15 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
+   <script>
         // API BASE URL (Definiramo, ker se uporablja za prijavo)
         const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
 
         // 🖼️ URL ZA NADOMESTNO SLIKO.
         const PLACEHOLDER_IMAGE_URL = 'https://via.placeholder.com/350x250/cccccc/777777?text=Rentyo+Placeholder'; 
 
-        // 🔥 POPRAVEK glede na 404 napako. Pot '/i18n/' je iskala datoteko na korenskem nivoju (brez /public/).
-        // Nastavitev na '/public/i18n/' ustreza poti vašega strežnika (http://127.0.0.1:5501/public/...)
-        const TRANSLATIONS_PATH = '/public/i18n/'; 
+        // 🔥 POPRAVEK: Spremenjeno nazaj na standardno pot '/i18n/', saj '/public/i18n/' ne deluje na produkcijskem strežniku (404 napaka).
+        const TRANSLATIONS_PATH = '/i18n/'; 
 
         
         let globalOffersData = {};
@@ -505,7 +519,7 @@
             let langData = null; 
 
             try {
-                // Sestavimo celotno pot: npr. /public/i18n/sl.json
+                // Sestavimo celotno pot: npr. /i18n/sl.json
                 const fullPath = `${TRANSLATIONS_PATH}${lang}.json`;
                 const response = await fetch(fullPath); 
                 
@@ -568,8 +582,8 @@
         // ===========================================
         
         const loadOffers = () => {
-             const offersContainer = document.getElementById('offersContainer');
-             fetch(`${API_BASE_URL}/offers`) 
+              const offersContainer = document.getElementById('offersContainer');
+              fetch(`${API_BASE_URL}/offers`) 
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Napaka pri nalaganju ponudb iz API-ja: ' + response.statusText);
@@ -589,15 +603,15 @@
                     const offersEntries = Object.entries(globalOffersData); 
 
                     if (offersEntries.length > 0) {
-                         if (window.innerWidth >= 768) {
-                             if(offersContainer) {
-                                offersContainer.style.display = 'grid';
+                             if (window.innerWidth >= 768) {
+                                 if(offersContainer) {
+                                     offersContainer.style.display = 'grid';
+                                 }
+                             } else {
+                                 if(offersContainer) {
+                                     offersContainer.style.display = 'flex';
+                                 }
                              }
-                         } else {
-                             if(offersContainer) {
-                                 offersContainer.style.display = 'flex';
-                             }
-                         }
                         
                         offersEntries.forEach(([key, offer]) => {
                             const card = createOfferCard(offer, key);
@@ -638,7 +652,7 @@
             
             card.onclick = (e) => {
                 if (e.target.classList.contains('offer-reserve-button')) {
-                     return true; 
+                      return true; 
                 }
                 displayOfferModal(offer._id); 
             };

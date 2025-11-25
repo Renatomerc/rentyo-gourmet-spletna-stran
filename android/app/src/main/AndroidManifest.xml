@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- NOVO: Dovoljenje za natančno lokacijo (GPS), nujno za pravilno delovanje -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- NOVO: Dovoljenje za približno lokacijo (omrežje), dobra praksa za fallback -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -39,8 +39,6 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
     </application>
-
-    <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

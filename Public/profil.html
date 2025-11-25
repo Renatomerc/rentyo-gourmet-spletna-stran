@@ -12,10 +12,9 @@
   />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
+  <script src="capacitor.js"></script> 
 <style>
     /* SPECIFIČEN CSS ZA PROFIL */
-    /* ... (ostali ne-konfliktni stili ostajajo enaki) ... */
-
     .profil-sekcija {
       padding: 40px 20px;
       max-width: 1000px;
@@ -39,14 +38,20 @@
         display: none !important; 
     }
 
+    /* 🚨 KLJUČNI STIL ZA CAPACITOR BARCODESCANNER 🚨 */
+    .barcode-scanner-active {
+        display: none; 
+    }
 
-    /* ===== STIIL ZA GUMBE ... (ostali gumbi in header stili) ===== */
+
+    /* ===== STIIL ZA GUMBE, VKLJUČNO S PRILAGODITVIJO ===== */
     
     .gumb-prijava, 
     .gumb-profil, 
     .gumb-odjava, 
     .kartica-podatkov button,
-    .modal-vsebina button[type="submit"] { /* Dodan stil za gumb v modal-u */
+    .modal-vsebina button[type="submit"],
+    #qr-scan-button { 
       display: inline-flex;
       align-items: center;
       gap: 5px; 
@@ -66,18 +71,79 @@
     /* Primarni stil za gumbe */
     .gumb-prijava,
     .gumb-profil,
-    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici),
-    .modal-vsebina button[type="submit"] /* Stil za gumb Oddaj oceno */ {
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):not(.status-potrjeno),
+    .modal-vsebina button[type="submit"] {
       background-color: #575757;
       color: white;
       border: 1px solid #575757;
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     }
+    
+    /* 🚀 STIL: QR GUMB */
+    #qr-scan-button {
+      background: none; 
+      color: #333; 
+      border: none; 
+      font-size: 16px;
+      padding: 10px 0; 
+      border-radius: 0;
+      margin-top: 0; 
+      cursor: pointer;
+      font-weight: normal; 
+      gap: 0; 
+    }
+    
+    /* Ovoj za ikono fotoaparata (Krog) */
+    #qr-scan-button .icon-ovoj {
+        width: 45px;
+        height: 45px;
+        background-color: #1BC0BB; 
+        border-radius: 50%; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        margin-right: 15px; 
+        flex-shrink: 0; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    }
+    
+    /* Besedilo zraven ikone */
+    #qr-scan-button .text-ovoj {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1.2; 
+    }
+    
+    /* Poudarjeno glavno besedilo (Črne barve) */
+    #qr-scan-button .main-text {
+        font-weight: bold;
+        color: #333; 
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+    
+    /* Sekundarno, manj poudarjeno besedilo (Črne barve) */
+    #qr-scan-button .sub-text {
+        font-weight: normal; 
+        color: #333; 
+        font-size: 13px;
+        opacity: 0.85; 
+    }
+    
+    .qr-scan-ovoj {
+        padding: 15px 0;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
 
     .gumb-prijava:hover, 
     .gumb-profil:hover,
-    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):hover,
+    .kartica-podatkov button:not(.gumb-odjava):not(.gumb-preklici):not(.status-potrjeno):hover,
     .modal-vsebina button[type="submit"]:hover {
       background-color: #787878;
       border-color: #787878;
@@ -121,6 +187,24 @@
       background-color: #c0392b;
       border-color: #c0392b;
     }
+    
+    /* 🚀 NOVO: Stil za Potrjeno stanje (Zelena) */
+    .status-potrjeno {
+        color: white;
+        background-color: #28a745; 
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+        text-align: center;
+        border: 1px solid #28a745;
+        height: 35px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
 
     /* OVOJ ZA PROFIL */
     .profil-ovoj {
@@ -231,21 +315,21 @@
         background-color: #f0f0f0 !important; 
     }
 
-    /* 🔑 KLJUČNI POPRAVEK: Stil za že ocenjene/preklicane rezervacije */
+    /* Stil za že ocenjene/preklicane rezervacije */
     .kartica-rezervacije.preklicano { 
         cursor: default !important;
-        background-color: #f7f7f7 !important; /* Nežno siva */
-        opacity: 0.85 !important; /* Rahla zmanjšana prosojnost, da se loči */
+        background-color: #f7f7f7 !important; 
+        opacity: 0.85 !important; 
         border: 1px solid #ccc !important; 
         transition: none !important;
     }
 
-    /* 🌟 NOVO: Stil za ocenjene rezervacije, brez močne posivitve */
+    /* Stil za ocenjene rezervacije, brez močne posivitve */
     .kartica-rezervacije.ocenjeno {
         cursor: default !important;
-        background-color: #e8fdfb !important; /* Svetlo sivo ozadje */
+        background-color: #e8fdfb !important; 
         border: 1px solid #e8fdfb !important;
-        border-left: 1px solid #e8fdfb !important; /* ZELENA/CYAN levo obroba */
+        border-left: 1px solid #e8fdfb !important; 
         transition: none !important;
     }
     
@@ -254,17 +338,16 @@
         border-left: 5px solid orange !important;
     }
     
-    /* 🔑 KLJUČNI POPRAVEK: Prepreči hover efekt na že ocenjenih/preklicanih karticah */
+    /* Prepreči hover efekt na že ocenjenih/preklicanih karticah */
     .kartica-rezervacije.ocenjeno:hover,
     .kartica-rezervacije.preklicano:hover {
-        background-color: inherit !important; /* Ohranimo barvo, ki je že nastavljena zgoraj */
+        background-color: inherit !important; 
         box-shadow: none !important; 
         transform: none !important;
     }
 
 
-    /* 🆕 NOVO: Stil za Modal (Okno za oceno) */
-    /* ... (ostali ne-konfliktni stili) ... */
+    /* Stil za Modal (Okno za oceno) */
     #modal-ocena { 
         position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; 
         overflow: auto; background-color: rgba(0,0,0,0.6);
@@ -298,7 +381,7 @@
         text-decoration: none; 
         cursor: pointer; 
     }
-    /* ODSTRANJENI STILI ZA SELECT in VSTAVLJENI NOVI ZA ZVEZDICE */
+    
     #formular-ocena textarea {
         padding: 10px; 
         border-radius: 6px; 
@@ -309,7 +392,7 @@
         box-sizing: border-box;
     }
     
-    /* 🌟 NOVO: Stil za Sporočilno polje */
+    /* Stil za Sporočilno polje */
     #sporocilo-ovoj {
         position: fixed;
         top: 10px;
@@ -317,7 +400,7 @@
         z-index: 1000;
         max-width: 350px;
         transition: opacity 0.3s, transform 0.3s;
-        transform: translateY(-100px); /* Skrito zgoraj */
+        transform: translateY(-100px); 
         opacity: 0;
     }
 
@@ -342,12 +425,12 @@
     }
     
     .sporocilo.visible {
-        transform: translateY(0); /* Prikazano */
+        transform: translateY(0); 
         opacity: 1;
     }
     
     /* ======================================= */
-    /* ===== 🚀 NOVI STILI ZA ZVEZDICE 🚀 ===== */
+    /* ===== STILI ZA ZVEZDICE (BREZ TEKSTA) ===== */
     /* ======================================= */
     .rating-wrapper {
         margin-bottom: 15px;
@@ -363,28 +446,23 @@
 
     .star-group {
         display: flex;
-        flex-direction: row-reverse; /* Obrnemo, da je 5 na levi */
-        unicode-bidi: bidi-override; /* Za pravilno delovanje obratne smeri */
+        flex-direction: row-reverse; 
+        unicode-bidi: bidi-override; 
     }
 
     .star-group span {
         font-size: 2.2em; 
-        color: #ccc; /* Privzeta barva (Siva/Neaktivna) */
+        color: #ccc; 
         cursor: pointer;
         transition: color 0.2s ease-in-out;
         padding: 0 2px;
     }
     
-    /* Barva aktivnih in pri lebdenju zvezdic */
     .star-group.active span,
     .star-group.hover span {
-        color: #20c0bd; /* ✨ ŽELENA BARVA: #20c0bd ✨ */
+        color: #20c0bd;
     }
-
-    .rating-text {
-        font-weight: 500;
-        min-width: 100px; 
-    }
+    
     /* ======================================= */
 
 
@@ -396,7 +474,6 @@
     @media (max-width: 768px) {
         
         /* 1. GLAVA (HEADER) */
-        /* ... (stili za glavo) ... */
         .glava {
             justify-content: space-between; 
             flex-direction: row; 
@@ -409,7 +486,6 @@
         }
 
         /* 2. MENU ZAVIHKA (Vertikalno na mobilnem) */
-        /* ... (stili za menu) ... */
         .profil-menu {
             flex-direction: column; 
             margin-bottom: 0; 
@@ -507,6 +583,19 @@
 
       <div class="vsebina-zavihek" id="aktualne-rezervacije">
         <h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>
+        
+        <div class="qr-scan-ovoj">
+            <button id="qr-scan-button" onclick="zacniSkeniranje()">
+                <div class="icon-ovoj">
+                    <i class="fas fa-camera"></i> 
+                </div>
+                <div class="text-ovoj">
+                    <span class="main-text" data-i18n="profile.scan_qr_main_text">Potrdi Prihod</span>
+                    <span class="sub-text" data-i18n="profile.scan_qr_sub_text">Skeniraj QR kodo in pridobi točke</span>
+                </div>
+            </button>
+            <p id="scan-status" style="margin-top: 10px; font-size: 14px; color: #555;"></p>
+        </div>
         </div>
 
       <div class="vsebina-zavihek" id="zgodovina">
@@ -595,8 +684,7 @@
                             <span data-value="2">★</span>
                             <span data-value="1">★</span>
                         </div>
-                        <span id="rating-text" class="rating-text"></span>
-                    </div>
+                        </div>
                 </div>
                 <div>
                     <label for="komentar" data-i18n="profile.comment_label">Komentar:</label>
@@ -620,6 +708,7 @@
         const ZGODOVINA_REZERVACIJ_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`;
         const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
         const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
+        const QR_API_URL = `${BASE_URL}restavracije/potrdi_prihod`; 
 
         // ===========================================
         // Elementi modala in podatki
@@ -630,12 +719,11 @@
         const ocenaRestavracijaIdInput = document.getElementById('ocena-restavracija-id'); 
         const ocenaRezervacijaIdInput = document.getElementById('ocena-rezervacija-id'); 
         const modalOcenaNaslov = document.getElementById('modal-ocena-naslov');
-        const sporociloOvoj = document.getElementById('sporocilo-ovoj'); // 🌟 NOVO: Ovoj za sporočila
+        const sporociloOvoj = document.getElementById('sporocilo-ovoj'); 
         
-        // 🚀 NOVO: Elementi za zvezdice
+        // Elementi za zvezdice
         const visualRating = document.getElementById('visual-rating');
         const hiddenSelect = document.getElementById('ocena-skrita');
-        const ratingText = document.getElementById('rating-text');
         
         // Elemente za prikaz podatkov
         const podatkiImeElement = document.getElementById('profil-ime'); 
@@ -643,10 +731,13 @@
         const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
         const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
         const tockeStatusElement = document.getElementById('tocke-status-prikaz');
+        
+        // 🚀 Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
+        let scanStatusElement = document.getElementById('scan-status');
 
 
         // ===========================================
-        // 1. FUNKCIJA ZA PRIKAZ SPOROČIL (ZAMENJAVA ZA alert())
+        // 1. FUNKCIJA ZA PRIKAZ SPOROČIL
         // ===========================================
         
         /**
@@ -672,7 +763,7 @@
         };
 
         // ===========================================
-        // 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov (NESPREMENJENO)
+        // 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov
         // ===========================================
         const zavihki = document.querySelectorAll(".profil-zavihek");
         const vsebine = document.querySelectorAll(".vsebina-zavihek");
@@ -686,6 +777,145 @@
                 document.getElementById(targetId).classList.add("active");
             });
         });
+
+
+        // ===========================================
+        // 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (CAPACITOR INTEGRACIJA) 🚀
+        // ===========================================
+        
+        // Preveri, ali se izvaja v Capacitor okolju
+        const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isPluginAvailable('BarcodeScanner');
+        
+        // Pomožna funkcija za čiščenje UI po skeniranju.
+        const stopHighlight = () => {
+             if (isCapacitorApp) {
+                 const { BarcodeScanner } = Capacitor.Plugins;
+                 BarcodeScanner.showBackground();
+                 document.body.classList.remove('barcode-scanner-active');
+             }
+        }
+
+
+        /**
+         * 1. Pošlje restavracijaId na strežnik za potrditev prihoda in dodelitev točk.
+         * @param {string} restavracijaId ID restavracije, skeniran iz QR kode.
+         */
+        const potrdiPrihodNaStrežniku = async (restavracijaId) => {
+            if (!zeton) {
+                prikaziSporocilo('error', i18next.t('profile.auth_required'));
+                return;
+            }
+            
+            if (scanStatusElement) {
+                 scanStatusElement.textContent = i18next.t('profile.status_sending');
+                 scanStatusElement.style.color = '#575757';
+            }
+
+            try {
+                const response = await fetch(QR_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}` 
+                    },
+                    body: JSON.stringify({ restavracijaId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    prikaziSporocilo('success', data.msg);
+                    
+                    if (scanStatusElement) {
+                        const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
+                        scanStatusElement.textContent = statusMsg;
+                        scanStatusElement.style.color = 'green';
+                    }
+                    
+                    naloziPodatkeProfila(); 
+                    // Po uspešni potrditvi ponovno naložimo AKTIVNE rezervacije,
+                    // da se prikaže nov status "Potrjeno".
+                    naloziAktivneRezervacije();
+
+                } else {
+                    console.error("Napaka pri potrditvi prihoda:", data);
+                    const errorMsg = i18next.t('profile.status_error') + `: ${data.msg || response.statusText}`;
+                    prikaziSporocilo('error', errorMsg);
+                     if (scanStatusElement) {
+                        scanStatusElement.textContent = errorMsg;
+                        scanStatusElement.style.color = 'red';
+                    }
+                }
+            } catch (error) {
+                console.error("Kritična napaka pri potrditvi prihoda:", error);
+                prikaziSporocilo('error', i18next.t('profile.server_error'));
+                 if (scanStatusElement) {
+                    scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
+                    scanStatusElement.style.color = 'red';
+                }
+            }
+            setTimeout(stopHighlight, 500);
+        };
+
+
+        /**
+         * 2. Zažene Capacitor BarcodeScanner.
+         */
+        const zacniSkeniranje = async () => {
+            if (!isCapacitorApp) {
+                prikaziSporocilo('error', i18next.t('profile.scan_unavailable') || 'Skeniranje ni na voljo.');
+                return;
+            }
+            
+            const { BarcodeScanner } = Capacitor.Plugins;
+
+            try {
+                document.body.classList.add('barcode-scanner-active');
+                BarcodeScanner.hideBackground();
+                
+                const status = await BarcodeScanner.checkPermission({ force: true });
+                if (status.granted) {
+                    
+                    if (scanStatusElement) {
+                        scanStatusElement.textContent = i18next.t('profile.status_scanning') || 'Skeniranje v teku...';
+                        scanStatusElement.style.color = '#1BC0BB';
+                    }
+
+                    const result = await BarcodeScanner.startScan();
+                    
+                    stopHighlight(); 
+
+                    if (result.hasContent) {
+                        const restavracijaId = result.content; 
+                        
+                        // Validacija formata: 24 znakov (MongoDB ObjectId)
+                        if (restavracijaId.length !== 24 || !restavracijaId.match(/^[0-9a-fA-F]{24}$/)) {
+                            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljaven format QR kode. Skenirajte čisto besedilo (ID restavracije).';
+                            prikaziSporocilo('error', msg);
+                             if (scanStatusElement) scanStatusElement.textContent = msg;
+                            return;
+                        }
+
+                        potrdiPrihodNaStrežniku(restavracijaId);
+
+                    } else {
+                        const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano.';
+                        prikaziSporocilo('error', msg);
+                         if (scanStatusElement) {
+                            scanStatusElement.textContent = msg;
+                            scanStatusElement.style.color = 'orange';
+                        }
+                    }
+                } else {
+                    prikaziSporocilo('error', i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.');
+                    stopHighlight();
+                }
+            } catch (error) {
+                console.error('Napaka pri BarcodeScannerju:', error);
+                prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
+                stopHighlight();
+            }
+        };
 
         // ===========================================
         // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
@@ -760,7 +990,6 @@
                             tockeStatusElement.innerHTML = statusText; 
 
                         } else if (tockeStatusElement) {
-                             // 🌟 POPRAVEK: Uporaba translation key
                              tockeStatusElement.textContent = i18next.t('profile.points_loading');
                         }
                         
@@ -821,6 +1050,41 @@
             const h3 = kontejnerElement.querySelector('h3');
             kontejnerElement.innerHTML = '';
             if (h3) kontejnerElement.appendChild(h3);
+            
+            // 🚀 Popravek: Dodajanje QR dela nazaj v aktivne rezervacije
+            if (jeAktivnaLista) {
+                const qrOvoj = document.createElement('div');
+                qrOvoj.classList.add('qr-scan-ovoj');
+                qrOvoj.innerHTML = `
+                   <button id="qr-scan-button" onclick="zacniSkeniranje()">
+                       <div class="icon-ovoj">
+                           <i class="fas fa-camera"></i> 
+                       </div>
+                       <div class="text-ovoj">
+                            <span class="main-text" data-i18n="profile.scan_qr_main_text">${i18next.t('profile.scan_qr_main_text')}</span>
+                            <span class="sub-text" data-i18n="profile.scan_qr_sub_text">${i18next.t('profile.scan_qr_sub_text')}</span>
+                        </div>
+                   </button>
+                    <p id="scan-status" style="margin-top: 10px; font-size: 14px; color: #555;"></p>
+                `;
+                kontejnerElement.appendChild(qrOvoj);
+                
+                // Ponovno nastavimo status gumba za QR skeniranje, če nismo v Capacitor okolju
+                 if (!isCapacitorApp) {
+                     const scanButton = qrOvoj.querySelector('#qr-scan-button');
+                     const statusElement = qrOvoj.querySelector('#scan-status');
+                     if (scanButton) scanButton.style.display = 'none';
+                     if (statusElement) {
+                         statusElement.textContent = i18next.t('profile.scan_unavailable') || 'Skeniranje je na voljo samo v mobilni aplikaciji.';
+                         statusElement.style.color = 'orange';
+                     }
+                }
+                
+                // Ponovno nastavimo referenco na element statusa, saj smo ga na novo ustvarili
+                scanStatusElement = qrOvoj.querySelector('#scan-status');
+
+            }
+
 
             if (!rezervacije || rezervacije.length === 0) {
                 const sporocilo = jeAktivnaLista 
@@ -853,21 +1117,16 @@
                 if (!jeAktivnaLista) {
                     const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; 
                     const isCancelled = currentStatus === 'PREKLICANO'; 
-                    // 🔑 KLJUČNA SPREMEMBA: Uporaba predpostavljene lastnosti `ocenjeno`
                     const jeZeOcenjeno = rez.ocenjeno || false; 
                     
-                    // 🚨 VEDNO DODAJ RAZRED .pretekla, ČE NI AKTIVNA LISTA
                     kartica.classList.add('pretekla'); 
                     
-                    // 🌟 NOVO: Dodajanje razredov za ločitev
                     if (isCancelled) {
                         kartica.classList.add('preklicano'); 
                     } else if (jeZeOcenjeno) {
-                        // 🔑 KLJUČNA SPREMEMBA: Doda se razred, ki CSS-u naroči ločitev
                         kartica.classList.add('ocenjeno'); 
                     } 
                     
-                    // 🌟 KLJUČNA LOGIKA: Event listener za odpiranje modala
                     if (!jeZeOcenjeno && !isCancelled) {
                         kartica.style.cursor = 'pointer';
                         kartica.addEventListener('click', (e) => {
@@ -895,42 +1154,41 @@
                 podatkiDiv.classList.add('rezervacija-podatki');
                 
              let htmlContent = `
-    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
-    
-    <p style="margin: 5px 0 0 0; display: flex; align-items: center;" class="text-sm">
-        
-        <span class="flex items-center mr-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2"> 
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg> 
-            <span>${rez.datum_rezervacije}</span>
-        </span>
-        
-        <span class="flex items-center mr-6 ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-            </svg> 
-            <span>${casIzpis}</span>
-        </span>
-        
-        <span class="flex items-center ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            <span>${rez.stevilo_oseb}</span>
-        </span>
-    </p>
-`;
+                    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
+                    
+                    <p style="margin: 5px 0 0 0; display: flex; align-items: center;" class="text-sm">
+                        
+                        <span class="flex items-center mr-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2"> 
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg> 
+                            <span>${rez.datum_rezervacije}</span>
+                        </span>
+                        
+                        <span class="flex items-center mr-6 ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg> 
+                            <span>${casIzpis}</span>
+                        </span>
+                        
+                        <span class="flex items-center ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <span>${rez.stevilo_oseb}</span>
+                        </span>
+                    </p>
+                `;
 
                 // Logika za status v zgodovini
                 if (!jeAktivnaLista) {
                     const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; 
                     const isCancelled = currentStatus === 'PREKLICANO'; 
-                    // Preveri, ali je bil razred dodan (kar pomeni, da je rez.ocenjeno TRUE iz API-ja)
                     const jeZeOcenjeno = kartica.classList.contains('ocenjeno'); 
                     
                     let statusTextHtml = '';
@@ -938,13 +1196,11 @@
                     if (isCancelled) {
                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color: orange;">${i18next.t('profile.status_cancelled')}</p>`;
                     } else if (jeZeOcenjeno) {
-                        // 🌟 IZPIS "OCENJENO"
                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color: #575757;">
                                             <i class="fas fa-check-circle" style="color: #20c0bd;"></i> 
                                             ${i18next.t('profile.status_rated')}
                                         </p>`;
                     } else {
-                        // 🌟 IZPIS "KLIKNITE ZA OCENO"
                          statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#20c0bd;">
                                             ${i18next.t('profile.status_rate_now')}
                                         </p>`;
@@ -956,21 +1212,35 @@
                 podatkiDiv.innerHTML = htmlContent;
                 kartica.appendChild(podatkiDiv);
                 
-                // --- 2. Gumb za preklic (Samo za aktivne) ---
+                // --- 2. LOGIKA ZA AKTIVNE REZERVACIJE (Potrjeno ali Prekliči) ---
                 if (jeAktivnaLista) {
-                    const preklicGumb = document.createElement('button');
-                    preklicGumb.classList.add('gumb-preklici');
-                    preklicGumb.textContent = i18next.t('profile.cancel_button');
-                    preklicGumb.style.flexShrink = '0'; 
+                    // Preverimo, ali je potrjen prihod
+                    // Backend mora za to polje poslati potrjen_prihod: true
+                    const jePotrjeno = rez.potrjen_prihod || false; 
 
-                    const mizaId = rez.mizaId; 
-                    
-                    preklicGumb.addEventListener('click', (e) => {
-                        e.stopPropagation(); 
-                        prekliciRezervacijo(rez.restavracijaId, mizaId, rez._id);
-                    });
-                    
-                    kartica.appendChild(preklicGumb);
+                    if (jePotrjeno) {
+                        // Renderiraj 'Potrjeno' status namesto gumba
+                        const statusDiv = document.createElement('div');
+                        statusDiv.classList.add('status-potrjeno');
+                        statusDiv.textContent = i18next.t('profile.status_confirmed') || 'Potrjeno'; 
+                        kartica.appendChild(statusDiv);
+                        
+                    } else {
+                        // Renderiraj 'Prekliči' gumb
+                        const preklicGumb = document.createElement('button');
+                        preklicGumb.classList.add('gumb-preklici');
+                        preklicGumb.textContent = i18next.t('profile.cancel_button');
+                        preklicGumb.style.flexShrink = '0'; 
+
+                        const mizaId = rez.mizaId; 
+                        
+                        preklicGumb.addEventListener('click', (e) => {
+                            e.stopPropagation(); 
+                            prekliciRezervacijo(rez.restavracijaId, mizaId, rez._id);
+                        });
+                        
+                        kartica.appendChild(preklicGumb);
+                    }
                 }
 
                 kontejnerElement.appendChild(kartica);
@@ -1024,6 +1294,8 @@
         // 5. LOGIKA ZA OCENJEVANJE IN ZVEZDICE 
         // ===========================================
         
+        // ... (Vsa logika za Modal in Star Rating ostane enaka) ...
+        
         /**
          * Odpre modal za ocenjevanje in napolni polja
          */
@@ -1033,10 +1305,10 @@
             ocenaRezervacijaIdInput.value = rezervacijaId; 
             
             // Počisti vnosna polja in inicializiraj zvezdice
-            hiddenSelect.value = '5'; // Nastavi privzeto na 5
+            document.getElementById('ocena-skrita').value = '5'; // Nastavi privzeto na 5
             document.getElementById('komentar').value = '';
             
-            // 🚀 KLJUČNO: Inicializacija prikaza zvezdic
+            // KLJUČNO: Inicializacija prikaza zvezdic
             updateStarRating(5); 
 
             modalOcena.classList.remove('skrij-modal');
@@ -1059,7 +1331,7 @@
 
             const restavracijaId = ocenaRestavracijaIdInput.value;
             const rezervacijaId = ocenaRezervacijaIdInput.value;
-            const ocena = hiddenSelect.value;
+            const ocena = document.getElementById('ocena-skrita').value;
             const komentar = document.getElementById('komentar').value;
             
             if (!restavracijaId || !rezervacijaId || !ocena) {
@@ -1100,41 +1372,26 @@
         };
 
         
-        // ===========================================
-        // 🚀 LOGIKA ZA INTERAKTIVNE ZVEZDICE 🚀
-        // ===========================================
-
-        const ratingDescriptions = {
-            '5': '',
-            '4': '',
-            '3': '',
-            '2': '',
-            '1': ''
-        };
-
+        // LOGIKA ZA INTERAKTIVNE ZVEZDICE
+        
         /**
          * Posodobi vizualni prikaz zvezdic in skrito polje.
-         * @param {number|string} value Izbrana ocena (1-5).
-         * @param {boolean} isHover Ali je funkcija klicana ob premiku miške.
          */
         const updateStarRating = (value, isHover = false) => {
             const stars = visualRating.querySelectorAll('span');
             const numericValue = parseInt(value);
 
             if (!isHover) {
-                hiddenSelect.value = value;
+                document.getElementById('ocena-skrita').value = value;
                 visualRating.setAttribute('data-value', value);
-                ratingText.textContent = ratingDescriptions[value] || '';
             }
 
             stars.forEach(star => {
                 const starValue = parseInt(star.getAttribute('data-value'));
                 
                 if (starValue <= numericValue) {
-                    // Uporabi barvo izbranih (ali lebdečih)
                     star.style.color = '#20c0bd'; 
                 } else {
-                    // Neaktivna barva
                     star.style.color = '#ccc'; 
                 }
             });
@@ -1191,6 +1448,13 @@
         const updateContent = () => {
           document.querySelectorAll("[data-i18n]").forEach((el) => {
             const key = el.getAttribute("data-i18n");
+            
+            // Logika za QR gumb in druge nestrukturirane prevode (preskočimo)
+            if (key === 'profile.scan_qr_main_text' || key === 'profile.scan_qr_sub_text') {
+                 return;
+            }
+
+            // Splošna logika prevajanja
             if (el.tagName === 'BUTTON' || el.classList.contains('profil-zavihek')) {
                 const ikona = el.querySelector('.fas');
                 el.textContent = i18next.t(key);
@@ -1243,7 +1507,7 @@
                 naloziAktivneRezervacije(); 
                 naloziZgodovinoRezervacij(); 
                 
-                // 🚀 ZAGON LOGIKE ZA ZVEZDICE
+                // ZAGON LOGIKE ZA ZVEZDICE
                 starRatingLogic(); 
                 
                 // Logika: Prikaz/skrivanje formularja za kartico
@@ -1251,9 +1515,9 @@
                 const formularKartice = document.getElementById('kartica-formular');
                 const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
                 
-                // POČISTIMO STATIČNO VSEBINO v "Aktualne rezervacije" in "Zgodovina rezervacij"
-                aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>`;
-                zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>`;
+                // POČISTIMO STATIČNO VSEBINO za naknadno renderiranje z renderRezervacije
+                aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">${i18next.t('profile.current_subtitle')}</h3>`;
+                zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">${i18next.t('profile.history_subtitle')}</h3>`;
 
 
                 if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
@@ -1276,6 +1540,19 @@
                         });
                     }
                 }
+                
+                // Če nismo v Capacitor okolju, skrijemo QR gumb, ko se naloži jezik
+                 if (!isCapacitorApp) {
+                     const scanButton = document.getElementById('qr-scan-button');
+                     if (scanButton) {
+                         scanButton.style.display = 'none';
+                     }
+                     if (scanStatusElement) {
+                         scanStatusElement.textContent = i18next.t('profile.scan_unavailable') || 'Skeniranje je na voljo samo v mobilni aplikaciji.';
+                         scanStatusElement.style.color = 'orange';
+                     }
+                }
+                
             }
         );
     </script>

@@ -807,8 +807,8 @@ exports.posodobiAdminVsebino = async (req, res) => {
 
 /**
  * 🟢 POSODOBLJENO: Potrdi uporabnikov prihod s skeniranjem QR kode (samo restavracijaId).
- * Poišče prvo aktivno rezervacijo za tega uporabnika v tej restavraciji,
- * posodobi status na 'POTRJENO_PRIHOD' in prišteje 50 točk.
+ * Poišče VSE AKTIVNE rezervacije za DANAŠNJI DAN, posodobi status na 'POTRJENO_PRIHOD' 
+ * in prišteje 50 točk.
  * POST /api/restavracije/potrdi_prihod
  */
 exports.potrdiPrihodInDodelitevTock = async (req, res) => {
@@ -828,53 +828,71 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
     try {
         const userIdObj = new mongoose.Types.ObjectId(userId);
         const restavracijaIdObj = new mongoose.Types.ObjectId(restavracijaId);
+        
+        // 🚀 NOVO: Pridobimo današnji datum v formatu YYYY-MM-DD
+        const danes = new Date();
+        const danesISO = danes.toISOString().split('T')[0]; // Format: "2025-11-25"
 
-        // --- 1. AGREGACIJA: Poišči Aktivno Rezervacijo in Mizo ID ---
+        // --- 1. AGREGACIJA: Poišči VSE ustrezne Rezervacije na DANAŠNJI DAN ---
         const rezultatIskanja = await Restavracija.aggregate([
             { $match: { "_id": restavracijaIdObj } },
             { $unwind: "$mize" },
             { $unwind: "$mize.rezervacije" },
             { $match: { 
                 "mize.rezervacije.uporabnikId": userIdObj, 
-                "mize.rezervacije.status": 'AKTIVNO'
+                "mize.rezervacije.status": 'AKTIVNO',
+                // 🚀 KLJUČNO: Dodamo preverjanje datuma in odstranimo $limit: 1
+                "mize.rezervacije.datum_rezervacije": danesISO 
             }},
             { $project: {
                 _id: 0, 
                 mizaId: "$mize._id",
                 rezervacijaId: "$mize.rezervacije._id"
-            }},
-            // Vzamemo samo prvo najdeno rezervacijo
-            { $limit: 1 }
+            }}
+            // ODSTRANJENO: { $limit: 1 }
         ]);
 
         if (rezultatIskanja.length === 0) {
-            return res.status(404).json({ msg: 'Aktivna rezervacija za tega uporabnika v tej restavraciji ni bila najdena.' });
+            // Sporočilo sedaj vključuje datum
+            return res.status(404).json({ msg: `Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
         }
         
-        const { mizaId, rezervacijaId } = rezultatIskanja[0];
-
         // --- 2. POSODOBITEV: Nastavi Status in Podeli Točke ---
         
-        // Posodobitev statusa rezervacije na POTRJENO_PRIHOD
-        const rezultatPosodobitve = await Restavracija.updateOne(
-            { 
-                _id: restavracijaIdObj, 
-                "mize._id": mizaId, // Uporabimo Miza ID, ki smo ga našli
-                "mize.rezervacije._id": rezervacijaId 
-            }, 
-            { 
-                $set: { "mize.$.rezervacije.$[rez].status": 'POTRJENO_PRIHOD' } 
-            },
-            {
-                arrayFilters: [ { "rez._id": rezervacijaId } ]
-            }
-        );
+        let posodobitevStevilo = 0;
+        let uspešnaPosodobitev = false;
         
-        if (rezultatPosodobitve.modifiedCount === 0) {
-            return res.status(500).json({ msg: 'Napaka pri posodabljanju statusa rezervacije.' });
+        // Potrdimo vsako rezervacijo, ki smo jo našli za današnji dan
+        for (const rezInfo of rezultatIskanja) {
+            const rezultatPosodobitve = await Restavracija.updateOne(
+                { 
+                    _id: restavracijaIdObj, 
+                    "mize._id": rezInfo.mizaId, 
+                    "mize.rezervacije._id": rezInfo.rezervacijaId 
+                }, 
+                { 
+                    $set: { 
+                        "mize.$.rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
+                        // 🚀 KLJUČNO: Nastavimo novo polje za frontend
+                        "mize.$.rezervacije.$[rez].potrjen_prihod": true 
+                    } 
+                },
+                {
+                    arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
+                }
+            );
+            
+            if (rezultatPosodobitve.modifiedCount > 0) {
+                uspešnaPosodobitev = true;
+                posodobitevStevilo++;
+            }
+        }
+        
+        if (!uspešnaPosodobitev) {
+            return res.status(500).json({ msg: 'Napaka pri posodabljanju statusa rezervacije. Nič ni bilo spremenjeno.' });
         }
 
-        // 3. 🟢 DODELITEV TOČK UPORABNIKU
+        // 3. 🟢 DODELITEV TOČK UPORABNIKU (samo enkrat)
         const posodobljenUporabnik = await Uporabnik.findByIdAndUpdate(
             userId, 
             { $inc: { tockeZvestobe: TOCK_NA_REZERVACIJO } }, // Prištevanje 50 točk
@@ -882,7 +900,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         );
 
         res.json({ 
-            msg: `Prihod na rezervacijo ID ${rezervacijaId} uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
+            msg: `Prihod na ${posodobitevStevilo} rezervacij(e) uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
             noveTocke: posodobljenUporabnik ? posodobljenUporabnik.tockeZvestobe : 'Ni posodobljeno'
         });
 
