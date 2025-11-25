@@ -12,27 +12,27 @@
     "title": "Gourmet & Experience"
   },
   "action_banner": {
-    "title": "Prenoti ancora i ristoranti per telefono?",
-    "subtitle": "Con noi trovi il tuo ristorante preferito, prenoti e ti godi l'esperienza senza chiamare. Rentyo Gourmet & Experience"
+    "title": "Stai ancora prenotando ristoranti per telefono?",
+    "subtitle": "Con noi trovi il tuo ristorante preferito, lo prenoti e ti godi l'esperienza, tutto senza chiamare. Rentyo Gourmet & Experience"
   },
   "search": {
     "restaurant_city_label": "Ristorante o città",
     "restaurant_city_placeholder": "Inserisci nome o città",
     "date_label": "Data",
-    "date_placeholder": "Seleziona data",
-    "time_label": "Ora della prenotazione",
-    "select_time": "Seleziona ora",
+    "date_placeholder": "Seleziona la data",
+    "time_label": "Orario di prenotazione",
+    "select_time": "Seleziona orario",
     "persons_label": "Numero di persone",
     "search_button": "Cerca",
-    "person_singular": "{{count}}",
-    "person_plural": "{{count}}"
+    "person_singular": "{{count}} persona",
+    "person_plural": "{{count}} persone"
   },
   "quick_search": {
     "title": "Selezione rapida della cucina"
   },
   "cuisine": {
     "meat": "Carne",
-    "vegetarian": "Vegetariana",
+    "vegetarian": "Veg",
     "fish": "Pesce",
     "drinks": "Bevande",
     "brunch": "Brunch"
@@ -43,42 +43,66 @@
     "reserve_button": "Prenota",
     "description_1": "Cucina tradizionale slovena e atmosfera piacevole.",
     "description_2": "Piatti moderni con ingredienti locali.",
-    "description_3": "Autentico cibo italiano e ottime pizze.",
+    "description_3": "Autentica cucina italiana e ottime pizze.",
     "description_4": "Eccellenti piatti a base vegetale per tutti.",
-    "description_5": "Brunch eccellenti per tutti.",
-    "check_tables": "Verifica i tavoli alle {{time}}",
+    "description_5": "Eccellenti brunch per tutti.",
+    "check_tables": "Verifica tavoli alle {{time}}",
     "cuisine": "Cucina",
-    "na": "Dati non disponibili",
+    "na": "Nessun dato",
     "search_results": "Risultati della ricerca",
     "available_tomorrow": "Domani alle {{time}}",
     "unavailable": "Nessun tavolo libero",
     "available_today": "Disponibile oggi",
     "search_title": "Risultati della ricerca"
   },
+  "gourmet_explore": {
+    "title": "Esplora esperienze indimenticabili"
+  },
+  "experience": {
+    "mainTitle": "Offerte ed annunci esclusivi",
+    "mainSubtitle": "Scopri promozioni speciali e raccomandazioni dai nostri partner.",
+    "bestOffersTitle": "Le nostre migliori offerte",
+    "fine_dining": "Alta Cucina",
+    "fine_dining_href": "experience.html?code=fine-dining",
+    "wine": "Degustazione di Vini",
+    "wine_href": "experience.html?code=wine-tasting",
+    "adventure": "Avventura all'aperto",
+    "adventure_href": "experience.html?code=outdoor-adventure",
+    "slepa-kuhinja": "Cucina Cieca",
+    "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
+    "sea": "Esperienze di Mare",
+    "sea_href": "experience.html?code=sea-experience",
+    "city": "Tour Gourmet Urbano",
+    "city_href": "experience.html?code=city-gourmet-tour",
+    "romantic": "Esperienze Romantiche",
+    "romantic_href": "experience.html?code=romantic-experience",
+    "eco": "Cucina Ecologica",
+    "eco_href": "experience.html?code=eco-cuisine"
+  },
   "messages": {
-    "enter_search_criteria": "Per favore, inserisci la città o il tipo di cucina per la ricerca.",
-    "required_fields_missing": "Per favore, compila tutti i campi obbligatori: data, ora e numero di persone.",
+    "enter_search_criteria": "Si prega di inserire una città o un tipo di cucina per la ricerca.",
+    "required_fields_missing": "Si prega di compilare tutte le informazioni richieste: data, ora e numero di persone.",
     "searching": "Ricerca ristoranti per '{{criteria}}'...",
     "search_success": "Trovati {{count}} ristoranti.",
     "search_error": "Ricerca fallita.",
     "no_restaurants_found": "Nessun ristorante trovato.",
     "reserving": "Prenotazione per {{stevilo}} persone alle {{cas}}...",
-    "reservation_success": "Prenotazione riuscita! Il tavolo n. {{miza}} è riservato per {{trajanje}}.",
-    "reservation_success_minimal": "Prenotazione riuscita alle {{cas}}!",
+    "reservation_success": "Prenotazione riuscita! Tavolo n. {{miza}} è prenotato per {{trajanje}}.",
+    "reservation_success_minimal": "Prenotato con successo alle {{cas}}!",
     "reservation_failed": "Prenotazione fallita.",
     "server_connection_error": "Connessione al server fallita.",
-    "server_connection_error_retry": "Errore di connessione al server, riprova.",
-    "login_success": "Accesso riuscito! Benvenuto.",
+    "server_connection_error_retry": "Errore di connessione al server, si prega di riprovare.",
+    "login_success": "Accesso riuscito! Benvenuto/a.",
     "registration_success": "Registrazione riuscita!",
-    "login_failed": "Accesso non riuscito.",
+    "login_failed": "Accesso fallito.",
     "registration_failed": "Registrazione fallita.",
     "server_error": "Errore del server.",
-    "check_availability_prompt": "Verifica tavoli liberi",
-    "available_times_found": "Slot disponibili al momento.",
+    "check_availability_prompt": "Verifica tavoli disponibili",
+    "available_times_found": "Slot attualmente disponibili.",
     "no_restaurant_selected": "Errore: Nessun ristorante selezionato.",
-    "select_reservation_date": "Per favore, seleziona la data della prenotazione.",
-    "pogoji_required": "Devi accettare i Termini e Condizioni e l'Informativa sulla Privacy per registrarti.",
-    "login_required": "L'accesso è richiesto per la prenotazione. Per favore, accedi.",
+    "select_reservation_date": "Si prega di selezionare una data di prenotazione.",
+    "pogoji_required": "Per registrarsi, è necessario accettare i Termini e Condizioni Generali e la Politica sulla Privacy.",
+    "login_required": "L'accesso è richiesto per la prenotazione. Si prega di accedere.",
     "google_reviews": "Google"
   },
   "duration": {
@@ -89,30 +113,30 @@
   "auth": {
     "login_title": "Accesso",
     "register_title": "Registrazione",
-    "login_success": "Accesso riuscito! Benvenuto.",
-    "register_success": "Registrazione riuscita! Ora puoi effettuare il login.",
-    "login_error": "Errore nell'accesso.",
+    "login_success": "Accesso riuscito! Benvenuto/a.",
+    "register_success": "Registrazione riuscita! Ora puoi accedere.",
+    "login_error": "Accesso fallito.",
     "register_error": "Registrazione fallita.",
     "server_error": "Errore di connessione al server."
   },
   "modal": {
     "login_tab": "Accesso",
     "register_tab": "Registrazione",
-    "email_placeholder": "Email",
+    "email_placeholder": "E-mail",
     "password_placeholder": "Password",
     "name_placeholder": "Nome e cognome",
     "login_button": "Accedi",
     "register_button": "Crea account",
     "tab_menu": "Menu",
-    "tab_gallery": "Immagini & Mappa",
+    "tab_gallery": "Foto & Mappa",
     "tab_reviews": "Recensioni",
     "tab_special_offer": "Offerta Attuale",
-    "special_offer_title": "Offerta speciale del ristorante",
-    "special_offer_default": "Attualmente non sono disponibili offerte speciali attive o menu stagionali.",
-    "no_reviews": "Al momento non sono disponibili recensioni dettagliate da visualizzare.",
-    "no_menu": "Il menu non è ancora disponibile.",
-    "reserve_button": "Prenota tavolo",
-    "gallery_title": "Galleria di immagini",
+    "special_offer_title": "Offerta Speciale del Ristorante",
+    "special_offer_default": "Attualmente non è disponibile alcuna offerta speciale attiva o menu stagionale.",
+    "no_reviews": "Attualmente non sono disponibili recensioni dettagliate da visualizzare.",
+    "no_menu": "Menu non ancora disponibile.",
+    "reserve_button": "Prenota un tavolo",
+    "gallery_title": "Galleria Immagini",
     "map_title": "Mappa della Posizione",
     "reservation_persons": "Numero di persone",
     "reservation_date": "Data",
@@ -123,8 +147,8 @@
       "duration_1h": "1 ora",
       "duration_1_5h": "1 ora e mezza (90 min)",
       "duration_2h": "2 ore",
-      "confirm_button": "Conferma durata e prenota",
-      "qr_reminder": "Non dimenticare di scansionare il codice QR del ristorante all'arrivo per ottenere punti e vantaggi!"
+      "confirm_button": "Conferma la durata e prenota",
+      "qr_reminder": "Non dimenticare di scansionare il QR code del ristorante all'arrivo per guadagnare punti e vantaggi!"
     }
   },
   "footer": {
@@ -137,19 +161,19 @@
     "career_href": "/it/carriere.html",
     "media_press": "Media / Angolo Stampa",
     "media_press_href": "/it/media-stampa.html",
-    "legal_info_title": "Informazioni legali",
+    "legal_info_title": "Informazioni Legali",
     "legal_info_href": "/it/informazioni-legali.html",
-    "privacy_policy": "Informativa sulla privacy",
+    "privacy_policy": "Informativa sulla Privacy",
     "privacy_policy_href": "/it/informativa-privacy.html",
-    "cookie_policy": "Informativa sui cookie",
-    "cookie_policy_href": "/it/informativa-cookie.html",
-    "terms_of_use": "Termini di utilizzo",
+    "cookie_policy": "Cookie",
+    "cookie_policy_href": "/it/politica-cookie.html",
+    "terms_of_use": "Termini di Utilizzo",
     "terms_of_use_href": "/it/termini-utilizzo.html",
-    "legal_notice": "Avviso legale",
+    "legal_notice": "Avviso Legale",
     "legal_notice_href": "/it/avviso-legale.html",
     "partnerships_title": "Partnership",
-    "for_partners": "Per i partner",
-    "for_partners_href": "/it/partnership.html#per-i-partner",
+    "for_partners": "Per i Partner",
+    "for_partners_href": "/it/partnership.html#per-partner",
     "affiliate_program": "Programma di affiliazione",
     "affiliate_program_href": "/it/partnership.html#programma-affiliazione",
     "connect_title": "Connettiti con noi",
@@ -163,9 +187,9 @@
     "tab_history": "Cronologia Prenotazioni",
     "tab_points_payment": "Punti e Pagamento",
     "tab_notifications": "Notifiche",
-    "data_subtitle": "I tuoi dati",
+    "data_subtitle": "I tuoi Dati",
     "name_label": "Nome e cognome:",
-    "email_label": "Email:",
+    "email_label": "E-mail:",
     "edit_button": "Modifica dati",
     "current_subtitle": "Prenotazioni attive",
     "no_current_reservations": "Attualmente non hai prenotazioni attive.",
@@ -173,7 +197,7 @@
     "history_subtitle": "Prenotazioni passate",
     "no_history_reservations": "La cronologia delle prenotazioni è vuota.",
     "points_payment_subtitle": "Punti e Metodi di Pagamento",
-    "points_title": "I tuoi punti accumulati",
+    "points_title": "I tuoi punti raccolti",
     "points_status": "Stato attuale: {{count}} punti (Sufficienti per uno sconto di 10€)",
     "points_status_dynamic": "Stato attuale: {{count}} punti",
     "card_title": "Carta di credito salvata",
@@ -181,23 +205,23 @@
     "add_card_button": "Aggiungi/Aggiorna carta",
     "save_card_button": "Salva carta",
     "hide_card_button": "Rimuovi carta",
-    "notifications_subtitle": "Le tue notifiche",
+    "notifications_subtitle": "Le tue Notifiche",
     "status_completed": "Grazie per la prenotazione",
-    "cancel_confirmation": "Vuoi davvero annullare la prenotazione?",
+    "cancel_confirmation": "Sei sicuro di voler annullare la prenotazione?",
     "cancel_success": "La prenotazione è stata annullata con successo.",
-    "status_rated": "Già valutato",
-    "status_rate_now": "Clicca per valutare",
-    "rate_title": "Valuta Ristorante",
-    "rating_label": "La tua Valutazione",
+    "status_rated": "Già recensito",
+    "status_rate_now": "Clicca per recensire",
+    "rate_title": "Vota il Ristorante",
+    "rating_label": "Il tuo Voto",
     "comment_label": "Commento (Opzionale)",
-    "submit_review": "Invia Valutazione",
-    "review_missing_data": "Errore: Dati mancanti per l'invio della valutazione.",
-    "review_success": "Valutazione inviata con successo! Grazie.",
-    "review_error": "Errore nell'invio della valutazione. Per favore, riprova."
+    "submit_review": "Invia Recensione",
+    "review_missing_data": "Errore: Dati mancanti per l'invio della recensione.",
+    "review_success": "Recensione inviata con successo! Grazie.",
+    "review_error": "Errore nell'invio della recensione. Si prega di riprovare."
   },
   "warning": {
     "title": "Avviso",
-    "default_message": "Si prega di notare che le informazioni visualizzate su disponibilità e prezzi sono solo a scopo informativo.",
+    "default_message": "Si prega di notare che le informazioni visualizzate sulla disponibilità e sui prezzi sono puramente indicative.",
     "understand_button": "Capisco"
   },
   "registration": {
@@ -209,7 +233,7 @@
     "politika_zasebnosti_href": "/it/informativa-privacy.html"
   },
   "cookieConsent": {
-    "message": "Questo sito web utilizza i cookie per garantire una migliore esperienza utente e analizzare il traffico. Per continuare, è richiesto il tuo consenso.",
+    "message": "Questo sito web utilizza i cookie per fornire una migliore esperienza utente e analisi del traffico. Per continuare a utilizzare, ti chiediamo il tuo consenso.",
     "moreInfoLink": {
       "text": "Leggi di più.",
       "url": "informativa-privacy.html"
@@ -221,8 +245,14 @@
       },
       {
         "id": "accept-cookies",
-        "text": "Accetto tutti"
-        }
-      ]
-    }
+        "text": "Accetta tutto"
+      }
+    ]
+  },
+  "global": {
+    "back": "Indietro",
+    "loadingOffers": "Caricamento offerte speciali...",
+    "footerText": "© 2025 Rentyo Gourmet. Tutti i diritti riservati.",
+    "searchAndReserve": "Cerca e Prenota" 
+  }
 }

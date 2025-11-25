@@ -2153,22 +2153,6 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 100%;
 }
 
-/* Silhueta steklenice na levi strani kartice */
-.country-card[data-experience-code="wine"] .wine-silhouette {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 80px;        /* širina levega dela */
-    height: 100%;       /* pokrije celotno višino kartice */
-    background-image: url('steklenica.svg'); /* tvoja SVG/PNG datoteka */
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.2;       /* diskretno */
-    pointer-events: none;
-    z-index: 1;         /* pod overlayjem */
-}
 
 /* Grid kartic */
 .country-cards-container {
@@ -2303,11 +2287,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 </head>
 
 <body>
-    <svg width="0" height="0" style="position:absolute">
-      <clipPath id="maskBottle" clipPathUnits="objectBoundingBox">
-        <path d="M0.45,0 L0.55,0 L0.55,0.15 L0.60,0.45 L0.60,1 L0.40,1 L0.40,0.45 L0.45,0.15 Z"/>
-      </clipPath>
-    </svg>
+
     <header class="glava">
         <div class="logotip">
             <a href="#" id="map-icon-link" class="icon-link">
@@ -2485,58 +2465,35 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     </div>
 </a>
 
-                <div class="country-card" data-experience-code="wine">
-                    <div class="wine-silhouette"></div> <!-- NOVI DIV ZA SILHUETO -->
-                    <img src="Wine-tasting.png" alt="Wine tasting" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.wine">Wine tasting</span>
-                    </div>
-                </div>
-
-                <div class="country-card" data-experience-code="adventure">
-                    <img src="Outdoor-adventure.png" alt="Outdoor adventure" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.adventure">Outdoor adventure</span>
-                    </div>
-                </div>
-
-               <div class="country-card" data-experience-code="slepa-kuhinja">
-    <img src="Slepa-kuhinja.png" alt="Slepa kuhinja" class="card-image">
-    <div class="card-overlay">
-        <span class="card-title" data-i18n="experience.slepa-kuhinja">Slepa kuhinja</span>
-    </div>
-</div>
-
-                <div class="country-card" data-experience-code="sea">
-                    <img src="images/experiences/sea.jpg" alt="Morska doživetja" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.sea">Morska doživetja</span>
-                    </div>
-                </div>
-
-                <div class="country-card" data-experience-code="city">
-                    <img src="images/experiences/city.jpg" alt="City gourmet tour" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.city">City gourmet tour</span>
-                    </div>
-                </div>
-
-                <div class="country-card" data-experience-code="romantic">
-                    <img src="Romanticna-dozivetja.png" alt="Romantična doživetja" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.romantic">Romantična doživetja</span>
-                    </div>
-                </div>
-
-                <div class="country-card" data-experience-code="eco">
-                    <img src="images/experiences/eco.jpg" alt="Ekološka kulinarika" class="card-image">
-                    <div class="card-overlay">
-                        <span class="card-title" data-i18n="experience.eco">Ekološka kulinarika</span>
-                    </div>
-                </div>
-                
+   <a href="wine.html" class="country-card-link">
+        <div class="country-card" data-experience-code="wine">
+            <div class="wine-silhouette"></div> 
+            <img src="Wine-tasting.png" alt="Degustacija vin" class="card-image">
+            <div class="card-overlay">
+                <span class="card-title" data-i18n="experience.wine">Degustacija vin</span>
             </div>
-        </section>
+        </div>
+    </a>
+
+    <a href="sea.html" class="country-card-link">
+        <div class="country-card" data-experience-code="sea">
+            <img src="images/experiences/sea.jpg" alt="Morska doživetja" class="card-image">
+            <div class="card-overlay">
+                <span class="card-title" data-i18n="experience.sea">Morska doživetja</span>
+            </div>
+        </div>
+    </a>
+
+    <a href="romantic.html" class="country-card-link">
+        <div class="country-card" data-experience-code="romantic">
+            <img src="Romanticna-dozivetja.png" alt="Romantična doživetja" class="card-image">
+            <div class="card-overlay">
+                <span class="card-title" data-i18n="experience.romantic">Romantična doživetja</span>
+            </div>
+        </div>
+    </a>
+
+</section>
 
 
     

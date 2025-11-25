@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "Iskanje Restavracij - Gourmet & Experience",
-    "profile_title": "Moj Profil - Gourmet & Experience"
+    "profile_title": "Moj Profil - Gourmet & Experience",
+    "pageTitle": "Rentyo Ponudbe in Doživetja"
   },
   "header": {
     "login": "Prijava",
@@ -54,6 +55,32 @@
     "unavailable": "Ni prostih miz",
     "available_today": "Na voljo danes",
     "search_title": "Rezultati iskanja"
+  },
+  "gourmet_explore": {
+    "title": "Razišči nepozabna doživetja"
+  },
+  "experience": {
+    "mainTitle": "Ekskluzivne ponudbe in oglasi",
+    "mainSubtitle": "Odkrijte posebne akcije in priporočila naših partnerjev.",
+    "bestOffersTitle": "Naše najboljše ponudbe",
+    "fine_dining": "Vrhunska kulinarika",
+    "fine_dining_href": "experience.html?code=fine-dining",
+    "wine": "Degustacija vin",
+    "wine_href": "experience.html?code=wine-tasting",
+    "adventure": "Pustolovščina na prostem",
+    "adventure_href": "experience.html?code=outdoor-adventure",
+    "slepa-kuhinja": "Slepa kuhinja", 
+    "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
+    "sea": "Morska doživetja",
+    "sea_href": "experience.html?code=sea-experience",
+    "city": "Mestni gourmet tour",
+    "city_href": "experience.html?code=city-gourmet-tour",
+    "romantic": "Romantična doživetja",
+    "romantic_href": "experience.html?code=romantic-experience",
+    "eco": "Ekološka kulinarika",
+    "eco_href": "experience.html?code=eco-cuisine",
+    "pageTitle": "Rentyo Ponudbe in Doživetja",
+    "noActiveOffers": "Trenutno ni aktivnih posebnih ponudb."
   },
   "messages": {
     "enter_search_criteria": "Prosimo, vnesite mesto ali vrsto kuhinje za iskanje.",
@@ -209,7 +236,7 @@
     "politika_zasebnosti_href": "/sl/politika-zasebnosti.html"
   },
   "cookieConsent": {
-    "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analizo prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
+    "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analize prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
     "moreInfoLink": {
       "text": "Preberi več.",
       "url": "politika-zasebnosti.html"
@@ -224,5 +251,17 @@
         "text": "Sprejmem vse"
       }
     ]
+  },
+  "global": {
+    "back": "Nazaj",
+    "loadingOffers": "Nalaganje posebnih ponudb...",
+    "footerText": "© 2025 Rentyo Gourmet. Vse pravice pridržane.",
+    "location": "Lokacija", 
+    "dateTime": "Datum/Čas",
+    "price": "Cena",
+    "noDescription": "Podroben opis ponudbe ni na voljo.",
+    "searchAndReserve": "Poišči in rezerviraj",
+    "notSpecified": "Ni določeno",
+    "dataLoadError": "❌ NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint '/api/offers'."
   }
 }
