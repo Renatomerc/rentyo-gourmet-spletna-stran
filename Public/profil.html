@@ -705,7 +705,8 @@
         // API poti
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
-        const ZGODOVINA_REZERVACIJ_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`;
+        // POPRAVEK: Preimenovano za jasnost, URL ostaja isti
+        const PRETEKLE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`; 
         const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
         const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
         const QR_API_URL = `${BASE_URL}restavracije/potrdi_prihod`; 
@@ -832,10 +833,14 @@
                         scanStatusElement.style.color = 'green';
                     }
                     
+                    // 1. Posodobitev točk in profila
                     naloziPodatkeProfila(); 
-                    // Po uspešni potrditvi ponovno naložimo AKTIVNE rezervacije,
-                    // da se prikaže nov status "Potrjeno".
+                    
+                    // 2. Premik rezervacije: Ponovno naloži aktivne (izgine)
                     naloziAktivneRezervacije();
+                    
+                    // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže) <--- POPRAVEK DODANO
+                    naloziPretekleRezervacije();
 
                 } else {
                     console.error("Napaka pri potrditvi prihoda:", data);
@@ -1034,7 +1039,8 @@
                 if (response.ok) {
                     prikaziSporocilo('success', i18next.t('profile.cancel_success'));
                     naloziAktivneRezervacije(); 
-                    naloziZgodovinoRezervacij();
+                    // POPRAVEK: Klic na novo preimenovano funkcijo
+                    naloziPretekleRezervacije();
                 } else {
                     const errorData = await response.json().catch(() => ({ msg: response.statusText }));
                     console.error("SERVER RESPONSE ERROR on cancellation:", response.status, errorData);
@@ -1268,9 +1274,10 @@
             }
         };
 
-        const naloziZgodovinoRezervacij = async () => {
+        // POPRAVEK: Preimenovana funkcija za nalaganje zgodovine rezervacij v naloziPretekleRezervacije
+        const naloziPretekleRezervacije = async () => {
             try {
-                const response = await fetch(ZGODOVINA_REZERVACIJ_API_URL, {
+                const response = await fetch(PRETEKLE_REZERVACIJE_API_URL, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${zeton}` }
                 });
@@ -1281,11 +1288,11 @@
                 } else if (response.status === 401 || response.status === 403) {
                     renderRezervacije([], zgodovinaRezervacijKontejner, false);
                 } else {
-                    console.error("Napaka pri nalaganju zgodovine rezervacij:", response.status);
+                    console.error("Napaka pri nalaganju preteklih rezervacij:", response.status);
                     zgodovinaRezervacijKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
                 }
             } catch (error) {
-                console.error("Kritična napaka pri nalaganju zgodovine rezervacij:", error);
+                console.error("Kritična napaka pri nalaganju preteklih rezervacij:", error);
             }
         };
 
@@ -1320,7 +1327,7 @@
         const zapriModalOcena = () => {
             modalOcena.classList.add('skrij-modal');
             // Ponovno naloži zgodovino, da se posodobi status ocenjene rezervacije
-            naloziZgodovinoRezervacij();
+            naloziPretekleRezervacije(); // POPRAVEK: Klic na novo preimenovano funkcijo
         };
 
         /**
@@ -1505,7 +1512,7 @@
                 // ZAGON NALAGANJA PODATKOV IN REZERVACIJ
                 naloziPodatkeProfila(); 
                 naloziAktivneRezervacije(); 
-                naloziZgodovinoRezervacij(); 
+                naloziPretekleRezervacije(); // POPRAVEK: Klic na novo preimenovano funkcijo
                 
                 // ZAGON LOGIKE ZA ZVEZDICE
                 starRatingLogic(); 
