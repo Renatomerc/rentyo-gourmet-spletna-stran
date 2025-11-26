@@ -705,7 +705,6 @@
         // API poti
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
-        // POPRAVEK: Preimenovano za jasnost, URL ostaja isti
         const PRETEKLE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`; 
         const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
         const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
@@ -836,10 +835,10 @@
                     // 1. Posodobitev točk in profila
                     naloziPodatkeProfila(); 
                     
-                    // 2. Premik rezervacije: Ponovno naloži aktivne (izgine)
+                    // 2. Premik rezervacije: Ponovno naloži aktivne (izgine/posodobi status)
                     naloziAktivneRezervacije();
                     
-                    // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže) <--- POPRAVEK DODANO
+                    // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže)
                     naloziPretekleRezervacije();
 
                 } else {
@@ -1039,7 +1038,6 @@
                 if (response.ok) {
                     prikaziSporocilo('success', i18next.t('profile.cancel_success'));
                     naloziAktivneRezervacije(); 
-                    // POPRAVEK: Klic na novo preimenovano funkcijo
                     naloziPretekleRezervacije();
                 } else {
                     const errorData = await response.json().catch(() => ({ msg: response.statusText }));
@@ -1120,8 +1118,10 @@
                 kartica.style.gap = '15px';
                 kartica.style.backgroundColor = '#fff';
                 
+                const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; // Vzemi status rezervacije
+
                 if (!jeAktivnaLista) {
-                    const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; 
+                    
                     const isCancelled = currentStatus === 'PREKLICANO'; 
                     const jeZeOcenjeno = rez.ocenjeno || false; 
                     
@@ -1133,7 +1133,8 @@
                         kartica.classList.add('ocenjeno'); 
                     } 
                     
-                    if (!jeZeOcenjeno && !isCancelled) {
+                    // Omogoči ocenjevanje samo, če ni preklicano in še ni ocenjeno
+                    if (!jeZeOcenjeno && !isCancelled && currentStatus === 'POTRJENO_PRIHOD') { 
                         kartica.style.cursor = 'pointer';
                         kartica.addEventListener('click', (e) => {
                             if (e.target.tagName !== 'BUTTON') { 
@@ -1193,7 +1194,6 @@
 
                 // Logika za status v zgodovini
                 if (!jeAktivnaLista) {
-                    const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; 
                     const isCancelled = currentStatus === 'PREKLICANO'; 
                     const jeZeOcenjeno = kartica.classList.contains('ocenjeno'); 
                     
@@ -1206,9 +1206,13 @@
                                             <i class="fas fa-check-circle" style="color: #20c0bd;"></i> 
                                             ${i18next.t('profile.status_rated')}
                                         </p>`;
-                    } else {
+                    } else if (currentStatus === 'POTRJENO_PRIHOD') { // Ko ni preklicano in še ni ocenjeno
                          statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#20c0bd;">
                                             ${i18next.t('profile.status_rate_now')}
+                                        </p>`;
+                    } else {
+                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#575757;">
+                                            ${i18next.t('profile.status_completed')}
                                         </p>`;
                     }
 
@@ -1220,19 +1224,18 @@
                 
                 // --- 2. LOGIKA ZA AKTIVNE REZERVACIJE (Potrjeno ali Prekliči) ---
                 if (jeAktivnaLista) {
-                    // Preverimo, ali je potrjen prihod
-                    // Backend mora za to polje poslati potrjen_prihod: true
-                    const jePotrjeno = rez.potrjen_prihod || false; 
+                    // POPRAVEK: Preverjamo status 'POTRJENO_PRIHOD', saj strežnik to nastavi po QR skeniranju.
+                    const jePotrjeno = currentStatus === 'POTRJENO_PRIHOD'; 
 
                     if (jePotrjeno) {
-                        // Renderiraj 'Potrjeno' status namesto gumba
+                        // Renderiraj 'Potrjeno' status namesto gumba (gumb Prekliči se skrije)
                         const statusDiv = document.createElement('div');
                         statusDiv.classList.add('status-potrjeno');
                         statusDiv.textContent = i18next.t('profile.status_confirmed') || 'Potrjeno'; 
                         kartica.appendChild(statusDiv);
                         
                     } else {
-                        // Renderiraj 'Prekliči' gumb
+                        // Renderiraj 'Prekliči' gumb (če je status 'POTRJENO' ali kateri koli drug ne-potrjen status)
                         const preklicGumb = document.createElement('button');
                         preklicGumb.classList.add('gumb-preklici');
                         preklicGumb.textContent = i18next.t('profile.cancel_button');
@@ -1274,7 +1277,6 @@
             }
         };
 
-        // POPRAVEK: Preimenovana funkcija za nalaganje zgodovine rezervacij v naloziPretekleRezervacije
         const naloziPretekleRezervacije = async () => {
             try {
                 const response = await fetch(PRETEKLE_REZERVACIJE_API_URL, {
@@ -1327,7 +1329,7 @@
         const zapriModalOcena = () => {
             modalOcena.classList.add('skrij-modal');
             // Ponovno naloži zgodovino, da se posodobi status ocenjene rezervacije
-            naloziPretekleRezervacije(); // POPRAVEK: Klic na novo preimenovano funkcijo
+            naloziPretekleRezervacije(); 
         };
 
         /**
@@ -1512,7 +1514,7 @@
                 // ZAGON NALAGANJA PODATKOV IN REZERVACIJ
                 naloziPodatkeProfila(); 
                 naloziAktivneRezervacije(); 
-                naloziPretekleRezervacije(); // POPRAVEK: Klic na novo preimenovano funkcijo
+                naloziPretekleRezervacije(); 
                 
                 // ZAGON LOGIKE ZA ZVEZDICE
                 starRatingLogic(); 
