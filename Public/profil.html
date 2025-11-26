@@ -92,6 +92,9 @@
       cursor: pointer;
       font-weight: normal; 
       gap: 0; 
+      display: flex; /* Dodano za poravnavo ikone in besedila v vrsti */
+      align-items: center; /* Poravnaj navpično */
+      width: 100%; /* Da zavzame celotno širino, kar omogoča prelamljanje */
     }
     
     /* Ovoj za ikono fotoaparata (Krog) */
@@ -116,6 +119,7 @@
         flex-direction: column;
         align-items: flex-start;
         line-height: 1.2; 
+        flex-grow: 1; /* Omogoči, da zasede preostali prostor */
     }
     
     /* Poudarjeno glavno besedilo (Črne barve) */
@@ -124,6 +128,7 @@
         color: #333; 
         font-size: 16px;
         margin-bottom: 2px;
+        white-space: normal; /* <--- POPRAVEK: Omogoči prelamljanje vrstice */
     }
     
     /* Sekundarno, manj poudarjeno besedilo (Črne barve) */
@@ -132,6 +137,7 @@
         color: #333; 
         font-size: 13px;
         opacity: 0.85; 
+        white-space: normal; /* <--- POPRAVEK: Omogoči prelamljanje vrstice */
     }
     
     .qr-scan-ovoj {

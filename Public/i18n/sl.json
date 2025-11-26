@@ -222,7 +222,9 @@
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova.",
     "scan_qr_main_text": "Skeniraj qr kodo in potrdi svoj prihod",
-    "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste."
+    "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste.",
+    "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
+    "status_confirmed": "Potrjeno"
   },
   "warning": {
     "title": "Opozorilo",
@@ -234,7 +236,7 @@
     "splosni_pogoji_link": "Splošnimi pogoji",
     "splosni_pogoji_href": "https://www.rentyo.com/sl/uvjeti-koristenja.html",
     "in_politiko": " in ",
-    "politika_zasebnosti_link": "Politiko zasebnosti",
+    "politika_zasebnosti_link": "Politika zasebnosti",
     "politika_zasebnosti_href": "https://www.rentyo.com/sl/politika-zasebnosti.html"
   },
   "cookieConsent": {

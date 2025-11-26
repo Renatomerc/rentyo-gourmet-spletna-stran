@@ -985,7 +985,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 return res.status(200).json({ msg: `profile.status_error: Vaša rezervacija je potekla in je bila označena kot ne-potrjena.`, status: 'NI_AKTIVNA' });
             }
             
-             return res.status(404).json({ msg: `profile.status_error: Trenutno niste v časovnem oknu za potrditev prihoda.` });
+             return res.status(404).json({ msg: `` });
         }
         
         if (posodobitevStevilo > 0) {
