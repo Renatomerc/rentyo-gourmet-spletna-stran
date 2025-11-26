@@ -1251,36 +1251,52 @@ exports.isciRestavracije = async (req, res) => {
 // =================================================================
 
 /**
- * Označi rezervacije, ki so pretekle (datum je mimo) in niso bile potrjene, 
- * s statusom 'NI_POTRJENA'. To prepreči, da bi se prikazovale kot aktivne in jih je mogoče oceniti.
+ * Označi rezervacije, ki so pretekle (datum in ura sta mimo) in niso bile potrjene, 
+ * s statusom 'NI_POTRJENA'. To prepreči, da bi se prikazovale kot aktivne.
  * @access Kliče se avtomatsko preko CRON Job-a ali ob zagonu strežnika.
  */
 exports.oznaciPretekleRezervacije = async () => {
-    // Uporabimo današnji datum in čas
-    const danes = new Date();
-    const vceraj = new Date(danes);
-    // Vzamemo datum od včeraj (da ujamemo vse včerajšnje rezervacije, ne glede na uro)
-    vceraj.setDate(danes.getDate() - 1); 
-    const vcerajISO = vceraj.toISOString().split('T')[0];
+    // Uporabimo točen časovni žig ZDAJ
+    const zdaj = new Date();
 
     try {
-        // Išči vse rezervacije, ki imajo datum DO VČERAJ (vključno z včeraj)
-        // IN so še vedno v statusu AKTIVNO (kar pomeni, da niso bile potrjene)
+        // Iščemo vse restavracije, ki imajo rezervacije za posodobitev
         const rezultat = await Restavracija.updateMany(
             { 
-                "mize.rezervacije.datum_rezervacije": { $lte: vcerajISO }, // Datum do vključno včeraj
-                "mize.rezervacije.status": 'AKTIVNO'
+                // Filtriramo samo rezervacije, ki so v statusu 'AKTIVNO' (ali 'POTRJENO')
+                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] } 
             },
             {
                 // Nastavi status na NI_POTRJENA in polje potrjen_prihod na false
                 $set: { 
-                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA',
+                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA', 
                     "mize.$[].rezervacije.$[rez].potrjen_prihod": false 
                 }
             },
             {
-                // Array filteri, ki določajo, katero rezervacijo naj posodobimo
-                arrayFilters: [ { "rez.status": 'AKTIVNO' } ]
+                // Array filteri: Uporabimo MONGODB IZRAZ ZA PREVERJANJE ČASOVNEGA ŽIGA
+                arrayFilters: [ 
+                    { 
+                        // 1. Preveri status, ki ga želimo očistiti
+                        "rez.status": { $in: ['AKTIVNO', 'POTRJENO'] },
+                        
+                        // 2. 🔑 KRITIČNI FILTER: Preveri, ali je rezervacija v preteklosti
+                        $expr: {
+                            $lt: [
+                                { 
+                                    $dateFromString: { 
+                                        // Ustvarimo ISO časovni žig iz polj datum_rezervacije in cas
+                                        // ODSOTNOST 'Z' na koncu pomaga pri lokalni časovni primerjavi
+                                        dateString: { 
+                                            $concat: [ "$$rez.datum_rezervacije", "T", "$$rez.cas", ":00.000" ] 
+                                        }
+                                    }
+                                },
+                                zdaj // Primerjamo s časom zdaj
+                            ]
+                        }
+                    } 
+                ]
             }
         );
 
