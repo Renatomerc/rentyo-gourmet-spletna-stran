@@ -489,7 +489,9 @@ exports.ustvariRezervacijo = async (req, res) => {
             datum,
             casStart: casZacetka,
             trajanjeUr: trajanje,
-            status: 'POTRJENO',
+            // **********************************************
+            status: 'AKTIVNO', // ✅ POPRAVLJENO: Nujen popravek statusa!
+            // **********************************************
         };
 
         const rezultat = await Restavracija.updateOne(
@@ -1182,9 +1184,9 @@ exports.isciRestavracije = async (req, res) => {
         // ====================================================================
         let restavracijeZaOdgovor = [];
 
-        if (Array.isArray(rezultati)) {
+        if (Array.isArray(rezultatov)) {
             restavracijeZaOdgovor = rezultati;
-        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultati).length > 0) {
+        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultatov).length > 0) {
             // Če je rezultat en sam objekt in ne array (kar se je dogajalo)
             restavracijeZaOdgovor = [rezultati];
         } else {
