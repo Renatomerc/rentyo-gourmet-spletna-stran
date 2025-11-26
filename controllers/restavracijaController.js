@@ -838,6 +838,9 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         let aktivnaRezervacijaNajdena = false;
         let posodobitevStevilo = 0;
         let potrjenaRezervacijaId = null; 
+        // 🚩 NOVO: Spremljamo, ali smo naleteli na preteklo in ne-potrjeno rezervacijo
+        let preteklaRezervacijaOciscena = false; 
+
 
         // --- 1. AGREGACIJA: Poišči VSE ustrezne Rezervacije na DANAŠNJI DAN ---
         const rezultatIskanja = await Restavracija.aggregate([
@@ -860,6 +863,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         ]);
 
         if (rezultatIskanja.length === 0) {
+            // Ni najdene niti AKTIVNE niti že POTRJENE rezervacije za danes
             return res.status(404).json({ msg: `profile.status_error: Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
         }
         
@@ -885,6 +889,8 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
 
             // 🚀 KLJUČNO: Preveri, ali je trenutni čas znotraj časovnega okna
             if (danes >= casZaPotrditevOd && danes <= casZaPotrditevDo) {
+                // PRIMER A: PRAVOČASNA POTRDITEV
+                
                 potrjenaRezervacijaId = rezInfo.rezervacijaId; 
                 
                 // Posodobitev statusa rezervacije na POTRJENO_PRIHOD
@@ -910,9 +916,37 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                     posodobitevStevilo++;
                 }
                 
+            } else if (danes > casZaPotrditevDo) { 
+                // 🔥 PRIMER B: PREPOZNO SKENIRANJE (Rezervacija je pretekla in ni bila potrjena)
+                
+                const rezultatOznacitve = await Restavracija.updateOne(
+                    { 
+                        _id: restavracijaIdObj, 
+                        "mize._id": rezInfo.mizaId, 
+                        "mize.rezervacije._id": rezInfo.rezervacijaId 
+                    }, 
+                    { 
+                        // Takoj jo označimo kot NI_POTRJENA, da ne povzroča napake na profilu
+                        $set: { 
+                            "mize.$.rezervacije.$[rez].status": 'NI_POTRJENA', 
+                            "mize.$.rezervacije.$[rez].potrjen_prihod": false 
+                        } 
+                    },
+                    {
+                        arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
+                    }
+                );
+                
+                if (rezultatOznacitve.modifiedCount > 0) {
+                    preteklaRezervacijaOciscena = true;
+                }
+
+                console.log(`Rezervacija ID ${rezInfo.rezervacijaId} je pretekla in je bila označena kot NI_POTRJENA.`);
+                // Nadaljujemo z zanko, da vidimo, če je katera druga rezervacija še aktivna
+                
             } else {
-                // Če časovno okno ni ustrezno
-                console.log(`Rezervacija ID ${rezInfo.rezervacijaId} ob ${rezInfo.casRezervacijeString} ni v časovnem oknu za potrditev.`);
+                // PRIMER C: PREZRAN SKEN (Rezervacija je še v prihodnosti)
+                console.log(`Rezervacija ID ${rezInfo.rezervacijaId} ob ${rezInfo.casRezervacijeString} je še v prihodnosti. Potrditev še ni mogoča.`);
             }
         }
         
@@ -920,6 +954,13 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
 
         // Če ni bila najdena ali potrjena nobena rezervacija V TEM ČASOVNEM OKNU
         if (posodobitevStevilo === 0 && !potrjenaRezervacijaId) {
+            
+            // 🔥 POPRAVEK ODGOVORA: Če je bila rezervacija OČIŠČENA, vrnemo uspeh/obvestilo, da ni aktivne
+            if (preteklaRezervacijaOciscena) {
+                return res.status(200).json({ msg: `profile.status_error: Vaša rezervacija je potekla in je bila označena kot ne-potrjena.`, status: 'NI_AKTIVNA' });
+            }
+            
+             // Če ni potrjena, je izven okna in NI potekla, ali je bila v prihodnosti
              return res.status(404).json({ msg: `profile.status_error: Trenutno niste v časovnem oknu za potrditev prihoda.` });
         }
         
@@ -934,7 +975,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             res.json({ 
                 msg: `Prihod na ${posodobitevStevilo} rezervacij(e) uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
                 noveTocke: posodobljenUporabnik ? posodobljenUporabnik.tockeZvestobe : 'Ni posodobljeno',
-                status: 'POTRJENO'
+                status: 'POTRJENO_PRIHOD' // Uporabimo status, ki ustreza shranjevanju
             });
         } else {
             // Če je bila rezervacija že potrjena in ste jo ponovno skenirali
