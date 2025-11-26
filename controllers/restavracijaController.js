@@ -807,8 +807,8 @@ exports.posodobiAdminVsebino = async (req, res) => {
 
 /**
  * 🟢 POSODOBLJENO: Potrdi uporabnikov prihod s skeniranjem QR kode (samo restavracijaId).
- * Poišče VSE AKTIVNE rezervacije za DANAŠNJI DAN, posodobi status na 'POTRJENO_PRIHOD' 
- * in prišteje 50 točk.
+ * Potrditev je dovoljena le v časovnem oknu, ki se začne 10 minut PRED rezervacijo in konča 60 minut PO rezervaciji.
+ * POZOR: Za rezervacije, ki so pretekle in niso potrjene, glej funkcijo 'oznaciPretekleRezervacije'.
  * POST /api/restavracije/potrdi_prihod
  */
 exports.potrdiPrihodInDodelitevTock = async (req, res) => {
@@ -816,6 +816,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
     const { restavracijaId } = req.body; 
     const userId = req.uporabnik ? req.uporabnik.id : null; 
     const TOCK_NA_REZERVACIJO = 50;
+    const ZETON_ZA_OCENJEVANJE = 1; // Nov žeton, ki omogoča ocenjevanje po potrditvi
 
     if (!userId) {
         return res.status(401).json({ msg: 'Neavtorizirano: Prijavite se za potrditev prihoda.' });
@@ -829,9 +830,12 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         const userIdObj = new mongoose.Types.ObjectId(userId);
         const restavracijaIdObj = new mongoose.Types.ObjectId(restavracijaId);
         
-        // 🚀 NOVO: Pridobimo današnji datum v formatu YYYY-MM-DD
         const danes = new Date();
-        const danesISO = danes.toISOString().split('T')[0]; // Format: "2025-11-25"
+        const danesISO = danes.toISOString().split('T')[0];
+        
+        let aktivnaRezervacijaNajdena = false;
+        let posodobitevStevilo = 0;
+        let potrjenaRezervacijaId = null; 
 
         // --- 1. AGREGACIJA: Poišči VSE ustrezne Rezervacije na DANAŠNJI DAN ---
         const rezultatIskanja = await Restavracija.aggregate([
@@ -840,69 +844,103 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             { $unwind: "$mize.rezervacije" },
             { $match: { 
                 "mize.rezervacije.uporabnikId": userIdObj, 
-                "mize.rezervacije.status": 'AKTIVNO',
-                // 🚀 KLJUČNO: Dodamo preverjanje datuma in odstranimo $limit: 1
+                // Vključimo tudi že potrjene (da jih lahko ponovno skenira)
+                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO_PRIHOD'] }, 
                 "mize.rezervacije.datum_rezervacije": danesISO 
             }},
             { $project: {
                 _id: 0, 
                 mizaId: "$mize._id",
-                rezervacijaId: "$mize.rezervacije._id"
+                rezervacijaId: "$mize.rezervacije._id",
+                casRezervacijeString: "$mize.rezervacije.cas", // npr. "10:00"
+                status: "$mize.rezervacije.status"
             }}
-            // ODSTRANJENO: { $limit: 1 }
         ]);
 
         if (rezultatIskanja.length === 0) {
-            // Sporočilo sedaj vključuje datum
-            return res.status(404).json({ msg: `Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
+            return res.status(404).json({ msg: `profile.status_error: Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
         }
         
-        // --- 2. POSODOBITEV: Nastavi Status in Podeli Točke ---
+        // --- 2. PREVERJANJE ČASA in POSODOBITEV ---
         
-        let posodobitevStevilo = 0;
-        let uspešnaPosodobitev = false;
-        
-        // Potrdimo vsako rezervacijo, ki smo jo našli za današnji dan
         for (const rezInfo of rezultatIskanja) {
-            const rezultatPosodobitve = await Restavracija.updateOne(
-                { 
-                    _id: restavracijaIdObj, 
-                    "mize._id": rezInfo.mizaId, 
-                    "mize.rezervacije._id": rezInfo.rezervacijaId 
-                }, 
-                { 
-                    $set: { 
-                        "mize.$.rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
-                        // 🚀 KLJUČNO: Nastavimo novo polje za frontend
-                        "mize.$.rezervacije.$[rez].potrjen_prihod": true 
-                    } 
-                },
-                {
-                    arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
-                }
-            );
+            // Pretvori čas rezervacije (npr. "10:00") v objekt Date za današnji dan
+            const [uraStr, minutaStr] = rezInfo.casRezervacijeString.split(':');
+            const casZacetkaRezervacije = new Date(danes);
+            casZacetkaRezervacije.setHours(parseInt(uraStr), parseInt(minutaStr), 0, 0);
+
+            // Izračunaj časovno okno za potrditev (10 minut prej, 60 minut kasneje)
+            const casZaPotrditevOd = new Date(casZacetkaRezervacije.getTime() - (10 * 60000)); 
+            const casZaPotrditevDo = new Date(casZacetkaRezervacije.getTime() + (60 * 60000)); 
             
-            if (rezultatPosodobitve.modifiedCount > 0) {
-                uspešnaPosodobitev = true;
-                posodobitevStevilo++;
+            aktivnaRezervacijaNajdena = true; // Našli smo rezervacijo za danes
+
+            // Če je rezervacija že potrjena, se to sporoči in preskoči posodobitev
+            if (rezInfo.status === 'POTRJENO_PRIHOD') {
+                potrjenaRezervacijaId = rezInfo.rezervacijaId;
+                continue; 
+            }
+
+            // 🚀 KLJUČNO: Preveri, ali je trenutni čas znotraj časovnega okna
+            if (danes >= casZaPotrditevOd && danes <= casZaPotrditevDo) {
+                potrjenaRezervacijaId = rezInfo.rezervacijaId; 
+                
+                // Posodobitev statusa rezervacije na POTRJENO_PRIHOD
+                const rezultatPosodobitve = await Restavracija.updateOne(
+                    { 
+                        _id: restavracijaIdObj, 
+                        "mize._id": rezInfo.mizaId, 
+                        "mize.rezervacije._id": rezInfo.rezervacijaId 
+                    }, 
+                    { 
+                        $set: { 
+                            "mize.$.rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
+                            "mize.$.rezervacije.$[rez].potrjen_prihod": true,
+                            "mize.$.rezervacije.$[rez].zeton_za_ocenjevanje": ZETON_ZA_OCENJEVANJE 
+                        } 
+                    },
+                    {
+                        arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
+                    }
+                );
+                
+                if (rezultatPosodobitve.modifiedCount > 0) {
+                    posodobitevStevilo++;
+                }
+                
+            } else {
+                // Če časovno okno ni ustrezno
+                console.log(`Rezervacija ID ${rezInfo.rezervacijaId} ob ${rezInfo.casRezervacijeString} ni v časovnem oknu za potrditev.`);
             }
         }
         
-        if (!uspešnaPosodobitev) {
-            return res.status(500).json({ msg: 'Napaka pri posodabljanju statusa rezervacije. Nič ni bilo spremenjeno.' });
+        // --- 3. ODGOVOR IN DODELITEV TOČK ---
+
+        // Če ni bila najdena ali potrjena nobena rezervacija V TEM ČASOVNEM OKNU
+        if (posodobitevStevilo === 0 && !potrjenaRezervacijaId) {
+             return res.status(404).json({ msg: `profile.status_error: Trenutno niste v časovnem oknu za potrditev prihoda.` });
         }
+        
+        // Dodelitev točk in odgovor (samo enkrat, če je bila katera koli rezervacija dejansko potrjena)
+        if (posodobitevStevilo > 0) {
+            const posodobljenUporabnik = await Uporabnik.findByIdAndUpdate(
+                userId, 
+                { $inc: { tockeZvestobe: TOCK_NA_REZERVACIJO } },
+                { new: true }
+            );
 
-        // 3. 🟢 DODELITEV TOČK UPORABNIKU (samo enkrat)
-        const posodobljenUporabnik = await Uporabnik.findByIdAndUpdate(
-            userId, 
-            { $inc: { tockeZvestobe: TOCK_NA_REZERVACIJO } }, // Prištevanje 50 točk
-            { new: true }
-        );
-
-        res.json({ 
-            msg: `Prihod na ${posodobitevStevilo} rezervacij(e) uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
-            noveTocke: posodobljenUporabnik ? posodobljenUporabnik.tockeZvestobe : 'Ni posodobljeno'
-        });
+            res.json({ 
+                msg: `Prihod na ${posodobitevStevilo} rezervacij(e) uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
+                noveTocke: posodobljenUporabnik ? posodobljenUporabnik.tockeZvestobe : 'Ni posodobljeno',
+                status: 'POTRJENO'
+            });
+        } else {
+            // Če je bila rezervacija že potrjena in ste jo ponovno skenirali
+            res.json({
+                msg: `Prihod na rezervacijo ID ${potrjenaRezervacijaId} je že bil potrjen.`,
+                status: 'ŽE_POTRJENO'
+            });
+        }
 
     } catch (error) {
         console.error('❌ NAPAKA PRI POTRDITVI PRIHODA IN DODELITVI TOČK:', error);
@@ -978,7 +1016,7 @@ exports.oznaciRezervacijoKotZakljuceno = async (req, res) => {
     }
 };
 
-// 🌟 NOVO: FUNKCIJA ZA ODDAJO OCENE IN KOMENTARJA 
+// 🌟 FUNKCIJA ZA ODDAJO OCENE IN KOMENTARJA (Nespremenjena)
 /**
  * @route POST /api/restavracije/oceni/:restavracijaId
  * @desc Shrani komentar v polje 'komentarji' in posodobi povprečje ocen.
@@ -1164,3 +1202,49 @@ exports.isciRestavracije = async (req, res) => {
         res.status(500).json({ msg: "Napaka strežnika pri iskanju.", error: error.message });
     }
 };
+
+// =================================================================
+// 🌟 NOVO: Funkcija za pretečene rezervacije (DODAJTE JO V SERVER.JS!)
+// =================================================================
+
+/**
+ * Označi rezervacije, ki so pretekle (datum je mimo) in niso bile potrjene, 
+ * s statusom 'NI_POTRJENA'. To prepreči, da bi se prikazovale kot aktivne in jih je mogoče oceniti.
+ * @access Kliče se avtomatsko preko CRON Job-a ali ob zagonu strežnika.
+ */
+exports.oznaciPretekleRezervacije = async () => {
+    // Uporabimo današnji datum in čas
+    const danes = new Date();
+    const vceraj = new Date(danes);
+    // Vzamemo datum od včeraj (da ujamemo vse včerajšnje rezervacije, ne glede na uro)
+    vceraj.setDate(danes.getDate() - 1); 
+    const vcerajISO = vceraj.toISOString().split('T')[0];
+
+    try {
+        // Išči vse rezervacije, ki imajo datum DO VČERAJ (vključno z včeraj)
+        // IN so še vedno v statusu AKTIVNO (kar pomeni, da niso bile potrjene)
+        const rezultat = await Restavracija.updateMany(
+            { 
+                "mize.rezervacije.datum_rezervacije": { $lte: vcerajISO }, // Datum do vključno včeraj
+                "mize.rezervacije.status": 'AKTIVNO'
+            },
+            {
+                // Nastavi status na NI_POTRJENA in polje potrjen_prihod na false
+                $set: { 
+                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA',
+                    "mize.$[].rezervacije.$[rez].potrjen_prihod": false 
+                }
+            },
+            {
+                // Array filteri, ki določajo, katero rezervacijo naj posodobimo
+                arrayFilters: [ { "rez.status": 'AKTIVNO' } ]
+            }
+        );
+
+        console.log(`✅ Uspešno označeno kot 'NI_POTRJENA': ${rezultat.modifiedCount} rezervacij.`);
+        return rezultat.modifiedCount;
+    } catch (error) {
+        console.error("❌ Napaka pri označevanju preteklih rezervacij:", error);
+        return 0;
+    }
+}
