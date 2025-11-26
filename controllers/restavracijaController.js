@@ -851,7 +851,8 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 "mize.rezervacije.uporabnikId": userIdObj, 
                 // Vključimo tudi že potrjene (da jih lahko ponovno skenira)
                 "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO_PRIHOD'] }, 
-                "mize.rezervacije.datum_rezervacije": danesISO 
+                // 💥 POPRAVEK: Uporabite pravilno ime polja za datum
+                "mize.rezervacije.datum": danesISO 
             }},
             { $project: {
                 _id: 0, 
