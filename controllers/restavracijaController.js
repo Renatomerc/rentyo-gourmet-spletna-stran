@@ -1252,56 +1252,68 @@ exports.isciRestavracije = async (req, res) => {
 
 /**
  * Označi rezervacije, ki so pretekle (datum in ura sta mimo) in niso bile potrjene, 
- * s statusom 'NI_POTRJENA'. To prepreči, da bi se prikazovale kot aktivne.
+ * s statusom 'NI_POTRJENA'.
  * @access Kliče se avtomatsko preko CRON Job-a ali ob zagonu strežnika.
  */
 exports.oznaciPretekleRezervacije = async () => {
-    // Uporabimo točen časovni žig ZDAJ
-    const zdaj = new Date();
+    // Uporabimo današnji datum
+    const danes = new Date();
+    const vceraj = new Date(danes);
+    vceraj.setDate(danes.getDate() - 1); 
+    const vcerajISO = vceraj.toISOString().split('T')[0];
+    
+    // Čas za primerjavo DANAŠNJIH rezervacij: npr. 1 uro nazaj
+    const pretekliCas = new Date(danes.getTime() - (60 * 60000)); 
+    const uraMinuteZdaj = `${String(pretekliCas.getHours()).padStart(2, '0')}:${String(pretekliCas.getMinutes()).padStart(2, '0')}`;
+    const danesISO = danes.toISOString().split('T')[0];
 
     try {
-        // Iščemo vse restavracije, ki imajo rezervacije za posodobitev
-        const rezultat = await Restavracija.updateMany(
+        // --- 1. KORAK: OČISTI VSE REZERVACIJE, KI SO PRETEKLE PRED VČERAJŠNJIM DNEVOM ---
+        const rezultatVceraj = await Restavracija.updateMany(
             { 
-                // Filtriramo samo rezervacije, ki so v statusu 'AKTIVNO' (ali 'POTRJENO')
-                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] } 
+                "mize.rezervacije.datum_rezervacije": { $lte: vcerajISO }, // Datum do vključno včeraj
+                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] } // Očisti aktivne in potrjene (ki niso bile zaključene)
             },
             {
-                // Nastavi status na NI_POTRJENA in polje potrjen_prihod na false
                 $set: { 
-                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA', 
+                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA',
                     "mize.$[].rezervacije.$[rez].potrjen_prihod": false 
                 }
             },
             {
-                // Array filteri: Uporabimo MONGODB IZRAZ ZA PREVERJANJE ČASOVNEGA ŽIGA
                 arrayFilters: [ 
-                    { 
-                        // 1. Preveri status, ki ga želimo očistiti
-                        "rez.status": { $in: ['AKTIVNO', 'POTRJENO'] },
-                        
-                        // 2. 🔑 KRITIČNI FILTER: Preveri, ali je rezervacija v preteklosti
-                        $expr: {
-                            $lt: [
-                                { 
-                                    $dateFromString: { 
-                                        // Ustvarimo ISO časovni žig iz polj datum_rezervacije in cas
-                                        // ODSOTNOST 'Z' na koncu pomaga pri lokalni časovni primerjavi
-                                        dateString: { 
-                                            $concat: [ "$$rez.datum_rezervacije", "T", "$$rez.cas", ":00.000" ] 
-                                        }
-                                    }
-                                },
-                                zdaj // Primerjamo s časom zdaj
-                            ]
-                        }
-                    } 
+                    { "rez.status": { $in: ['AKTIVNO', 'POTRJENO'] } } // Filter na status
                 ]
             }
         );
 
-        console.log(`✅ Uspešno označeno kot 'NI_POTRJENA': ${rezultat.modifiedCount} rezervacij.`);
-        return rezultat.modifiedCount;
+        // --- 2. KORAK: OČISTI DANAŠNJE REZERVACIJE, KI SO PO URI ŽE PRETEKLE (npr. pred 1 uro) ---
+        // Opomba: Ker ne moremo uporabiti $expr, uporabimo navaden tekstovni filter, 
+        // ki dela samo za današnji dan, saj se teksti ure pravilno primerjajo.
+        const rezultatDanes = await Restavracija.updateMany(
+            { 
+                "mize.rezervacije.datum_rezervacije": danesISO, // Samo današnji datum
+                "mize.rezervacije.cas": { $lte: uraMinuteZdaj }, // Čas do 1 uro nazaj
+                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] }
+            },
+            {
+                $set: { 
+                    "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA',
+                    "mize.$[].rezervacije.$[rez].potrjen_prihod": false 
+                }
+            },
+            {
+                arrayFilters: [ 
+                    { "rez.status": { $in: ['AKTIVNO', 'POTRJENO'] } }
+                ]
+            }
+        );
+
+
+        const skupnoPosodobljeno = rezultatVceraj.modifiedCount + rezultatDanes.modifiedCount;
+        
+        console.log(`✅ Uspešno označeno kot 'NI_POTRJENA': ${skupnoPosodobljeno} rezervacij.`);
+        return skupnoPosodobljeno;
     } catch (error) {
         console.error("❌ Napaka pri označevanju preteklih rezervacij:", error);
         return 0;
