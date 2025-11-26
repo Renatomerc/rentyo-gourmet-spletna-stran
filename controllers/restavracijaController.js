@@ -893,22 +893,24 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 
                 potrjenaRezervacijaId = rezInfo.rezervacijaId; 
                 
-                // Posodobitev statusa rezervacije na POTRJENO_PRIHOD
+                // Posodobitev statusa rezervacije na POTRJENO_PRIHOD (Uporaba dveh array filtrov)
                 const rezultatPosodobitve = await Restavracija.updateOne(
                     { 
                         _id: restavracijaIdObj, 
-                        "mize._id": rezInfo.mizaId, 
-                        "mize.rezervacije._id": rezInfo.rezervacijaId 
+                        "mize.rezervacije._id": rezInfo.rezervacijaId // Zadošča, da jo najde v katerikoli mizi
                     }, 
                     { 
                         $set: { 
-                            "mize.$.rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
-                            "mize.$.rezervacije.$[rez].potrjen_prihod": true,
-                            "mize.$.rezervacije.$[rez].zeton_za_ocenjevanje": ZETON_ZA_OCENJEVANJE 
+                            "mize.$[miza].rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
+                            "mize.$[miza].rezervacije.$[rez].potrjen_prihod": true,
+                            "mize.$[miza].rezervacije.$[rez].zeton_za_ocenjevanje": ZETON_ZA_OCENJEVANJE 
                         } 
                     },
                     {
-                        arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
+                        arrayFilters: [ 
+                            { "miza._id": rezInfo.mizaId }, // Filter za mizo
+                            { "rez._id": rezInfo.rezervacijaId } // Filter za rezervacijo
+                        ]
                     }
                 );
                 
@@ -922,18 +924,20 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 const rezultatOznacitve = await Restavracija.updateOne(
                     { 
                         _id: restavracijaIdObj, 
-                        "mize._id": rezInfo.mizaId, 
                         "mize.rezervacije._id": rezInfo.rezervacijaId 
                     }, 
                     { 
-                        // Takoj jo označimo kot NI_POTRJENA, da ne povzroča napake na profilu
+                        // Takoj jo označimo kot NI_POTRJENA, da ne povzroča napake na profilu (Uporaba dveh array filtrov)
                         $set: { 
-                            "mize.$.rezervacije.$[rez].status": 'NI_POTRJENA', 
-                            "mize.$.rezervacije.$[rez].potrjen_prihod": false 
+                            "mize.$[miza].rezervacije.$[rez].status": 'NI_POTRJENA', 
+                            "mize.$[miza].rezervacije.$[rez].potrjen_prihod": false 
                         } 
                     },
                     {
-                        arrayFilters: [ { "rez._id": rezInfo.rezervacijaId } ]
+                        arrayFilters: [ 
+                            { "miza._id": rezInfo.mizaId }, // Filter za mizo
+                            { "rez._id": rezInfo.rezervacijaId } // Filter za rezervacijo
+                        ]
                     }
                 );
                 
