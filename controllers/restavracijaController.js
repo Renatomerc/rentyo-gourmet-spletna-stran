@@ -851,7 +851,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 "mize.rezervacije.uporabnikId": userIdObj, 
                 // Vključimo tudi že potrjene (da jih lahko ponovno skenira)
                 "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO_PRIHOD'] }, 
-                // 💥 POPRAVEK: Uporabite pravilno ime polja za datum
+                // ✅ POPRAVEK 1: Uporabite pravilno ime polja za datum
                 "mize.rezervacije.datum": danesISO 
             }},
             { $project: {
@@ -894,23 +894,24 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 
                 potrjenaRezervacijaId = rezInfo.rezervacijaId; 
                 
-                // Posodobitev statusa rezervacije na POTRJENO_PRIHOD (Uporaba dveh array filtrov)
+                // Posodobitev statusa rezervacije na POTRJENO_PRIHOD (Poenostavljeno array filtriranje)
                 const rezultatPosodobitve = await Restavracija.updateOne(
                     { 
                         _id: restavracijaIdObj, 
-                        "mize.rezervacije._id": rezInfo.rezervacijaId // Zadošča, da jo najde v katerikoli mizi
+                        "mize.rezervacije._id": rezInfo.rezervacijaId // Poišči rezervacijo znotraj katerekoli mize
                     }, 
                     { 
                         $set: { 
-                            "mize.$[miza].rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
-                            "mize.$[miza].rezervacije.$[rez].potrjen_prihod": true,
-                            "mize.$[miza].rezervacije.$[rez].zeton_za_ocenjevanje": ZETON_ZA_OCENJEVANJE 
+                            // Uporabimo samo en filter 'rez' in tarčamo nanj
+                            "mize.$[].rezervacije.$[rez].status": 'POTRJENO_PRIHOD',
+                            "mize.$[].rezervacije.$[rez].potrjen_prihod": true,
+                            "mize.$[].rezervacije.$[rez].zeton_za_ocenjevanje": ZETON_ZA_OCENJEVANJE 
                         } 
                     },
                     {
+                        // ✅ POPRAVEK 2: Poenostavitev array filtrov na samo enega (rez)
                         arrayFilters: [ 
-                            { "miza._id": rezInfo.mizaId }, // Filter za mizo
-                            { "rez._id": rezInfo.rezervacijaId } // Filter za rezervacijo
+                            { "rez._id": rezInfo.rezervacijaId }
                         ]
                     }
                 );
@@ -928,16 +929,16 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                         "mize.rezervacije._id": rezInfo.rezervacijaId 
                     }, 
                     { 
-                        // Takoj jo označimo kot NI_POTRJENA, da ne povzroča napake na profilu (Uporaba dveh array filtrov)
+                        // Takoj jo označimo kot NI_POTRJENA, da ne povzroča napake na profilu (Poenostavljeno array filtriranje)
                         $set: { 
-                            "mize.$[miza].rezervacije.$[rez].status": 'NI_POTRJENA', 
-                            "mize.$[miza].rezervacije.$[rez].potrjen_prihod": false 
+                            "mize.$[].rezervacije.$[rez].status": 'NI_POTRJENA', 
+                            "mize.$[].rezervacije.$[rez].potrjen_prihod": false 
                         } 
                     },
                     {
+                        // ✅ POPRAVEK 2: Poenostavitev array filtrov na samo enega (rez)
                         arrayFilters: [ 
-                            { "miza._id": rezInfo.mizaId }, // Filter za mizo
-                            { "rez._id": rezInfo.rezervacijaId } // Filter za rezervacijo
+                            { "rez._id": rezInfo.rezervacijaId }
                         ]
                     }
                 );
