@@ -17,11 +17,13 @@ const session = require('express-session');
 
 // ⭐ KLJUČNO: Uvoz funkcije za inicializacijo Passporta
 // 🚨 POPRAVEK: MORA BITI UVOŽENA PRED KLICEM setupPassport(app)
-// PREDPOSTAVKA POTI: Preverite, ali je pot `./passportConfig` pravilna!
 const setupPassport = require('./passportConfig'); 
 
 // ⭐ KLJUČNO: Uvoz ločene povezave za uporabnike.
-const dbUsers = require('./dbUsers'); // Predvidevamo, da ta poskrbi za svojo povezavo
+const dbUsers = require('./dbUsers'); 
+
+// 🟢 NOVO: Uvoz krmilnika za dostop do funkcije za čiščenje rezervacij
+const restavracijaController = require('./controllers/restavracijaController'); // 🔥 DODANO
 
 // 4️⃣ Inicializacija aplikacije
 const app = express();
@@ -39,10 +41,7 @@ if (!JWT_SECRET_KEY) {
 // ========================================
 // 🔗 NASTAVITEV ABSOLUTNE POTI ZA ISKANJE MODELOV ZA RENDER (OSTANE)
 // ========================================
-// Ker vemo, da je server.js v 'src' in modeli v 'src/models',
-// to je pot, ki nam je pomagala pri prejšnji napaki.
 module.paths.push(path.resolve(__dirname)); 
-// Opomba: Ker smo v passportConfig.js uporabili './models/Uporabnik', tukaj ne potrebujemo več '../'.
 
 // ========================================
 // 🗄️ POVEZAVA Z MONGODB (RESTAVRACIJE) - KRITIČEN KORAK
@@ -57,11 +56,8 @@ mongoose.connect(mongoURIReservations)
   })
   .catch(err => {
     console.error('❌ Napaka pri povezovanju z MongoDB (Restavracije). Kritična napaka:', err);
-    process.exit(1); // Zapusti aplikacijo, če je DB nedostopen
+    process.exit(1); 
   });
-
-// Sekundarna povezava za uporabnike se vzpostavi preko dbUsers.js (predvidevamo, da je znotraj te datoteke)
-// Če dbUsers.js ne izvaža Promise, je to edini način za sinhronizacijo.
 
 // ========================================
 // 🚀 GLAVNA FUNKCIJA ZA ZAGON APLIKACIJE (Kliče se po uspešni povezavi z DB)
@@ -82,7 +78,7 @@ function startApp() {
     })); 
 
     app.use(express.json());
-    app.use(express.urlencoded({ extended: true })); // Dodano za Passport.js
+    app.use(express.urlencoded({ extended: true })); 
     app.use(cookieParser(COOKIE_SECRET));
 
     // Middleware za Session in Passport
@@ -101,39 +97,56 @@ function startApp() {
     app.use(passport.session()); 
     
     // ========================================
-    // 3️⃣ Uvoz in inicializacija routerjev (ZDaj, ko je DB povezana!)
+    // 🔥 NOVO: Klic funkcije za čiščenje preteklih rezervacij ob zagonu
+    // ========================================
+    try {
+        console.log("🛠️ Sprožam čiščenje preteklih, nepotrjenih rezervacij...");
+        restavracijaController.oznaciPretekleRezervacije(); 
+        
+        // 🕒 Opcijsko: Nastavite CRON-like mehanizem za redno čiščenje (npr. vsak dan ob 01:00)
+        // OPOZORILO: Za dolgotrajne projekte je bolje uporabiti namenski CRON job zunaj Express strežnika!
+        // Vendar je ta enostaven način zaenkrat dovolj dober.
+        // setInterval(() => {
+        //     console.log("🕒 Nočno čiščenje preteklih rezervacij...");
+        //     restavracijaController.oznaciPretekleRezervacije(); 
+        // }, 24 * 60 * 60 * 1000); // Vsakih 24 ur (to ni točno, a služi svojemu namenu)
+
+    } catch (e) {
+        console.error("❌ NAPAKA pri inicializaciji čiščenja rezervacij:", e.message);
+    }
+    // ========================================
+    
+    
+    // ========================================
+    // 3️⃣ Uvoz in inicializacija routerjev 
     // ========================================
     let restavracijaRouter;
     let userRoutes;
     let uploadRouter;
-    let offersRouter; // ⭐ NOVO: Deklaracija routerja za ponudbe
+    let offersRouter; 
     let authMiddleware; 
     let preveriGosta; 
     let zahtevajPrijavo; 
 
     try {
-        // Ta koda uporablja modele, zato jo premaknemo sem!
         authMiddleware = require('./middleware/authMiddleware')(JWT_SECRET_KEY);
         preveriGosta = authMiddleware.preveriGosta; 
         zahtevajPrijavo = authMiddleware.zahtevajPrijavo;
 
         // Klic setupPassport
-        setupPassport(app); // Sedaj je funkcija definirana zgoraj!
+        setupPassport(app); 
 
         // Uvoz routerjev, ki uporabljajo Mongoose modele
+        // Uporabimo uvoženi restavracijaController, da se izognemo ponovnemu require() klicu
         restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
         userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
         uploadRouter = require('./routes/uploadRoutes');
         
-        // ⭐ NOVO: Uvoz routerja za ponudbe
-        // Predvidevamo, da je offersRoutes.js v mapi ./routes/
         offersRouter = require('./routes/offersRoutes'); 
 
     } catch (e) {
         console.error("❌ Kritična napaka pri nalaganju routerjev. Preverite poti modelov znotraj routerjev:", e.message);
-        // Tukaj moramo ugotoviti, kateri uvoz je povzročil napako
         console.error("Stack trace:", e.stack);
-        // Aplikacijo lahko pustimo teči, da vidimo, kje drugje so napake, a API poti ne bodo delovale
     }
 
 
@@ -154,7 +167,6 @@ function startApp() {
     }
 
     if (userRoutes) {
-        // TUKAJ SE BO SEDAJ NAŠLA RUTA /api/auth/google
         app.use('/api/auth', userRoutes); 
         console.log("✅ API Pot za Avtentikacijo (/api/auth) je uspešno priključena.");
     }
@@ -183,7 +195,6 @@ function startApp() {
 
     // 🌟 Strežba statičnih datotek (slike, meniji, CSS, JS)
     app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
-    // Pričakujemo, da je mapa 'Public' znotraj 'src' na Renderju, sicer bi morali uporabiti '..'
     app.use(express.static(path.join(__dirname, 'Public'))); 
 
     // 🔹 SPA fallback - postavi ZADNJI, PO API IN STATIČNEM
