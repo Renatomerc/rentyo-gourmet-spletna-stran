@@ -12,6 +12,9 @@ const UporabnikShema = require('../models/Uporabnik');
 const dbUsers = require('../dbUsers');
 const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
 
+// 🚀 KRITIČNI UVOZ: Za dinamično obravnavanje časovnih pasov (letni/zimski čas)
+const moment = require('moment-timezone'); 
+
 
 // Pomožna funkcija: Preveri, ali se dve rezervaciji prekrivata
 const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, obstojeceTrajanje) => {
@@ -759,6 +762,7 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
     }
 };
 
+
 // =================================================================
 // 3. Admin operacije (PUT /admin/posodobi_vsebino/:restavracijaId)
 // =================================================================
@@ -862,22 +866,40 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             return res.status(404).json({ msg: `profile.status_error: Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
         }
         
-        // --- 2. PREVERJANJE ČASA in POSODOBITEV ---
+        // --- 2. PREVERJANJE ČASA in POSODOBITEV (Dinamični Timezone) ---
         
+        // 🚨 NOVO: Določimo časovni pas, ki ustreza lokaciji restavracije (Slovenija)
+        const CILJNI_TZ = 'Europe/Ljubljana'; 
+        
+        // Izračunamo, koliko ur je razlika med UTC in našim ciljnim časovnim pasom za današnji datum
+        // Moment nam pove offset v minutah, mi ga pretvorimo v ure (za CET +1, za CEST +2)
+        const timezoneOffsetMinutes = moment.tz(danes, CILJNI_TZ).utcOffset();
+        const timezoneOffsetHours = timezoneOffsetMinutes / 60; 
+
         for (const rezInfo of rezultatIskanja) {
             
-            // 💡 POPRAVEK: Pretvorba casStart (število) nazaj v format HH:MM
             if (typeof rezInfo.casZacetkaSt === 'undefined' || rezInfo.casZacetkaSt === null) {
                  console.error(`Opozorilo: casZacetkaSt je nedefiniran za rezervacijo ID ${rezInfo.rezervacijaId}`);
-                 continue; // Preskoči to rezervacijo, če čas ni določen
+                 continue; 
             }
-            const casRezervacijeString = `${String(rezInfo.casZacetkaSt).padStart(2, '0')}:00`;
             
-            // Pretvori čas rezervacije (npr. "10:00") v objekt Date
-            const [uraStr, minutaStr] = casRezervacijeString.split(':');
+            // 1. Določimo lokalno uro, ki jo je uporabnik rezerviral (npr. 15:00)
+            const localReservedHour = parseInt(rezInfo.casZacetkaSt);
+            
+            // 2. Izračunamo UTC uro: npr. 15:00 CET (lokalno) = 14:00 UTC
+            // UTC ura = Lokalna ura - offset (za CET: 15 - 1 = 14)
+            const UTCHour = localReservedHour - timezoneOffsetHours;
+            
+            // Pripravimo format za logiranje
+            const casRezervacijeString = `${String(localReservedHour).padStart(2, '0')}:00`; 
+            
+            // 3. Nastavimo čas
             const casZacetkaRezervacije = new Date(danes);
-            casZacetkaRezervacije.setHours(parseInt(uraStr), parseInt(minutaStr), 0, 0);
-
+            
+            // 💥 KLJUČNO: Uporaba setUTCHours (namesto setHours), da se čas rezervacije pravilno postavi
+            // glede na UTC offset strežnika (tako da 14 UTC ustreza 15 lokalno)
+            casZacetkaRezervacije.setUTCHours(UTCHour, 0, 0, 0); 
+            
             // Izračunaj časovno okno za potrditev (10 minut prej, 60 minut kasneje)
             const casZaPotrditevOd = new Date(casZacetkaRezervacije.getTime() - (10 * 60000)); 
             const casZaPotrditevDo = new Date(casZacetkaRezervacije.getTime() + (60 * 60000)); 
@@ -1226,9 +1248,9 @@ exports.isciRestavracije = async (req, res) => {
         // ====================================================================
         let restavracijeZaOdgovor = [];
 
-        if (Array.isArray(rezultatov)) {
+        if (Array.isArray(rezultati)) {
             restavracijeZaOdgovor = rezultati;
-        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultatov).length > 0) {
+        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultati).length > 0) {
             // Če je rezultat en sam objekt in ne array (kar se je dogajalo)
             restavracijeZaOdgovor = [rezultati];
         } else {
@@ -1272,7 +1294,7 @@ exports.oznaciPretekleRezervacije = async () => {
         // --- 1. KORAK: OČISTI VSE REZERVACIJE, KI SO PRETEKLE PRED VČERAJŠNJIM DNEVOM ---
         const rezultatVceraj = await Restavracija.updateMany(
             { 
-                "mize.rezervacije.datum_rezervacije": { $lte: vcerajISO }, // Datum do vključno včeraj
+                "mize.rezervacije.datum": { $lte: vcerajISO }, // Datum do vključno včeraj
                 "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] } // Očisti aktivne in potrjene (ki niso bile zaključene)
             },
             {
@@ -1293,8 +1315,8 @@ exports.oznaciPretekleRezervacije = async () => {
         // ki dela samo za današnji dan, saj se teksti ure pravilno primerjajo.
         const rezultatDanes = await Restavracija.updateMany(
             { 
-                "mize.rezervacije.datum_rezervacije": danesISO, // Samo današnji datum
-                "mize.rezervacije.cas": { $lte: uraMinuteZdaj }, // Čas do 1 uro nazaj
+                "mize.rezervacije.datum": danesISO, // Samo današnji datum
+                "mize.rezervacije.casStart": { $lte: pretekliCas.getHours() } , // Čas do 1 ure nazaj (primerjava cele ure)
                 "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO'] }
             },
             {
