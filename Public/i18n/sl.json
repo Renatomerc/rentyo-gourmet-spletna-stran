@@ -154,6 +154,10 @@
       "qr_reminder": "Ne pozabite ob prihodu skenirajet QR kodo restavracije in pridobite točke in ugodnosti!"
     }
   },
+  "qr_scan": {
+    "title": "Skeniraj qr kodo in potrdi svoj prihod",
+    "subtitle": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste."
+  },
   "footer": {
     "about_company_title": "O Rentyo Gourmet",
     "about_us": "O nas",
@@ -230,10 +234,10 @@
   "registration": {
     "pogoji_strinjanje": "Strinjam se s ",
     "splosni_pogoji_link": "Splošnimi pogoji",
-    "splosni_pogoji_href": "/sl/uvjeti-koristenja.html",
+    "splosni_pogoji_href": "https://www.rentyo.com/sl/uvjeti-koristenja.html",
     "in_politiko": " in ",
     "politika_zasebnosti_link": "Politiko zasebnosti",
-    "politika_zasebnosti_href": "/sl/politika-zasebnosti.html"
+    "politika_zasebnosti_href": "https://www.rentyo.com/sl/politika-zasebnosti.html"
   },
   "cookieConsent": {
     "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analize prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
