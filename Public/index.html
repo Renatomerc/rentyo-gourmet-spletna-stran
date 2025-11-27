@@ -3887,7 +3887,21 @@ function filterAndRenderRestavracije(optionalFilteredList) {
     
     const filtered = listToRender.filter(r => {
         if (currentFilterKuhinja === '') return true; 
-        return r.deviznaKuhinja === currentFilterKuhinja; 
+        
+        // 🔥 KRITIČNI POPRAVEK: Array Filtriranje
+        // Predvidevam, da je polje kuhinje na objektu restavracije 'cuisine' ali 'deviznaKuhinja'.
+        // Uporabimo 'deviznaKuhinja', kot je v originalu, in preverimo Array objektov.
+        const kuhinjeArray = r.deviznaKuhinja;
+        
+        if (Array.isArray(kuhinjeArray)) {
+            // Preoblikujemo Array objektov v Array stringov [ "Mesna", "Ribiška" ]
+            const imenaKuhinj = kuhinjeArray.map(k => k.name_sl); 
+            // Preverimo, ali izbrani filter obstaja v tem seznamu
+            return imenaKuhinj.includes(currentFilterKuhinja);
+        }
+        
+        // Če ni Array ali če polje ne obstaja, ga ne prikažemo.
+        return false; 
     });
 
     mrezaKarticDiv.innerHTML = '';
