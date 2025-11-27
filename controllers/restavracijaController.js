@@ -1196,7 +1196,7 @@ exports.oddajOcenoInKomentar = async (req, res, next) => {
 
 
 // =================================================================
-// 💥 6. FUNKCIJA ZA ISKANJE (KONČNA REŠITEV - Vrnjeno na REGEX in $OR)
+// 💥 6. FUNKCIJA ZA ISKANJE (POPRAVEK ZA SINTAKSO IN CUISINE ARRAY)
 // =================================================================
 
 /**
@@ -1228,24 +1228,16 @@ exports.isciRestavracije = async (req, res) => {
     // 2. Iskanje po kuhinji (Cuisine)
     const kuhinjaTrim = kuhinja ? kuhinja.trim() : '';
     if (kuhinjaTrim !== '') {
-        // 🔥 KRITIČNI POPRAVEK: 
-        // Če je "cuisine" polje objektov (kot v vašem posnetku: cuisine: [{ name_sl: "Mesna" }]), 
-        // uporabite:
-        // iskalniPogoji['cuisine.name_sl'] = kuhinjaTrim;
-        
-        // Če je "cuisine" polje stringov (npr. cuisine: ["Mesna", "Ribja"]), 
-        // uporabite preprosto ujemanje:
-        iskalniPogoji.cuisine = kuhinjaTrim; 
-        
-        // Ta oblika (iskalniPogoji.cuisine = kuhinjaTrim;) deluje tudi kot implicitni $all: [kuhinjaTrim]
-        // za Array polja v MongoDB.
+        // 🔥 KRITIČNI POPRAVEK: Uporabite Dot Notation, če je cuisine Array objektov
+        // (npr. cuisine: [{ name_sl: "Mesna" }])
+        iskalniPogoji['cuisine.name_sl'] = kuhinjaTrim;
     }
     
     // ⚠️ POZOR: POGOJ ZA ŠTEVILO OSEB IN DATUM JE IZKLJUČEN.
     
     try {
         
-        console.log("🔥 MongoDB Iskalni Pogoji (KONČNA REŠITEV):", JSON.stringify(iskalniPogoji));
+        console.log("🔥 MongoDB Iskalni Pogoji (FINAL):", JSON.stringify(iskalniPogoji));
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
@@ -1253,28 +1245,19 @@ exports.isciRestavracije = async (req, res) => {
             .limit(50);
         
         // ====================================================================
-        // ⭐ KLJUČNO: ZAGOTOVITEV, DA JE ODGOVOR VEDNO ARRAY ZA FRONT-END
+        // ⭐ DIAGNOSTIKA in VRAČANJE ODGOVORA (Poenostavljeno)
         // ====================================================================
-        let restavracijeZaOdgovor = [];
+        
+        // Mongoose find() skoraj vedno vrne Array, tudi če je prazen ali vsebuje 1 rezultat.
+        console.log(`✅ Iskanje uspešno: Najdenih restavracij za vrnitev: ${rezultati.length}`);
 
-        if (Array.isArray(rezultati)) {
-            restavracijeZaOdgovor = rezultati;
-        } else if (rezultati && typeof rezultati === 'object' && Object.keys(rezultati).length > 0) {
-            // Če je rezultat en sam objekt in ne array (kar se je dogajalo)
-            restavracijeZaOdgovor = [rezultati];
-        } else {
-            // Ni najdenih rezultatov
-            restavracijeZaOdgovor = [];
-        }
-
-        console.log(`✅ Iskanje uspešno: Najdenih restavracij za vrnitev: ${restavracijeZaOdgovor.length}`);
-
-        // Odgovor v Front-end je VEDNO array (seštevka restavracij ali prazen array)
-        return res.status(200).json(restavracijeZaOdgovor);
+        // Odgovor v Front-end je VEDNO array (rezultatov ali prazen array)
+        // Staro logiko za preverjanje Array.isArray ni več potrebna, saj Mongoose find() to zagotavlja.
+        return res.status(200).json(rezultati);
         
     } catch (error) {
         console.error("❌ Napaka pri iskanju restavracij:", error);
-        res.status(500).json({ msg: "Napaka strežnika pri iskanju.", error: error.message });
+        res.status(500).json({ success: false, msg: "Napaka strežnika pri iskanju.", error: error.message });
     }
 };
 
