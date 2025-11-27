@@ -26,6 +26,22 @@
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
 <style>
+/* =================================================================
+// ⭐ PISAVA 'CREAMCAKE' - OTF format (Brez presledka)
+// ================================================================= */
+@font-face {
+  /* Uporabimo ime brez presledka */
+  font-family: 'CreamCake';
+  
+  /* ⭐ POPRAVEK POTI: Uporabimo relativno pot (odpravi zmedo z absolutno potjo /) ⭐ */
+  src: url('./fonts/Cream Cake.woff2') format('opentype'); 
+  
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; 
+}
+
+    
     /*
      * ========================================================================
      * I. STILI ZA PASICO PIŠKOTKOV (KRITIČNI STILI - NA ZAČETKU)
@@ -2295,14 +2311,115 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 .highlighted-card {
     animation: highlight-flash 1.5s ease-out;
 }
+/* =================================================================
+// ⭐ POSODOBLJEN CSS ZA ANIMIRANI SPLASH SCREEN (CAPACITOR ONLY) ⭐
+// ================================================================= */
+
+/* CONTAINER ZA WEB SPLASH SCREEN */
+#splashScreenWeb {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Barva ozadja je KONSTANTNO turkizna */
+    background-color: #20c0bd; 
+    
+    /* ⭐ KLJUČNO POPRAVLJENO: Privzeto skrij, da se ne prikaže na SPLETNI STRANI ⭐ */
+    display: none !important; 
+    
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* ⭐ FONT SIZE POPRAVEK: Ekstremno zmanjšano na 2.5rem ⭐ */
+    font-size: 3rem; 
+    
+    /* Barva besedila je KONSTANTNO bela */
+    color: white; 
+    overflow: hidden;
+    pointer-events: none;
+    /* Odstranili smo prehod background-color, saj ga ni! */
+    transition: opacity 0.5s ease; 
+    opacity: 1; 
+}
+
+/* ⭐ NOVO: Ta razred doda JavaScript SAMO v mobilni aplikaciji, da ga prikaže ⭐ */
+.show-on-mobile#splashScreenWeb {
+    display: flex !important; 
+}
+
+/* Osnovni stil za vse dele logotipa */
+#splashScreenWeb span {
+    opacity: 0; 
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease; 
+    display: inline-block;
+    
+    color: white !important; 
+    /* ⭐ PISAVA: Uporabljamo CreamCake brez presledka! ⭐ */
+    font-family: 'CreamCake', Arial, sans-serif !important; 
+    font-weight: 500;
+}
 
 
+/* ⭐ POSPEŠITEV ANIMACIJE: Zamiki med črkami so skrajšani na 0.2s ⭐ */
+
+/* Animacija: R (fade-in in premik) - 0.5s */
+.logo-part-1 {
+    animation: fade-in 0.5s ease-out 0.2s forwards;
+}
+
+/* Animacija: e (fade-in in premik) - 0.7s */
+.logo-part-2 {
+    animation: fade-in 0.5s ease-out 0.7s forwards;
+}
+
+/* Animacija: n (fade-in in premik) - 0.9s */
+.logo-part-3 {
+    animation: fade-in 0.5s ease-out 0.9s forwards;
+}
+
+/* Animacija: t (fade-in in premik) - 1.1s */
+.logo-part-4 {
+    animation: fade-in 0.5s ease-out 1.1s forwards;
+}
+
+/* Animacija: y (fade-in in premik) - 1.3s */
+.logo-part-5 {
+    animation: fade-in 0.5s ease-out 1.3s forwards;
+}
+
+/* Animacija: o (fade-in in premik) - 1.5s (Konec pri 1.5s + 0.5s = 2.0s) */
+.logo-part-6 {
+    animation: fade-in 0.5s ease-out 1.5s forwards;
+}
+
+/* Definicija CSS Keyframes */
+@keyframes fade-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =================================================================
+// ⭐ RAZRED ZA PREHOD BARV (ODSTRANJEN) ⭐
+// ================================================================= */
 
   </style>
 </head>
 
 <body>
-
+    
+<div id="splashScreenWeb">
+    <span class="logo-part-1">R</span>
+    <span class="logo-part-2">e</span>
+    <span class="logo-part-3">n</span> 
+    <span class="logo-part-4">t</span> 
+    <span class="logo-part-5">y</span> 
+    <span class="logo-part-6">o</span> 
+</div>
+    
     <header class="glava">
         <div class="logotip">
             <a href="#" id="map-icon-link" class="icon-link">
@@ -2314,7 +2431,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             <div class="map-content">
                 <button id="close-map-btn" class="close-btn">&times;</button>
                 <div id="large-map-container">
-                    <p style="text-align: center; padding-top: 50px;">Tukaj bo velik, interaktiven zemljevid.</p>
+                    <p style="text-align: center; padding-top: 50px;"></p>
                 </div>
             </div>
         </div>
@@ -2918,6 +3035,66 @@ const tabOcene = document.getElementById('tabOcene'); // Element za ocene
 // 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
 const appleLoginBtn = document.getElementById('apple-sign-in-btn');   
+
+
+// =================================================================
+// ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
+// =================================================================
+
+// Opomba: Ker potrebujemo hitrost, bomo del kode izvajali TAKOJ, ne da bi čakali na 'DOMContentLoaded'.
+
+if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    
+    const webSplash = document.getElementById('splashScreenWeb');
+    
+    // ⭐ KLJUČNA SPREMEMBA ZA ODPRAVO BLISKANJA: 
+    // Element prikažemo TAKOJ, ko se skripta izvede (ne čakamo na DOMContentLoaded).
+    if (webSplash) {
+        webSplash.classList.add('show-on-mobile');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // 1. Logika za skritje oglasne sekcije 'akcijeBanner'
+        const akcijeBanner = document.getElementById('akcijeBanner');
+        if (akcijeBanner) {
+            akcijeBanner.remove(); 
+            console.log("Capacitor App: Oglasna sekcija 'akcijeBanner' je uspešno odstranjena.");
+        }
+
+        // ⭐ POPRAVEK ČASOV ZA HITREJŠI START ⭐
+        // Animacija se sedaj konča pri 2.0s (PREDPOSTAVLJA SE HITREJŠI CSS!)
+        const totalAnimationFinishTime = 2000; 
+        const stabilizationTime = 200;   // Standarden čas pred izbleditvijo
+        const safetyMargin = 5000;       // ⭐ POPRAVEK: Ohranjamo varnostno rezervo 5.0 sekund (5000ms) za stabilnost! ⭐
+        
+        // Skupni čas, ko se začne skrivati Native Splash: 2.0s + 5.0s = 7000ms
+        const hideNativeDelay = totalAnimationFinishTime + safetyMargin; // 7000ms
+
+        // 1. KORAK: SPROŽITEV PREHODA BARV JE ODSTRANJENA (saj ni več prehoda)
+
+        // 2. KORAK: SKRIJEMO NATIVE SPLASH SCREEN (po koncu animacije in zamiku)
+        // Pri 7.0s
+        setTimeout(async () => {
+            
+            // ⭐ SKRIJEMO NATIVNI SPLASH ⭐
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+                await window.Capacitor.Plugins.SplashScreen.hide(); 
+            }
+            
+            // 3. KORAK: SKRIJEMO WEB SPLASH SCREEN (izbleditev HTML elementa)
+            // Pri 7.2s (7.0s + 0.2s)
+            setTimeout(() => {
+                 if (webSplash) {
+                    webSplash.style.opacity = '0';
+                    // Odstranimo ga iz DOM-a po zaključku izbleditve (500ms)
+                    setTimeout(() => webSplash.remove(), 500); 
+                }
+            }, stabilizationTime); 
+            
+        }, hideNativeDelay); // 7000ms zamude
+    });
+}
 
 
 // =================================================================

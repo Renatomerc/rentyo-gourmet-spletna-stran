@@ -224,7 +224,8 @@
     "scan_qr_main_text": "Skeniraj qr kodo in potrdi svoj prihod",
     "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste.",
     "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
-    "status_confirmed": "Potrjeno"
+    "status_confirmed": "Potrjeno",
+    "scan_unavailable": "Naloži aplikacijo in pridobi točke in popuste"
   },
   "warning": {
     "title": "Opozorilo",

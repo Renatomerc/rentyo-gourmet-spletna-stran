@@ -1228,7 +1228,17 @@ exports.isciRestavracije = async (req, res) => {
     // 2. Iskanje po kuhinji (Cuisine)
     const kuhinjaTrim = kuhinja ? kuhinja.trim() : '';
     if (kuhinjaTrim !== '') {
-        iskalniPogoji.cuisine = { $in: [kuhinjaTrim] };
+        // 🔥 KRITIČNI POPRAVEK: 
+        // Če je "cuisine" polje objektov (kot v vašem posnetku: cuisine: [{ name_sl: "Mesna" }]), 
+        // uporabite:
+        // iskalniPogoji['cuisine.name_sl'] = kuhinjaTrim;
+        
+        // Če je "cuisine" polje stringov (npr. cuisine: ["Mesna", "Ribja"]), 
+        // uporabite preprosto ujemanje:
+        iskalniPogoji.cuisine = kuhinjaTrim; 
+        
+        // Ta oblika (iskalniPogoji.cuisine = kuhinjaTrim;) deluje tudi kot implicitni $all: [kuhinjaTrim]
+        // za Array polja v MongoDB.
     }
     
     // ⚠️ POZOR: POGOJ ZA ŠTEVILO OSEB IN DATUM JE IZKLJUČEN.
@@ -1239,7 +1249,6 @@ exports.isciRestavracije = async (req, res) => {
 
         // Izvedba poizvedbe
         const rezultati = await Restavracija.find(iskalniPogoji)
-            // 🔥 KRITIČNI POPRAVEK: DODANO POLJE 'komentarji'
             .select('ime name title mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija komentarji') 
             .limit(50);
         

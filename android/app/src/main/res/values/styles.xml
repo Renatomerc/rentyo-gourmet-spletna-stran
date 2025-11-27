@@ -5,7 +5,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
         <item name="android:statusBarColor">@color/turkizna_status_bar</item>
     </style>
 
@@ -15,8 +14,29 @@
         <item name="android:background">@null</item>
     </style>
 
-
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+
+        <item name="android:windowBackground">@color/turkizna_status_bar</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_transparent_splash</item>
+
+        <item name="windowSplashScreenAnimationDuration">10000</item>
+
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+
     </style>
+
+    <style name="Rentyo_DatePickerDialog_Theme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#20c0bd</item>
+        <item name="colorPrimary">#20c0bd</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:datePickerStyle">@style/Rentyo_DatePickerStyle</item>
+    </style>
+
+    <style name="Rentyo_DatePickerStyle" parent="android:Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">#20c0bd</item>
+        <item name="android:colorControlActivated">#20c0bd</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
 </resources>

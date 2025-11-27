@@ -6,24 +6,49 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.getcapacitor.BridgeActivity;
+import androidx.core.splashscreen.SplashScreen;
+import android.graphics.Color;
+import java.util.concurrent.TimeUnit;
 
-// Ta import je KLJUČEN, da Java najde R.color
-// Prepričajte se, da je paket "eu.rentyo.rentyo" pravilen!
+// Uvoz za R.color, ki je ključen za barvo
 import eu.rentyo.rentyo.R;
 
 public class MainActivity extends BridgeActivity {
+    
+    // ⭐ POPRAVEK: Vračamo zadrževanje na 5 sekund (5000ms), da preprečimo bliskanje. ⭐
+    private static final long MINIMUM_SPLASH_TIME = TimeUnit.SECONDS.toMillis(5);
+    private long startTime;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        
+        // KLJUČNO POPRAVLJENO: NAMESTO SAMO INSTALACIJE, UPORABIMO POGOJ ZA ZADRŽANJE 
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        startTime = System.currentTimeMillis();
+        
+        // Native Splash ostane viden, dokler ne poteče MINIMUM_SPLASH_TIME
+        splashScreen.setKeepOnScreenCondition(() -> {
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            // Drži Native Splash, dokler naš čas (5000ms) ni dosežen.
+            return elapsedTime < MINIMUM_SPLASH_TIME; 
+        });
+
         super.onCreate(savedInstanceState);
+
+        // KLJUČNO: NASTAVITEV OZADJA WEBVIEW-JA, DA PREPREČI BELI BLISK 
+        this.getBridge().getWebView().setBackgroundColor(Color.parseColor("#20c0bd"));
 
         final Window window = getWindow();
 
         // KLJUČNO: Barvo pridobimo iz colors.xml/styles.xml
-        // POZOR: Če R.color.turkizna_status_bar ne obstaja, bo prišlo do napake!
         int turkizna_barva = getResources().getColor(R.color.turkizna_status_bar);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11 (R) in novejši
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // Android 11+
+            
+            // ... (Koda za Android 11+ ostane enaka) ...
+
+            // TIPKARSKA NAPAKA (getDecorView) JE POPRAVLJENA
             final int visibility = window.getDecorView().getSystemUiVisibility();
 
             window.getDecorView().setSystemUiVisibility(
@@ -32,7 +57,7 @@ public class MainActivity extends BridgeActivity {
             // Nastavi barvo Status Bar-a neposredno v Native barvo
             window.setStatusBarColor(turkizna_barva);
 
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) { // POPRAVEK JE TUKAJ: VERSION.SDK_INT 
             // Android 5 (Lollipop) do Android 10 (Q)
 
             getWindow().getDecorView().setSystemUiVisibility(
@@ -44,5 +69,10 @@ public class MainActivity extends BridgeActivity {
             // Nastavi barvo Status Bar-a neposredno v Native barvo
             getWindow().setStatusBarColor(turkizna_barva);
         }
+
+        // ***************************************************************
+        // REGISTRACIJA CAPACITOR VTIČNIKA
+        // ***************************************************************
+        registerPlugin(MinimalistDatePickerPlugin.class);
     }
 }
