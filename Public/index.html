@@ -3940,17 +3940,22 @@ function renderFeaturedRestavracije() {
 // 5. Nastavitev Gumbov za Hitro Iskanje Listenerji 
 function setupKuhinjaFiltersListeners() {
     
-    const vsiGumbi = document.querySelectorAll('.gumb-kategorija');
+    // 🔥 Uporabite bolj robusten selektor (poišče elemente z atributom data-kuhinja)
+    const vsiGumbi = document.querySelectorAll('[data-kuhinja]');
+    
+    // Če želite ostati pri razredu: const vsiGumbi = document.querySelectorAll('.gumb-kategorija');
+
     console.log("🔥 Število gumbov za kuhinjo najdenih za pripenjanje listenerjev:", vsiGumbi.length); // DIAGNOSTIKA!
 
     vsiGumbi.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // 🔥 DIAGNOSTIKA: Preverjanje, ali koda sploh pride sem.
+            // DIAGNOSTIKA: Preverjanje, ali koda sploh pride sem.
             console.log("✅ Klik na gumb uspešno zajet. Filter:", btn.getAttribute('data-kuhinja')); 
             
-            document.querySelectorAll('.gumb-kategorija').forEach(b => b.classList.remove('active'));
+            // Če smo uporabili selektor [data-kuhinja], moramo vse gumbe ponovno poiskati za odstranitev razreda 'active'
+            document.querySelectorAll('[data-kuhinja]').forEach(b => b.classList.remove('active'));
             
             const novaKuhinja = btn.getAttribute('data-kuhinja');
             if (currentFilterKuhinja === novaKuhinja) {
