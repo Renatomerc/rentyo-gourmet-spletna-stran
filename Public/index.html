@@ -10,11 +10,16 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   />
+  
   <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    type="text/css"
+    href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css"
   />
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script> 
+  
+  <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@7.2.1/i18nextBrowserLanguageDetector.min.js"></script>
@@ -2405,6 +2410,148 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 /* =================================================================
 // ⭐ RAZRED ZA PREHOD BARV (ODSTRANJEN) ⭐
 // ================================================================= */
+/* =======================================================
+   ★ 1. GLAVNI KOLEDAR
+   ======================================================= */
+.pika-single {
+    width: 260px;                /* POPRAVEK – več prostora, nič več manjšanja */
+    transform: scale(1.20);     /* povečaj ali zmanjša vrednost */
+    transform-origin: top left;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    font-family: var(--font-family);
+}
+
+/* =======================================================
+   ★ 2. GLAVA KOLEDARJA (MESec / LETO)
+   ======================================================= */
+.pika-title {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center;
+    width: 100% !important;
+    padding: 12px 16px !important;
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+}
+
+.pika-label {
+    font-size: 17px !important;
+    font-weight: 600 !important;
+}
+
+/* Puščice */
+.pika-prev,
+.pika-next {
+    color: var(--accent-color);
+    opacity: 0.8;
+    font-size: 18px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.pika-prev:hover,
+.pika-next:hover {
+    opacity: 0.5;
+}
+
+/* =======================================================
+   ★ 3. DNEVI V TEDNU
+   ======================================================= */
+.pika-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+.pika-table thead th {
+    font-size: 12px;
+    color: #333;
+    padding: 8px 0;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* =======================================================
+   ★ 4. CELICE DNEVOV
+   ======================================================= */
+.pika-table th,
+.pika-table td {
+    width: calc(100% / 7) !important;
+    padding: 6px 0 !important;
+    text-align: center !important;
+}
+
+/* =======================================================
+   ★ 5. ŠTEVILKE (DNEVI)
+   ======================================================= */
+.pika-button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    margin: 0 auto !important;
+    font-size: 14px !important;
+    color: #333;
+    background: none !important;
+    border-radius: 50%;
+    transition: 0.15s;
+}
+
+/* =======================================================
+   ★ 6. DANES (rob)
+   ======================================================= */
+.is-today .pika-button {
+    color: #000 !important;
+    font-weight: 700;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    border: 2px solid #333 !important;
+    background: none !important;
+}
+
+/* =======================================================
+   ★ 7. IZBRAN DAN — POLNA TURKIZNA BARVA
+   ======================================================= */
+.is-selected .pika-button {
+    background: #20c0bd !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-weight: 600;
+    border: 2px solid #20c0bd !important;
+}
+
+/* =======================================================
+   ★ 8. HOVER
+   ======================================================= */
+.pika-button:hover {
+    background: #20c0bd !important;
+    color: #fff !important;
+    border-radius: 50%;
+}
+
+/* =======================================================
+   ★ 9. ZUNANJI & DISABLED
+   ======================================================= */
+.is-outside-current-month .pika-button {
+    color: rgba(0,0,0,0.45) !important;
+}
+
+.is-disabled .pika-button {
+    color: #ccc !important;
+    opacity: 0.7;
+}
+
+
 
   </style>
 </head>
@@ -2537,7 +2684,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
           </form>
         </section>
 
-      <section class="hitra-iskanja">
+       <section class="hitra-iskanja">
     <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
     <div class="gumbi-kategorij">
         <a href="#" class="gumb-kategorija" data-kuhinja="Mesna" data-i18n="cuisine.meat">Mesne jedi</a>
@@ -2579,7 +2726,6 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             </div>
         </section>
         
-        <!-- NOV DODATEK: Velika sekcija za izpostavljene akcije -->
         <section class="velika-akcija-slika" id="akcijeBanner">
             
             <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
@@ -2741,29 +2887,21 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
         <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
         <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
         
-        <!-- ============================================= -->
-        <!-- NOV DODATEK: GUMBI ZA SOCIALNO PRIJAVO -->
-        <!-- ============================================= -->
         <div class="social-login-separator">
             <span data-i18n="modal.or_sign_in_with">Ali pa se prijavite z:</span>
         </div>
         
         <div class="social-login-buttons">
-            <!-- GUMB ZA GOOGLE PRIJAVO -->
             <button type="button" class="gumb-prijava-social" id="google-sign-in-btn">
                 <i class="fab fa-google"></i> Google
             </button>
             
-            <!-- GUMB ZA APPLE PRIJAVO (Za iOS je nujen) -->
             <button type="button" class="gumb-prijava-social apple" id="apple-sign-in-btn">
                 <i class="fab fa-apple"></i> Apple
             </button>
             
-            <!-- Opomba: Načeloma bi lahko dodali še Facebook, če želite -->
-        </div>
-        <!-- ============================================= -->
-        
-      </form>
+            </div>
+        </form>
 
       <form class="login-form" id="formRegistracija">
         <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
@@ -2841,20 +2979,16 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
   </div>
 
 <footer class="noga">
-    <!-- GUMB ZA PREKLOP (Vidno samo na mobilnem) -->
     <button id="footerToggleBtn" class="footer-toggle-btn" aria-expanded="false" aria-controls="nogaVsebinaSkrita" aria-label="Prikaži/Skrij vsebino noge">
-        <!-- Ikona treh pikic (SVG) -->
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
     </button>
     
-    <!-- NOVI KONTEJNER: Vsa vsebina, ki se skrije/prikaže ob kliku na gumb -->
     <div id="nogaVsebinaSkrita" class="noga-vsebina-skrita">
         <div class="noga-vsebina">
 
             <div class="noga-sekcija noga-accordion">
                 <h4 class="noga-naslov" data-target="o-rentyo-vsebina" data-i18n="footer.about_company_title">O Rentyo Gourmet</h4>
                 <ul id="o-rentyo-vsebina" class="noga-linki">
-                    <!-- POSODOBLJENO: Uporaba realnih href-ov za navigacijo v istem zavihku -->
                     <li><a href="o-nas.html" data-i18n="footer.about_us" data-i18n-href="footer.about_us_href">O nas</a></li>
                     <li><a href="kontakt.html" data-i18n="footer.contact" data-i18n-href="footer.contact_href">Kontakt</a></li>
                     <li><a href="kariera.html" data-i18n="footer.career" data-i18n-href="footer.career_href">Kariera</a></li>
@@ -2865,7 +2999,6 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             <div class="noga-sekcija noga-accordion">
                 <h4 class="noga-naslov" data-target="pravne-info-vsebina" data-i18n="footer.legal_info_title">Pravne Informacije</h4>
                 <ul id="pravne-info-vsebina" class="noga-linki">
-                    <!-- POSODOBLJENO: Uporaba realnih href-ov -->
                     <li><a href="politika-zasebnosti.html" data-i18n="footer.privacy_policy" data-i18n-href="footer.privacy_policy_href">Politika zasebnosti</a></li>
                     <li><a href="politika-piskotkov.html" data-i18n="footer.cookie_policy" data-i18n-href="footer.cookie_policy_href">Politika Piškotkov</a></li>
                     <li><a href="pogoji-uporabe.html" data-i18n="footer.terms_of_use" data-i18n-href="footer.terms_of_use_href">Pogoji Uporabe</a></li>
@@ -2877,7 +3010,6 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             <div class="noga-sekcija noga-accordion">
                 <h4 class="noga-naslov" data-target="partnerstva-vsebina" data-i18n="footer.partnerships_title">Partnerstva</h4>
                 <ul id="partnerstva-vsebina" class="noga-linki">
-                    <!-- POSODOBLJENO: Uporaba realnih href-ov -->
                     <li><a href="za-partnerje.html" data-i18n="footer.for_partners" data-i18n-href="footer.for_partners_href">Za Partnerje</a></li>
                 </ul>
             </div>
@@ -2885,8 +3017,6 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             <div class="noga-sekcija noga-accordion">
                 <h4 class="noga-naslov" data-target="social-vsebina" data-i18n="footer.connect_title">Poveži se z nami</h4>
                 <ul id="social-vsebina" class="noga-linki">
-                    <!-- Predpostavljamo, da so to zunanje povezave in bi morale odpreti nov zavihek, 
-                         če vodijo na zunanje socialne strani. Lahko dodate target="_blank", če želite, sicer pustimo standardno. -->
                     <li><a href="https://www.facebook.com/people/Rentyo-Gourmet/61581337694663/" target="_blank">Facebook</a></li>
                     <li><a href="https://www.instagram.com/rentyo.gourmet/" target="_blank">Instagram</a></li>
                     <li><a href="https://www.tiktok.com/@rentyo_travel?lang=sl" target="_blank">TikTok</a></li>
@@ -2895,9 +3025,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
                     <li><a href="mailto:info@rentyo.eu">Email</a></li>
                 </ul>
             </div>
-        </div> <!-- Konec .noga-vsebina (navigacijski stolpci) -->
-        
-<div class="noga-dodatno-info" style="text-align: center; font-size: 0.875rem; margin-bottom: 1rem;">
+        </div> <div class="noga-dodatno-info" style="text-align: center; font-size: 0.875rem; margin-bottom: 1rem;">
             
             <p style="margin-bottom: 0.5rem;">
                 <span data-i18n="footer.payment_info_prefix">Varno plačilo, ki ga omogoča</span>
@@ -2958,18 +3086,57 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/sl.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hr.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
   
+  <script src="script.js"></script>
+  
+<script>
+// TUKAJ JE POTREBNO DODATI PIKADAY CDN-JE (TUKAJ SO ŽE PRAVILNO DEFINIRANI SPODAJ, ZATO TA KOMENTAR ODSTRANIM)
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script> 
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+
 <script>
 // =================================================================
 // 0. GLOBALNE INICIALIZACIJE IN OSNOVNE SPREMENLJIVKE
 // =================================================================
+
+// 🚨 KRITIČNO: MANJKAJOČA DEFINICIJA, KI JE POVZROČILA NAPAKO
+const pikadayLangs = {
+    sl: {
+        months        : ['Januar','Februar','Marec','April','Maj','Junij','Julij','Avgust','September','Oktober','November','December'],
+        weekdays      : ['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'],
+        weekdaysShort : ['Ned','Pon','Tor','Sre','Čet','Pet','Sob']
+    },
+    en: {
+        months        : ['January','February','March','April','May','June','July','August','September','October','November','December'],
+        weekdays      : ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+        weekdaysShort : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    },
+    de: {
+        months        : ['Januar','Februar','März','April','Mai','Juni','Juli','Avgust','September','Oktober','November','Dezember'],
+        weekdays      : ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+        weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']
+    },
+    hr: {
+        months        : ['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj','Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'],
+        weekdays      : ['Nedjelja','Ponedjeljak','Utorak','Srijeda','Četvrtak','Petak','Subota'],
+        weekdaysShort : ['Ned','Pon','Uto','Sri','Čet','Pet','Sub']
+    },
+    it: {
+        months        : ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+        weekdays      : ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
+        weekdaysShort : ['Dom','Lun','Mar','Mer','Gio','Ven','Sab']
+    },
+    fr: {
+        months        : ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+        weekdays      : ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+        weekdaysShort : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+    }
+};
 
 // API BASE URL
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
@@ -3037,8 +3204,7 @@ const prosteUreRezultati = document.getElementById('prosteUreRezultati');
 const tabOcene = document.getElementById('tabOcene'); // Element za ocene
 // 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
-const appleLoginBtn = document.getElementById('apple-sign-in-btn');   
-
+const appleLoginBtn = document.getElementById('apple-sign-in-btn');
 
 // =================================================================
 // ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
@@ -3522,24 +3688,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // LOGIKA REZERVACIJSKEGA MODALA (API klic)
     
-    const currentLang = i18next.language; 
-    if (modalDatumInput && typeof flatpickr !== "undefined") {
-        flatpickr(modalDatumInput, {
-            dateFormat: "d.m.Y", 
-            altInput: true,
-            altFormat: "d.m.Y",
-            locale: currentLang, 
-            minDate: "today", 
-            onChange: function(selectedDates, dateStr, instance) {
-                modalDatumInput.setAttribute('data-reserv-datum', dateStr);
-                globalSelectedTime = null; 
-                
-                if(prosteUreRezultati) prosteUreRezultati.innerHTML = 
-                    '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
-                updateContent();
+const currentLang = i18next.language; 
+// Preverimo, ali sta Pikaday in Moment.js na voljo
+if (modalDatumInput && typeof Pikaday !== "undefined" && typeof moment !== "undefined") {
+    
+  // ⭐ KRITIČNA ZAŠČITA ZA ANDROID/CAPACITOR:
+// Takoj odstrani fokus, da prepreči nativno tipkovnico/koledar.
+modalDatumInput.addEventListener('focus', (e) => {
+    e.preventDefault(); 
+    // e.target.blur();  <-- TO ODSTRANITE!
+});
+    
+    // Inicializacija Pikaday
+    const modalPicker = new Pikaday({
+        field: modalDatumInput,
+        // ✅ POPRAVLJENO: Format brez presledkov
+        format: 'DD.MM.YYYY', // Moment.js format
+        minDate: new Date(),
+        i18n: pikadayLangs[currentLang] || pikadayLangs['sl'], // Uporaba lokalizacije
+        onSelect: function(date) {
+            // Uporabite Moment.js za formatiranje datuma v želeni obliki
+            // ✅ POPRAVLJENO: Format brez presledkov
+            const dateStr = moment(date).format('DD.MM.YYYY'); 
+            
+            // Nastavitev vrednosti v input polje
+            modalDatumInput.value = dateStr; 
+            modalDatumInput.setAttribute('data-reserv-datum', dateStr);
+            
+            globalSelectedTime = null; // Ponastavitev časa
+            
+            if(prosteUreRezultati) prosteUreRezultati.innerHTML = 
+                '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+            
+            // Če obstaja, pokliče posodobitev vsebine (npr. i18n prevodi)
+            if (typeof updateContent === 'function') {
+                updateContent(); 
             }
-        });
-    }
+        },
+        bound: true // Koledar ostane znotraj vidnega območja
+    });
+}
 
     if (gumbRezervirajModal) {
         gumbRezervirajModal.onclick = null; 
@@ -4807,16 +4995,35 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         );
     }
+    
+    const datumInput = document.getElementById('datum');
+    const currentLang = i18next.language;
 
-    // ZAGON DATE PICKERJA za iskalnik
-    if(typeof flatpickr !== "undefined") {
-        flatpickr("#datum", {
-          dateFormat: "d. m. Y",
-          minDate: "today",
+    // ZAGON DATE PICKERJA za iskalnik (Pikaday)
+    // Preverimo, ali sta Pikaday in Moment.js na voljo
+    if (datumInput && typeof Pikaday !== "undefined" && typeof moment !== "undefined") {
+        
+// ⭐ KRITIČNA ZAŠČITA ZA ANDROID/CAPACITOR:
+// Prepreči odpiranje nativnega koledarja/tipkovnice
+datumInput.addEventListener('focus', (e) => {
+    e.preventDefault(); 
+    // e.target.blur();  <-- TO ODSTRANITE!
+});
+
+        new Pikaday({
+            field: datumInput,
+            // ✅ POPRAVLJENO: Format brez presledkov
+            format: 'DD.MM.YYYY', // Moment.js format (ustreza "d.m.Y")
+            minDate: new Date(),
+            i18n: pikadayLangs[currentLang] || pikadayLangs['sl'], // Uporaba lokalizacije
+            onSelect: function(date) {
+                // Poskrbimo za pravilen zapis v input polje
+                // ✅ POPRAVLJENO: Format brez presledkov
+                datumInput.value = moment(date).format('DD.MM.YYYY');
+            },
+            bound: true // Koledar ostane znotraj vidnega območja
         });
     }
-    
-    
 // =========================================================
 // X. LOGIKA ZA ZEMLJEVID (MAP MODAL) - VKLJUČENO Z LEAFLETOM!
 // =========================================================
