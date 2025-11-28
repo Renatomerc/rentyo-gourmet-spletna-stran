@@ -3882,42 +3882,47 @@ function renderFeaturedCard(restavracija) {
     return card;
 }
 
-// 3. Filtriranje in Prikaz (PRILJUBLJENO)
+// 3. Filtriranje in Prikaz (KONČNA REŠITEV Z NOVIM POLJEM kuhinja_filtri)
 function filterAndRenderRestavracije(optionalFilteredList) {
     if (!mrezaKarticDiv || !statusKarticeDiv) return;
 
+    // Uporabljamo celoten seznam restavracij naloženih ob zagonu
     const listToRender = optionalFilteredList || allRestavracije;
     
     const filtered = listToRender.filter(r => {
+        // 1. Če filter ni izbran (pogled 'Priljubljeno v bližini'), prikaži vse
         if (currentFilterKuhinja === '') return true; 
         
-        // 🔥 KRITIČNI POPRAVEK: Array Filtriranje
-        // Predvidevam, da je polje kuhinje na objektu restavracije 'cuisine' ali 'deviznaKuhinja'.
-        // Uporabimo 'deviznaKuhinja', kot je v originalu, in preverimo Array objektov.
-        const kuhinjeArray = r.deviznaKuhinja;
-        
-        if (Array.isArray(kuhinjeArray)) {
-            // Preoblikujemo Array objektov v Array stringov [ "Mesna", "Ribiška" ]
-            const imenaKuhinj = kuhinjeArray.map(k => k.name_sl); 
-            // Preverimo, ali izbrani filter obstaja v tem seznamu
-            return imenaKuhinj.includes(currentFilterKuhinja);
+        // 2. Filtriranje z uporabo novega, čistega Array polja iz MongoDB
+        const filtriIzBaze = r.kuhinja_filtri; // ⭐ TO JE KLJUČNA SPREMEMBA ⭐
+
+        // Preverimo, ali je polje Array in ali vsebuje aktivni filter
+        if (Array.isArray(filtriIzBaze)) {
+            // .includes() preveri ujemanje
+            return filtriIzBaze.includes(currentFilterKuhinja);
         }
         
-        // Če ni Array ali če polje ne obstaja, ga ne prikažemo.
+        // Če polje manjka ali ni Array (dokument ni bil posodobljen), ga izloči
         return false; 
     });
 
+    // Prikaz in renderiranje rezultatov
     mrezaKarticDiv.innerHTML = '';
     statusKarticeDiv.textContent = '';
     
+    // Če ni najdenih rezultatov
     if (filtered.length === 0) {
-        statusKarticeDiv.textContent = i18next.t('messages.no_restaurants_found') || 'Ni najdenih restavracij.'; 
+        statusKarticeDiv.textContent = i18next.t('messages.no_restaurants_found') || 'Ni najdenih restavracij.';
+        console.log("Filtriranje uspešno, najdenih 0 restavracij za filter:", currentFilterKuhinja);
         return;
     }
 
     filtered.forEach(restavracija => {
         mrezaKarticDiv.appendChild(renderCard(restavracija));
     });
+    
+    // Potrdimo število najdenih restavracij
+    console.log(`Filtriranje uspešno: Prikazujem ${filtered.length} restavracij za filter: ${currentFilterKuhinja}`);
     
     updateContent(); 
 }
