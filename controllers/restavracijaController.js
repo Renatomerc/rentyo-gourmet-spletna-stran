@@ -1225,12 +1225,12 @@ exports.isciRestavracije = async (req, res) => {
         ];
     }
     
-    // 2. Iskanje po kuhinji (Cuisine)
+   // 2. Iskanje po kuhinji (Cuisine)
     const kuhinjaTrim = kuhinja ? kuhinja.trim() : '';
     if (kuhinjaTrim !== '') {
-        // 🔥 KRITIČNI POPRAVEK: Uporabite Dot Notation, če je cuisine Array objektov
-        // (npr. cuisine: [{ name_sl: "Mesna" }])
-        iskalniPogoji['cuisine.name_sl'] = kuhinjaTrim;
+        // 🔥 KONČNI POPRAVEK: Uporaba novega polja kuhinja_filtri (Array Stringov)
+        // MongoDB išče ta string znotraj Array polja.
+        iskalniPogoji.kuhinja_filtri = kuhinjaTrim;
     }
     
     // ⚠️ POZOR: POGOJ ZA ŠTEVILO OSEB IN DATUM JE IZKLJUČEN.
