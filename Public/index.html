@@ -3939,9 +3939,16 @@ function renderFeaturedRestavracije() {
 
 // 5. Nastavitev Gumbov za Hitro Iskanje Listenerji 
 function setupKuhinjaFiltersListeners() {
-    document.querySelectorAll('.gumb-kategorija').forEach(btn => {
+    
+    const vsiGumbi = document.querySelectorAll('.gumb-kategorija');
+    console.log("🔥 Število gumbov za kuhinjo najdenih za pripenjanje listenerjev:", vsiGumbi.length); // DIAGNOSTIKA!
+
+    vsiGumbi.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+            
+            // 🔥 DIAGNOSTIKA: Preverjanje, ali koda sploh pride sem.
+            console.log("✅ Klik na gumb uspešno zajet. Filter:", btn.getAttribute('data-kuhinja')); 
             
             document.querySelectorAll('.gumb-kategorija').forEach(b => b.classList.remove('active'));
             
