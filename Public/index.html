@@ -3945,40 +3945,55 @@ function renderFeaturedRestavracije() {
     updateContent();
 }
 
-// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji 
+// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji (POPRAVLJENO ZA KLIC API)
 function setupKuhinjaFiltersListeners() {
     
-    // 🔥 Uporabite bolj robusten selektor (poišče elemente z atributom data-kuhinja)
+    // Uporabimo robusten selektor za vse gumbe, ki imajo data-kuhinja atribut
     const vsiGumbi = document.querySelectorAll('[data-kuhinja]');
     
-    // Če želite ostati pri razredu: const vsiGumbi = document.querySelectorAll('.gumb-kategorija');
-
-    console.log("🔥 Število gumbov za kuhinjo najdenih za pripenjanje listenerjev:", vsiGumbi.length); // DIAGNOSTIKA!
+    // LOGIRANJE ZDAJ MORA DELOVATI (če se funkcija izvede)
+    console.log("🔥 Število gumbov za kuhinjo najdenih za pripenjanje listenerjev:", vsiGumbi.length); 
 
     vsiGumbi.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             
             // DIAGNOSTIKA: Preverjanje, ali koda sploh pride sem.
-            console.log("✅ Klik na gumb uspešno zajet. Filter:", btn.getAttribute('data-kuhinja')); 
+            console.log("✅ KLIK GUMBA: Filter:", btn.getAttribute('data-kuhinja')); 
             
-            // Če smo uporabili selektor [data-kuhinja], moramo vse gumbe ponovno poiskati za odstranitev razreda 'active'
+            // Odstrani 'active' razred z vseh gumbov
             document.querySelectorAll('[data-kuhinja]').forEach(b => b.classList.remove('active'));
             
             const novaKuhinja = btn.getAttribute('data-kuhinja');
+            let filterAktiven = false; // Status iskanja
+
+            // Logika za vklop/izklop filtra (Toggle)
             if (currentFilterKuhinja === novaKuhinja) {
+                // Če je filter že enak, ga izklopimo
                 currentFilterKuhinja = ''; 
+                filterAktiven = false;
             } else {
+                // Če je nov filter, ga vklopimo
                 btn.classList.add('active'); 
                 currentFilterKuhinja = novaKuhinja;
+                filterAktiven = true;
             }
             
-            filterAndRenderRestavracije();
+            // ⭐ KLJUČNA SPREMEMBA: Kličemo API za iskanje
+            if (filterAktiven) {
+                // Če je filter vklopljen, iščemo preko API-ja. 
+                // Posredujemo samo kuhinjo, ostali iskalni parametri so prazni/privzeti.
+                // Uporabimo e za reference v handleIskanjeRestavracij.
+                handleIskanjeRestavracij(e, '', '', '', 1, currentFilterKuhinja); 
+            } else {
+                // Če je filter izklopljen, ponovno naložimo privzete restavracije (poln seznam)
+                loadRestavracije();
+            }
         });
     });
 }
 
-// 5.1 LISTENER ZA GLAVNI ISKALNIK (POPRAVLJEN ZA API KLIC)
+// 5.1 LISTENER ZA GLAVNI ISKALNIK (OSTANE NESPREMENJEN)
 if (iskalnik) iskalnik.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -4008,7 +4023,7 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
     
     if (rezultatiContainer) {
         // Prikaz sporočila, da potrdimo, da se klic izvaja
-        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">${i18next.t('messages.searching', { criteria: mesto || '...' })}</div>`;
+        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">${i18next.t('messages.searching', { criteria: mesto || kuhinjaKljuc || '...' })}</div>`;
     }
 
     const datumZaBackend = formatirajDatumZaBackend(datum); 
@@ -4057,7 +4072,7 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
     }
 }
 
-// 6.1 POMOŽNA FUNKCIJA ZA PRIKAZ REZULTATOV ISKANJA
+// 6.1 POMOŽNA FUNKCIJA ZA PRIKAZ REZULTATOV ISKANJA (OSTANE NESPREMENJENA)
 function prikaziRezultate(restavracije) {
     const container = document.getElementById('rezultatiIskanja');
     if (!container) return; 
@@ -4072,7 +4087,7 @@ function prikaziRezultate(restavracije) {
 }
 
 
-// 7. Glavna funkcija za nalaganje (PRAVI API KLIC) 
+// 7. Glavna funkcija za nalaganje (OSTANE NESPREMENJENA)
 async function loadRestavracije() {
     if (!mrezaKarticDiv) return; 
 
