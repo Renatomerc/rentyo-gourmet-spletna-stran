@@ -1,6 +1,6 @@
 // ===============================================
 // 🗄️ RESTAVRACIJA MODEL (Mongoose Shema)
-// POPRAVLJENO: Dodan rezervacijaId v shemo Komentarjev
+// POPRAVLJENO: Dodan opomnikPoslan v shemo Rezervacija
 // ===============================================
 const mongoose = require('mongoose');
 
@@ -23,6 +23,12 @@ const RezervacijaSchema = new mongoose.Schema({
     telefon: String,
     stevilo_oseb: { type: Number, required: true },
     datum: { type: String, required: true },
+
+    // 🔥 NOVO POLJE: Za sledenje, ali je bil opomnik že poslan
+    opomnikPoslan: { 
+        type: Boolean, 
+        default: false 
+    },
 });
 
 // 2. Shema za vdelan dokument Miza

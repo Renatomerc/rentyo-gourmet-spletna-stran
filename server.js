@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 SERVER.JS — Rentyo Gourmet Backend (POPRAVLJENO z Firebase Admin SDK)
+// 🟢 SERVER.JS — Rentyo Gourmet Backend (POPRAVLJENO z Firebase Admin SDK in Schedulerjem)
 // ========================================
 
 // 1️⃣ Uvoz potrebnih modulov
@@ -25,7 +25,10 @@ const setupPassport = require('./passportConfig');
 const dbUsers = require('./dbUsers'); 
 
 // 🟢 NOVO: Uvoz krmilnika za dostop do funkcije za čiščenje rezervacij
-const restavracijaController = require('./controllers/restavracijaController'); // 🔥 DODANO
+const restavracijaController = require('./controllers/restavracijaController'); 
+
+// 🔥 DODANO ZA CRON JOB: Uvoz schedulerja
+const scheduler = require('./cron/scheduler'); 
 
 // 4️⃣ Inicializacija aplikacije
 const app = express();
@@ -41,7 +44,7 @@ if (!JWT_SECRET_KEY) {
 }
 
 // ========================================
-// 🔥 PUSH OBOVESTILA - INITIALIZACIJA FIREBASE ADMIN SDK
+// 🔥 PUSH OBOVESTILA - INITIALIZACIJA FIREBASE ADMIN SDK (Vaša koda, ostane ista)
 // ========================================
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
@@ -128,16 +131,15 @@ function startApp() {
         console.log("🛠️ Sprožam čiščenje preteklih, nepotrjenih rezervacij...");
         restavracijaController.oznaciPretekleRezervacije(); 
         
-        // 🕒 Opcijsko: Nastavite CRON-like mehanizem za redno čiščenje (npr. vsak dan ob 01:00)
-        // OPOZORILO: Za dolgotrajne projekte je bolje uporabiti namenski CRON job zunaj Express strežnika!
-        // Vendar je ta enostaven način zaenkrat dovolj dober.
-        // setInterval(() => {
-        //     console.log("🕒 Nočno čiščenje preteklih rezervacij...");
-        //     restavracijaController.oznaciPretekleRezervacije(); 
-        // }, 24 * 60 * 60 * 1000); // Vsakih 24 ur (to ni točno, a služi svojemu namenu)
-
+        // ⭐ DODANO: Zaganjanje periodičnega CRON SCHEDULERJA
+        if (admin.apps.length > 0) { // Preveri, ali je Firebase Admin SDK inicializiran
+            scheduler.startScheduler();
+        } else {
+            console.warn("⚠️ Cron Scheduler NI zagnan, ker Firebase Admin SDK ni inicializiran.");
+        }
+        
     } catch (e) {
-        console.error("❌ NAPAKA pri inicializaciji čiščenja rezervacij:", e.message);
+        console.error("❌ NAPAKA pri inicializaciji čiščenja rezervacij ali schedulerja:", e.message);
     }
     // ========================================
     

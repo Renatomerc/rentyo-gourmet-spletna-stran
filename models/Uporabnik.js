@@ -1,5 +1,6 @@
 // ========================================
 // 🟢 uporabnik.js — Uporabnik model (Sedaj izvaža samo SHEMO!)
+// POPRAVLJENO: Dodan fcmToken za PUSH obvestila
 // ========================================
 
 const mongoose = require('mongoose');
@@ -22,7 +23,15 @@ const UporabnikShema = new mongoose.Schema({
     tockeZvestobe: {
         type: Number,
         default: 100
-    }
+    },
+
+    // 🔥 NOVO: Polje za shranjevanje Firebase Cloud Messaging (FCM) žetona
+    fcmToken: { 
+        type: String, 
+        default: null, 
+        unique: true, 
+        sparse: true // Omogoča več dokumentov, ki nimajo tokena
+    },
 
 }, { timestamps: true });
 
