@@ -1,3 +1,7 @@
+// ===============================================
+// 🔑 AUTH MIDDLEWARE (JWT in Session podpora)
+// ===============================================
+
 const jwt = require('jsonwebtoken');
 
 // ⭐ Uvozi shemo in sekundarno povezavo
@@ -48,15 +52,35 @@ module.exports = (JWT_SECRET_KEY) => {
      * Vedno kliče 'next()', ne glede na uspeh (uporabnik je bodisi prijavljen ali anonimni gost).
      */
     const preveriGosta = async (req, res, next) => {
+        
+        // 1. 🔥 KRITIČNI POPRAVEK: Najprej preverimo, ali je uporabnik že avtenticiran preko Passport Sessiona.
+        if (req.isAuthenticated && req.isAuthenticated()) {
+            console.log("DEBUG: Uporabnik avtenticiran preko Passport seje (Web). Preskoči JWT preverjanje.");
+            // Passport nastavi req.user, to uporabimo kot vir.
+            req.uporabnik = req.user;
+            req.uporabnik.jePrijavljen = true;
+            // Poskrbimo za konsistentnost (ID namesto _id)
+            if (req.uporabnik._id) {
+                req.uporabnik.id = req.uporabnik._id;
+                delete req.uporabnik._id;
+            }
+            delete req.uporabnik.geslo;
+            return next();
+        }
+        
+        // ----------------------------------------------------
+        // Nadaljevanje z JWT/Cookie logiko (za mobilno aplikacijo)
+        // ----------------------------------------------------
+        
         let token;
         
-        // 1. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA
+        // 2. POSKUSI BRANJE IZ VARNEGA, PODPISANEGA PIŠKOTKA
         if (req.signedCookies && req.signedCookies.auth_token) {
             token = req.signedCookies.auth_token;
             console.log("DEBUG: Žeton najden v signed cookie.");
         }
         
-        // 2. REZERVA: Poskusi branje iz glave Authorization
+        // 3. REZERVA: Poskusi branje iz glave Authorization (za mobilno aplikacijo)
         else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
             console.log("DEBUG: Žeton najden v Authorization glavi.");
@@ -73,7 +97,7 @@ module.exports = (JWT_SECRET_KEY) => {
                 if (!uporabnik) {
                     console.log("DEBUG: Neveljaven žeton: Uporabnik ni najden v DB. Nadaljujem kot anonimni klic.");
                     // V primeru, da je piškotek prisoten, a neveljaven, ga IZBRIŠEMO
-                    res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0) }); 
+                    res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0), signed: true }); 
                     
                     req.uporabnik = preberiAnonimnePodatke(req);
                     return next(); 
@@ -86,7 +110,12 @@ module.exports = (JWT_SECRET_KEY) => {
                 delete req.uporabnik.geslo; 
                 req.uporabnik.id = req.uporabnik._id;
                 
-                console.log(`DEBUG: Uporabnik ${req.uporabnik.email} uspešno avtenticiran.`);
+                console.log(`DEBUG: Uporabnik ${req.uporabnik.email} uspešno avtenticiran (JWT).`);
+                
+                // ⭐ DODATNA KOMPATIBILNOST: Nastavimo tudi req.user, če je Passport v igri.
+                // To prepreči, da bi katera Passport funkcija kasneje sprožila preusmeritev.
+                req.user = req.uporabnik; 
+
                 next();
 
             } catch (error) {
@@ -96,7 +125,7 @@ module.exports = (JWT_SECRET_KEY) => {
                 // Izbrišemo neveljaven piškotek PRED klicem next()
                 res.cookie('auth_token', '', { httpOnly: true, expires: new Date(0), signed: true }); 
 
-                // Nadaljujemo kot anonimni gost (in se izognemo TypeError)
+                // Nadaljujemo kot anonimni gost
                 req.uporabnik = preberiAnonimnePodatke(req);
                 next(); 
             }
