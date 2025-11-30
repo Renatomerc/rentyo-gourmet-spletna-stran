@@ -3099,6 +3099,63 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
+<script> 
+// Import ni več potreben, uporabljamo globalni Capacitor.Plugins.PushNotifications
+const PushNotifications = Capacitor.Plugins.PushNotifications;
+
+const initializePushNotifications = async () => {
+    
+    // DEBUGGING: Preverimo, ali se JS koda sploh izvede!
+    console.error('!!!!!!!!!!!!!!!!!! STARTING PUSH INITIALIZATION JS CODE !!!!!!!!!!!!!!!!!!');
+
+    console.log('Registering for push notifications...');
+
+    // 1. NAJPREJ NASTAVIMO VSE POSLUŠALCE (LISTENERS)
+
+    // 3. Registracija – dobimo FCM TOKEN
+    PushNotifications.addListener('registration', (token) => {
+        // Žeton se še vedno izpiše v Logcatu, kar je koristno za debug, ampak se NE PRIKAŽE kot alert končnemu uporabniku.
+        console.error('*** USPEŠNO PRIDOBLJEN ŽETON! ***', token.value);
+        
+        // Vrstica z alertom je bila odstranjena
+    });
+
+    // 4. Napaka pri registraciji
+    PushNotifications.addListener('registrationError', (err) => {
+        console.error('Error during registration: ', err.error);
+        alert('NAPAKA PRI REGISTRACIJI! ' + JSON.stringify(err));
+    });
+
+    // 5. Prejem obvestila (ko je aplikacija odprta/v ospredju)
+    PushNotifications.addListener('pushNotificationReceived', (notification) => {
+        console.log('Foreground notification:', notification);
+        alert('Novo Obvestilo:\n' + notification.title + '\n' + notification.body);
+    });
+
+    // 6. Klik na obvestilo (ko je aplikacija v ozadju/zapreta)
+    PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+        console.log('Notification action performed:', notification);
+    });
+
+
+    // 2. SEDAJ ZAČNEMO PROCES PRIDOBITVE DOVOLJENJA IN REGISTRACIJE
+    
+    // Zahteva za dovoljenje
+    const permStatus = await PushNotifications.requestPermissions();
+
+    if (permStatus.receive === 'granted') {
+        // Registracija za Push. Listener je že nastavljen!
+        await PushNotifications.register();
+    } else {
+        console.error('Permission not granted for push notifications');
+        return;
+    }
+
+};
+
+// Pravilna inicializacija za Capacitor, ki uporablja dogodek 'load' namesto 'deviceready'
+window.addEventListener('load', initializePushNotifications);
+</script>
 <script>
 // =================================================================
 // 0. GLOBALNE INICIALIZACIJE IN OSNOVNE SPREMENLJIVKE
@@ -3205,6 +3262,9 @@ const tabOcene = document.getElementById('tabOcene'); // Element za ocene
 // 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
 const appleLoginBtn = document.getElementById('apple-sign-in-btn');
+</script>
+
+<script>
 
 // =================================================================
 // ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
@@ -5538,12 +5598,13 @@ function dodajMarkerjeRestavracij(leafletMap) {
         }
     });
 
-    // 3. Prilagoditev pogleda (Zoom & Center)
+// 3. Prilagoditev pogleda (Zoom & Center)
     if (bounds.length > 0) {
         leafletMap.fitBounds(bounds, {
             padding: [0, 0] // 🔥 POPRAVLJENO: Padding nastavljen na 0, da se odstrani beli rob okoli zemljevida
         });
     }
+
 }
 </script>
     <div id="toaster-container">

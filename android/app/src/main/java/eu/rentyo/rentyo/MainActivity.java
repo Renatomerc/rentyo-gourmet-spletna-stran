@@ -9,9 +9,10 @@ import com.getcapacitor.BridgeActivity;
 import androidx.core.splashscreen.SplashScreen;
 import android.graphics.Color;
 import java.util.concurrent.TimeUnit;
-
-// Uvoz za R.color, ki je ključen za barvo
+import android.content.Intent; 
 import eu.rentyo.rentyo.R;
+
+import com.google.firebase.FirebaseApp; // 🔥 DODANO: UVOZ ZA FIREBASE
 
 public class MainActivity extends BridgeActivity {
     
@@ -35,6 +36,11 @@ public class MainActivity extends BridgeActivity {
         });
 
         super.onCreate(savedInstanceState);
+
+        // 🔥 KLJUČNO: ROČNA INICIALIZACIJA FIREBASE
+        if (FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseApp.initializeApp(this);
+        }
 
         // KLJUČNO: NASTAVITEV OZADJA WEBVIEW-JA, DA PREPREČI BELI BLISK 
         this.getBridge().getWebView().setBackgroundColor(Color.parseColor("#20c0bd"));
@@ -74,5 +80,15 @@ public class MainActivity extends BridgeActivity {
         // REGISTRACIJA CAPACITOR VTIČNIKA
         // ***************************************************************
         registerPlugin(MinimalistDatePickerPlugin.class);
+    }
+
+    // 🔥 KLJUČNO POPRAVILO: Dodatek onNewIntent metode za prestrezanje PUSH obvestil
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getExtras() != null) {
+            // Posreduje Intent nazaj v Capacitor, ki ga obdela PushNotifications
+            getBridge().onNewIntent(intent);
+        }
     }
 }

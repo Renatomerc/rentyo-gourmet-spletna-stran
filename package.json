@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "cap-sync": "npx cap sync android && node fix-cap.js"
+  },
   "dependencies": {
     "@capacitor-community/barcode-scanner": "^4.0.1",
     "@capacitor/android": "^7.4.4",
@@ -6,6 +9,7 @@
     "@capacitor/core": "^7.4.4",
     "@capacitor/ios": "^7.4.4",
     "@capacitor/keyboard": "^7.0.3",
+    "@capacitor/push-notifications": "^7.0.3",
     "@capacitor/status-bar": "^7.0.3",
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
     "bcryptjs": "^3.0.2",
@@ -16,6 +20,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
+    "firebase-admin": "^13.6.0",
     "flatpickr": "^4.6.13",
     "i18next": "^25.6.0",
     "i18next-http-backend": "^3.0.2",

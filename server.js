@@ -1,5 +1,5 @@
 // ========================================
-// 🟢 SERVER.JS — Rentyo Gourmet Backend (POPRAVLJENO)
+// 🟢 SERVER.JS — Rentyo Gourmet Backend (POPRAVLJENO z Firebase Admin SDK)
 // ========================================
 
 // 1️⃣ Uvoz potrebnih modulov
@@ -11,12 +11,14 @@ require('dotenv').config();
 const path = require('path');
 const fallback = require('connect-history-api-fallback'); 
 
+// 🔥 DODANO: Uvoz Admin SDK
+const admin = require('firebase-admin'); 
+
 // ⭐ Uvoz Passport.js in Express Session
 const passport = require('passport');
 const session = require('express-session');
 
 // ⭐ KLJUČNO: Uvoz funkcije za inicializacijo Passporta
-// 🚨 POPRAVEK: MORA BITI UVOŽENA PRED KLICEM setupPassport(app)
 const setupPassport = require('./passportConfig'); 
 
 // ⭐ KLJUČNO: Uvoz ločene povezave za uporabnike.
@@ -37,6 +39,29 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'super_session_secret_123';
 if (!JWT_SECRET_KEY) {
     console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni najden. Preverite .env datoteko!");
 }
+
+// ========================================
+// 🔥 PUSH OBOVESTILA - INITIALIZACIJA FIREBASE ADMIN SDK
+// ========================================
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        // Ker Render pošlje JSON kot en dolg tekst, ga moramo parsiati
+        const serviceAccountText = process.env.FIREBASE_SERVICE_ACCOUNT;
+        const serviceAccount = JSON.parse(serviceAccountText);
+
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log('✅ Firebase Admin SDK za PUSH obvestila je uspešno inicializiran.');
+    } catch (e) {
+        console.error('❌ NAPAKA: Inicializacija Firebase Admin SDK ni uspela. Preverite FIREBASE_SERVICE_ACCOUNT JSON format.', e);
+        // OPOZORILO: Ne izključite strežnika, saj to ni kritično za delovanje strani, le za PUSH obvestila
+    }
+} else {
+    console.warn('⚠️ OPOZORILO: FIREBASE_SERVICE_ACCOUNT ni nastavljen. PUSH obvestila ne bodo delovala, dokler ga ne nastavite na Renderju.');
+}
+// ========================================
+
 
 // ========================================
 // 🔗 NASTAVITEV ABSOLUTNE POTI ZA ISKANJE MODELOV ZA RENDER (OSTANE)
