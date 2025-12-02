@@ -1197,3 +1197,4 @@ document.addEventListener('DOMContentLoaded', () => {
         potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
     }
 });
+

@@ -54,6 +54,49 @@ const steviloOsebInput = document.getElementById('stevilo_oseb');
 const kuhinjaInput = document.getElementById('kuhinja');
 
 
+// 🔥 NOVO: Element za prikaz statusa zvestobe
+const loyaltyStatusDiv = document.getElementById('loyalty-status-display');
+
+
+// ----------------------------------------------------
+// ⚙️ LOGIKA ZVESTOBE IN POPUSTOV (DINAMIČNO IZ BAZE)
+// ----------------------------------------------------
+// GLOBALNI PRAGI: Uporabljamo jih SAMO za prikaz uporabnikovega statusa v glavi/sidebaru,
+// ne pa za popust na restavracijski kartici.
+const GLOBAL_LOYALTY_TIERS = [
+    { points: 1000, discount: 10 }, // Globalni prag za izračun statusa v glavi
+    { points: 500, discount: 5 },  
+    { points: 0, discount: 0 }     
+];
+
+let currentUserPoints = 0; // Shranjuje točke, pridobljene iz API-ja
+let currentUserDiscount = 0; // Shranjuje IZRAČUNAN globalni popust (za prikaz v glavi/sidebaru)
+
+/**
+ * Funkcija izračuna popust na podlagi točk zvestobe in pragov restavracije/globalnih pragov.
+ * @param {number} tocke - Trenutno število točk uporabnika.
+ * @param {Array} loyaltyTiers - Nizi popustov, pridobljenih iz restavracije (loyaltyTiers) ali GLOBAL_LOYALTY_TIERS.
+ * @returns {number} Odstotek popusta (npr. 5 ali 10).
+ */
+function calculateDiscount(tocke, loyaltyTiers) {
+    if (!loyaltyTiers || loyaltyTiers.length === 0) {
+        return 0;
+    }
+    
+    // Poskrbimo, da so nizi razvrščeni od največjega praga navzdol
+    const sortedTiers = loyaltyTiers.sort((a, b) => b.points - a.points);
+    
+    for (const tier of sortedTiers) {
+        if (tocke >= tier.points) {
+            // Vrne najvišji popust, ki ga uporabnik doseže
+            return tier.discount; 
+        }
+    }
+    return 0;
+}
+// ----------------------------------------------------
+
+
 // ===============================================
 // II. POMOŽNE FUNKCIJE
 // ===============================================
@@ -155,6 +198,109 @@ function renderReviews(reviews) {
     if (typeof updateContent === 'function') updateContent();
 }
 // -------------------------------------------------------------
+
+
+// -------------------------------------------------------------
+// II-B. LOGIKA AVTENTIKACIJE IN ZVESTOBE
+// -------------------------------------------------------------
+
+// 🔥 NOVO: Pomožna funkcija za preverjanje prijave
+function isUserLoggedIn() {
+    // Predpostavljamo, da je žeton avtentikacije shranjen v localStorage, npr. 'authToken'
+    const token = localStorage.getItem('authToken'); 
+    // Opomba: Bolj robustna preverba bi vključevala preverjanje veljavnosti žetona
+    return !!token; 
+}
+
+
+// 🔥 NOVO: Funkcija za prikaz statusa zvestobe
+function updateLoyaltyDisplay(isLoggedIn) {
+    if (!loyaltyStatusDiv) return;
+
+    if (!isLoggedIn) {
+        // Skrijemo, če uporabnik ni prijavljen
+        loyaltyStatusDiv.style.display = 'none';
+        return;
+    }
+    
+    // Uporabljamo currentUserDiscount, ki je nastavljen na podlagi GLOBAL_LOYALTY_TIERS
+    if (currentUserDiscount > 0) {
+        // Uporabnik ima popust
+        loyaltyStatusDiv.innerHTML = `
+            <div class="loyalty-alert success">
+                🎉 **Čestitke!** Imate ${currentUserPoints} točk zvestobe. 
+                Trenutno imate **${currentUserDiscount}% popusta** v sodelujočih restavracijah.
+            </div>
+        `;
+        loyaltyStatusDiv.style.display = 'block';
+    } else {
+        // Uporabnik je prijavljen, a nima popusta - ga spodbudimo k zbiranju
+        const nextTier = GLOBAL_LOYALTY_TIERS.find(t => t.points > currentUserPoints);
+        
+        let message = `Imate ${currentUserPoints} točk zvestobe.`;
+        if (nextTier) {
+             const neededPoints = nextTier.points - currentUserPoints;
+             message += ` Zberite še ${neededPoints} točk za ${nextTier.discount}% popusta!`;
+        } else if (currentUserPoints >= GLOBAL_LOYALTY_TIERS[0].points) {
+             message = `Imate maksimalno ${currentUserPoints} točk zvestobe!`;
+        }
+
+        loyaltyStatusDiv.innerHTML = `<div class="loyalty-info">${message}</div>`;
+        loyaltyStatusDiv.style.display = 'block';
+    }
+}
+
+
+// 🔥 NOVO: Glavna funkcija za pridobivanje točk
+async function initializeLoyaltyStatus() {
+    const isLoggedIn = isUserLoggedIn();
+
+    if (!isLoggedIn) {
+        currentUserPoints = 0;
+        currentUserDiscount = 0;
+        updateLoyaltyDisplay(false); 
+        return; 
+    }
+    
+    try {
+        // Uporabimo žeton, ki je bil shranjen pri prijavi/registraciji
+        const token = localStorage.getItem('authToken'); 
+        
+        // KLIC ZAŠČITENE RUTE PROFILA
+        const response = await fetch('/api/auth/profil', {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                // To pošlje žeton, ki ga backend uporabi za avtentikacijo
+                'Authorization': `Bearer ${token}` 
+            },
+        }); 
+        
+        if (response.ok) {
+            const result = await response.json();
+            
+            // 🔥 KLJUČNO: Pridobimo točke
+            currentUserPoints = result.uporabnik.tockeZvestobe || 0; 
+            
+            // Uporabi GLOBALNE pragove za določitev currentUserDiscount (za prikaz v glavi)
+            currentUserDiscount = calculateDiscount(currentUserPoints, GLOBAL_LOYALTY_TIERS); 
+            updateLoyaltyDisplay(true); 
+
+        } else if (response.status === 401) {
+             console.warn("Avtentikacija točk ni uspela (žeton verjetno potekel). Prikaz skrit.");
+             updateLoyaltyDisplay(false);
+             // TODO: Počistite žeton, če je potekel in preusmerite
+        } else {
+            console.error("Napaka pri pridobivanju profila:", response.statusText);
+            updateLoyaltyDisplay(true); // Prikazemo info z 0 tockami (ali napako)
+        }
+    } catch (error) {
+        console.error("Kritična napaka pri Fetch klicu za profil:", error);
+        updateLoyaltyDisplay(false);
+    }
+}
+// -------------------------------------------------------------
+
 
 // Funkcija za logiko zavihkov
 modalTabs.forEach(tab => {
@@ -293,7 +439,7 @@ function prikaziPodrobnosti(restavracija) {
     // KRITIČEN POPRAVEK: Uporabimo mapiranje podatkov, da se ključi API-ja ujemajo z renderReviews
     if (tabOcene) {
         // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
-        console.log("Prejeti komentarji iz API-ja (komentarji):", komentarji); 
+        // console.log("Prejeti komentarji iz API-ja (komentarji):", komentarji); 
         // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
 
         const mapiraniKomentarji = komentarji.map(komentar => ({
@@ -305,7 +451,7 @@ function prikaziPodrobnosti(restavracija) {
         }));
         
         // 👇👇👇 DODANO ZA RAZHROŠČEVANJE 👇👇👇
-        console.log("Mapirani komentarji (poslani v renderReviews):", mapiraniKomentarji);
+        // console.log("Mapirani komentarji (poslani v renderReviews):", mapiraniKomentarji);
         // 👆👆👆 DODANO ZA RAZHROŠČEVANJE 👆👆👆
 
         renderReviews(mapiraniKomentarji);
@@ -446,11 +592,32 @@ function renderFeaturedCard(restavracija) {
         slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
     }
     
+    // 🔥 LOGIKA POPUSTA ZA KARTICO: Uporabi dinamične popuste iz restavracije
+    // ----------------------------------------------------------------------
+    // 1. Preberi loyaltyTiers iz objekta restavracije (predpostavljamo, da ga API vrne)
+    // Uporabljamo ključ 'loyaltyTiers', kot ste ga navedli v primeru API-ja
+    const restavracijaLoyaltyTiers = restavracija.loyaltyTiers || []; 
+    
+    // 2. Izračunaj popust na podlagi točk uporabnika (currentUserPoints) in pragov restavracije
+    const effectiveDiscount = calculateDiscount(currentUserPoints, restavracijaLoyaltyTiers);
+    
+    let discountBadgeHTML = '';
+    // Prikaz popusta samo, če je dejanski popust > 0
+    if (effectiveDiscount > 0) {
+        discountBadgeHTML = `
+            <div class="loyalty-badge">
+                -${effectiveDiscount}%
+            </div>
+        `;
+    }
+    // -----------------------------------------------------------------------------
+    
     // Listener za celotno kartico
     card.addEventListener('click', () => poglejDetajle(restavracija._id));
 
     card.innerHTML = `
-        <div class="slika-kartice" style="background-image: url('${slikaUrl}')"></div>
+        <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
+            ${discountBadgeHTML} </div>
         <div class="vsebina-kartice-izpostavljeno">
             <h3>${imeRestavracije}</h3>
         </div>
@@ -706,6 +873,9 @@ function preveriInPrikaziOpozorilo() {
 document.addEventListener('DOMContentLoaded', () => {
     naloziInPrikaziRestavracije();
     preveriInPrikaziOpozorilo();
+    
+    // 🔥 NOVO: Kličemo funkcijo za zvestobo ob nalaganju strani
+    initializeLoyaltyStatus(); 
     
     // 🔥 Listener za Formular Iskanja (Če Formular Obstaja)
     if (searchForm) {

@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="legal.page_title">Informacije & Pravna obvestila</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Osnovni mobilni slog */
+        body {
+            background-color: #ffffff;
+            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Glava (Header) - Fiksno na vrhu */
+        .header-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Stil za 'izgled' gumba za izbiro jezika */
+        .language-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Stil za sam gumb jezika */
+        .language-button {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            /* DODANO: da ne zavzame celotnega prostora elementa in je klik omejen na sam gumb */
+            height: 36px; 
+            box-sizing: border-box;
+        }
+
+        .language-button:hover {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        
+        /* Skrita vsebina (izbira jezikov) */
+        .language-options {
+            display: none;
+            position: absolute;
+            right: 0;
+            margin-top: 0.5rem;
+            min-width: 10rem;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            overflow: hidden;
+        }
+        
+        .language-dropdown.open .language-options {
+            display: block;
+        }
+        
+        .language-option {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .language-option:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .language-option.selected {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        
+        /* Stil za vsebino - pomembno za branje na mobilniku */
+        .main-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding: 1rem 0;
+        }
+        
+        /* Stil za naslove v sekcijah */
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="header-bar p-4">
+        <div class="flex items-center justify-between max-w-lg mx-auto">
+            
+            <a href="index.html" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            
+            <h1 class="text-lg font-bold"><span data-i18n="legal.page_title">Informacije & Pravna obvestila</span></h1>
+            
+            <div class="language-dropdown" id="language-dropdown">
+                <button class="language-button" id="language-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v5.586l-2.293-2.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L11 11.586V6z" clip-rule="evenodd" transform="rotate(270 10 10)"/>
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 5a1 1 0 112 0v2.793l.293-.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L7 7.793V5z" clip-rule="evenodd"/>
+                    </svg>
+                    <span id="current-language">SL</span> 
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                <div class="language-options" id="language-options">
+                    <div class="language-option" data-lang="sl">Slovenščina (SL)</div>
+                    <div class="language-option" data-lang="hr">Hrvatski (HR)</div>
+                    <div class="language-option" data-lang="it">Italiano (IT)</div>
+                    <div class="language-option" data-lang="fr">Français (FR)</div>
+                    <div class="language-option" data-lang="de">Deutsch (DE)</div>
+                    <div class="language-option" data-lang="en">English (EN)</div>
+                    <div class="language-option" data-lang="es">Español (ES)</div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto p-4">
+        
+        <div class="main-content space-y-8">
+            
+            <section id="o-nas">
+                <h2 class="content-title" data-i18n="about.title">O Rentyo Gourmet</h2>
+                
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.subtitle">Rezervacija mize – hitro, enostavno in brez klica.</h3>
+                <p data-i18n="about.content_1">
+                    Rentyo Gourmet je evropska spletna platforma, ki omogoča hitro in zanesljivo rezervacijo miz v izbranih restavracijah. Na enem mestu lahko poiščete restavracije po lokaciji, kuhinji ali datumu ter v nekaj klikih rezervirate svojo mizo.
+                </p>
+                <p class="mt-2" data-i18n="about.content_2">
+                    Naša naloga je, da vam olajšamo izkušnjo rezervacije – brez čakanja na telefonske klice ali nepotrebnih zamud. Mi poskrbimo, da vaša rezervacija varno prispe do restavracije in da ste o njenem statusu obveščeni v realnem času.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.why_title">Zakaj Rentyo Gourmet?</h3>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li data-i18n="about.why_item_1">Preprosta rezervacija 24/7</li>
+                    <li data-i18n="about.why_item_2">Brez dodatnih stroškov za uporabnike</li>
+                    <li data-i18n="about.why_item_3">Zanesljivo potrjevanje rezervacij</li>
+                    <li data-i18n="about.why_item_4">Varna uporaba in zaščita vaših podatkov</li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.team_title">Kdo stoji za Rentyo Gourmet?</h3>
+                <p data-i18n="about.team_content_1">
+                    Rentyo Gourmet razvija in upravlja podjetje Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., s sedežem v Zagrebu, Hrvaška.
+                </p>
+                <p class="mt-2" data-i18n="about.team_content_2">
+                    Naša ekipa verjame, da mora biti rezervacija mize tako enostavna, kot je nakup vozovnice. Delujemo po celotni Evropi in sodelujemo neposredno z restavracijami.
+                </p>
+            </section>
+
+            <section id="zasebnost">
+                <h2 class="content-title" data-i18n="privacy.title">Politika Zasebnosti</h2>
+                <p data-i18n="privacy.intro">
+                    Vaša zasebnost nam veliko pomeni. Rentyo Gourmet, ki ga upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obdeluje osebne podatke uporabnikov v skladu z zakonodajo EU (GDPR) in hrvaškim Zakonom o varstvu osebnih podatkov.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.data_collected_title">Katere podatke zbiramo</h3>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li data-i18n="privacy.data_item_1">Ime in priimek</li>
+                    <li data-i18n="privacy.data_item_2">E-poštni naslov</li>
+                    <li data-i18n="privacy.data_item_3">Datum, ura in število oseb za rezervacijo</li>
+                    <li data-i18n="privacy.data_item_4">Podatki o uporabi spletne strani (prek piškotkov)</li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.why_collected_title">Zakaj jih zbiramo</h3>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li data-i18n="privacy.why_item_1">za potrjevanje in obveščanje o rezervacijah,</li>
+                    <li data-i18n="privacy.why_item_2">za zagotavljanje podpore uporabnikom,</li>
+                    <li data-i18n="privacy.why_item_3">za izboljšanje uporabniške izkušnje,</li>
+                    <li data-i18n="privacy.why_item_4">le ob vašem soglasju: za občasna obvestila o novostih ali promocijah.</li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.sharing_title">Deljenje podatkov</h3>
+                <p data-i18n="privacy.sharing_content_1">
+                    Vaše podatke delimo izključno z restavracijo, pri kateri ste opravili rezervacijo, in le v obsegu, ki je potreben za izvedbo storitve.
+                </p>
+                <p class="mt-2" data-i18n="privacy.sharing_content_2">
+                    Podatki niso prodajani ali deljeni tretjim osebam za oglaševanje.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.retention_title">Hramba podatkov</h3>
+                <p data-i18n="privacy.retention_content">
+                    Podatke hranimo toliko časa, kolikor je potrebno za namen rezervacije in skladno z zakonodajo. Uporabniki lahko kadarkoli zahtevajo izbris svojih podatkov na <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.rights_title">Vaše pravice</h3>
+                <p data-i18n="privacy.rights_content">
+                    Imate pravico do dostopa, popravka, izbrisa in omejitve obdelave osebnih podatkov. Za vse zahteve glede zasebnosti nas kontaktirajte prek <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.
+                </p>
+            </section>
+
+            <section id="pogoji">
+                <h2 class="content-title" data-i18n="terms.title">Pogoji Uporabe</h2>
+                <p data-i18n="terms.intro">
+                    Z uporabo spletne strani Rentyo Gourmet se strinjate s spodnjimi pogoji.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.offer_title">1. Kaj ponujamo</h3>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li data-i18n="terms.offer_item_1">Rentyo Gourmet omogoča uporabnikom brezplačno rezervacijo miz v restavracijah.</li>
+                    <li data-i18n="terms.offer_item_2" class="font-medium">Ne prodajamo hrane, pijače ali drugih gostinskih storitev.</li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.how_it_works_title">2. Kako deluje</h3>
+                <p data-i18n="terms.how_it_works_content_1">
+                    Rezervacija prek platforme pomeni, da ste izrazili interes za določen termin v restavraciji.
+                </p>
+                <p data-i18n="terms.how_it_works_content_2">
+                    Potrditev rezervacije prejmete po e-pošti ali znotraj spletne strani.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.responsibility_title">3. Odgovornost</h3>
+                <p data-i18n="terms.responsibility_content_1">
+                    Rentyo Gourmet ni odgovoren za dejanske storitve, ki jih opravi restavracija (npr. kakovost hrane ali postrežbe).
+                </p>
+                <p data-i18n="terms.responsibility_content_2">
+                    V primeru težav se uporabnik obrne neposredno na restavracijo.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.cancellation_title">4. Odpoved rezervacije</h3>
+                <p data-i18n="terms.cancellation_content_1">
+                    Če želite rezervacijo odpovedati ali spremeniti, to storite prek povezave v potrditvenem e-sporočilu ali jo enostavno prekličete znotraj vašega uporabniškga računa.
+                </p>
+                <p data-i18n="terms.cancellation_content_2">
+                    Restavracija ima lahko svojo politiko odpovedi, ki se prikaže ob rezervaciji.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.fair_use_title">5. Varnost in poštena uporaba</h3>
+                <p data-i18n="terms.fair_use_content_1">
+                    Uporabnik se zavezuje, da bo rezervacije uporabljal pošteno.
+                </p>
+                <p data-i18n="terms.fair_use_content_2">
+                    Zloraba sistema (npr. ponavljajoče se lažne rezervacije) lahko privede do blokade računa.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.law_title">6. Pravo in pristojnost</h3>
+                <p data-i18n="terms.law_content_1">
+                    Za uporabo strani in razreševanje sporov velja hrvaško pravo.
+                </p>
+                <p data-i18n="terms.law_content_2">
+                    Pristojno sodišče je v Zagrebu, Hrvaška.
+                </p>
+            </section>
+
+            <section id="partnerji">
+                <h2 class="content-title" data-i18n="legal_notice.title">Pravno Obvestilo</h2>
+                <p data-i18n="legal_notice.content_1">
+                    Vse informacije na strani Rentyo Gourmet so informativne narave in namenjene uporabnikom, ki želijo opraviti rezervacijo.
+                </p>
+                <p class="mt-2" data-i18n="legal_notice.content_2">
+                    Rentyo Gourmet ne prevzema odgovornosti za napake ali netočnosti v opisu restavracij, ki jih posredujejo sami ponudniki. Uporaba strani je na lastno odgovornost.
+                </p>
+                <p class="mt-2" data-i18n="legal_notice.content_3">
+                    Spletna stran se redno posodablja, vendar Rentyo Gourmet ne jamči za neprekinjeno delovanje ali popolno točnost vseh podatkov.
+                </p>
+            </section>
+
+            <section id="kontakt">
+                <h2 class="content-title" data-i18n="contact.title">Pravne Informacije in Kontakt</h2>
+                
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="contact.company_data_title">Uradni podatki podjetja (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):</h3>
+                <ul class="list-none space-y-1 text-sm">
+                    <li data-i18n="contact.name">Naziv podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</li>
+                    <li data-i18n="contact.address">Sedež: Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
+                    <li data-i18n="contact.vat">Davčna številka (OIB): 85972870674</li>
+                    <li data-i18n="contact.iban">IBAN: LT31 3250 0588 1111 4934 (Revolut)</li>
+                    <li data-i18n="contact.swift">BIC / SWIFT: REVOLT21</li>
+                    <li data-i18n="contact.court">Pristojno sodišče: Zagreb, Hrvaška</li>
+                </ul>
+                <p class="mt-2 text-sm" data-i18n="contact.compliance">
+                    Podjetje deluje v skladu z veljavno hrvaško zakonodajo in evropskimi predpisi, zlasti uredbo (EU) 2016/679 (GDPR). V primeru sporov se uporablja hrvaško pravo, razen če evropska zakonodaja določa drugače.
+                </p>
+                
+                <hr class="my-6 border-gray-200">
+                
+                <h2 class="content-title" data-i18n="partners.title">Platforma za partnerje Rentyo Gourmet</h2>
+                <p data-i18n="partners.intro">
+                    Razvijte svoje poslovanje z optimizacijo rezervacij in zmanjšanjem 'no-show' odsotnosti.
+                </p>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.join_title">1. Pridružite se skupnosti Rentyo Gourmet</h3>
+                <p data-i18n="partners.join_content">
+                    Rentyo Gourmet je premium platforma, namenjena poenostavitvi in digitalizaciji rezervacij v sektorju vrhunske gastronomije. Iščemo partnerje, ki delijo našo vizijo odličnosti.
+                </p>
+                
+                <h4 class="font-medium mt-3" data-i18n="partners.who_can_join_title">Kdo se nam lahko pridruži?</h4>
+                <ul class="list-disc ml-5 space-y-1">
+                    <li data-i18n="partners.who_item_1">Restavracije: Optimizirajte rezervacije in izboljšajte zasedenost miz.</li>
+                    <li data-i18n="partners.who_item_2">Bari in saloni: Učinkovito upravljajte svoje prostore in dogodke.</li>
+                    <li data-i18n="partners.who_item_3">Vinarne in degustacijske sobe: Poenostavite rezervacije za vodene degustacije in dogodke.</li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.advantages_title">2. Zakaj partnerstvo z Rentyo Gourmet?</h3>
+                <h4 class="font-medium mt-3" data-i18n="partners.key_advantages_title">Ključne prednosti partnerstva:</h4>
+                <ul class="list-disc ml-5 space-y-2">
+                    <li data-i18n="partners.advantage_1">Večji doseg do premium strank: Dostop do rastoče baze strank in ljubiteljev gastronomije.</li>
+                    <li data-i18n="partners.advantage_2">Orodja za optimizacijo zasedenosti: Napredna orodja za avtomatizacijo komunikacije.</li>
+                    <li data-i18n="partners.advantage_3">
+                        Varnost rezervacij (kreditna kartica): Kot partner lahko zahtevate podatke o kreditni kartici gosta kot jamstvo. *Opomba: Kartica služi izključno kot garancija v primeru 'no-show' ali odpovedi izven vaših pogojev.*
+                    </li>
+                    <li data-i18n="partners.advantage_4">
+                        Ničelna toleranca za 'No-Show': Uporabnik, ki rezervira dvakrat in rezervacije ne odpove ali se ne pojavi, je po drugem opozorilu trajno odstranjen iz aplikacije.
+                    </li>
+                </ul>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.how_to_start_title">3. Kako začeti (Postopek)</h3>
+                <h4 class="font-medium mt-3" data-i18n="partners.steps_title">Preprosti koraki do uspeha:</h4>
+                <ol class="list-decimal ml-5 space-y-2">
+                    <li data-i18n="partners.step_1">
+                        Registracija in izbira paketa: Registrirajte se na <a href="http://gourmet.rentyo.eu" class="text-blue-600 hover:underline">gourmet.rentyo.eu</a>, izberite paket in dokončajte nakup.
+                    </li>
+                    <li data-i18n="partners.step_2">
+                        Nastavitev profila: V meniju za rezervacije izberite 'Moj profil', kjer naložite podatke, slike, menije, cene in opis za aplikacijo.
+                    </li>
+                    <li data-i18n="partners.step_3">
+                        Zagon: Ko je vaš profil dokončan, začnite prejemati optimizirane in zanesljive rezervacije.
+                    </li>
+                </ol>
+
+                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.contact_title">4. Kontakt za dodatna vprašanja</h3>
+                <ul class="list-none space-y-1 text-sm">
+                    <li data-i18n="partners.contact_email">E-pošta: <a href="mailto:partners@rentyo.eu" class="text-blue-600 hover:underline">partners@rentyo.eu</a></li>
+                    <li data-i18n="partners.contact_phone">Telefon (WhatsApp): +385 98 902 3144</li>
+                    <li data-i18n="partners.contact_address">Sedež podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
+                </ul>
+                
+            </section>
+        </div>
+
+    </main>
+
+    <script>
+        // Objekt, ki vsebuje vse prevode (prevzeto iz prejšnjega odgovora)
+        const i18nData = {
+            sl: {
+                "legal.page_title": "Informacije & Pravna obvestila",
+                "about.title": "O Rentyo Gourmet",
+                "about.subtitle": "Rezervacija mize – hitro, enostavno in brez klica.",
+                "about.content_1": "Rentyo Gourmet je evropska spletna platforma, ki omogoča hitro in zanesljivo rezervacijo miz v izbranih restavracijah. Na enem mestu lahko poiščete restavracije po lokaciji, kuhinji ali datumu ter v nekaj klikih rezervirate svojo mizo.",
+                "about.content_2": "Naša naloga je, da vam olajšamo izkušnjo rezervacije – brez čakanja na telefonske klice ali nepotrebnih zamud. Mi poskrbimo, da vaša rezervacija varno prispe do restavracije in da ste o njenem statusu obveščeni v realnem času.",
+                "about.why_title": "Zakaj Rentyo Gourmet?",
+                "about.why_item_1": "Preprosta rezervacija 24/7",
+                "about.why_item_2": "Brez dodatnih stroškov za uporabnike",
+                "about.why_item_3": "Zanesljivo potrjevanje rezervacij",
+                "about.why_item_4": "Varna uporaba in zaščita vaših podatkov",
+                "about.team_title": "Kdo stoji za Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet razvija in upravlja podjetje Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., s sedežem v Zagrebu, Hrvaška.",
+                "about.team_content_2": "Naša ekipa verjame, da mora biti rezervacija mize tako enostavna, kot je nakup vozovnice. Delujemo po celotni Evropi in sodelujemo neposredno z restavracijami.",
+                
+                "privacy.title": "Politika Zasebnosti",
+                "privacy.intro": "Vaša zasebnost nam veliko pomeni. Rentyo Gourmet, ki ga upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obdeluje osebne podatke uporabnikov v skladu z zakonodajo EU (GDPR) in hrvaškim Zakonom o varstvu osebnih podatkov.",
+                "privacy.data_collected_title": "Katere podatke zbiramo",
+                "privacy.data_item_1": "Ime in priimek",
+                "privacy.data_item_2": "E-poštni naslov",
+                "privacy.data_item_3": "Datum, ura in število oseb za rezervacijo",
+                "privacy.data_item_4": "Podatki o uporabi spletne strani (prek piškotkov)",
+                "privacy.why_collected_title": "Zakaj jih zbiramo",
+                "privacy.why_item_1": "za potrjevanje in obveščanje o rezervacijah,",
+                "privacy.why_item_2": "za zagotavljanje podpore uporabnikom,",
+                "privacy.why_item_3": "za izboljšanje uporabniške izkušnje,",
+                "privacy.why_item_4": "le ob vašem soglasju: za občasna obvestila o novostih ali promocijah.",
+                "privacy.sharing_title": "Deljenje podatkov",
+                "privacy.sharing_content_1": "Vaše podatke delimo izključno z restavracijo, pri kateri ste opravili rezervacijo, in le v obsegu, ki je potreben za izvedbo storitve.",
+                "privacy.sharing_content_2": "Podatki niso prodajani ali deljeni tretjim osebam za oglaševanje.",
+                "privacy.retention_title": "Hramba podatkov",
+                "privacy.retention_content": "Podatke hranimo toliko časa, kolikor je potrebno za namen rezervacije in skladno z zakonodajo. Uporabniki lahko kadarkoli zahtevajo izbris svojih podatkov na <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "Vaše pravice",
+                "privacy.rights_content": "Imate pravico do dostopa, popravka, izbrisa in omejitve obdelave osebnih podatkov. Za vse zahteve glede zasebnosti nas kontaktirajte prek <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Pogoji Uporabe",
+                "terms.intro": "Z uporabo spletne strani Rentyo Gourmet se strinjate s spodnjimi pogoji.",
+                "terms.offer_title": "1. Kaj ponujamo",
+                "terms.offer_item_1": "Rentyo Gourmet omogoča uporabnikom brezplačno rezervacijo miz v restavracijah.",
+                "terms.offer_item_2": "Ne prodajamo hrane, pijače ali drugih gostinskih storitev.",
+                "terms.how_it_works_title": "2. Kako deluje",
+                "terms.how_it_works_content_1": "Rezervacija prek platforme pomeni, da ste izrazili interes za določen termin v restavraciji.",
+                "terms.how_it_works_content_2": "Potrditev rezervacije prejmete po e-pošti ali znotraj spletne strani.",
+                "terms.responsibility_title": "3. Odgovornost",
+                "terms.responsibility_content_1": "Rentyo Gourmet ni odgovoren za dejanske storitve, ki jih opravi restavracija (npr. kakovost hrane ali postrežbe).",
+                "terms.responsibility_content_2": "V primeru težav se uporabnik obrne neposredno na restavracijo.",
+                "terms.cancellation_title": "4. Odpoved rezervacije",
+                "terms.cancellation_content_1": "Če želite rezervacijo odpovedati ali spremeniti, to storite prek povezave v potrditvenem e-sporočilu ali jo enostavno prekličete znotraj vašega uporabniškga računa.",
+                "terms.cancellation_content_2": "Restavracija ima lahko svojo politiko odpovedi, ki se prikaže ob rezervaciji.",
+                "terms.fair_use_title": "5. Varnost in poštena uporaba",
+                "terms.fair_use_content_1": "Uporabnik se zavezuje, da bo rezervacije uporabljal pošteno.",
+                "terms.fair_use_content_2": "Zloraba sistema (npr. ponavljajoče se lažne rezervacije) lahko privede do blokade računa.",
+                "terms.law_title": "6. Pravo in pristojnost",
+                "terms.law_content_1": "Za uporabo strani in razreševanje sporov velja hrvaško pravo.",
+                "terms.law_content_2": "Pristojno sodišče je v Zagrebu, Hrvaška.",
+                
+                "legal_notice.title": "Pravno Obvestilo",
+                "legal_notice.content_1": "Vse informacije na strani Rentyo Gourmet so informativne narave in namenjene uporabnikom, ki želijo opraviti rezervacijo.",
+                "legal_notice.content_2": "Rentyo Gourmet ne prevzema odgovornosti za napake ali netočnosti v opisu restavracij, ki jih posredujejo sami ponudniki. Uporaba strani je na lastno odgovornost.",
+                "legal_notice.content_3": "Spletna stran se redno posodablja, vendar Rentyo Gourmet ne jamči za neprekinjeno delovanje ali popolno točnost vseh podatkov.",
+                
+                "contact.title": "Pravne Informacije in Kontakt",
+                "contact.company_data_title": "Uradni podatki podjetja (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Naziv podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Sedež: Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška",
+                "contact.vat": "Davčna številka (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Pristojno sodišče: Zagreb, Hrvaška",
+                "contact.compliance": "Podjetje deluje v skladu z veljavno hrvaško zakonodajo in evropskimi predpisi, zlasti uredbo (EU) 2016/679 (GDPR). V primeru sporov se uporablja hrvaško pravo, razen če evropska zakonodaja določa drugače.",
+                
+                "partners.title": "Platforma za partnerje Rentyo Gourmet",
+                "partners.intro": "Razvijte svoje poslovanje z optimizacijo rezervacij in zmanjšanjem 'no-show' odsotnosti.",
+                "partners.join_title": "1. Pridružite se skupnosti Rentyo Gourmet",
+                "partners.join_content": "Rentyo Gourmet je premium platforma, namenjena poenostavitvi in digitalizaciji rezervacij v sektorju vrhunske gastronomije. Iščemo partnerje, ki delijo našo vizijo odličnosti.",
+                "partners.who_can_join_title": "Kdo se nam lahko pridruži?",
+                "partners.who_item_1": "Restavracije: Optimizirajte rezervacije in izboljšajte zasedenost miz.",
+                "partners.who_item_2": "Bari in saloni: Učinkovito upravljajte svoje prostore in dogodke.",
+                "partners.who_item_3": "Vinarne in degustacijske sobe: Poenostavite rezervacije za vodene degustacije in dogodke.",
+                "partners.advantages_title": "2. Zakaj partnerstvo z Rentyo Gourmet?",
+                "partners.key_advantages_title": "Ključne prednosti partnerstva:",
+                "partners.advantage_1": "Večji doseg do premium strank: Dostop do rastoče baze strank in ljubiteljev gastronomije.",
+                "partners.advantage_2": "Orodja za optimizacijo zasedenosti: Napredna orodja za avtomatizacijo komunikacije.",
+                "partners.advantage_3": "Varnost rezervacij (kreditna kartica): Kot partner lahko zahtevate podatke o kreditni kartici gosta kot jamstvo. *Opomba: Kartica služi izključno kot garancija v primeru 'no-show' ali odpovedi izven vaših pogojev.*",
+                "partners.advantage_4": "Ničelna toleranca za 'No-Show': Uporabnik, ki rezervira dvakrat in rezervacije ne odpove ali se ne pojavi, je po drugem opozorilu trajno odstranjen iz aplikacije.",
+                "partners.how_to_start_title": "3. Kako začeti (Postopek)",
+                "partners.steps_title": "Preprosti koraki do uspeha:",
+                "partners.step_1": "Registracija in izbira paketa: Registrirajte se na <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, izberite paket in dokončajte nakup.",
+                "partners.step_2": "Nastavitev profila: V meniju za rezervacije izberite 'Moj profil', kjer naložite podatke, slike, menije, cene in opis za aplikacijo.",
+                "partners.step_3": "Zagon: Ko je vaš profil dokončan, začnite prejemati optimizirane in zanesljive rezervacije.",
+                "partners.contact_title": "4. Kontakt za dodatna vprašanja",
+                "partners.contact_email": "E-pošta: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Telefon (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Sedež podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška",
+            },
+            hr: {
+                "legal.page_title": "Informacije & Pravne obavijesti",
+                "about.title": "O Rentyo Gourmet",
+                "about.subtitle": "Rezervacija stola – brzo, jednostavno i bez poziva.",
+                "about.content_1": "Rentyo Gourmet je europska internetska platforma koja omogućuje brzu i pouzdanu rezervaciju stolova u odabranim restoranima. Na jednom mjestu možete pretraživati restorane prema lokaciji, kuhinji ili datumu te rezervirati svoj stol u nekoliko klikova.",
+                "about.content_2": "Naš zadatak je olakšati vam iskustvo rezervacije – bez čekanja telefonskih poziva ili nepotrebnih odgoda. Mi osiguravamo da vaša rezervacija sigurno stigne do restorana te da ste o njenom statusu obaviješteni u stvarnom vremenu.",
+                "about.why_title": "Zašto Rentyo Gourmet?",
+                "about.why_item_1": "Jednostavna rezervacija 24/7",
+                "about.why_item_2": "Bez dodatnih troškova za korisnike",
+                "about.why_item_3": "Pouzdana potvrda rezervacija",
+                "about.why_item_4": "Sigurna upotreba i zaštita vaših podataka",
+                "about.team_title": "Tko stoji iza Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet razvija i upravlja tvrtka Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., sa sjedištem u Zagrebu, Hrvatska.",
+                "about.team_content_2": "Naš tim vjeruje da rezervacija stola mora biti jednako jednostavna kao kupnja karte. Djelujemo diljem Europe i surađujemo izravno s restoranima.",
+                
+                "privacy.title": "Politika Privatnosti",
+                "privacy.intro": "Vaša privatnost nam je od velike važnosti. Rentyo Gourmet, kojim upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obrađuje osobne podatke korisnika u skladu sa zakonodavstvom EU (GDPR) i hrvatskim Zakonom o zaštiti osobnih podataka.",
+                "privacy.data_collected_title": "Koje podatke prikupljamo",
+                "privacy.data_item_1": "Ime i prezime",
+                "privacy.data_item_2": "E-mail adresa",
+                "privacy.data_item_3": "Datum, vrijeme i broj osoba za rezervaciju",
+                "privacy.data_item_4": "Podaci o korištenju web stranice (putem kolačića)",
+                "privacy.why_collected_title": "Zašto ih prikupljamo",
+                "privacy.why_item_1": "za potvrđivanje i obavještavanje o rezervacijama,",
+                "privacy.why_item_2": "za pružanje korisničke podrške,",
+                "privacy.why_item_3": "za poboljšanje korisničkog iskustva,",
+                "privacy.why_item_4": "samo uz vaš pristanak: za povremene obavijesti o novostima ili promocijama.",
+                "privacy.sharing_title": "Dijeljenje podataka",
+                "privacy.sharing_content_1": "Vaše podatke dijelimo isključivo s restoranom kod kojeg ste izvršili rezervaciju, i to samo u opsegu potrebnom za izvršenje usluge.",
+                "privacy.sharing_content_2": "Podaci se ne prodaju niti dijele trećim osobama u svrhu oglašavanja.",
+                "privacy.retention_title": "Pohrana podataka",
+                "privacy.retention_content": "Podatke pohranjujemo onoliko dugo koliko je potrebno za svrhu rezervacije i sukladno zakonu. Korisnici u bilo kojem trenutku mogu zatražiti brisanje svojih podataka na <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "Vaša prava",
+                "privacy.rights_content": "Imate pravo na pristup, ispravak, brisanje i ograničenje obrade osobnih podataka. Za sve zahtjeve vezane uz privatnost, kontaktirajte nas putem <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Uvjeti Korištenja",
+                "terms.intro": "Korištenjem web stranice Rentyo Gourmet prihvaćate sljedeće uvjete.",
+                "terms.offer_title": "1. Što nudimo",
+                "terms.offer_item_1": "Rentyo Gourmet korisnicima omogućuje besplatnu rezervaciju stolova u restoranima.",
+                "terms.offer_item_2": "Ne prodajemo hranu, piće ili druge ugostiteljske usluge.",
+                "terms.how_it_works_title": "2. Kako funkcionira",
+                "terms.how_it_works_content_1": "Rezervacija putem platforme znači da ste izrazili interes za određeni termin u restoranu.",
+                "terms.how_it_works_content_2": "Potvrdu rezervacije primit ćete e-mailom ili unutar web stranice.",
+                "terms.responsibility_title": "3. Odgovornost",
+                "terms.responsibility_content_1": "Rentyo Gourmet nije odgovoran za stvarne usluge koje pruža restoran (npr. kvaliteta hrane ili posluživanje).",
+                "terms.responsibility_content_2": "U slučaju problema, korisnik se obraća izravno restoranu.",
+                "terms.cancellation_title": "4. Otkazivanje rezervacije",
+                "terms.cancellation_content_1": "Ako želite otkazati ili promijeniti rezervaciju, to možete učiniti putem poveznice u potvrdnoj e-poruci ili je jednostavno otkazati unutar svog korisničkog računa.",
+                "terms.cancellation_content_2": "Restoran može imati vlastitu politiku otkazivanja, koja se prikazuje prilikom rezervacije.",
+                "terms.fair_use_title": "5. Sigurnost i pošteno korištenje",
+                "terms.fair_use_content_1": "Korisnik se obvezuje da će rezervacije koristiti pošteno.",
+                "terms.fair_use_content_2": "Zloupotreba sustava (npr. ponovljene lažne rezervacije) može dovesti do blokade računa.",
+                "terms.law_title": "6. Pravo i nadležnost",
+                "terms.law_content_1": "Za korištenje stranice i rješavanje sporova primjenjuje se hrvatsko pravo.",
+                "terms.law_content_2": "Nadležni sud je u Zagrebu, Hrvatska.",
+                
+                "legal_notice.title": "Pravna Obavijest",
+                "legal_notice.content_1": "Sve informacije na web stranici Rentyo Gourmet su informativne prirode i namijenjene korisnicima koji žele izvršiti rezervaciju.",
+                "legal_notice.content_2": "Rentyo Gourmet ne preuzima odgovornost za pogreške ili netočnosti u opisu restorana koje dostavljaju sami pružatelji. Korištenje stranice je na vlastitu odgovornost.",
+                "legal_notice.content_3": "Web stranica se redovito ažurira, ali Rentyo Gourmet ne jamči za neprekidan rad ili potpunu točnost svih podataka.",
+                
+                "contact.title": "Pravne Informacije i Kontakt",
+                "contact.company_data_title": "Službeni podaci tvrtke (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Naziv tvrtke: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Sjedište: Ulica grada Vukovara 271, 10000 Zagreb, Hrvatska",
+                "contact.vat": "Porezni broj (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Nadležni sud: Zagreb, Hrvatska",
+                "contact.compliance": "Tvrtka posluje u skladu s važećim hrvatskim zakonodavstvom i europskim propisima, posebno Uredbom (EU) 2016/679 (GDPR). U slučaju sporova primjenjuje se hrvatsko pravo, osim ako europsko zakonodavstvo ne nalaže drugačije.",
+                
+                "partners.title": "Platforma za partnere Rentyo Gourmet",
+                "partners.intro": "Razvijte svoje poslovanje optimizacijom rezervacija i smanjenjem 'no-show' odsutnosti.",
+                "partners.join_title": "1. Pridružite se zajednici Rentyo Gourmet",
+                "partners.join_content": "Rentyo Gourmet je premium platforma namijenjena pojednostavljenju i digitalizaciji rezervacija u sektoru vrhunske gastronomije. Tražimo partnere koji dijele našu viziju izvrsnosti.",
+                "partners.who_can_join_title": "Tko nam se može pridružiti?",
+                "partners.who_item_1": "Restorani: Optimizirajte rezervacije i poboljšajte popunjenost stolova.",
+                "partners.who_item_2": "Barovi i saloni: Učinkovito upravljajte svojim prostorima i događajima.",
+                "partners.who_item_3": "Vinarije i degustacijske sobe: Pojednostavite rezervacije za vođene degustacije i događaje.",
+                "partners.advantages_title": "2. Zašto partnerstvo s Rentyo Gourmet?",
+                "partners.key_advantages_title": "Ključne prednosti partnerstva:",
+                "partners.advantage_1": "Veći doseg do premium klijenata: Pristup rastućoj bazi klijenata i ljubitelja gastronomije.",
+                "partners.advantage_2": "Alati za optimizaciju popunjenosti: Napredni alati za automatizaciju komunikacije.",
+                "partners.advantage_3": "Sigurnost rezervacija (kreditna kartica): Kao partner možete zahtijevati podatke o kreditnoj kartici gosta kao jamstvo. *Napomena: Kartica služi isključivo kao garancija u slučaju 'no-show' ili otkazivanja izvan vaših uvjeta.*",
+                "partners.advantage_4": "Nulta tolerancija za 'No-Show': Korisnik koji rezervira dva puta i rezervaciju ne otkaže ili se ne pojavi, trajno se uklanja iz aplikacije nakon drugog upozorenja.",
+                "partners.how_to_start_title": "3. Kako započeti (Postupak)",
+                "partners.steps_title": "Jednostavni koraci do uspjeha:",
+                "partners.step_1": "Registracija i odabir paketa: Registrirajte se na <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, odaberite paket i dovršite kupnju.",
+                "partners.step_2": "Postavljanje profila: U izborniku za rezervacije odaberite 'Moj profil' gdje prenosite svoje podatke, slike, jelovnike, cijene i opis za aplikaciju.",
+                "partners.step_3": "Pokretanje: Kada je vaš profil dovršen, počnite primati optimizirane i pouzdane rezervacije.",
+                "partners.contact_title": "4. Kontakt za dodatna pitanja",
+                "partners.contact_email": "E-mail: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Telefon (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Sjedište tvrtke: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvatska",
+            },
+            it: {
+                "legal.page_title": "Informazioni & Note legali",
+                "about.title": "Informazioni su Rentyo Gourmet",
+                "about.subtitle": "Prenotazione del tavolo – veloce, semplice e senza chiamata.",
+                "about.content_1": "Rentyo Gourmet è una piattaforma online europea che consente la prenotazione rapida e affidabile dei tavoli in ristoranti selezionati. In un unico luogo è possibile cercare ristoranti per località, cucina o data e prenotare il proprio tavolo in pochi clic.",
+                "about.content_2": "Il nostro compito è semplificare la vostra esperienza di prenotazione – senza attese al telefono o ritardi inutili. Ci assicuriamo che la vostra prenotazione arrivi in modo sicuro al ristorante e che siate informati in tempo reale sul suo stato.",
+                "about.why_title": "Perché Rentyo Gourmet?",
+                "about.why_item_1": "Prenotazione semplice 24/7",
+                "about.why_item_2": "Nessun costo aggiuntivo per gli utenti",
+                "about.why_item_3": "Conferma affidabile delle prenotazioni",
+                "about.why_item_4": "Uso sicuro e protezione dei vostri dati",
+                "about.team_title": "Chi c'è dietro Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet è sviluppato e gestito dalla società Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., con sede a Zagabria, Croazia.",
+                "about.team_content_2": "Il nostro team crede che la prenotazione di un tavolo debba essere semplice come l'acquisto di un biglietto. Operiamo in tutta Europa e collaboriamo direttamente con i ristoranti.",
+                
+                "privacy.title": "Informativa sulla Privacy",
+                "privacy.intro": "La vostra privacy è molto importante per noi. Rentyo Gourmet, gestita da Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., elabora i dati personali degli utenti in conformità con la legislazione UE (GDPR) e la Legge croata sulla protezione dei dati personali.",
+                "privacy.data_collected_title": "Quali dati raccogliamo",
+                "privacy.data_item_1": "Nome e cognome",
+                "privacy.data_item_2": "Indirizzo e-mail",
+                "privacy.data_item_3": "Data, ora e numero di persone per la prenotazione",
+                "privacy.data_item_4": "Dati sull'utilizzo del sito web (tramite cookie)",
+                "privacy.why_collected_title": "Perché li raccogliamo",
+                "privacy.why_item_1": "per la conferma e l'informazione sulle prenotazioni,",
+                "privacy.why_item_2": "per fornire supporto agli utenti,",
+                "privacy.why_item_3": "per migliorare l'esperienza utente,",
+                "privacy.why_item_4": "solo con il vostro consenso: per notifiche occasionali su novità o promozioni.",
+                "privacy.sharing_title": "Condivisione dei dati",
+                "privacy.sharing_content_1": "Condividiamo i vostri dati esclusivamente con il ristorante presso il quale avete effettuato la prenotazione, e solo nella misura necessaria per l'esecuzione del servizio.",
+                "privacy.sharing_content_2": "I dati non vengono venduti o condivisi con terze parti per scopi pubblicitari.",
+                "privacy.retention_title": "Conservazione dei dati",
+                "privacy.retention_content": "Conserviamo i dati per il tempo necessario allo scopo della prenotazione e in conformità con la legge. Gli utenti possono richiedere la cancellazione dei propri dati in qualsiasi momento all'indirizzo <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "I vostri diritti",
+                "privacy.rights_content": "Avete il diritto di accesso, rettifica, cancellazione e limitazione del trattamento dei dati personali. Per tutte le richieste relative alla privacy, contattateci tramite <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Termini di Utilizzo",
+                "terms.intro": "Utilizzando il sito web Rentyo Gourmet, accettate i seguenti termini.",
+                "terms.offer_title": "1. Cosa offriamo",
+                "terms.offer_item_1": "Rentyo Gourmet consente agli utenti di prenotare gratuitamente tavoli nei ristoranti.",
+                "terms.offer_item_2": "Non vendiamo cibo, bevande o altri servizi di ristorazione.",
+                "terms.how_it_works_title": "2. Come funziona",
+                "terms.how_it_works_content_1": "La prenotazione tramite la piattaforma significa che avete espresso interesse per una specifica data e ora presso il ristorante.",
+                "terms.how_it_works_content_2": "Riceverete la conferma della prenotazione via e-mail o all'interno del sito web.",
+                "terms.responsibility_title": "3. Responsabilità",
+                "terms.responsibility_content_1": "Rentyo Gourmet non è responsabile per i servizi effettivi forniti dal ristorante (ad esempio, la qualità del cibo o del servizio).",
+                "terms.responsibility_content_2": "In caso di problemi, l'utente si rivolge direttamente al ristorante.",
+                "terms.cancellation_title": "4. Annullamento della prenotazione",
+                "terms.cancellation_content_1": "Se desiderate annullare o modificare una prenotazione, potete farlo tramite il link nell'e-mail di conferma o semplicemente annullarla all'interno del vostro account utente.",
+                "terms.cancellation_content_2": "Il ristorante può avere una propria politica di cancellazione, che viene mostrata al momento della prenotazione.",
+                "terms.fair_use_title": "5. Sicurezza e uso corretto",
+                "terms.fair_use_content_1": "L'utente si impegna a utilizzare le prenotazioni in modo corretto.",
+                "terms.fair_use_content_2": "L'abuso del sistema (ad esempio, prenotazioni false ripetute) può portare al blocco dell'account.",
+                "terms.law_title": "6. Legge e giurisdizione",
+                "terms.law_content_1": "Per l'uso del sito e la risoluzione delle controversie si applica la legge croata.",
+                "terms.law_content_2": "Il tribunale competente è a Zagabria, Croazia.",
+                
+                "legal_notice.title": "Nota Legale",
+                "legal_notice.content_1": "Tutte le informazioni sul sito web Rentyo Gourmet sono di natura informativa e destinate agli utenti che desiderano effettuare una prenotazione.",
+                "legal_notice.content_2": "Rentyo Gourmet non si assume alcuna responsabilità per errori o imprecisioni nella descrizione dei ristoranti forniti dai gestori stessi. L'uso del sito è a proprio rischio.",
+                "legal_notice.content_3": "Il sito web viene regolarmente aggiornato, ma Rentyo Gourmet non garantisce il funzionamento ininterrotto o la completa accuratezza di tutti i dati.",
+                
+                "contact.title": "Informazioni Legali e Contatti",
+                "contact.company_data_title": "Dati ufficiali dell'azienda (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Nome della società: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Sede: Ulica grada Vukovara 271, 10000 Zagabria, Croazia",
+                "contact.vat": "Codice fiscale (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Foro competente: Zagabria, Croazia",
+                "contact.compliance": "L'azienda opera in conformità con la legislazione croata vigente e i regolamenti europei, in particolare il regolamento (UE) 2016/679 (GDPR). In caso di controversie si applica la legge croata, salvo diversa disposizione della legislazione europea.",
+                
+                "partners.title": "Piattaforma per i partner Rentyo Gourmet",
+                "partners.intro": "Sviluppate la vostra attività ottimizzando le prenotazioni e riducendo l'assenza 'no-show'.",
+                "partners.join_title": "1. Unitevi alla comunità Rentyo Gourmet",
+                "partners.join_content": "Rentyo Gourmet è una piattaforma premium dedicata a semplificare e digitalizzare le prenotazioni nel settore dell'alta gastronomia. Cerchiamo partner che condividano la nostra visione di eccellenza.",
+                "partners.who_can_join_title": "Chi può unirsi a noi?",
+                "partners.who_item_1": "Ristoranti: Ottimizzate le prenotazioni e migliorate l'occupazione dei tavoli.",
+                "partners.who_item_2": "Bar e Lounge: Gestite in modo efficiente i vostri spazi ed eventi.",
+                "partners.who_item_3": "Cantine e sale degustazione: Semplificate le prenotazioni per degustazioni guidate ed eventi.",
+                "partners.advantages_title": "2. Perché la partnership con Rentyo Gourmet?",
+                "partners.key_advantages_title": "Vantaggi chiave della partnership:",
+                "partners.advantage_1": "Maggiore portata a clienti premium: Accesso a una base crescente di clienti e amanti della gastronomia.",
+                "partners.advantage_2": "Strumenti di ottimizzazione dell'occupazione: Strumenti avanzati per l'automazione della comunicazione.",
+                "partners.advantage_3": "Sicurezza delle prenotazioni (carta di credito): Come partner potete richiedere i dati della carta di credito dell'ospite come garanzia. *Nota: La carta serve esclusivamente come garanzia in caso di 'no-show' o cancellazione al di fuori dei vostri termini.*",
+                "partners.advantage_4": "Tolleranza zero per il 'No-Show': L'utente che prenota due volte e non annulla o non si presenta viene rimosso definitivamente dall'applicazione dopo il secondo avviso.",
+                "partners.how_to_start_title": "3. Come iniziare (Procedura)",
+                "partners.steps_title": "Semplici passi verso il successo:",
+                "partners.step_1": "Registrazione e scelta del pacchetto: Registratevi su <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, scegliete il pacchetto e completate l'acquisto.",
+                "partners.step_2": "Impostazione del profilo: Nel menu di prenotazione selezionate 'Il mio profilo', dove caricherete i vostri dati, immagini, menu, prezzi e descrizione per l'applicazione.",
+                "partners.step_3": "Lancio: Una volta completato il profilo, iniziate a ricevere prenotazioni ottimizzate e affidabili.",
+                "partners.contact_title": "4. Contatti per ulteriori domande",
+                "partners.contact_email": "E-mail: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Telefon (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Sede della società: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagabria, Croazia",
+            },
+            fr: {
+                "legal.page_title": "Informations & Mentions Légales",
+                "about.title": "À propos de Rentyo Gourmet",
+                "about.subtitle": "Réservation de table – rapide, simple et sans appel.",
+                "about.content_1": "Rentyo Gourmet est une plateforme en ligne européenne qui permet la réservation rapide et fiable de tables dans des restaurants sélectionnés. En un seul endroit, vous pouvez rechercher des restaurants par emplacement, cuisine ou date et réserver votre table en quelques clics.",
+                "about.content_2": "Notre mission est de simplifier votre expérience de réservation – sans attente d'appels téléphoniques ni retards inutiles. Nous veillons à ce que votre réservation parvienne en toute sécurité au restaurant et que vous soyez informé de son statut en temps réel.",
+                "about.why_title": "Pourquoi Rentyo Gourmet ?",
+                "about.why_item_1": "Réservation simple 24/7",
+                "about.why_item_2": "Pas de frais supplémentaires pour les utilisateurs",
+                "about.why_item_3": "Confirmation fiable des réservations",
+                "about.why_item_4": "Utilisation sécurisée et protection de vos données",
+                "about.team_title": "Qui est derrière Rentyo Gourmet ?",
+                "about.team_content_1": "Rentyo Gourmet est développé et géré par la société Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., dont le siège est à Zagreb, Croatie.",
+                "about.team_content_2": "Notre équipe croit que la réservation d'une table devrait être aussi simple que l'achat d'un billet. Nous opérons dans toute l'Europe et collaborons directement avec les restaurants.",
+                
+                "privacy.title": "Politique de Confidentialité",
+                "privacy.intro": "Votre confidentialité est très importante pour nous. Rentyo Gourmet, géré par Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., traite les données personnelles des utilisateurs conformément à la législation de l'UE (RGPD) et à la loi croate sur la protection des données personnelles.",
+                "privacy.data_collected_title": "Quelles données collectons-nous",
+                "privacy.data_item_1": "Nom et prénom",
+                "privacy.data_item_2": "Adresse e-mail",
+                "privacy.data_item_3": "Date, heure et nombre de personnes pour la réservation",
+                "privacy.data_item_4": "Données sur l'utilisation du site web (via cookies)",
+                "privacy.why_collected_title": "Pourquoi les collectons-nous",
+                "privacy.why_item_1": "pour la confirmation et l'information sur les réservations,",
+                "privacy.why_item_2": "pour fournir un support utilisateur,",
+                "privacy.why_item_3": "pour améliorer l'expérience utilisateur,",
+                "privacy.why_item_4": "uniquement avec votre consentement : pour des notifications occasionnelles sur les nouveautés ou promotions.",
+                "privacy.sharing_title": "Partage des données",
+                "privacy.sharing_content_1": "Nous partageons vos données exclusivement avec le restaurant auprès duquel vous avez effectué la réservation, et uniquement dans la mesure nécessaire à l'exécution du service.",
+                "privacy.sharing_content_2": "Les données ne sont ni vendues ni partagées avec des tiers à des fins publicitaires.",
+                "privacy.retention_title": "Conservation des données",
+                "privacy.retention_content": "Nous conservons les données aussi longtemps que nécessaire aux fins de la réservation et conformément à la loi. Les utilisateurs peuvent demander la suppression de leurs données à tout moment à <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "Vos droits",
+                "privacy.rights_content": "Vous avez le droit d'accès, de rectification, de suppression et de limitation du traitement de vos données personnelles. Pour toute demande concernant la confidentialité, contactez-nous via <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Conditions d'Utilisation",
+                "terms.intro": "En utilisant le site web Rentyo Gourmet, vous acceptez les conditions suivantes.",
+                "terms.offer_title": "1. Ce que nous offrons",
+                "terms.offer_item_1": "Rentyo Gourmet permet aux utilisateurs de réserver gratuitement des tables dans des restaurants.",
+                "terms.offer_item_2": "Nous ne vendons pas de nourriture, de boissons ou d'autres services de restauration.",
+                "terms.how_it_works_title": "2. Comment cela fonctionne",
+                "terms.how_it_works_content_1": "La réservation via la plateforme signifie que vous avez exprimé votre intérêt pour un créneau horaire spécifique au restaurant.",
+                "terms.how_it_works_content_2": "La confirmation de la réservation est reçue par e-mail ou via le site web.",
+                "terms.responsibility_title": "3. Responsabilité",
+                "terms.responsibility_content_1": "Rentyo Gourmet n'est pas responsable des services réels fournis par le restaurant (par exemple, la qualité de la nourriture ou du service).",
+                "terms.responsibility_content_2": "En cas de problème, l'utilisateur doit contacter directement le restaurant.",
+                "terms.cancellation_title": "4. Annulation de la réservation",
+                "terms.cancellation_content_1": "Si vous souhaitez annuler ou modifier une réservation, vous pouvez le faire via le lien dans l'e-mail de confirmation ou simplement l'annuler dans votre compte utilisateur.",
+                "terms.cancellation_content_2": "Le restaurant peut avoir sa propre politique d'annulation, qui est affichée lors de la réservation.",
+                "terms.fair_use_title": "5. Sécurité et utilisation équitable",
+                "terms.fair_use_content_1": "L'utilisateur s'engage à utiliser les réservations de manière équitable.",
+                "terms.fair_use_content_2": "L'abuso du système (par exemple, réservations fausses répétées) peut entraîner le blocage du compte.",
+                "terms.law_title": "6. Droit applicable et juridiction",
+                "terms.law_content_1": "Le droit croate s'applique à l'utilisation du site et à la résolution des litiges.",
+                "terms.law_content_2": "Le tribunal compétent est à Zagreb, Croatie.",
+                
+                "legal_notice.title": "Mention Légale",
+                "legal_notice.content_1": "Toutes les informations sur le site web Rentyo Gourmet sont de nature informative et destinées aux utilisateurs souhaitant effectuer une réservation.",
+                "legal_notice.content_2": "Rentyo Gourmet n'assume aucune responsabilité pour les erreurs ou inexactitudes dans la description des restaurants fournies par les prestataires eux-mêmes. L'utilisation du site est à vos propres risques.",
+                "legal_notice.content_3": "Le site web est régulièrement mis à jour, mais Rentyo Gourmet ne garantit pas un fonctionnement ininterrompu ni l'exactitude complète de toutes les données.",
+                
+                "contact.title": "Informations Légales et Contact",
+                "contact.company_data_title": "Informations officielles de la société (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Nom de la société: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Siège social: Ulica grada Vukovara 271, 10000 Zagreb, Croatie",
+                "contact.vat": "Numéro d'identification fiscale (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Tribunal compétent: Zagreb, Croatie",
+                "contact.compliance": "L'entreprise opère conformément à la législation croate en vigueur et aux réglementations européennes, notamment le règlement (UE) 2016/679 (RGPD). En cas de litige, le droit croate s'applique, sauf disposition contraire de la législation européenne.",
+                
+                "partners.title": "Plateforme pour les partenaires Rentyo Gourmet",
+                "partners.intro": "Développez votre activité en optimisant les réservations et en réduisant les absences 'no-show'.",
+                "partners.join_title": "1. Rejoignez la communauté Rentyo Gourmet",
+                "partners.join_content": "Rentyo Gourmet est une plateforme premium dédiée à la simplification et à la numérisation des réservations dans le secteur de la gastronomie de luxe. Nous recherchons des partenaires qui partagent notre vision de l'excellence.",
+                "partners.who_can_join_title": "Qui peut nous rejoindre ?",
+                "partners.who_item_1": "Restaurants: Optimisez les réservations et améliorez l'occupation des tables.",
+                "partners.who_item_2": "Bars et salons: Gérez efficacement vos espaces et événements.",
+                "partners.who_item_3": "Caves et salles de dégustation: Simplifiez les réservations pour les dégustations guidées et les événements.",
+                "partners.advantages_title": "2. Pourquoi un partenariat z Rentyo Gourmet ?",
+                "partners.key_advantages_title": "Avantages clés du partenariat :",
+                "partners.advantage_1": "Meilleure portée auprès des clients premium: Accès à une base croissante de clients et d'amateurs de gastronomie.",
+                "partners.advantage_2": "Outils d'optimisation de l'occupation: Outils avancés pour l'automatisatiion de la communication.",
+                "partners.advantage_3": "Sécurité des réservations (carte de crédit): En tant que partenaire, vous pouvez exiger les détails de la carte de crédit du client comme garantie. *Note: La carte sert uniquement de garantie en cas de 'no-show' ou d'annulation en dehors de vos conditions.*",
+                "partners.advantage_4": "Tolérance zéro pour le 'No-Show': L'utilisateur qui réserve deux fois et n'annule pas ou ne se présente pas est définitivement retiré de l'application après le deuxième avertissement.",
+                "partners.how_to_start_title": "3. Comment démarrer (Procédure)",
+                "partners.steps_title": "Étapes simples vers le succès :",
+                "partners.step_1": "Inscription et choix du forfait: Inscrivez-vous sur <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, choisissez le forfait et finalisez l'achat.",
+                "partners.step_2": "Configuration du profil: Dans le menu de réservation, sélectionnez 'Mon profil' où vous téléchargez vos données, images, menus, prix et description pour l'application.",
+                "partners.step_3": "Lancement: Une fois votre profil terminé, commencez à recevoir des réservations optimisées et fiables.",
+                "partners.contact_title": "4. Contact pour des questions supplémentaires",
+                "partners.contact_email": "E-mail: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Téléphone (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Siège social: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Croatie",
+            },
+            de: {
+                "legal.page_title": "Informationen & Rechtliche Hinweise",
+                "about.title": "Über Rentyo Gourmet",
+                "about.subtitle": "Tischreservierung – schnell, einfach und ohne Anruf.",
+                "about.content_1": "Rentyo Gourmet ist eine europäische Online-Plattform, die eine schnelle und zuverlässige Tischreservierung in ausgewählten Restaurants ermöglicht. An einem Ort können Sie Restaurants nach Standort, Küche oder Datum suchen und Ihren Tisch mit wenigen Klicks reservieren.",
+                "about.content_2": "Unsere Aufgabe ist es, Ihnen die Reservierungserfahrung zu erleichtern – ohne Wartezeiten am Telefon oder unnötige Verzögerungen. Wir sorgen dafür, dass Ihre Reservierung sicher beim Restaurant ankommt und Sie in Echtzeit über ihren Status informiert werden.",
+                "about.why_title": "Warum Rentyo Gourmet?",
+                "about.why_item_1": "Einfache Reservierung 24/7",
+                "about.why_item_2": "Keine zusätzlichen Kosten für Benutzer",
+                "about.why_item_3": "Zuverlässige Bestätigung der Reservierungen",
+                "about.why_item_4": "Sichere Nutzung und Schutz Ihrer Daten",
+                "about.team_title": "Wer steht hinter Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet wird entwickelt und verwaltet von der Firma Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., mit Sitz in Zagreb, Kroatien.",
+                "about.team_content_2": "Unser Team glaubt, dass eine Tischreservierung so einfach sein sollte wie der Kauf eines Tickets. Wir sind in ganz Europa tätig und arbeiten direkt mit Restaurants.",
+                
+                "privacy.title": "Datenschutzbestimmungen",
+                "privacy.intro": "Ihre Privatsphäre ist uns sehr wichtig. Rentyo Gourmet, betrieben von Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., verarbeitet personenbezogene Daten von Nutzern gemäß der EU-Gesetzgebung (DSGVO) und dem kroatischen Gesetz zum Schutz personenbezogener Daten.",
+                "privacy.data_collected_title": "Welche Daten wir sammeln",
+                "privacy.data_item_1": "Name und Nachname",
+                "privacy.data_item_2": "E-Mail-Adresse",
+                "privacy.data_item_3": "Datum, Uhrzeit und Anzahl der Personen für die Reservierung",
+                "privacy.data_item_4": "Daten zur Nutzung der Website (über Cookies)",
+                "privacy.why_collected_title": "Warum wir sie sammeln",
+                "privacy.why_item_1": "zur Bestätigung und Information über Reservierungen,",
+                "privacy.why_item_2": "zur Bereitstellung von Benutzerunterstützung,",
+                "privacy.why_item_3": "zur Verbesserung des Nutzererlebnisses,",
+                "privacy.why_item_4": "nur mit Ihrer Zustimmung: für gelegentliche Benachrichtigungen über Neuigkeiten oder Werbeaktionen.",
+                "privacy.sharing_title": "Weitergabe von Daten",
+                "privacy.sharing_content_1": "Wir geben Ihre Daten ausschließlich an das Restaurant weiter, bei dem Sie die Reservierung vorgenommen haben, und nur in dem Umfang, der zur Erbringung der Dienstleistung erforderlich ist.",
+                "privacy.sharing_content_2": "Die Daten werden nicht an Dritte zu Werbezwecken verkauft oder weitergegeben.",
+                "privacy.retention_title": "Datenspeicherung",
+                "privacy.retention_content": "Wir speichern die Daten so lange, wie es für den Zweck der Reservierung erforderlich ist und im Einklang mit den gesetzlichen Bestimmungen. Benutzer können jederzeit die Löschung ihrer Daten unter <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a> verlangen.",
+                "privacy.rights_title": "Ihre Rechte",
+                "privacy.rights_content": "Sie haben das Recht auf Zugang, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten. Für alle Anfragen bezüglich des Datenschutzes kontaktieren Sie uns bitte über <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Nutzungsbedingungen",
+                "terms.intro": "Durch die Nutzung der Rentyo Gourmet Website stimmen Sie den folgenden Bedingungen zu.",
+                "terms.offer_title": "1. Was wir anbieten",
+                "terms.offer_item_1": "Rentyo Gourmet ermöglicht Benutzern die kostenlose Reservierung von Tischen in Restaurants.",
+                "terms.offer_item_2": "Wir verkaufen keine Speisen, Getränke oder andere gastronomische Dienstleistungen.",
+                "terms.how_it_works_title": "2. Wie es funktioniert",
+                "terms.how_it_works_content_1": "Eine Reservierung über die Plattform bedeutet, dass Sie Interesse an einem bestimmten Termin im Restaurant bekundet haben.",
+                "terms.how_it_works_content_2": "Die Bestätigung der Reservierung erhalten Sie per E-Mail oder auf der Website.",
+                "terms.responsibility_title": "3. Haftung",
+                "terms.responsibility_content_1": "Rentyo Gourmet ist nicht verantwortlich für die tatsächlichen Dienstleistungen des Restaurants (z.B. Qualität der Speisen oder des Services).",
+                "terms.responsibility_content_2": "Bei Problemen wendet sich der Benutzer direkt an das Restaurant.",
+                "terms.cancellation_title": "4. Stornierung der Reservierung",
+                "terms.cancellation_content_1": "Wenn Sie eine Reservierung stornieren oder ändern möchten, können Sie dies über den Link in der Bestätigungs-E-Mail tun oder sie einfach in Ihrem Benutzerkonto stornieren.",
+                "terms.cancellation_content_2": "Das Restaurant kann eigene Stornierungsbedingungen haben, die bei der Reservierung angezeigt werden.",
+                "terms.fair_use_title": "5. Sicherheit und faire Nutzung",
+                "terms.fair_use_content_1": "Der Benutzer verpflichtet sich, die Reservierungen fair zu nutzen.",
+                "terms.fair_use_content_2": "Missbrauch des Systems (z.B. wiederholte gefälschte Reservierungen) kann zur Kontosperrung führen.",
+                "terms.law_title": "6. Recht und Zuständigkeit",
+                "terms.law_content_1": "Für die Nutzung der Website und die Beilegung von Streitigkeiten gilt kroatisches Recht.",
+                "terms.law_content_2": "Das zuständige Gericht ist in Zagreb, Kroatien.",
+                
+                "legal_notice.title": "Rechtlicher Hinweis",
+                "legal_notice.content_1": "Alle Informationen auf der Rentyo Gourmet Website dienen Informationszwecken und sind für Benutzer bestimmt, die eine Reservierung vornehmen möchten.",
+                "legal_notice.content_2": "Rentyo Gourmet übernimmt keine Verantwortung für Fehler oder Ungenauigkeiten in den Restaurantbeschreibungen, die von den Anbietern selbst bereitgestellt werden. Die Nutzung der Website erfolgt auf eigene Gefahr.",
+                "legal_notice.content_3": "Die Website wird regelmäßig aktualisiert, aber Rentyo Gourmet garantiert nicht für einen unterbrechungsfreien Betrieb oder die vollständige Richtigkeit aller Daten.",
+                
+                "contact.title": "Rechtliche Informationen und Kontakt",
+                "contact.company_data_title": "Offizielle Unternehmensdaten (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Firmenname: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Sitz: Ulica grada Vukovara 271, 10000 Zagreb, Kroatien",
+                "contact.vat": "Steuernummer (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Zuständiges Gericht: Zagreb, Kroatien",
+                "contact.compliance": "Das Unternehmen arbeitet gemäß der geltenden kroatischen Gesetzgebung und europäischen Vorschriften, insbesondere der Verordnung (EU) 2016/679 (DSGVO). Im Falle von Streitigkeiten gilt kroatisches Recht, sofern die europäische Gesetzgebung nichts anderes vorschreibt.",
+                
+                "partners.title": "Plattform für Rentyo Gourmet Partner",
+                "partners.intro": "Entwickeln Sie Ihr Geschäft durch Optimierung der Reservierungen und Reduzierung von 'No-Show'-Abwesenheiten.",
+                "partners.join_title": "1. Treten Sie der Rentyo Gourmet Community bei",
+                "partners.join_content": "Rentyo Gourmet ist eine Premium-Plattform zur Vereinfachung und Digitalisierung von Reservierungen im Premium-Gastronomiebereich. Wir suchen Partner, die unsere Vision von Exzellenz teilen.",
+                "partners.who_can_join_title": "Wer kann uns beitreten?",
+                "partners.who_item_1": "Restaurants: Optimieren Sie Reservierungen und verbessern Sie die Tischauslastung.",
+                "partners.who_item_2": "Bars und Lounges: Verwalten Sie Ihre Räumlichkeiten und Veranstaltungen effizient.",
+                "partners.who_item_3": "Weingüter und Degustationsräume: Vereinfachen Sie Reservierungen für geführte Verkostungen und Veranstaltungen.",
+                "partners.advantages_title": "2. Warum eine Partnerschaft mit Rentyo Gourmet?",
+                "partners.key_advantages_title": "Wesentliche Vorteile der Partnerschaft:",
+                "partners.advantage_1": "Größere Reichweite bei Premium-Kunden: Zugang zu einer wachsenden Basis von Kunden und Gastronomie-Liebhabern.",
+                "partners.advantage_2": "Tools zur Optimierung der Auslastung: Fortschrittliche Tools zur Automatisierung der Kommunikation.",
+                "partners.advantage_3": "Sicherheit der Reservierungen (Kreditkarte): Als Partner können Sie Kreditkartendaten des Gastes als Garantie verlangen. *Hinweis: Die Karte dient ausschließlich als Garantie im Falle von 'No-Show' oder Stornierung außerhalb Ihrer Bedingungen.*",
+                "partners.advantage_4": "Null-Toleranz für 'No-Show': Benutzer, die zweimal reservieren und nicht stornieren oder erscheinen, werden nach der zweiten Warnung dauerhaft aus der App entfernt.",
+                "partners.how_to_start_title": "3. Wie Sie beginnen (Vorgehensweise)",
+                "partners.steps_title": "Einfache Schritte zum Erfolg:",
+                "partners.step_1": "Registrierung und Paketauswahl: Registrieren Sie sich auf <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, wählen Sie ein Paket und schließen Sie den Kauf ab.",
+                "partners.step_2": "Profileinrichtung: Wählen Sie im Reservierungsmenü 'Mein Profil', wo Sie Ihre Daten, Bilder, Menüs, Preise und die Beschreibung für die App hochladen.",
+                "partners.step_3": "Start: Sobald Ihr Profil vollständig ist, beginnen Sie, optimierte und zuverlässige Reservierungen zu erhalten.",
+                "partners.contact_title": "4. Kontakt für weitere Fragen",
+                "partners.contact_email": "E-Mail: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Telefon (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Firmensitz: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Kroatien",
+            },
+            en: {
+                "legal.page_title": "Information & Legal Notices",
+                "about.title": "About Rentyo Gourmet",
+                "about.subtitle": "Table booking – fast, simple, and without calling.",
+                "about.content_1": "Rentyo Gourmet is a European online platform that enables quick and reliable table booking in selected restaurants. In one place, you can search for restaurants by location, cuisine, or date and reserve your table in just a few clicks.",
+                "about.content_2": "Our mission is to simplify your booking experience – without waiting for phone calls or unnecessary delays. We ensure that your reservation safely reaches the restaurant and that you are informed about its status in real-time.",
+                "about.why_title": "Why Rentyo Gourmet?",
+                "about.why_item_1": "Simple booking 24/7",
+                "about.why_item_2": "No extra cost for users",
+                "about.why_item_3": "Reliable reservation confirmation",
+                "about.why_item_4": "Secure usage and protection of your data",
+                "about.team_title": "Who is behind Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet is developed and managed by the company Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., headquartered in Zagreb, Croatia.",
+                "about.team_content_2": "Our team believes that table booking should be as simple as buying a ticket. We operate across Europe and collaborate directly with restaurants.",
+                
+                "privacy.title": "Privacy Policy",
+                "privacy.intro": "Your privacy is of great importance to us. Rentyo Gourmet, managed by Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., processes users' personal data in accordance with EU legislation (GDPR) and the Croatian Personal Data Protection Act.",
+                "privacy.data_collected_title": "What data we collect",
+                "privacy.data_item_1": "Name and surname",
+                "privacy.data_item_2": "Email address",
+                "privacy.data_item_3": "Date, time, and number of people for the reservation",
+                "privacy.data_item_4": "Website usage data (via cookies)",
+                "privacy.why_collected_title": "Why we collect it",
+                "privacy.why_item_1": "for confirming and informing about reservations,",
+                "privacy.why_item_2": "for providing user support,",
+                "privacy.why_item_3": "for improving user experience,",
+                "privacy.why_item_4": "only with your consent: for occasional notifications about news or promotions.",
+                "privacy.sharing_title": "Data Sharing",
+                "privacy.sharing_content_1": "We share your data exclusively with the restaurant where you made the reservation, and only to the extent necessary for the service execution.",
+                "privacy.sharing_content_2": "Data is not sold or shared with third parties for advertising.",
+                "privacy.retention_title": "Data Retention",
+                "privacy.retention_content": "We store data for as long as necessary for the purpose of the reservation and in compliance with the law. Users can request the deletion of their data at any time at <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "Your Rights",
+                "privacy.rights_content": "You have the right to access, rectify, erase, and restrict the processing of your personal data. For all privacy-related requests, contact us via <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Terms of Use",
+                "terms.intro": "By using the Rentyo Gourmet website, you agree to the following terms.",
+                "terms.offer_title": "1. What we offer",
+                "terms.offer_item_1": "Rentyo Gourmet allows users to book tables in restaurants for free.",
+                "terms.offer_item_2": "We do not sell food, beverages, or other catering services.",
+                "terms.how_it_works_title": "2. How it works",
+                "terms.how_it_works_content_1": "A reservation through the platform means you have expressed interest in a specific time slot at the restaurant.",
+                "terms.how_it_works_content_2": "Reservation confirmation is received via email or within the website.",
+                "terms.responsibility_title": "3. Responsibility",
+                "terms.responsibility_content_1": "Rentyo Gourmet is not responsible for the actual services provided by the restaurant (e.g., food quality or service).",
+                "terms.responsibility_content_2": "In case of issues, the user contacts the restaurant directly.",
+                "terms.cancellation_title": "4. Reservation Cancellation",
+                "terms.cancellation_content_1": "If you wish to cancel or modify a reservation, you can do so via the link in the confirmation email or simply cancel it within your user account.",
+                "terms.cancellation_content_2": "The restaurant may have its own cancellation policy, which is displayed upon booking.",
+                "terms.fair_use_title": "5. Security and Fair Use",
+                "terms.fair_use_content_1": "The user commits to using reservations fairly.",
+                "terms.fair_use_content_2": "System abuse (e.g., repeated fake reservations) may lead to account blocking.",
+                "terms.law_title": "6. Law and Jurisdiction",
+                "terms.law_content_1": "Croatian law applies to the use of the site and the resolution of disputes.",
+                "terms.law_content_2": "The competent court is in Zagreb, Croatia.",
+                
+                "legal_notice.title": "Legal Notice",
+                "legal_notice.content_1": "All information on the Rentyo Gourmet website is informative and intended for users who wish to make a reservation.",
+                "legal_notice.content_2": "Rentyo Gourmet assumes no responsibility for errors or inaccuracies in the restaurant descriptions provided by the providers themselves. Use of the site is at your own risk.",
+                "legal_notice.content_3": "The website is regularly updated, but Rentyo Gourmet does not guarantee uninterrupted operation or complete accuracy of all data.",
+                
+                "contact.title": "Legal Information and Contact",
+                "contact.company_data_title": "Official company data (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Company Name: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Headquarters: Ulica grada Vukovara 271, 10000 Zagreb, Croatia",
+                "contact.vat": "Tax Number (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Competent Court: Zagreb, Croatia",
+                "contact.compliance": "The company operates in accordance with valid Croatian legislation and European regulations, particularly Regulation (EU) 2016/679 (GDPR). In case of disputes, Croatian law applies, unless European legislation dictates otherwise.",
+                
+                "partners.title": "Rentyo Gourmet Partner Platform",
+                "partners.intro": "Grow your business by optimizing reservations and reducing 'no-show' absences.",
+                "partners.join_title": "1. Join the Rentyo Gourmet Community",
+                "partners.join_content": "Rentyo Gourmet is a premium platform dedicated to simplifying and digitizing reservations in the fine dining sector. We are looking for partners who share our vision of excellence.",
+                "partners.who_can_join_title": "Who can join us?",
+                "partners.who_item_1": "Restaurants: Optimize reservations and improve table occupancy.",
+                "partners.who_item_2": "Bars and Lounges: Efficiently manage your spaces and events.",
+                "partners.who_item_3": "Wineries and Tasting Rooms: Simplify bookings for guided tastings and events.",
+                "partners.advantages_title": "2. Why Partner with Rentyo Gourmet?",
+                "partners.key_advantages_title": "Key advantages of the partnership:",
+                "partners.advantage_1": "Greater reach to premium customers: Access to a growing base of customers and gastronomy lovers.",
+                "partners.advantage_2": "Occupancy optimization tools: Advanced tools for communication automation.",
+                "partners.advantage_3": "Reservation Security (Credit Card): As a partner, you can require guest credit card details as a guarantee. *Note: The card serves exclusively as a guarantee in case of 'no-show' or cancellation outside your terms.*",
+                "partners.advantage_4": "Zero Tolerance for 'No-Show': A user who books twice and fails to cancel or show up is permanently removed from the application after the second warning.",
+                "partners.how_to_start_title": "3. How to Get Started (Procedure)",
+                "partners.steps_title": "Simple steps to success:",
+                "partners.step_1": "Registration and package selection: Register at <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, select a package, and complete the purchase.",
+                "partners.step_2": "Profile Setup: In the reservation menu, select 'My Profile' where you upload your data, images, menus, prices, and description for the application.",
+                "partners.step_3": "Launch: Once your profile is complete, start receiving optimized and reliable reservations.",
+                "partners.contact_title": "4. Contact for additional questions",
+                "partners.contact_email": "Email: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Phone (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Company Headquarters: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Croatia",
+            },
+            es: {
+                "legal.page_title": "Información & Avisos Legales",
+                "about.title": "Acerca de Rentyo Gourmet",
+                "about.subtitle": "Reserva de mesa – rápida, sencilla y sin llamar.",
+                "about.content_1": "Rentyo Gourmet es una plataforma en línea europea que permite la reserva rápida y fiable de mesas en restaurantes seleccionados. En un solo lugar, puede buscar restaurantes por ubicación, cocina o fecha y reservar su mesa en tan solo unos clics.",
+                "about.content_2": "Nuestra misión es simplificar su experiencia de reserva – sin esperas de llamadas telefónicas ni retrasos innecesarios. Nos aseguramos de que su reserva llegue de forma segura al restaurante y de que se le informe de su estado en tiempo real.",
+                "about.why_title": "Por qué Rentyo Gourmet?",
+                "about.why_item_1": "Reserva sencilla 24/7",
+                "about.why_item_2": "Sin costes adicionales para los usuarios",
+                "about.why_item_3": "Confirmación fiable de las reservas",
+                "about.why_item_4": "Uso seguro y protección de sus datos",
+                "about.team_title": "¿Quién está detrás de Rentyo Gourmet?",
+                "about.team_content_1": "Rentyo Gourmet es desarrollado y gestionado por la empresa Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., con sede en Zagreb, Croacia.",
+                "about.team_content_2": "Nuestro equipo cree que la reserva de una mesa debe ser tan sencilla como comprar un billete. Operamos en toda Europa y colaboramos directamente con los restaurantes.",
+                
+                "privacy.title": "Política de Privacidad",
+                "privacy.intro": "Su privacidad es de gran importancia para nosotros. Rentyo Gourmet, gestionado por Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., procesa los datos personales de los usuarios de acuerdo con la legislación de la UE (RGPD) y la Ley croata de Protección de Datos Personales.",
+                "privacy.data_collected_title": "Qué datos recopilamos",
+                "privacy.data_item_1": "Nombre y apellido",
+                "privacy.data_item_2": "Dirección de correo electrónico",
+                "privacy.data_item_3": "Fecha, hora y número de personas para la reserva",
+                "privacy.data_item_4": "Datos de uso del sitio web (a través de cookies)",
+                "privacy.why_collected_title": "Por qué los recopilamos",
+                "privacy.why_item_1": "para confirmar e informar sobre las reservas,",
+                "privacy.why_item_2": "para proporcionar soporte al usuario,",
+                "privacy.why_item_3": "para mejorar la experiencia del usuario,",
+                "privacy.why_item_4": "solo con su consentimiento: para notificaciones ocasionales sobre novedades o promociones.",
+                "privacy.sharing_title": "Compartición de Datos",
+                "privacy.sharing_content_1": "Compartimos sus datos exclusivamente con el restaurante donde realizó la reserva, y solo en la medida necesaria para la ejecución del servicio.",
+                "privacy.sharing_content_2": "Los datos no se venden ni se comparten con terceros para publicidad.",
+                "privacy.retention_title": "Retención de Datos",
+                "privacy.retention_content": "Almacenamos los datos durante el tiempo que sea necesario para el propósito de la reserva y en cumplimiento con la ley. Los usuarios pueden solicitar la eliminación de sus datos en cualquier momento en <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                "privacy.rights_title": "Sus Derechos",
+                "privacy.rights_content": "Tiene derecho a acceder, rectificar, eliminar y restringir el procesamiento de sus datos personales. Para todas las solicitudes relacionadas con la privacidad, contáctenos a través de <a href=\"mailto:privacy@rentyo.eu\" class=\"text-blue-600 hover:underline\">privacy@rentyo.eu</a>.",
+                
+                "terms.title": "Condiciones de Uso",
+                "terms.intro": "Al utilizar el sitio web Rentyo Gourmet, acepta las siguientes condiciones.",
+                "terms.offer_title": "1. Lo que ofrecemos",
+                "terms.offer_item_1": "Rentyo Gourmet permite a los usuarios reservar mesas en restaurantes de forma gratuita.",
+                "terms.offer_item_2": "No vendemos alimentos, bebidas u otros servicios de restauración.",
+                "terms.how_it_works_title": "2. Cómo funciona",
+                "terms.how_it_works_content_1": "Una reserva a través de la plataforma significa que ha expresado interés en un horario específico en el restaurante.",
+                "terms.how_it_works_content_2": "La confirmación de la reserva se recibe por correo electrónico o dentro del sitio web.",
+                "terms.responsibility_title": "3. Responsabilidad",
+                "terms.responsibility_content_1": "Rentyo Gourmet no es responsable de los servicios reales prestados por el restaurante (por ejemplo, calidad de la comida o servicio).",
+                "terms.responsibility_content_2": "En caso de problemas, el usuario se pone en contacto directamente con el restaurante.",
+                "terms.cancellation_title": "4. Cancelación de la Reserva",
+                "terms.cancellation_content_1": "Si desea cancelar o modificar una reserva, puede hacerlo a través del enlace en el correo electrónico de confirmación o simplemente cancelarla dentro de su cuenta de usuario.",
+                "terms.cancellation_content_2": "El restaurante puede tener su propia política de cancelación, que se muestra al realizar la reserva.",
+                "terms.fair_use_title": "5. Seguridad y Uso Justo",
+                "terms.fair_use_content_1": "El usuario se compromete a utilizar las reservas de forma justa.",
+                "terms.fair_use_content_2": "El abuso del sistema (por ejemplo, reservas falsas repetidas) puede llevar al bloqueo de la cuenta.",
+                "terms.law_title": "6. Ley y Jurisdicción",
+                "terms.law_content_1": "Se aplica la ley croata al uso del sitio y a la resolución de disputas.",
+                "terms.law_content_2": "El tribunal competente está en Zagreb, Croacia.",
+                
+                "legal_notice.title": "Aviso Legal",
+                "legal_notice.content_1": "Toda la información en el sitio web Rentyo Gourmet es de carácter informativo y está destinada a los usuarios que deseen realizar una reserva.",
+                "legal_notice.content_2": "Rentyo Gourmet no asume ninguna responsabilidad por errores o inexactitudes en la descripción de los restaurantes proporcionadas por los propios proveedores. El uso del sitio es bajo su propio riesgo.",
+                "legal_notice.content_3": "El sitio web se actualiza periódicamente, pero Rentyo Gourmet no garantiza el funcionamiento ininterrumpido ni la exactitud completa de todos los datos.",
+                
+                "contact.title": "Información Legal y Contacto",
+                "contact.company_data_title": "Datos oficiales de la empresa (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):",
+                "contact.name": "Nombre de la empresa: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.",
+                "contact.address": "Sede: Ulica grada Vukovara 271, 10000 Zagreb, Croacia",
+                "contact.vat": "Número de identificación fiscal (OIB): 85972870674",
+                "contact.iban": "IBAN: LT31 3250 0588 1111 4934 (Revolut)",
+                "contact.swift": "BIC / SWIFT: REVOLT21",
+                "contact.court": "Tribunal competente: Zagreb, Croacia",
+                "contact.compliance": "La empresa opera de acuerdo con la legislación croata vigente y las regulaciones europeas, en particular el Reglamento (UE) 2016/679 (RGPD). En caso de disputas, se aplica la ley croata, a menos que la legislación europea dicte lo contrario.",
+                
+                "partners.title": "Plataforma para Socios Rentyo Gourmet",
+                "partners.intro": "Haga crecer su negocio optimizando las reservas y reduciendo las ausencias 'no-show'.",
+                "partners.join_title": "1. Únase a la Comunidad Rentyo Gourmet",
+                "partners.join_content": "Rentyo Gourmet es una plataforma premium dedicada a simplificar y digitalizar las reservas en el sector de la alta cocina. Buscamos socios que compartan nuestra visión de excelencia.",
+                "partners.who_can_join_title": "¿Quién puede unirse a nosotros?",
+                "partners.who_item_1": "Restaurantes: Optimice las reservas y mejore la ocupación de las mesas.",
+                "partners.who_item_2": "Bares y Salones: Gestione eficientemente sus espacios y eventos.",
+                "partners.who_item_3": "Bodegas y Salas de Degustación: Simplifique las reservas para catas guiadas y eventos.",
+                "partners.advantages_title": "2. ¿Por qué asociarse con Rentyo Gourmet?",
+                "partners.key_advantages_title": "Ventajas clave de la asociación:",
+                "partners.advantage_1": "Mayor alcance a clientes premium: Acceso a una base creciente de clientes y amantes de la gastronomía.",
+                "partners.advantage_2": "Herramientas de optimización de ocupación: Herramientas avanzadas para la automatización de la comunicación.",
+                "partners.advantage_3": "Seguridad de las Reservas (Tarjeta de Crédito): Como socio, puede requerir los detalles de la tarjeta de crédito del huésped como garantía. *Nota: La tarjeta sirve exclusivamente como garantía en caso de 'no-show' o cancelación fuera de sus términos.*",
+                "partners.advantage_4": "Tolerancia Cero para 'No-Show': Un usuario que reserva dos veces y no cancela o no se presenta es eliminado permanentemente de la aplicación después del segundo aviso.",
+                "partners.how_to_start_title": "3. Cómo Empezar (Procedimiento)",
+                "partners.steps_title": "Pasos sencillos hacia el éxito:",
+                "partners.step_1": "Registro y selección de paquete: Regístrese en <a href=\"http://gourmet.rentyo.eu\" class=\"text-blue-600 hover:underline\">gourmet.rentyo.eu</a>, seleccione un paquete y complete la compra.",
+                "partners.step_2": "Configuración del Perfil: En el menú de reservas, seleccione 'Mi Perfil' donde carga sus datos, imágenes, menús, precios y descripción para la aplicación.",
+                "partners.step_3": "Lanzamiento: Una vez que su perfil esté completo, comience a recibir reservas optimizadas y fiables.",
+                "partners.contact_title": "4. Contacto para preguntas adicionales",
+                "partners.contact_email": "Correo electrónico: <a href=\"mailto:partners@rentyo.eu\" class=\"text-blue-600 hover:underline\">partners@rentyo.eu</a>",
+                "partners.contact_phone": "Teléfono (WhatsApp): +385 98 902 3144",
+                "partners.contact_address": "Sede de la empresa: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Croacia",
+            }
+        };
+
+        // ** POPRAVLJENA JAVASCRIPT KODA **
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.getElementById('language-dropdown');
+            const optionsContainer = document.getElementById('language-options');
+            const currentLangDisplay = document.getElementById('current-language');
+            
+            // Določimo privzet jezik
+            let currentLang = 'sl'; 
+
+            // Pomožna funkcija za varno iskanje v ugnezdenem objektu
+            const getTranslationValue = (data, key) => {
+                const keys = key.split('.');
+                let value = data;
+                for (const k of keys) {
+                    if (value && typeof value === 'object' && value.hasOwnProperty(k)) {
+                        value = value[k];
+                    } else {
+                        return null; 
+                    }
+                }
+                return value;
+            };
+
+            // Glavna funkcija za preklop in prevod besedila
+            const setLanguage = (lang) => {
+                currentLang = lang;
+                
+                // 1. Posodobi naslov strani (<title> tag)
+                const titleElement = document.querySelector('title');
+                const pageTitleKey = titleElement.getAttribute('data-i18n');
+                const newTitle = getTranslationValue(i18nData[lang], pageTitleKey);
+                
+                if (newTitle) {
+                    titleElement.textContent = newTitle.replace(/<[^>]*>?/gm, ''); 
+                }
+
+                // 2. Posodobi vse elemente z data-i18n atributom
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    const value = getTranslationValue(i18nData[lang], key);
+                    
+                    if (value !== null) {
+                        if (element.tagName !== 'TITLE') {
+                            // Uporabimo innerHTML, da ohranimo morebitne HTML oznake (npr. <a> za linke)
+                            element.innerHTML = value;
+                        }
+                    }
+                });
+                
+                // 3. Posodobi prikaz trenutnega jezika v gumbu
+                currentLangDisplay.textContent = lang.toUpperCase();
+
+                // 4. Posodobi izbran jezik v spustnem seznamu (dodaj/odstrani selected class)
+                document.querySelectorAll('.language-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.getAttribute('data-lang') === lang) {
+                        opt.classList.add('selected');
+                    }
+                });
+            };
+
+            // Preklopi prikaz spustnega seznama
+            dropdown.addEventListener('click', (e) => {
+                // Poskrbimo, da se klik na opcijo ne šteje kot klik na celoten dropdown, da se dropdown takoj ne zapre
+                if (!e.target.closest('.language-options')) {
+                    dropdown.classList.toggle('open');
+                }
+            });
+
+            // Obdelava izbire jezika
+            optionsContainer.addEventListener('click', (e) => {
+                const selectedOption = e.target.closest('.language-option');
+                if (selectedOption) {
+                    const selectedLang = selectedOption.getAttribute('data-lang');
+                    
+                    // Prevedi vsebino
+                    setLanguage(selectedLang);
+
+                    // Zapri spustni seznam
+                    dropdown.classList.remove('open');
+                }
+            });
+            
+            // Zapri spustni seznam, če kliknemo kamorkoli drugam
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+
+            // Inicializiraj prevod ob nalaganju strani (privzeto na SL)
+            setLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>

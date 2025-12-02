@@ -1177,7 +1177,6 @@ exports.oddajOcenoInKomentar = async (req, res, next) => {
             { new: true }
         );
 
-
         res.status(201).json({ 
             success: true, 
             message: 'Ocena in komentar uspešno shranjena!',

@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item>
+        <color android:color="@color/turkizna_status_bar"/>
+    </item>
+    
+    <item>
+        <inset android:drawable="@drawable/rentyo_logo_white" 
+               android:insetLeft="30%p" 
+               android:insetRight="30%p" 
+               android:insetTop="30%p" 
+               android:insetBottom="30%p" />
+    </item>
 
-</selector>
+</layer-list>

@@ -445,7 +445,7 @@
         }
 
         .duration-content h3 {
-            color: #4edaa9;
+            color: #0c3c36;
             margin-top: 0;
             margin-bottom: 20px;
             font-size: 1.4rem;
@@ -480,7 +480,7 @@
         }
         
         .duration-opcija:hover {
-            border-color: #4edaa9;
+            border-color: #148a86;
             background-color: #ffffff;
         }
 
@@ -517,10 +517,10 @@
         }
         
         .duration-opcija.selected {
-            border-color: #4edaa9;
-            background-color: #4edaa9; /* Dodamo rahel odtenek za boljšo vidljivost izbrane opcije */
+            border-color: #148a86;
+            background-color: #148a86; /* Dodamo rahel odtenek za boljšo vidljivost izbrane opcije */
             /* Zamenjaj barvo poudarka za lažjo berljivost */
-            border-color: #4edaa9; 
+            border-color: #148a86; 
             /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
         -webkit-tap-highlight-color: transparent;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -541,7 +541,7 @@
             padding: 12px;
             border: none;
             border-radius: 8px;
-            background-color: #4edaa9;
+            background-color: #148a86;
             color: #333;
             font-weight: bold;
             cursor: pointer;
@@ -553,7 +553,7 @@
         }
 
         .gumb-potrdi-trajanje:hover {
-            background-color: #33b688;
+            background-color: #148a86;
         }
         /* Slogi za opomnik o QR kodi in točkah znotraj modalnega okna */
 .duration-content .qr-reminder-text {
@@ -760,8 +760,8 @@
             flex-wrap: wrap; /* Ključno za prelom vrstice */
             justify-content: space-between; /* Ključno za ločitev ocene in razdalje */
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
             border-bottom: 0px solid #e0e0e0;
         }
 
@@ -804,7 +804,7 @@
             font-size: 0.8rem;
             font-weight: bold; 
             color: #333; 
-            margin-top: 5px; 
+            margin-top: 0px; 
             margin-bottom: 0;
             display: flex;
             align-items: center;
@@ -930,6 +930,7 @@
         text-overflow: ellipsis; 
         
     }
+    
 
     
     /* ======================================================= */
@@ -1064,8 +1065,8 @@
         margin-top: 25px;
         text-align: center;
         border-radius: 20px;
-        background-color: #1BC0BB; 
-        color: #333;
+        background-color: #169B99; 
+        color: #f5f5f5;
         font-size: 1rem;
         font-weight: 600;
         text-decoration: none;
@@ -1129,10 +1130,10 @@
     .modal-tab.active {
         color: #ffffff;
         border-bottom-color: none;
-        background-color: #1BC0BB;
+        background-color: #169B99;
         border-radius: 25px;
         margin-bottom: 0px; 
-        box-shadow: 0 0px 0px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(49, 49, 49, 0.276);
         /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -1262,7 +1263,7 @@
         width: 100%;
         height: 100%;
         /* z-index je ključen, da se kontrolniki prikažejo nad vsem ostalim v modalu */
-        z-index: 1; 
+        z-index: 1000; 
     }
 
     /* Ohranjena pravila za stare iframe, če jih še kje uporabljate */
@@ -1319,9 +1320,9 @@
         border: none;
         font-size: 26px;
         cursor: pointer;
-        color: #222222;
+        color: #f0f0f0;
         padding: 0;
-        z-index: 1000;
+        z-index: 1;
     }
     
     .mobilni-meni {
@@ -1485,7 +1486,7 @@
         .rezervacija-vnosna-polja {
             flex-direction: column; /* Na mobilnem postavimo pod seboj */
             gap: 15px;
-            margin: 15px 15px; 
+            margin: 15px 30px; 
             padding: 30px 0;
         }
     }
@@ -1504,6 +1505,8 @@
     font-size: 16px;
     cursor: pointer;
     background-color: white;
+    width: 60%;
+    box-shadow: 0 1px 8px rgba(60, 60, 60, 0.234);
     
     /* 👇 DODANE LASTNOSTI ZA STANDARDIZACIJO VIDEZA SELECT ELEMENTA 👇 */
     
@@ -1577,16 +1580,16 @@
     }
 
     .gumb-ura:hover {
-        background-color: #4edaa9;
-        border: 1px solid #4edaa9; /* Rdeč rob kot poudarek */
+        background-color: #169B99;
+        border: 1px solid #169B99; /* Rdeč rob kot poudarek */
     
     }
 
     /* Stil za izbran gumb ure */
     .gumb-ura.selected {
-        background-color: #4edaa9; /* Barva poudarka */
+        background-color: #169B99; /* Barva poudarka */
         color: #333;
-        border-color: #33b688;
+        border-color: #169B99;
         font-weight: bold;
     }
  /* =================================================== */
@@ -1820,7 +1823,7 @@
 }
 
 .toast.success {
-    background-color: #4CAF50; /* Zelena za uspeh */
+    background-color: #148a86; /* Zelena za uspeh */
 }
 
 .toast.error {
@@ -1828,11 +1831,11 @@
 }
 
 .toast.info {
-    background-color: #2196F3; /* Modra za info */
+    background-color: #0464b2; /* Modra za info */
 }
 
 .toast.warning {
-    background-color: #ff9800; /* Oranžna za opozorilo */
+    background-color: #c47500; /* Oranžna za opozorilo */
 }
 
 .toast-icon {
@@ -1995,10 +1998,10 @@
 */
 
 /* Primer nastavitve: */
-border-top-left-radius: 280px;
-border-top-right-radius: 280px;
+border-top-left-radius: 20px;
+border-top-right-radius: 20px;
 border-bottom-right-radius: 20px;
-border-bottom-left-radius: 280px;
+border-bottom-left-radius: 20px;
 
 /* Prejšnja enotna vrednost je zdaj zakomentirana:
    border-radius: 50px;
@@ -2112,12 +2115,12 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 /* Dodano oblikovanje za kartico z oceno (Review Card) */
 .review-card {
     /* Uporaba tega stila je boljša kot samo 'border-b' */
-    border: 1px solid #b8b8b8; /* Lahka siva obroba okoli kartice */
+    border: 1px solid #fefefe; /* Lahka siva obroba okoli kartice */
     border-radius: 20px; /* Zaobljeni robovi kartice */
     padding: 1.5rem; /* Notranji rob znotraj okvirja */
     margin-bottom: 1.5rem; /* Razmik med karticami */
     background-color: #ffffff; /* Belo ozadje za vsako kartico */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Nežna senca za 'dvignjen' videz */
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.267); /* Nežna senca za 'dvignjen' videz */
 }
 
 /* Stilizacija imena avtorja in datuma znotraj review-card */
@@ -2156,14 +2159,14 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 .gourmet-explore {
     padding: 4rem 2rem 2rem;
     text-align: center;
-    background-color: var(--rmlk-siva);
 }
 
 .gourmet-explore h2 {
     color: var(--rmlk-modra);
-    margin-bottom: 2.5rem;
-    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
     font-weight: 700;
+    color: #333
 }
 
 /* Nastavljiv border-radius za vsak vogal */
@@ -2223,7 +2226,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.106);
+    background: rgba(0, 0, 0, 0.281);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2328,7 +2331,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 100%;
     height: 100%;
     /* Barva ozadja je KONSTANTNO turkizna */
-    background-color: #20c0bd; 
+    background-color: #169b99; 
     
     /* ⭐ KLJUČNO POPRAVLJENO: Privzeto skrij, da se ne prikaže na SPLETNI STRANI ⭐ */
     display: none !important; 
@@ -2520,14 +2523,14 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
    ★ 7. IZBRAN DAN — POLNA TURKIZNA BARVA
    ======================================================= */
 .is-selected .pika-button {
-    background: #20c0bd !important;
+    background: #169b99 !important;
     color: #fff !important;
     border-radius: 50% !important;
-    width: 32px !important;
-    height: 32px !important;
-    line-height: 32px !important;
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
     font-weight: 600;
-    border: 2px solid #20c0bd !important;
+    border: 2px solid #169b99 !important;
 }
 
 /* =======================================================
@@ -2550,6 +2553,150 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     color: #ccc !important;
     opacity: 0.7;
 }
+/* Vaša obstoječa (pravilna) koda za PRIVZETO SKRIVANJE */
+#capacitorTaskbar {
+    display: none !important; 
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* Povečamo višino, da se prilega poudarjen gumb */
+    height: 65px; 
+    background-color: #faf9f6;
+    /* Uporabimo bolj subtilno/čisto senco za modern videz */
+    border-top: none; 
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1); 
+    z-index: 1000;
+}
+
+/* 🌟 KLJUČNA NOV KOS KODE: Prikaz in oblikovanje za mobilno aplikacijo! 🌟 */
+#capacitorTaskbar.is-mobile {
+    display: flex !important; 
+    justify-content: space-around; 
+    align-items: center; 
+}
+
+/* Stil za posamezen element znotraj vrstice */
+.taskbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #169b99; /* Barva neaktivne ikone */
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 5px 0; /* POPRAVEK: Odstranimo horizontalni padding, da ima besedilo več prostora */
+    /* Povečamo manjšo fleksibilnost in ciljno območje */
+    flex-grow: 1; 
+    max-width: 25%;
+    transition: color 0.3s;
+}
+
+/* 🌟 POPRAVEK: Stil za IKONO znotraj taskbar-item 🌟 */
+/* To zagotovi, da so ikone večje in bolj izrazite */
+.taskbar-item i {
+    font-size: 1.4rem; /* Poveča velikost same ikone */
+    margin-bottom: 2px; /* Doda malo prostora med ikono in besedilom */
+    line-height: 1; 
+}
+
+/* Aktivni element ali poudarek (za Domov/Aktivno) */
+.taskbar-item.active,
+.taskbar-item:hover {
+    color: #169b99; /* Modra akcentna barva (prilagodite!) */
+}
+
+/* ---------------------------------------------------- */
+/* 🚀 NOVI STILI ZA SREDINSKI GUMB "SCAN & EARN" 🚀 */
+/* ---------------------------------------------------- */
+
+.scan-btn-ovoj {
+    /* To ustvari prostor nad navigacijo, kot na sliki */
+    margin-top: -30px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px; /* Širina za polkrog */
+    height: 80px; /* Višina za polkrog */
+}
+
+.scan-btn {
+    /* Stil za sam gumb/krog */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px; 
+    height: 60px;
+    border-radius: 50%; /* Naredi krog */
+    background-color: #169b99; /* Modra barva ozadja (prilagodite!) */
+    color: #faf9f6;
+    box-shadow: 0 4px 10px rgba(4, 75, 62, 0.6); /* Poudarjena senca */
+    font-size: 1.6rem; /* POPRAVEK: Povečana velikost ikone */
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.scan-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(4, 75, 62, 0.6);
+}
+
+/* Dodamo še en stil za Tri pikice, če ga potrebujete za mobilni meni */
+.taskbar-item .fas.fa-ellipsis-h {
+    font-size: 1.2rem; 
+}
+/* =============================================== */
+/* 🔥 CSS za Dinamični Popust Zvestobe (Loyalty Badge) */
+/* =============================================== */
+
+/* Osnovno pozicioniranje na kartici */
+.kartica-izpostavljeno .slika-kartice {
+    position: relative; /* Ključen je relative, da se badge znotraj pozicionira absolutno */
+    overflow: hidden; /* Skrijemo morebiten preliv pri animaciji */
+}
+
+.loyalty-badge {
+    /* Pozicioniranje: Zgoraj desno */
+    position: absolute;
+    top: 0;
+    right: 0;
+    
+    /* Videz */
+    background-color: #e53e3e; /* Intenzivna rdeča (ali zelena/zlata, odvisno od želenega dizajna) */
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 6px 15px;
+    
+    /* Oblika in transformacija */
+    transform: rotate(45deg) translate(15%, -15%); /* Nagne ga in premakne na rob */
+    transform-origin: 100% 0%; /* Fiksira transformacijo v zgornjem desnem kotu */
+    
+    /* Senčenje in meje */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    border-bottom-left-radius: 5px;
+    z-index: 10; /* Poskrbimo, da je nad sliko */
+    
+    /* Dodaten prostor okoli teksta */
+    width: 150px; /* Dovolj širok, da se tekst -10% prikaže cel */
+    text-align: center;
+}
+
+/* Če želite drugačen, enostavnejši stil brez nagibanja (alternativna opcija): */
+/*
+.loyalty-badge.alternative {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #2c5282; 
+    padding: 4px 8px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+*/
+
+
+
 
 
 
@@ -2583,35 +2730,23 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             </div>
         </div>
         
-        <div class="akcije" id="desktopAkcije"> 
-          <a href="#" id="odpriPrijavoDesktop" class="gumb-prijava" data-i18n="header.login">
-            <i class="fas fa-user"></i> Prijava
-          </a>
-
-          <div class="profil-ovoj" id="profilMeniDesktop" style="display: none;">
-            <a href="profil.html" class="gumb-profil" data-i18n="header.profile">
-              <i class="fas fa-user-circle"></i> Moj Profil
-            </a>
-            <a href="#" id="gumbOdjavaDesktop" class="gumb-odjava" data-i18n="header.logout">
-              <i class="fas fa-sign-out-alt"></i> Odjava
-            </a>
-          </div>
-          <div class="jezik-ovoj" id="jezikOvojDesktop">
-            <i class="fas fa-globe"></i>
-            <select class="izbira-jezika" id="izbiraJezikaDesktop">
-              <option value="sl">SL</option>
-              <option value="en">EN</option>
-              <option value="de">DE</option>
-              <option value="hr">HR</option>
-              <option value="it">IT</option>
-              <option value="fr">FR</option>
-            </select>
-          </div>
-        </div>
+  <div class="akcije" id="desktopAkcije">
+  <div class="jezik-ovoj" id="jezikOvojDesktop">
+    <i class="fas fa-globe"></i>
+    <select class="izbira-jezika" id="izbiraJezikaDesktop">
+      <option value="sl">SL</option>
+      <option value="en">EN</option>
+      <option value="de">DE</option>
+      <option value="hr">HR</option>
+      <option value="it">IT</option>
+      <option value="fr">FR</option>
+    </select>
+  </div>
+</div>
         
-    <button class="hamburger-gumb" id="hamburgerGumb">
-        <i class="fas fa-ellipsis-h"></i>
-    </button>
+   <button class="hamburger-gumb" id="hamburgerGumb">
+    <i class="fas fa-user-circle"></i> 
+</button>
 
         <div class="mobilni-meni" id="mobilniMeni">
             <a href="#" id="odpriPrijavoMobilni" class="gumb-prijava" data-i18n="header.login">
@@ -2654,19 +2789,12 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
               <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
             </div>
 
-            <div class="iskalnik-polje">
+            <div class="iskalnik-polje skrij-polje">
               <label for="datum" data-i18n="search.date_label">Datum</label>
               <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
             </div>
 
-            <div class="iskalnik-polje">
-              <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
-              <select id="cas">
-                <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
-              </select>
-            </div>
-
-            <div class="iskalnik-polje">
+            <div class="iskalnik-polje skrij-polje">
               <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
               <select id="stevilo_oseb">
                 <option value="1">1</option>
@@ -2677,6 +2805,16 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
                 <option value="6">6</option>
                 <option value="7">7</option>
                 <option value="8">8</option>
+              </select>
+            </div>
+
+            <div class="iskalnik-polje">
+              <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
+              <select id="cas">
+                <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
+                <option value="18.0">18:00</option>
+                <option value="19.0">19:00</option>
+                <option value="20.0">20:00</option>
               </select>
             </div>
 
@@ -3053,6 +3191,26 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     </div>
 </footer>
 
+<div id="capacitorTaskbar" class="capacitor-only">
+    
+    <a href="index.html" class="taskbar-item active">
+        <i class="fas fa-home"></i> 
+        <span data-i18n="">Domov</span>
+    </a>
+    
+    <div class="scan-btn-ovoj">
+        <a href="profil.html#aktualne-rezervacije" class="scan-btn" title="Aktualne rezervacije (Scan & Earn)">
+            <i class="fas fa-qrcode"></i> 
+        </a>
+    </div>
+    
+    <a href="info-legal.html" class="taskbar-item">
+        <i class="fas fa-receipt"></i>
+        <span data-i18n="">Rezervacije</span>
+    </a>
+    
+    </div>
+
 <div id="cookie-consent-banner" class="cookie-banner hidden" style="display: none !important;" data-capacitor-remove-on-native="true">
     <div class="banner-content">
         
@@ -3087,10 +3245,9 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 </div>
 
   
+  <script src="capacitor.js"></script>
   <script src="script.js"></script>
-  
-<script>
-// TUKAJ JE POTREBNO DODATI PIKADAY CDN-JE (TUKAJ SO ŽE PRAVILNO DEFINIRANI SPODAJ, ZATO TA KOMENTAR ODSTRANIM)
+
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script> 
@@ -3270,26 +3427,63 @@ const appleLoginBtn = document.getElementById('apple-sign-in-btn');
 // ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
 // =================================================================
 
+// ⭐ DEFINICIJA ZASTAVICE ZA PRVI ZAGON ⭐
+const ZASTAVICA_PRVI_ZAGON = 'aplikacijaPrviZagonKončan';
+
 // Opomba: Ker potrebujemo hitrost, bomo del kode izvajali TAKOJ, ne da bi čakali na 'DOMContentLoaded'.
 
 if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     
+    // Pridobitev elementa za spletni pozdravni zaslon
     const webSplash = document.getElementById('splashScreenWeb');
     
-    // ⭐ KLJUČNA SPREMEMBA ZA ODPRAVO BLISKANJA: 
-    // Element prikažemo TAKOJ, ko se skripta izvede (ne čakamo na DOMContentLoaded).
-    if (webSplash) {
-        webSplash.classList.add('show-on-mobile');
+    // ---------------------------------------------------------------------
+    // 1. PREVERJANJE LOCALSTORAGE PRED PRIKAZOM (Izvede se TAKOJ ob nalaganju skripte)
+    // ---------------------------------------------------------------------
+
+    if (localStorage.getItem(ZASTAVICA_PRVI_ZAGON) === 'true') {
+        
+        console.log("Pozdravni zaslon preskočen, ker je bil že viden.");
+        if (webSplash) {
+            webSplash.remove(); // Takoj odstrani element, če je bil že viden
+        }
+        // Skrij native splash, če je aktiven (za gotovost)
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+            window.Capacitor.Plugins.SplashScreen.hide(); 
+        }
+        // TUKAJ SE BLOK KONČA, saj ne potrebujemo DOMContentLoaded logike za splash screen.
+        // Vendar moramo še vedno poslušati DOMContentLoaded za druge stvari (odstranitev bannerja).
+        
+    } else {
+        // Če še ni bil viden, ga prikažemo in pustimo, da se izvede logika časovnika
+        
+        // ⭐ KLJUČNA SPREMEMBA ZA ODPRAVO BLISKANJA: 
+        // Element prikažemo TAKOJ, ko se skripta izvede.
+        if (webSplash) {
+            webSplash.classList.add('show-on-mobile');
+        }
     }
+
+
+    // ---------------------------------------------------------------------
+    // 2. DOMContentLoaded LOGIKA (Za ostale aspekte in dokončanje animacije)
+    // ---------------------------------------------------------------------
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        // 1. Logika za skritje oglasne sekcije 'akcijeBanner'
+        // 1. Logika za skritje oglasne sekcije 'akcijeBanner' (Ta se izvede vedno)
         const akcijeBanner = document.getElementById('akcijeBanner');
         if (akcijeBanner) {
             akcijeBanner.remove(); 
             console.log("Capacitor App: Oglasna sekcija 'akcijeBanner' je uspešno odstranjena.");
         }
+
+        // Če je bil pozdravni zaslon že viden, se logika časovnika NE sme zagnati.
+        if (localStorage.getItem(ZASTAVICA_PRVI_ZAGON) === 'true') {
+            return; 
+        }
+
+        // --- Logika časovnika za PRVI ZAGON ---
 
         // ⭐ POPRAVEK ČASOV ZA HITREJŠI START ⭐
         // Animacija se sedaj konča pri 2.0s (PREDPOSTAVLJA SE HITREJŠI CSS!)
@@ -3316,14 +3510,22 @@ if (window.Capacitor && window.Capacitor.isNativePlatform()) {
             setTimeout(() => {
                  if (webSplash) {
                     webSplash.style.opacity = '0';
+                    
                     // Odstranimo ga iz DOM-a po zaključku izbleditve (500ms)
-                    setTimeout(() => webSplash.remove(), 500); 
+                    setTimeout(() => {
+                        webSplash.remove(); 
+                        
+                        // 🚨 KRITIČNA VRSTICA: NASTAVITEV ZASTAVICE PO KONCU ANIMACIJE
+                        localStorage.setItem(ZASTAVICA_PRVI_ZAGON, 'true');
+                        
+                    }, 500); 
                 }
             }, stabilizationTime); 
             
         }, hideNativeDelay); // 7000ms zamude
-    });
-}
+    }); // Zapira document.addEventListener('DOMContentLoaded', ...)
+
+} // Zapira if (window.Capacitor && window.Capacitor.isNativePlatform())
 
 
 // =================================================================
@@ -3338,7 +3540,7 @@ function generateStarsHTML(rating) {
     let starsHTML = '';
     for (let i = 1; i <= maxStars; i++) {
         if (i <= roundedRating) {
-            starsHTML += `<span style="color: #20c0bd;">${fullStar}</span>`;
+            starsHTML += `<span style="color: #169b99;">${fullStar}</span>`;
         } else {
             starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
         }
@@ -3422,13 +3624,25 @@ const preimenujOsebe = () => {
 function generirajCasovneOpcije() {
   const select = document.getElementById("cas");
   if (!select) return; 
+
+  // Praznjenje seznama, da se zagotovi, da ni podvojenih opcij
+  // Opomba: Če imate prvo opcijo ("Izberi čas") v HTML, to izpustite ali jo dodajte nazaj
+  select.innerHTML = ''; 
+
+  // Generiranje samo polnih ur (od 10:00 do 23:00)
   for (let h = 10; h <= 23; h++) {
-    let c1 = `${h.toString().padStart(2, "0")}:00`;
-    let c2 = `${h.toString().padStart(2, "0")}:30`;
-    select.add(new Option(c1, c1));
-    if (h < 23) select.add(new Option(c2, c2));
+    // Vidni tekst za uporabnika (npr. 10:00)
+    let displayTime = `${h.toString().padStart(2, "0")}:00`;
+    
+    // Vrednost za backend (npr. 10.0, 19.0)
+    let decimalValue = h.toFixed(1); 
+    
+    // Dodajanje opcije v <select>
+    select.add(new Option(displayTime, decimalValue));
   }
-  select.value = "19:00";
+  
+  // Nastavitev privzete izbrane vrednosti na 19.0 (19:00)
+  select.value = "19.0"; 
 }
 
 const updateContent = () => {
@@ -3727,24 +3941,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 🔥 POPRAVEK ZA GLAVNI MOBILNI MENI (HAMBURGER V GLAVI)
-    if(hamburgerGumb && mobilniMeni) {
-        hamburgerGumb.addEventListener('click', () => {
-            mobilniMeni.classList.toggle('active');
-            const icon = hamburgerGumb.querySelector('i');
-            if (icon) {
-                if (mobilniMeni.classList.contains('active')) {
-                    icon.classList.remove('fa-ellipsis-h');
-                    icon.classList.add('fa-times'); 
-                } else {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-ellipsis-h'); 
-                }
-            }
-            // Opcijsko: Prepreči scroll, ko je meni odprt
-            document.body.classList.toggle('menu-open', mobilniMeni.classList.contains('active'));
-        });
-    }
+    // 🔥 POPRAVEK ZA GLAVNI MOBILNI MENI (PROFILNI DROPDOWN V GLAVI)
+// Predpostavljamo, da je 'mobilniMeni' pravi ID za vaš dropdown (prej profilniDropdown)
+if(hamburgerGumb && mobilniMeni) {
+    hamburgerGumb.addEventListener('click', (e) => {
+        
+        // Uporabimo e.preventDefault(), če gumb ni <button> ampak <a>
+        if (e) e.preventDefault(); 
+        
+        // 1. Preklopi razred 'active' za prikaz/skrivanje menija
+        mobilniMeni.classList.toggle('active');
+        
+        // 🚨 KODA ZA SPREMINJANJE IKONE JE ODSTRANJENA!
+        // Ikona <i class="fas fa-user-circle"></i> bo ostala ves čas enaka.
+        
+        // 2. Opcijsko: Prepreči scroll, ko je meni odprt
+        document.body.classList.toggle('menu-open', mobilniMeni.classList.contains('active'));
+    });
+}
 
     // LOGIKA REZERVACIJSKEGA MODALA (API klic)
     
@@ -5606,6 +5820,73 @@ function dodajMarkerjeRestavracij(leafletMap) {
     }
 
 }
+// V VAŠI JAVASCRIPT DATOTEKI: script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const taskbar = document.getElementById('capacitorTaskbar');
+    // Preverimo, ali je objekt Capacitor definiran (kar pomeni, da je mobilna aplikacija)
+    const isMobileApp = typeof window.Capacitor !== 'undefined'; 
+
+    if (taskbar && isMobileApp) {
+        
+        // =========================================================================
+        // ⭐ NOVO: Dodajanje razreda na telo (<body>) za CSS targetiranje
+        // =========================================================================
+        document.body.classList.add('is-capacitor-app');
+        
+        // 1. Dodamo razred za prikaz Taskbarja in Flexbox stile
+        taskbar.classList.add('is-mobile'); 
+        
+        // 2. Skrijemo nogo (footer)
+        const footer = document.querySelector('footer');
+        if (footer) {
+             footer.style.display = 'none'; 
+        }
+        
+        // 3. Dodamo padding na glavno vsebino
+        const mainContent = document.querySelector('main');
+        if (mainContent) {
+            // Predpostavljam, da je taskbar visok 65px
+            mainContent.style.paddingBottom = '65px'; 
+        }
+    } 
+    
+    // ------------------------------------------------------------------
+    // 💡 NOVO: Logika za preklop zavihka na profil.html s pomočjo URL-ja 💡
+    // ------------------------------------------------------------------
+
+    function preklopiZavihekPoHashu() {
+        // Izvedemo samo na strani profil.html
+        if (!window.location.pathname.includes('profil.html')) {
+            return;
+        }
+
+        const ciljniHash = window.location.hash.substring(1); // Npr. 'aktualne-rezervacije'
+
+        if (ciljniHash === 'aktualne-rezervacije') {
+            
+            // 🎯 POPRAVEK: Uporabljamo vaš natančen selektor: .profil-zavihek[data-target="aktualne-rezervacije"]
+            const ciljniGumb = document.querySelector(`.profil-zavihek[data-target="${ciljniHash}"]`); 
+            
+            if (ciljniGumb) {
+                // Če najdemo gumb, simuliramo klik nanj
+                ciljniGumb.click(); 
+                
+                // Očistimo hash iz URL-ja
+                history.replaceState(null, null, 'profil.html'); 
+                
+            } else {
+                console.warn(`Zavihek Aktualne Rezervacije ni bil najden. Preverite HTML za selektor: .profil-zavihek[data-target="${ciljniHash}"]`);
+            }
+        }
+    }
+
+    // Zaženemo funkcijo ob nalaganju strani
+    setTimeout(preklopiZavihekPoHashu, 100);
+    
+});
+
 </script>
     <div id="toaster-container">
     </div>

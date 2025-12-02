@@ -86,6 +86,28 @@ const KomentarShema = new mongoose.Schema({
 }, { _id: true }); 
 
 
+// =======================================================
+// 🔥 NOVO: PODSHEMA ZA PRAGOVE ZVESTOBE (LOYALTY TIERS)
+// =======================================================
+const LoyaltyTierSchema = new mongoose.Schema({
+    points: {
+        type: Number,
+        required: true,
+        default: 500,
+        min: 0,
+        comment: "Minimalno število točk za dosego tega popusta."
+    },
+    discount: {
+        type: Number,
+        required: true,
+        default: 5,
+        min: 0,
+        max: 100,
+        comment: "Odstotek popusta."
+    }
+}, { _id: false }); // ID ni potreben za vdelan dokument
+
+
 // 4. GLAVNA Shema za Restavracijo 
 const RestavracijaSchema = new mongoose.Schema({
     // ----- OSNOVNA POLJA -----
@@ -123,6 +145,15 @@ const RestavracijaSchema = new mongoose.Schema({
     },
 
     // ----- DODATNA POLJA ZA FRONTEND IN GEO-ISKANJE -----
+    
+    // 🔥 KLJUČNO NOVO POLJE: Dinamični popusti zvestobe
+    loyaltyTiers: {
+        type: [LoyaltyTierSchema], // Uporabimo novo shemo
+        default: [
+            { points: 1000, discount: 10 },
+            { points: 500, discount: 5 }
+        ]
+    },
     
     // 🔥 POPRAVLJENO: Dodan setter za pravilno shranjevanje decimalne vrednosti
     ocena_povprecje: { 

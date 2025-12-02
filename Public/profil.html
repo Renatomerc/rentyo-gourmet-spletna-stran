@@ -13,6 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/23.11.5/i18next.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js"></script>
   <script src="capacitor.js"></script> 
+
 <style>
     /* SPECIFIČEN CSS ZA PROFIL */
     .profil-sekcija {
@@ -97,54 +98,80 @@
       width: 100%; /* Da zavzame celotno širino, kar omogoča prelamljanje */
     }
     
-    /* Ovoj za ikono fotoaparata (Krog) */
-    #qr-scan-button .icon-ovoj {
-        width: 45px;
-        height: 45px;
-        background-color: #1BC0BB; 
-        border-radius: 50%; 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 20px;
-        margin-right: 15px; 
-        flex-shrink: 0; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-    }
+    /* ================================================================= */
+/* NOVO: Ovalni ovoj za celoten blok QR skenerja */
+/* ================================================================= */
+
+.qr-scan-ovoj {
+    /* Odstranimo stari stil, ki je bil samo črta */
+    /* padding: 15px 0; */
+    /* margin-bottom: 15px; */
+    /* border-bottom: 1px solid #eee; */
     
-    /* Besedilo zraven ikone */
-    #qr-scan-button .text-ovoj {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        line-height: 1.2; 
-        flex-grow: 1; /* Omogoči, da zasede preostali prostor */
-    }
+    /* 🟢 NOVI OVALNI OVOJ (KARTICA) 🟢 */
+    background-color: white; /* Bela notranjost */
+    border-radius: 12px; /* Zaobljeni robovi */
+    padding: 15px; /* Notranji rob znotraj ovoja */
+    margin: 15px; /* Zunanji rob, da se kartica loči od okolice */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Senčenje, da izgleda kot kartica */
     
-    /* Poudarjeno glavno besedilo (Črne barve) */
-    #qr-scan-button .main-text {
-        font-weight: bold;
-        color: #333; 
-        font-size: 16px;
-        margin-bottom: 2px;
-        white-space: normal; /* <--- POPRAVEK: Omogoči prelamljanje vrstice */
-    }
-    
-    /* Sekundarno, manj poudarjeno besedilo (Črne barve) */
-    #qr-scan-button .sub-text {
-        font-weight: normal; 
-        color: #333; 
-        font-size: 13px;
-        opacity: 0.85; 
-        white-space: normal; /* <--- POPRAVEK: Omogoči prelamljanje vrstice */
-    }
-    
-    .qr-scan-ovoj {
-        padding: 15px 0;
-        margin-bottom: 15px;
-        border-bottom: 1px solid #eee;
-    }
+    /* Prepričajte se, da je ta element display:block ali display:flex */
+    display: block; 
+}
+
+
+/* ================================================================= */
+/* OBSTOJEČI STILI ZA NOTRANJO VSEBINO (QR gumb) */
+/* ================================================================= */
+
+#qr-scan-button {
+    display: flex; /* Ključno za poravnavo ikone in besedila */
+    align-items: center; /* Vertikalna poravnava */
+    width: 100%; /* Da zasede celoten prostor znotraj ovoja */
+}
+
+/* Ovoj za ikono fotoaparata (Krog - OSTANE ENAK) */
+#qr-scan-button .icon-ovoj {
+    width: 45px;
+    height: 45px;
+    background-color: #1BC0BB; 
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    margin-right: 15px; 
+    flex-shrink: 0; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+}
+
+/* Besedilo zraven ikone (OSTANE ENAK) */
+#qr-scan-button .text-ovoj {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2; 
+    flex-grow: 1; 
+}
+
+/* Poudarjeno glavno besedilo (OSTANE ENAK) */
+#qr-scan-button .main-text {
+    font-weight: bold;
+    color: #333; 
+    font-size: 16px;
+    margin-bottom: 2px;
+    white-space: normal;
+}
+
+/* Sekundarno, manj poudarjeno besedilo (OSTANE ENAK) */
+#qr-scan-button .sub-text {
+    font-weight: normal; 
+    color: #333; 
+    font-size: 13px;
+    opacity: 0.85; 
+    white-space: normal;
+}
 
 
     .gumb-prijava:hover, 
@@ -267,7 +294,7 @@
 
     .profil-zavihek.active {
       border-bottom-color:none ; 
-      color: #20c0bd;
+      color: #169b99;
     }
 
     .vsebina-zavihek {
@@ -520,11 +547,11 @@
         
         /* Aktivni zavihek (Mobilni) */
         .profil-zavihek.active {
-            border-left-color: #1BC0BB; 
+            border-left-color: #169B99; 
             color: #f8f8f8;
             border-radius: 25px;
-            background-color: #1BC0BB;
-            border-bottom-color: #1BC0BB; 
+            background-color: #169B99;
+            border-bottom-color: #169B99; 
     -webkit-tap-highlight-color: transparent;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
@@ -785,182 +812,236 @@
         });
 
 
-        // ===========================================
-        // 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (CAPACITOR INTEGRACIJA) 🚀
-        // ===========================================
+   // ===========================================
+// 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (CAPACITOR INTEGRACIJA) 🚀
+// Uporablja stabilnejši Community vtičnik.
+// ===========================================
+
+// Preveri, ali se izvaja v Capacitor okolju
+const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isPluginAvailable('BarcodeScanner');
+
+/**
+ * Pomožna funkcija za čiščenje UI in prisilno ustavljanje kamere.
+ * Zdaj vključuje klic showBackground in stopScan za Community vtičnik.
+ */
+const stopHighlight = async () => { 
+     if (isCapacitorApp) {
+         try {
+             const { BarcodeScanner } = Capacitor.Plugins;
+             
+             // 🚨 KRITIČNO: Community vtičnik zahteva to za ustavitev kamere.
+             await BarcodeScanner.stopScan(); 
+             
+             // Community vtičnik zahteva, da je ozadje spet vidno.
+             await BarcodeScanner.showBackground();
+             
+         } catch (e) {
+             console.log("BarcodeScanner.stopScan/showBackground failed, likely due to previous crash. Ignoring error.");
+         }
+         
+         // Odstranitev celozaslonskega premaza (če se je uporabil za UI)
+         document.body.classList.remove('barcode-scanner-active');
+     }
+}
+
+
+/**
+ * 1. Pošlje restavracijaId na strežnik za potrditev prihoda in dodelitev točk.
+ * (Ta funkcija ostaja večinoma enaka, popravljen je le klic stopHighlight.)
+ * @param {string} restavracijaId ID restavracije, skeniran iz QR kode.
+ */
+const potrdiPrihodNaStrežniku = async (restavracijaId) => {
+    if (!zeton) {
+        prikaziSporocilo('error', i18next.t('profile.auth_required'));
+        return;
+    }
+    
+    if (scanStatusElement) {
+         scanStatusElement.textContent = i18next.t('profile.status_sending');
+         scanStatusElement.style.color = '#575757';
+    }
+
+    try {
+        const response = await fetch(QR_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${zeton}` 
+            },
+            body: JSON.stringify({ restavracijaId })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            prikaziSporocilo('success', data.msg);
+            
+            if (scanStatusElement) {
+                const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
+                scanStatusElement.textContent = statusMsg;
+                scanStatusElement.style.color = 'green';
+            }
+            
+            // 1. Posodobitev točk in profila
+            naloziPodatkeProfila(); 
+            
+            // 2. Premik rezervacije: Ponovno naloži aktivne (izgine/posodobi status)
+            naloziAktivneRezervacije();
+            
+            // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže)
+            naloziPretekleRezervacije();
+
+        } else {
+            console.error("Napaka pri potrditvi prihoda:", data);
+            const errorMsg = i18next.t('profile.status_error') + `: ${data.msg || response.statusText}`;
+            prikaziSporocilo('error', errorMsg);
+             if (scanStatusElement) {
+                scanStatusElement.textContent = errorMsg;
+                scanStatusElement.style.color = 'red';
+            }
+        }
+    } catch (error) {
+        console.error("Kritična napaka pri potrditvi prihoda:", error);
+        prikaziSporocilo('error', i18next.t('profile.server_error'));
+         if (scanStatusElement) {
+            scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
+            scanStatusElement.style.color = 'red';
+        }
+    }
+    // 🚨 Klic stopHighlight mora počakati na ustavitev kamere.
+    await stopHighlight(); 
+};
+
+
+/**
+ * 2. Zažene Community BarcodeScanner.
+ */
+const zacniSkeniranje = async () => {
+    if (!isCapacitorApp) {
+        prikaziSporocilo('error', i18next.t('profile.scan_unavailable') || 'Skeniranje ni na voljo.');
+        return;
+    }
+    
+    const { BarcodeScanner } = Capacitor.Plugins;
+
+    try {
+        // --- 🚨 KRITIČNA SPREMEMBA 1: Preverjanje in zahtevanje dovoljenja ---
         
-        // Preveri, ali se izvaja v Capacitor okolju
-        const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isPluginAvailable('BarcodeScanner');
+        // Community vtičnik (za razliko od ML Kit) uporablja get/requestPermission()
+        let status = await BarcodeScanner.checkPermission();
+
+        if (status.granted === false) {
+            status = await BarcodeScanner.requestPermission();
+        }
         
-        // Pomožna funkcija za čiščenje UI po skeniranju.
-        const stopHighlight = () => {
-             if (isCapacitorApp) {
-                 const { BarcodeScanner } = Capacitor.Plugins;
-                 BarcodeScanner.showBackground();
-                 document.body.classList.remove('barcode-scanner-active');
-             }
+        if (status.granted === false) {
+             const msg = i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.';
+             prikaziSporocilo('error', msg);
+             if (scanStatusElement) scanStatusElement.textContent = msg;
+             
+             stopHighlight(); 
+             return;
+        }
+        
+        // --- 🚨 KRITIČNA SPREMEMBA 2: Community vtičnik potrebuje transparentno ozadje ---
+        
+        // Naredi ozadje WebViewa transparentno, da se skozi njega vidi kamera.
+        await BarcodeScanner.hideBackground();
+        
+        // Ta klic pustimo, saj generira celozaslonski premaz/ozadje:
+        document.body.classList.add('barcode-scanner-active'); 
+        
+        if (scanStatusElement) {
+            scanStatusElement.textContent = i18next.t('profile.status_scanning') || 'Skeniranje v teku...';
+            scanStatusElement.style.color = '#1BC0BB';
+        }
+
+        // --- 🚨 KRITIČNA SPREMEMBA 3: Community vtičnik deluje s poslušanjem dogodkov ---
+        
+        // Community vtičnik uporablja startScan z zanko (ne odpira nove Activity)
+        const result = await BarcodeScanner.startScan();
+        
+        // Ustavitev je v Community vtičniku izrecno potrebna
+        await stopHighlight(); 
+        
+        // ***************************************************************
+        // KRITIČNA OBRAVNAVA: Preveri, ali je rezultat definiran in ima vsebino
+        // ***************************************************************
+        if (!result || result.hasContent === false) {
+            // To se zgodi, če je skeniranje prekinjeno ali vtičnik ni našel vsebine.
+            const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano.';
+            prikaziSporocilo('error', msg);
+            if (scanStatusElement) {
+                scanStatusElement.textContent = msg;
+                scanStatusElement.style.color = 'orange';
+            }
+            return;
         }
 
 
-        /**
-         * 1. Pošlje restavracijaId na strežnik za potrditev prihoda in dodelitev točk.
-         * @param {string} restavracijaId ID restavracije, skeniran iz QR kode.
-         */
-        const potrdiPrihodNaStrežniku = async (restavracijaId) => {
-            if (!zeton) {
-                prikaziSporocilo('error', i18next.t('profile.auth_required'));
-                return;
-            }
-            
-            if (scanStatusElement) {
-                 scanStatusElement.textContent = i18next.t('profile.status_sending');
-                 scanStatusElement.style.color = '#575757';
-            }
-
-            try {
-                const response = await fetch(QR_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${zeton}` 
-                    },
-                    body: JSON.stringify({ restavracijaId })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    prikaziSporocilo('success', data.msg);
-                    
-                    if (scanStatusElement) {
-                        const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
-                        scanStatusElement.textContent = statusMsg;
-                        scanStatusElement.style.color = 'green';
-                    }
-                    
-                    // 1. Posodobitev točk in profila
-                    naloziPodatkeProfila(); 
-                    
-                    // 2. Premik rezervacije: Ponovno naloži aktivne (izgine/posodobi status)
-                    naloziAktivneRezervacije();
-                    
-                    // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže)
-                    naloziPretekleRezervacije();
-
-                } else {
-                    console.error("Napaka pri potrditvi prihoda:", data);
-                    const errorMsg = i18next.t('profile.status_error') + `: ${data.msg || response.statusText}`;
-                    prikaziSporocilo('error', errorMsg);
-                     if (scanStatusElement) {
-                        scanStatusElement.textContent = errorMsg;
-                        scanStatusElement.style.color = 'red';
-                    }
-                }
-            } catch (error) {
-                console.error("Kritična napaka pri potrditvi prihoda:", error);
-                prikaziSporocilo('error', i18next.t('profile.server_error'));
-                 if (scanStatusElement) {
-                    scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
-                    scanStatusElement.style.color = 'red';
-                }
-            }
-            setTimeout(stopHighlight, 500);
-        };
-
-
-        /**
-         * 2. Zažene Capacitor BarcodeScanner.
-         */
-        const zacniSkeniranje = async () => {
-            if (!isCapacitorApp) {
-                prikaziSporocilo('error', i18next.t('profile.scan_unavailable') || 'Skeniranje ni na voljo.');
-                return;
-            }
-            
-            const { BarcodeScanner } = Capacitor.Plugins;
-
-            try {
-                document.body.classList.add('barcode-scanner-active');
-                BarcodeScanner.hideBackground();
-                
-                const status = await BarcodeScanner.checkPermission({ force: true });
-                if (status.granted) {
-                    
-                    if (scanStatusElement) {
-                        scanStatusElement.textContent = i18next.t('profile.status_scanning') || 'Skeniranje v teku...';
-                        scanStatusElement.style.color = '#1BC0BB';
-                    }
-
-                    const result = await BarcodeScanner.startScan();
-                    
-                    stopHighlight(); 
-
-                    if (result.hasContent) {
-                        const restavracijaId = result.content; 
-                        
-                        // Validacija formata: 24 znakov (MongoDB ObjectId)
-                        if (restavracijaId.length !== 24 || !restavracijaId.match(/^[0-9a-fA-F]{24}$/)) {
-                            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljaven format QR kode. Skenirajte čisto besedilo (ID restavracije).';
-                            prikaziSporocilo('error', msg);
-                             if (scanStatusElement) scanStatusElement.textContent = msg;
-                            return;
-                        }
-
-                        potrdiPrihodNaStrežniku(restavracijaId);
-
-                    } else {
-                        const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano.';
-                        prikaziSporocilo('error', msg);
-                         if (scanStatusElement) {
-                            scanStatusElement.textContent = msg;
-                            scanStatusElement.style.color = 'orange';
-                        }
-                    }
-                } else {
-                    prikaziSporocilo('error', i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.');
-                    stopHighlight();
-                }
-            } catch (error) {
-                console.error('Napaka pri BarcodeScannerju:', error);
-                prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
-                stopHighlight();
-            }
-        };
-
-        // ===========================================
-        // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
-        // ===========================================
-
-        const zeton = localStorage.getItem('zeton');
+        // Logika se nadaljuje le, če je result definiran in ima vsebino:
+        const restavracijaId = result.content; 
         
-        const updateHeader = () => {
-            if (!zeton) {
-                window.location.href = 'index.html';
-            }
-        };
+        // Validacija formata: 24 znakov (MongoDB ObjectId)
+        if (restavracijaId.length !== 24 || !restavracijaId.match(/^[0-9a-fA-F]{24}$/)) {
+            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljaven format QR kode. Skenirajte čisto besedilo (ID restavracije).';
+            prikaziSporocilo('error', msg);
+             if (scanStatusElement) scanStatusElement.textContent = msg;
+            return;
+        }
+
+        potrdiPrihodNaStrežniku(restavracijaId);
         
-        const odjava = (e) => {
-            if (e) e.preventDefault();
-            localStorage.removeItem('zeton'); 
-            localStorage.removeItem('jeLastnik'); 
-            window.location.href = 'index.html'; 
-        };
         
-        const posodobiPrikazPodatka = (element, labelKey, value) => {
-            if (element) {
-                const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
-                let span = element.querySelector('.placeholder-text');
-                
-                element.innerHTML = `<strong>${label}:</strong> `; 
-                
-                if(!span) {
-                    span = document.createElement('span');
-                    span.className = 'placeholder-text';
-                }
-                span.textContent = value;
-                element.appendChild(span);
-            }
-        };
+    } catch (error) {
+        // Obravnava kritičnih napak
+        
+        if (error.message && error.message.includes('permission')) {
+             prikaziSporocilo('error', i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.');
+        } else {
+             prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
+        }
+       
+        console.error('Napaka pri Community BarcodeScannerju:', error);
+        
+        await stopHighlight();
+    }
+};
+
+// ===========================================
+// 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
+// ===========================================
+
+const zeton = localStorage.getItem('zeton');
+
+const updateHeader = () => {
+    if (!zeton) {
+        window.location.href = 'index.html';
+    }
+};
+
+const odjava = (e) => {
+    if (e) e.preventDefault();
+    localStorage.removeItem('zeton'); 
+    localStorage.removeItem('jeLastnik'); 
+    window.location.href = 'index.html'; 
+};
+
+const posodobiPrikazPodatka = (element, labelKey, value) => {
+    if (element) {
+        const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
+        let span = element.querySelector('.placeholder-text');
+        
+        element.innerHTML = `<strong>${label}:</strong> `; 
+        
+        if(!span) {
+            span = document.createElement('span');
+            span.className = 'placeholder-text';
+        }
+        span.textContent = value;
+        element.appendChild(span);
+    }
+};
 
         const naloziPodatkeProfila = async () => {
             if (!zeton) return;

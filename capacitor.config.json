@@ -12,7 +12,8 @@
       "showSpinner": false,
       "splashFullScreen": true,
       "splashImmersive": true
-    }
+    },
+    "BarcodeScanner": {}
   },
   "cordova": {}
 }
