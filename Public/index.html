@@ -872,64 +872,87 @@
         }
         
    /* ======================================================= */
-    /* NOVO: KARTICA IZPOSTAVLJENO (MANJŠA KARTICA) */
-    /* ======================================================= */
-    .kartica-izpostavljeno {
-        /* Nadomesti pravila osnovne .kartica */
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        
-        /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
-        border-top-left-radius: 10px;    /* Radius zgoraj levo */
-        border-top-right-radius: 10px;   /* Radius zgoraj desno */
-        border-bottom-right-radius: 20px; /* Radius spodaj desno */
-        border-bottom-left-radius: 20px;  /* Radius spodaj levo */
-        
-        /* Prejšnja enotna lastnost: border-radius: 10px; */
-        
-        width: 100%;
-        height: 250px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        background-color: #88d82d; /* Svetlo ozadje */
-        transition: box-shadow 0.2s, transform 0.2s;
-        border: 0px solid #333;
-    }
+/* NOVO: KARTICA IZPOSTAVLJENO (MANJŠA KARTICA) */
+/* ======================================================= */
+.kartica-izpostavljeno {
+    /* Nadomesti pravila osnovne .kartica */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
+    border-top-left-radius: 10px;    /* Radius zgoraj levo */
+    border-top-right-radius: 10px;   /* Radius zgoraj desno */
+    border-bottom-right-radius: 20px; /* Radius spodaj desno */
+    border-bottom-left-radius: 20px;  /* Radius spodaj levo */
+    
+    /* Prejšnja enotna lastnost: border-radius: 10px; */
+    
+    width: 100%;
+    height: 250px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    background-color: #88d82d; /* Svetlo ozadje */
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: 0px solid #333;
+}
 
-    .kartica-izpostavljeno:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateY(0px);
-        
-        
-    }
+.kartica-izpostavljeno:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(0px);
+    
+    
+}
 
-    /* SPREMENJENO: Zmanjšano na 50px za še manjšo višino slike */
-    .kartica-izpostavljeno .slika-kartice {
-        width: 100%;
-        height: 220px; 
-        background-size: cover;
-        background-position: center;
-        background-color: #f5f5f5;
-    }
+/* SPREMENJENO: Zmanjšano na 50px za še manjšo višino slike */
+.kartica-izpostavljeno .slika-kartice {
+    width: 100%;
+    height: 220px; 
+    background-size: cover;
+    background-position: center;
+    background-color: #f5f5f5;
+    
+    /* ⭐ KLJUČNA SPREMEMBA 1: Nastavitev relativnega pozicioniranja za otroške elemente */
+    position: relative;
+}
 
-    /* SPREMENJENO: Zmanjšan padding na 6px */
-    .kartica-izpostavljeno .vsebina-kartice-izpostavljeno {
-        padding: 10px; 
-        text-align: center;
-    }
+/* ⭐ KLJUČNA SPREMEMBA 2: STILI ZA OZNAKO POPUSTA */
+.kartica-izpostavljeno .slika-kartice .oznaka-ponudbe {
+    position: absolute; /* Pozicioniranje glede na starša (.slika-kartice) */
+    top: 10px;          /* 10px od zgornjega roba */
+    right: 10px;        /* 10px od desnega roba */
+    
+    /* Oblikovanje oznake */
+    background-color: #ffcc00; /* Močna, opazna barva (npr. rumena/zlata) */
+    color: #333;               /* Temno besedilo */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 10; /* Poskrbimo, da je nad sliko */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+/* ---------------------------------------------------- */
 
-    /* SPREMENJENO: Zmanjšana velikost pisave na 0.85rem */
-    .kartica-izpostavljeno .vsebina-kartice-izpostavljeno h3 {
-        font-size: 0.9rem; 
-        font-weight: 600;
-        margin: 0;
-        color: #333;
-        white-space: nowrap; 
-        overflow: hidden;
-        text-overflow: ellipsis; 
-        
-    }
+
+/* SPREMENJENO: Zmanjšan padding na 6px */
+.kartica-izpostavljeno .vsebina-kartice-izpostavljeno {
+    padding: 10px; 
+    text-align: center;
+}
+
+/* SPREMENJENO: Zmanjšana velikost pisave na 0.85rem */
+.kartica-izpostavljeno .vsebina-kartice-izpostavljeno h3 {
+    font-size: 0.9rem; 
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    
+}
     
 
     
@@ -4282,13 +4305,22 @@ function renderFeaturedCard(restavracija) {
     const card = document.createElement('div');
     card.className = 'kartica kartica-izpostavljeno';
     card.setAttribute('data-id', restavracija._id || restavracija.id);
-    card.addEventListener('click', () => prikaziPodrobnosti(restavracija));
+    
+    // Predpostavimo, da je prikaziPodrobnosti funkcija za obravnavo klika
+    card.addEventListener('click', () => prikaziPodrobnosti(restavracija)); 
 
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; 
+    
+    // ⭐ NOVO: Pridobitev besedila popusta (polje 'popust' je vklučeno v Controller Aggregate)
+    const besediloPopusta = restavracija.popust || ''; 
 
     card.innerHTML = `
-        <div class="slika-kartice" style="background-image: url('${slikaUrl}')"></div>
+        <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
+            
+            <span class="oznaka-ponudbe">${besediloPopusta}</span>
+            
+        </div>
         <div class="vsebina-kartice-izpostavljeno">
             <h3>${restavracijaIme}</h3>
         </div>

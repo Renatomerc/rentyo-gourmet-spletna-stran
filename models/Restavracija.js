@@ -109,6 +109,15 @@ const RestavracijaSchema = new mongoose.Schema({
     naslovPodjetja: String, 
     davcnaStevilka: String, 
     drzava: String,
+    
+    // ⭐ NOVO: POLJE ZA POPUST ZA IZPOSTAVLJENO SEKCIJO
+    popust: {
+        type: String, 
+        default: '', // Privzeta vrednost je prazen niz (NI izpostavljeno)
+        trim: true
+    },
+    // ----------------------------------------------------
+    
     cuisine: [String], 
     
     delovniCasStart: { type: Number, default: 8 }, 

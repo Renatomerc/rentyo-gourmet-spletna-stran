@@ -28,6 +28,13 @@ module.exports = (preveriGosta) => {
      */
     router.get('/privzeto', restavracijaController.getPrivzetoRestavracije); 
 
+    /**
+     * ⭐ NOVO: POT ZA IZPOSTAVLJENE RESTAVRACIJE
+     * GET /api/restavracije/izpostavljene
+     * Vrača samo restavracije, ki imajo v polju 'popust' podatke.
+     */
+    router.get('/izpostavljene', restavracijaController.getIzpostavljeneRestavracije);
+
 
     // -----------------------------------------------------------------
     // 🟢 DVE POTI ZA PREVERJANJE RAZPOLOŽLJIVOSTI:

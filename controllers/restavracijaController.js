@@ -87,6 +87,60 @@ exports.getPrivzetoRestavracije = async (req, res) => {
         res.status(500).json({ msg: "Napaka strežnika pri nalaganju restavracij" });
     }
 };
+/**
+ * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (POPRAVLJEN KLON getPrivzetoRestavracije)
+ * Vrača samo restavracije, ki imajo neprazno polje 'popust'.
+ */
+exports.getIzpostavljeneRestavracije = async (req, res) => {
+    console.log("===> API klic za /izpostavljene prejet. Vrnjeni bodo samo filtrirani podatki.");
+
+    try {
+        const restavracije = await Restavracija.aggregate([
+            // ⭐ KLJUČNA SPREMEMBA: DODAJANJE $match FAZE FILTRIRANJA
+            { $match: { 
+                popust: { $exists: true, $ne: null, $ne: "" } 
+            }},
+            // ----------------------------------------------------------------------
+            
+            { $project: {
+                _id: 1, 
+                // Ključni podatki kartice
+                imeRestavracije: { $ifNull: ["$ime", "$naziv", "Ime manjka v bazi (Controller)"] }, 
+                urlSlike: { 
+                    $ifNull: [
+                        "$mainImageUrl", 
+                        { $arrayElemAt: ["$galerija_slik", 0] } 
+                    ]
+                },
+                deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
+                
+                opis: { $ifNull: ["$opis", "Opis manjka."] }, 
+                meni: 1, 
+                
+                // ⭐ NOVO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
+                popust: 1, 
+                // ---------------------------------------------
+                
+                komentarji: 1, 
+                galerija_slik: 1, 
+                ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
+                
+                googleRating: { $ifNull: ["$googleRating", 0] },
+                googleReviewCount: { $ifNull: ["$googleReviewCount", 0] },
+                
+                lokacija: 1,
+                razpolozljivost_status: 1,
+                razpolozljivost_cas: 1
+            }}
+        ]);
+        
+        res.status(200).json(restavracije);
+
+    } catch (error) {
+        console.error("Napaka pri pridobivanju izpostavljenih restavracij:", error);
+        res.status(500).json({ msg: "Napaka strežnika pri nalaganju izpostavljenih restavracij" });
+    }
+};
 
 
 /**
