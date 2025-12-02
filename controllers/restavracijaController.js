@@ -65,6 +65,10 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE KOMENTARJI
                 komentarji: 1, // <--- DODANO ZA REŠITEV PROBLEMA Z OCENAMI
                 
+                // ⭐ NOVO: DODAJTE FEATURED POLJE TUKAJ!
+                featured: 1, 
+                // ------------------------------------
+                
                 // Ostala polja
                 galerija_slik: 1, 
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
@@ -118,7 +122,10 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                 meni: 1, 
                 
                 // ⭐ NOVO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
-                popust: 1, 
+                popust: 1,
+                
+                // 🔥 DODANO: VKLJUČITEV POLJA FEATURED V PROJEKCIJO
+                featured: 1,
                 // ---------------------------------------------
                 
                 komentarji: 1, 
