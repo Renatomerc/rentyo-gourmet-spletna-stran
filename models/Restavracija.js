@@ -116,6 +116,12 @@ const RestavracijaSchema = new mongoose.Schema({
         default: '', // Privzeta vrednost je prazen niz (NI izpostavljeno)
         trim: true
     },
+    
+    // 🔥 NOVO: POLJE ZA OZNAČEVANJE IZPOSTAVLJENE RESTAVRACIJE (FEATURED)
+    featured: {
+        type: Boolean,
+        default: false // Privzeto ni izpostavljeno
+    },
     // ----------------------------------------------------
     
     cuisine: [String], 
