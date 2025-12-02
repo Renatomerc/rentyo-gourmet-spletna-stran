@@ -487,7 +487,7 @@ function filterAndRenderRestavracije() {
 
 // Prikaz Izpostavljenih Restavracij (Uporabimo prve 3 kot featured)
 function renderFeaturedRestavracije() {
-    const featuredList = allRestavracije.filter(r => r.featured === true || r.izpostavljeno === true);
+    const featuredList = allRestavracije.filter(r => r.featured == true || r.izpostavljeno == true);
 
     if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.innerHTML = '';
     if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
