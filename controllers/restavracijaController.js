@@ -842,7 +842,6 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         let potrjenaRezervacijaId = null; 
         let preteklaRezervacijaOciscena = false; 
 
-
         // --- 1. AGREGACIJA: Poišči VSE ustrezne Rezervacije na DANAŠNJI DAN ---
         const rezultatIskanja = await Restavracija.aggregate([
             { $match: { "_id": restavracijaIdObj } },
@@ -850,7 +849,8 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             { $unwind: "$mize.rezervacije" },
             { $match: { 
                 "mize.rezervacije.uporabnikId": userIdObj, 
-                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO_PRIHOD'] }, 
+                // 🔥 POPRAVEK: DODAN 'POTRJENO', saj je to pogosto vmesni status pred prihodom.
+                "mize.rezervacije.status": { $in: ['AKTIVNO', 'POTRJENO', 'POTRJENO_PRIHOD'] }, 
                 "mize.rezervacije.datum": danesISO 
             }},
             { $project: {
@@ -863,16 +863,18 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         ]);
 
         if (rezultatIskanja.length === 0) {
+            console.log(`[DEBUG_FAIL] Ne najdem aktivne rezervacije za uporabnika ${userId} danes v restavraciji ${restavracijaId}.`);
             return res.status(404).json({ msg: `profile.status_error: Aktivna rezervacija za danes (${danesISO}) v tej restavraciji ni bila najdena.` });
         }
         
+        console.log(`[DEBUG_SUCCESS] Najdenih ${rezultatIskanja.length} potencialnih rezervacij. Preverjam časovno okno...`);
+
         // --- 2. PREVERJANJE ČASA in POSODOBITEV (Dinamični Timezone) ---
         
         // 🚨 NOVO: Določimo časovni pas, ki ustreza lokaciji restavracije (Slovenija)
         const CILJNI_TZ = 'Europe/Ljubljana'; 
         
         // Izračunamo, koliko ur je razlika med UTC in našim ciljnim časovnim pasom za današnji datum
-        // Moment nam pove offset v minutah, mi ga pretvorimo v ure (za CET +1, za CEST +2)
         const timezoneOffsetMinutes = moment.tz(danes, CILJNI_TZ).utcOffset();
         const timezoneOffsetHours = timezoneOffsetMinutes / 60; 
 
@@ -887,22 +889,37 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             const localReservedHour = parseInt(rezInfo.casZacetkaSt);
             
             // 2. Izračunamo UTC uro: npr. 15:00 CET (lokalno) = 14:00 UTC
-            // UTC ura = Lokalna ura - offset (za CET: 15 - 1 = 14)
             const UTCHour = localReservedHour - timezoneOffsetHours;
             
             // Pripravimo format za logiranje
             const casRezervacijeString = `${String(localReservedHour).padStart(2, '0')}:00`; 
             
-            // 3. Nastavimo čas
+            // 3. Nastavimo čas (ustvarimo DATE objekt za rezervacijo)
             const casZacetkaRezervacije = new Date(danes);
             
             // 💥 KLJUČNO: Uporaba setUTCHours (namesto setHours), da se čas rezervacije pravilno postavi
-            // glede na UTC offset strežnika (tako da 14 UTC ustreza 15 lokalno)
             casZacetkaRezervacije.setUTCHours(UTCHour, 0, 0, 0); 
             
             // Izračunaj časovno okno za potrditev (10 minut prej, 60 minut kasneje)
             const casZaPotrditevOd = new Date(casZacetkaRezervacije.getTime() - (10 * 60000)); 
             const casZaPotrditevDo = new Date(casZacetkaRezervacije.getTime() + (60 * 60000)); 
+            
+            // ----------------------------------------------------------------------
+            // ⭐ NOVO: KLJUČNO LOGIRANJE ZA DEBUGIRANJE ČASOVNEGA PASU
+            // ----------------------------------------------------------------------
+            console.log(`\n--- DEBUG OKNO: ${rezInfo.rezervacijaId.toString()} ---`);
+            console.log(`Lokalna ura rezervacije (casZacetkaSt): ${localReservedHour}:00`);
+            console.log(`Izračunan UTC Offset (ur): ${timezoneOffsetHours}`);
+            console.log(`Čas začetka rezervacije (Date objekt): ${casZacetkaRezervacije.toISOString()}`);
+            console.log(`Okno za potrditev (UTC čas Date objektov):`);
+            console.log(`  OD: ${casZaPotrditevOd.toISOString()}`);
+            console.log(`  DO: ${casZaPotrditevDo.toISOString()}`);
+            console.log(`Trenutni čas (danes - Date objekt): ${danes.toISOString()}`);
+            
+            const isWithinTimeWindow = danes >= casZaPotrditevOd && danes <= casZaPotrditevDo;
+            console.log(`POGOJ ČASOVNEGA OKNA JE: ${isWithinTimeWindow}`);
+            console.log(`-----------------------------------`);
+            // ----------------------------------------------------------------------
             
             aktivnaRezervacijaNajdena = true;
 
@@ -912,7 +929,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             }
 
             // 🚀 PRIMER A: PRAVOČASNA POTRDITEV
-            if (danes >= casZaPotrditevOd && danes <= casZaPotrditevDo) {
+            if (isWithinTimeWindow) { // Uporabimo isWithinTimeWindow za bolj jasno kodo
                 
                 potrjenaRezervacijaId = rezInfo.rezervacijaId; 
                 
@@ -940,6 +957,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 
                 if (rezultatPosodobitve.modifiedCount > 0) {
                     posodobitevStevilo++;
+                    console.log(`[DEBUG_UPDATE] Status rezervacije ${rezInfo.rezervacijaId} uspešno posodobljen na POTRJENO_PRIHOD.`);
                 }
                 
             } else if (danes > casZaPotrditevDo) { 
@@ -973,7 +991,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 
             } else {
                 // PRIMER C: PREZRAN SKEN
-                console.log(`Rezervacija ID ${rezInfo.rezervacijaId} ob ${casRezervacijeString} je še v prihodnosti. Potrditev še ni mogoča.`);
+                console.log(`[DEBUG_FAIL] Rezervacija ID ${rezInfo.rezervacijaId} ob ${casRezervacijeString} je še v prihodnosti. Potrditev še ni mogoča.`);
             }
         }
         
@@ -985,7 +1003,7 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 return res.status(200).json({ msg: `profile.status_error: Vaša rezervacija je potekla in je bila označena kot ne-potrjena.`, status: 'NI_AKTIVNA' });
             }
             
-             return res.status(404).json({ msg: `` });
+             return res.status(404).json({ msg: `profile.status_error: Časovno okno za potrditev prihoda še ni aktivno.` });
         }
         
         if (posodobitevStevilo > 0) {
@@ -994,6 +1012,8 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 { $inc: { tockeZvestobe: TOCK_NA_REZERVACIJO } },
                 { new: true }
             );
+             console.log(`[DEBUG_SUCCESS] Uporabniku ${userId} prištetih ${TOCK_NA_REZERVACIJO} točk. Nove točke: ${posodobljenUporabnik.tockeZvestobe}`);
+
 
             res.json({ 
                 msg: `Prihod na ${posodobitevStevilo} rezervacij(e) uspešno potrjen. Dodeljenih ${TOCK_NA_REZERVACIJO} točk!`,
@@ -1008,15 +1028,14 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
         }
 
     } catch (error) {
-        console.error('❌ NAPAKA PRI POTRDITVI PRIHODA IN DODELITVI TOČK:', error);
-        // Tukaj se je včasih pojavljala napaka: 'Napaka strežnika pri potrditvi prihoda.'
+        console.error('❌ KRITIČNA NAPAKA PRI POTRDITVI PRIHODA IN DODELITVI TOČK:', error);
         res.status(500).json({ msg: 'Napaka strežnika pri potrditvi prihoda.' });
     }
 };
 
 
 /**
- * Označi rezervacijo kot zaključeno. To funkcijo običajno sproži lastnik/admin restavracije.
+ * Označi rezervacijo kot zaključeno. To funkciju običajno sproži lastnik/admin restavracije.
  * TA FUNKCIJA NE DODELJUJE VEČ TOČK, saj to naredi 'potrdiPrihodInDodelitevTock'.
  * PUT /api/restavracije/zakljuci_rezervacijo
  * (To sproži Admin.)
