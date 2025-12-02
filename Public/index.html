@@ -2675,6 +2675,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 
 
 
+
   </style>
 </head>
 
@@ -4533,7 +4534,7 @@ function prikaziRezultate(restavracije) {
 }
 
 
-// 7. Glavna funkcija za nalaganje (OSTANE NESPREMENJENA)
+// 7. Glavna funkcija za nalaganje (POPRAVLJENO)
 async function loadRestavracije() {
     if (!mrezaKarticDiv) return; 
 
@@ -4551,7 +4552,10 @@ async function loadRestavracije() {
         const data = await response.json();
         
         allRestavracije = data; 
-        MOCK_IZPOSTAVLJENO_RAW = allRestavracije.slice(0, 3); 
+        
+        // ❌ ODSTRANJENA VRSTICA: MOCK_IZPOSTAVLJENO_RAW = allRestavracije.slice(0, 3);
+        // Ta vrstica je odstranjena, da bi preprečila prisilno omejitev na 3,
+        // kar omogoča funkciji renderFeaturedRestavracije, da prikaže vse označene restavracije.
         
         setupKuhinjaFiltersListeners();
         filterAndRenderRestavracije();
