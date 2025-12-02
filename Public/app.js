@@ -445,22 +445,12 @@ function renderFeaturedCard(restavracija) {
     } else {
         slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || 'https://via.placeholder.com/300x200?text=Slika+ni+na+voljo';
     }
-
-    // ⭐ KLJUČNA LOGIKA ZA POPUST (Prebere polje)
-    const popust = restavracija.popust || ''; // Polje, ki ga sedaj dobimo iz API-ja
-    
-    // Generira HTML za oznako popusta, če polje ni prazno
-    const popustHTML = popust
-        ? `<div class="popust-oznaka">${popust}</div>`
-        : '';
-    // -----------------------------------------------------------------------------
     
     // Listener za celotno kartico
     card.addEventListener('click', () => poglejDetajle(restavracija._id));
 
     card.innerHTML = `
-        <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
-             ${popustHTML} </div>
+        <div class="slika-kartice" style="background-image: url('${slikaUrl}')"></div>
         <div class="vsebina-kartice-izpostavljeno">
             <h3>${imeRestavracije}</h3>
         </div>

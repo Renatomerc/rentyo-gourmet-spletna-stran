@@ -108,7 +108,7 @@ const RestavracijaSchema = new mongoose.Schema({
     imePodjetja: String, 
     naslovPodjetja: String, 
     davcnaStevilka: String, 
-    drzava: String, // 🚨 POPRAVEK: Vejica dodana TUKAJ
+    drzava: String,
     
     // ⭐ NOVO: POLJE ZA POPUST ZA IZPOSTAVLJENO SEKCIJO
     popust: {
