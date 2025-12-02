@@ -858,7 +858,9 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
                 mizaId: "$mize._id", // ID mize je nujen za posodobitev z $
                 rezervacijaId: "$mize.rezervacije._id",
                 casZacetkaSt: "$mize.rezervacije.casStart", // Uporabljamo casStart (število)
-                status: "$mize.rezervacije.status"
+                status: "$mize.rezervacije.status",
+                // ⭐ DODANO: PRIDOBITEV TRAJANJA REZERVACIJE ZA PRAVILEN IZRAČUN OKNA
+                trajanjeUr: "$mize.rezervacije.trajanjeUr" 
             }}
         ]);
 
@@ -900,14 +902,20 @@ exports.potrdiPrihodInDodelitevTock = async (req, res) => {
             // 💥 KLJUČNO: Uporaba setUTCHours (namesto setHours), da se čas rezervacije pravilno postavi
             casZacetkaRezervacije.setUTCHours(UTCHour, 0, 0, 0); 
             
-            // Izračunaj časovno okno za potrditev (10 minut prej, 60 minut kasneje)
+            // ⭐ NOVO: Izračun trajanja v milisekundah (trajanjeUr * 60 min * 60000 ms/min)
+            // Uporabimo 1.5 ure kot privzeto, če trajanjeUr ni določeno.
+            const trajanjeRezervacijeMs = (rezInfo.trajanjeUr || 1.5) * 60 * 60000;
+            
+            // Izračunaj časovno okno za potrditev (10 minut prej, CELOTNO TRAJANJE kasneje)
             const casZaPotrditevOd = new Date(casZacetkaRezervacije.getTime() - (10 * 60000)); 
-            const casZaPotrditevDo = new Date(casZacetkaRezervacije.getTime() + (60 * 60000)); 
+            // 💥 POPRAVEK: Dinamično določanje konca okna s trajanjeUr
+            const casZaPotrditevDo = new Date(casZacetkaRezervacije.getTime() + trajanjeRezervacijeMs); 
             
             // ----------------------------------------------------------------------
-            // ⭐ NOVO: KLJUČNO LOGIRANJE ZA DEBUGIRANJE ČASOVNEGA PASU
+            // ⭐ NOVO: KLJUČNO LOGIRANJE ZA DEBUGIRANJE ČASOVNEGA PASU (posodobljeno)
             // ----------------------------------------------------------------------
             console.log(`\n--- DEBUG OKNO: ${rezInfo.rezervacijaId.toString()} ---`);
+            console.log(`Trajanje rezervacije (ur): ${rezInfo.trajanjeUr || 1.5}`);
             console.log(`Lokalna ura rezervacije (casZacetkaSt): ${localReservedHour}:00`);
             console.log(`Izračunan UTC Offset (ur): ${timezoneOffsetHours}`);
             console.log(`Čas začetka rezervacije (Date objekt): ${casZacetkaRezervacije.toISOString()}`);
