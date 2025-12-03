@@ -38,8 +38,8 @@ a:hover {
     justify-content: space-between; 
     align-items: center; 
     padding: 15px 5%; /* Uporaba odstotkov za boljšo odzivnost */
-    background-color: #169b99;
-    border-bottom: 3px solid #169b99;
+    background-color: #00979C;
+    border-bottom: 3px solid #00979C;
 }
 
 .logotip img {
@@ -277,7 +277,7 @@ body.is-capacitor .iskalnik-sekcija {
 
 .gumb-isci {
     padding: 10px;
-    background-color: #169b99;
+    background-color: #00979C;
     color: white;
     border: none;
     border-radius: 20px;

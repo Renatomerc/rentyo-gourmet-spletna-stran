@@ -338,7 +338,7 @@
     }
 
     .form-group-checkbox a {
-        color: #20c0bd;
+        color: #00979C;
         font-weight: bold;
         text-decoration: none;
         transition: color 0.2s;
@@ -346,7 +346,7 @@
     }
 
     .form-group-checkbox a:hover {
-        color: #169b99;
+        color: #00979C;
         text-decoration: underline;
         
     }
@@ -375,7 +375,7 @@
     }
 
     .login-form button:hover:not(:disabled) {
-      background-color: #169b99;
+      background-color: #00979C;
     }
 
     /* Poseben stil, ko je gumb onemogočen (disabled) */
@@ -385,6 +385,7 @@
         cursor: not-allowed;
         box-shadow: none;
     }
+    
     /* ----------------------------------------------------------------- */
     /* 🔥 KONEC NOVIH STILOV 🔥 */
     /* ----------------------------------------------------------------- */
@@ -652,7 +653,7 @@
         }
 
         .gumb-razumem:hover {
-            background-color: #169b99;
+            background-color: #00979C;
         }
 
         /* ===== GUMBI V GLAVI (OSTANE NESPREMENJENO) ===== */
@@ -916,22 +917,39 @@
     position: relative;
 }
 
-/* ⭐ KLJUČNA SPREMEMBA 2: STILI ZA OZNAKO POPUSTA */
+/* ⭐ KLJUČNA SPREMEMBA 2: STILI ZA OKROGLO OZNAKO POPUSTA (POPRAVLJENO) */
 .kartica-izpostavljeno .slika-kartice .oznaka-ponudbe {
-    position: absolute; /* Pozicioniranje glede na starša (.slika-kartice) */
-    top: 10px;          /* 10px od zgornjega roba */
-    right: 10px;        /* 10px od desnega roba */
+    position: absolute; 
+    top: 10px;          
+    right: 10px;        
     
-    /* Oblikovanje oznake */
-    background-color: #ffcc00; /* Močna, opazna barva (npr. rumena/zlata) */
-    color: #333;               /* Temno besedilo */
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.8rem;
+    /* Oblikovanje za okroglo obliko */
+    background-color: #88d82d; /* Rdeča/izstopajoča barva za popust */
+    color: #131313;               /* Belo besedilo */
+    
+    /* 🔥 KLJUČNA SPREMEMBA: Enak padding za krog (višina == širina) */
+    padding: 8px; 
+    
+    /* 🔥 KLJUČNA SPREMEMBA: Nastavitev za popolnoma okroglo obliko */
+    border-radius: 50%;
+    
+    font-size: 0.9rem;
     font-weight: 700;
-    text-transform: uppercase;
-    z-index: 10; /* Poskrbimo, da je nad sliko */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    
+    /* Odstranimo text-transform, ker se morda ne prilega */
+    text-transform: none; 
+    
+    /* Dodatni stili */
+    z-index: 10; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    
+    /* Po želji, da besedilo bolje stoji na sredini */
+    line-height: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px; /* Fiksna širina in višina za popoln krog */
+    height: 45px;
 }
 /* ---------------------------------------------------- */
 
@@ -2354,7 +2372,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 100%;
     height: 100%;
     /* Barva ozadja je KONSTANTNO turkizna */
-    background-color: #169b99; 
+    background-color: #00979C; 
     
     /* ⭐ KLJUČNO POPRAVLJENO: Privzeto skrij, da se ne prikaže na SPLETNI STRANI ⭐ */
     display: none !important; 
@@ -2546,14 +2564,14 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
    ★ 7. IZBRAN DAN — POLNA TURKIZNA BARVA
    ======================================================= */
 .is-selected .pika-button {
-    background: #169b99 !important;
+    background: #00979C !important;
     color: #fff !important;
     border-radius: 50% !important;
     width: 36px !important;
     height: 36px !important;
     line-height: 36px !important;
     font-weight: 600;
-    border: 2px solid #169b99 !important;
+    border: 2px solid #00979C !important;
 }
 
 /* =======================================================
@@ -2605,7 +2623,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    color: #169b99; /* Barva neaktivne ikone */
+    color: #00979C; /* Barva neaktivne ikone */
     font-size: 0.7rem;
     font-weight: 500;
     padding: 5px 0; /* POPRAVEK: Odstranimo horizontalni padding, da ima besedilo več prostora */
@@ -2626,7 +2644,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 /* Aktivni element ali poudarek (za Domov/Aktivno) */
 .taskbar-item.active,
 .taskbar-item:hover {
-    color: #169b99; /* Modra akcentna barva (prilagodite!) */
+    color: #00979C; /* Modra akcentna barva (prilagodite!) */
 }
 
 /* ---------------------------------------------------- */
@@ -2651,7 +2669,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 60px; 
     height: 60px;
     border-radius: 50%; /* Naredi krog */
-    background-color: #169b99; /* Modra barva ozadja (prilagodite!) */
+    background-color: #00979C; /* Modra barva ozadja (prilagodite!) */
     color: #faf9f6;
     box-shadow: 0 4px 10px rgba(4, 75, 62, 0.6); /* Poudarjena senca */
     font-size: 1.6rem; /* POPRAVEK: Povečana velikost ikone */
@@ -2668,15 +2686,62 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 .taskbar-item .fas.fa-ellipsis-h {
     font-size: 1.2rem; 
 }
+/* V VAŠO CSS DATOTEKO (style.css) */
+
+.app-download-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.app-download-content h2 {
+    margin-bottom: 10px;
+}
+
+.app-download-content p {
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.app-store-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.store-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    color: white; /* Barva teksta na gumbu */
+    min-width: 150px;
+}
+
+.play-store {
+    background-color: #000000; /* Črna za Google Play */
+}
+
+.app-store {
+    background-color: #007aff; /* Modra za Apple */
+}
+
+.store-link i, .store-link img {
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+.small-info {
+    margin-top: 40px;
+    font-size: 0.9em;
+    color: #888;
+}
 
 
 
-
-
-
-
-
-  </style>
+ </style>
 </head>
 
 <body>
@@ -3516,7 +3581,7 @@ function generateStarsHTML(rating) {
     let starsHTML = '';
     for (let i = 1; i <= maxStars; i++) {
         if (i <= roundedRating) {
-            starsHTML += `<span style="color: #169b99;">${fullStar}</span>`;
+            starsHTML += `<span style="color: #00979C;">${fullStar}</span>`;
         } else {
             starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
         }
@@ -4314,7 +4379,7 @@ function renderFeaturedCard(restavracija) {
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; 
     
     // ⭐ NOVO: Pridobitev besedila popusta (polje 'popust' je vklučeno v Controller Aggregate)
-    const besediloPopusta = restavracija.popust || ''; 
+    const besediloPopusta = restavracija.popust || '-10%'; 
 
     card.innerHTML = `
         <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
@@ -4374,22 +4439,29 @@ function filterAndRenderRestavracije(optionalFilteredList) {
     updateContent(); 
 }
 
-// 4. Prikaz Izpostavljenih Restavracij
+// 4. Prikaz Izpostavljenih Restavracij (POPRAVLJENO, uporablja featured: true)
 function renderFeaturedRestavracije() {
     if (!mrezaIzpostavljenoKarticDiv) return;
     
+    // 🔥 NOVO: Filtrirajte neposredno iz allRestavracije
+    // Uporaba "!!" zagotavlja, da zajamemo 'true' ne glede na tip podatka, ki pride iz API-ja.
+    const featuredList = allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
+    
     mrezaIzpostavljenoKarticDiv.innerHTML = '';
     
-    if (MOCK_IZPOSTAVLJENO_RAW.length === 0) {
+    // Uporabi novo, filtrirano featuredList
+    if (featuredList.length === 0) {
         mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (i18next.t('messages.no_restaurants_found') || 'Ni izpostavljenih restavracij.') + '</div>'; 
         return;
     }
     
-    MOCK_IZPOSTAVLJENO_RAW.forEach(restavracija => {
+    // Iteriraj čez novo, filtrirano featuredList
+    featuredList.forEach(restavracija => {
         mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
     });
     
-    updateContent();
+    // Če je updateContent definirana
+    if (typeof updateContent === 'function') updateContent();
 }
 
 // 5. Nastavitev Gumbov za Hitro Iskanje Listenerji (POPRAVLJENO ZA KLIC API)
@@ -5812,68 +5884,293 @@ function dodajMarkerjeRestavracij(leafletMap) {
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    const taskbar = document.getElementById('capacitorTaskbar');
-    // Preverimo, ali je objekt Capacitor definiran (kar pomeni, da je mobilna aplikacija)
+    // Obstoječa spremenljivka, ki preverja, ali je koda v mobilni aplikaciji (Capacitor)
     const isMobileApp = typeof window.Capacitor !== 'undefined'; 
+
+    const taskbar = document.getElementById('capacitorTaskbar');
+    // NAJDEMO MODALNO OKNO ZA NADZOR VIDNOSTI
+    const loginModal = document.getElementById('loginModal');
+    // NOVO: Poiščemo obrazec za prijavo (ID v HTML je formPrijava)
+    const loginForm = document.getElementById('formPrijava');
+    
+    // 💡 NOVO: Poiščemo elemente za preklop
+    const loginLink = document.getElementById('odpriPrijavoMobilni'); // Gumb "Prijava"
+    const profileContainer = document.getElementById('profilMeniMobilni'); // Kontejner za "Moj Profil / Odjava"
+
+
+    // =========================================================================
+    // 🛠️ NOVO: FUNKCIJA ZA PREVERJANJE STATUSA PRIJAVE
+    // =========================================================================
+    function checkLoginStatus() {
+        // ⭐ ZAMENJAJTE to s pravo logiko, ki preveri, ali je uporabnik prijavljen
+        // Npr. preverjanje, ali obstaja avtentikacijski žeton v LocalStorage ali SessionStorage
+        const isAuthenticated = localStorage.getItem('authToken') !== null; 
+        return isAuthenticated;
+    }
+
+    // =========================================================================
+    // 🛠️ NOVO: FUNKCIJA ZA POSODOBITEV ELEMENTOV V ZAVIHKU
+    // =========================================================================
+    function updateMobileTaskbarUI() {
+        const isLoggedIn = checkLoginStatus();
+
+        if (isLoggedIn) {
+            // Uporabnik je prijavljen
+            if (loginLink) loginLink.style.display = 'none'; // Skrij "Prijava"
+            if (profileContainer) profileContainer.style.display = 'block'; // Prikaži "Moj Profil / Odjava"
+            console.log("UI posodobljen: Prikazan je profil.");
+        } else {
+            // Uporabnik ni prijavljen
+            if (loginLink) loginLink.style.display = 'block'; // Prikaži "Prijava"
+            if (profileContainer) profileContainer.style.display = 'none'; // Skrij "Moj Profil / Odjava"
+            console.log("UI posodobljen: Prikazana je prijava.");
+        }
+    }
+
 
     if (taskbar && isMobileApp) {
         
         // =========================================================================
-        // ⭐ NOVO: Dodajanje razreda na telo (<body>) za CSS targetiranje
+        // ⭐ OBSTAJEČA LOGIKA ZA CAPACITOR APP
         // =========================================================================
         document.body.classList.add('is-capacitor-app');
-        
-        // 1. Dodamo razred za prikaz Taskbarja in Flexbox stile
         taskbar.classList.add('is-mobile'); 
         
-        // 2. Skrijemo nogo (footer)
         const footer = document.querySelector('footer');
         if (footer) {
              footer.style.display = 'none'; 
         }
         
-        // 3. Dodamo padding na glavno vsebino
         const mainContent = document.querySelector('main');
         if (mainContent) {
-            // Predpostavljam, da je taskbar visok 65px
             mainContent.style.paddingBottom = '65px'; 
         }
+
+        // 💡 POPRAVLJENO: LOGIKA ZA SKRIVANJE LOGIN MODALA NA CAPACITORJU OB ZAGONU
+        if (loginModal) {
+             // Modal sedaj ostane skrit, dokler se ne pokliče s strani/gumba
+             loginModal.style.display = 'none'; 
+        }
+
+        // 🟢 NOVO: LOGIKA ZA AKTIVACIJO GUMBA ZA PRIJAVO V CAPACITOR OKOLJU
+        // Uporabljamo obstoječo spremenljivko 'loginLink' (odpriPrijavoMobilni)
+        if (loginLink) {
+            // Predpostavimo, da je to gumb, ki odpira modal s prijavno vsebino.
+            loginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (loginModal) {
+                    // Preverite, kateri 'display' stil potrebuje vaš modal, običajno je 'block' ali 'flex'
+                    loginModal.style.display = 'block'; 
+                }
+            });
+            // Opomba: DOLOČANJE display stila se sedaj premakne v updateMobileTaskbarUI
+        }
+        
+        // 🚀 KLIC FUNKCIJE OB ZAGONU (prvo določanje, kaj naj bo vidno)
+        updateMobileTaskbarUI();
+        // =========================================================================
     } 
     
+    // =========================================================================
+    // 💡 POPRAVEK: LOGIKA ZA ZAPIRANJE MODALA PO USPEŠNI PRIJAVI (SAMO V CAPACITOR OKOLJU)
+    // =========================================================================
+
+    if (loginForm && isMobileApp) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Preprečimo privzeto obnašanje (osvežitev strani)
+
+            // =======================================================================
+            // ⭐ VSTAVITE SVOJO LOGIKO ZA PRIJAVO TUKAJ (NPR. AJAX KLIC NA STREŽNIK)
+            // =======================================================================
+            
+            // VZOREC: Predpostavljamo, da je rezultat logike shranjen v spremenljivki 'prijavaUspešna'
+            const prijavaUspešna = true; // ZAMENJAJTE 'true' Z REZULTATOM VAŠE DEJANSKE PRIJAVNE LOGIKE!
+
+            if (prijavaUspešna) {
+                // PRIMER: Shranimo žeton (da checkLoginStatus deluje)
+                localStorage.setItem('authToken', 'fake-token'); 
+                
+                // 🚀 ZAPRI MODALNO OKNO
+                if (loginModal) {
+                    loginModal.style.display = 'none';
+                    // 🟢 NOVO: POSODOBI ELEMENTE ZAVIHKOV PO USPEŠNI PRIJAVI
+                    updateMobileTaskbarUI();
+                }
+            } else {
+                // Obravnava napake pri prijavi (npr. napačno geslo)
+                console.warn("Prijava neuspešna."); 
+            }
+        });
+    }
+    
+    // -------------------------------------------------------------------------
+    // 🚀 POPRAVLJENO: LOGIKA ZA ODJAVO (Poslušalec dogodkov na gumbu za odjavo)
+    // -------------------------------------------------------------------------
+    // ⭐ KLJUČNA SPREMEMBA: ID gumba je zdaj 'gumbOdjavaMobilni' namesto 'gumbZaOdjavo'
+    const logoutButton = document.getElementById('gumbOdjavaMobilni'); 
+    
+    if (logoutButton) {
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // ⭐ LOGIKA ZA ODJAVO (odstranitev žetona)
+            localStorage.removeItem('authToken'); // Odstrani žeton
+            
+            // 🟢 KLJUČNO: POSODOBI ELEMENTE ZAVIHKOV PO ODJAVI (prikaže "Prijava")
+            updateMobileTaskbarUI();
+            
+            // Po odjavi lahko preusmeriš uporabnika na domačo stran:
+            // window.location.href = '/';
+            console.log("Uporabnik uspešno odjavljen. UI posodobljen.");
+        });
+    }
+
+    // =========================================================================
+    // 💡 OBSTAJEČA LOGIKA ZA WEB/PWA (ko se NE izvaja v Capacitorju)
+    // =========================================================================
+
+    if (!isMobileApp) {
+
+        // 💡 NOVO: LOGIKA ZA SKRIVANJE LOGIN MODALA NA WEB/PWA
+        if (loginModal) {
+            // Modal je privzeto skrit na Web/PWA. Pokaže se le ob kliku (pokliče se showAppDownloadModal()).
+            loginModal.style.display = 'none';
+        }
+
+        
+        // 1. Poiščemo elemente v mobilnem meniju
+        // const loginLink = document.getElementById('odpriPrijavoMobilni'); // že deklarirano zgoraj
+        // const profileContainer = document.getElementById('profilMeniMobilni'); // že deklarirano zgoraj
+        const mobilniMeni = document.getElementById('mobilniMeni');
+        const jezikOvoj = document.getElementById('jezikOvojMobilni'); 
+        
+        // ... (preostala obstoječa logika za Web/PWA)
+        
+        // 2. Skrijemo standardne gumbe za prijavo in profil/odjavo
+        if (loginLink) {
+            loginLink.style.display = 'none';
+        }
+        if (profileContainer) {
+            profileContainer.style.display = 'none';
+        }
+        
+        // 3. Vstavimo nov gumb za prenos aplikacije na njihovo mesto
+        if (mobilniMeni) {
+            const downloadLink = document.createElement('a');
+            downloadLink.href = "#";
+            downloadLink.className = 'gumb-prenos-app';
+            downloadLink.innerHTML = '<i class="fas fa-mobile-alt"></i> Prenesi Aplikacijo';
+            
+            // Dodamo dogodek za prikaz modalnega okna
+            downloadLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showAppDownloadModal(); 
+            });
+
+            // Vstavimo gumb takoj pred izbiro jezika (jezik ostane viden!)
+            mobilniMeni.insertBefore(downloadLink, jezikOvoj);
+        }
+        
+        // Če gumb za prijavo/registracijo v glavi ostane viden na PWA/Web, 
+        // mu dodamo dogodek, da pokliče modalno okno za prenos.
+        const loginModalOpener = document.getElementById('odpriPrijavoMobilni'); // ponovno uporabimo ID
+        if(loginModalOpener) {
+             loginModalOpener.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 showAppDownloadModal();
+             });
+        }
+    }
+
+    // 💡 DODATNO: Dodamo listener za standardni gumb za zapiranje modalnega okna 'zapriModal' (×)
+    const zapriModalGumb = document.getElementById('zapriModal'); 
+    if (zapriModalGumb && loginModal) {
+        zapriModalGumb.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+    }
+
     // ------------------------------------------------------------------
-    // 💡 NOVO: Logika za preklop zavihka na profil.html s pomočjo URL-ja 💡
+    // Logika za preklop zavihka na profil.html s pomočjo URL-ja
     // ------------------------------------------------------------------
 
     function preklopiZavihekPoHashu() {
-        // Izvedemo samo na strani profil.html
         if (!window.location.pathname.includes('profil.html')) {
             return;
         }
 
-        const ciljniHash = window.location.hash.substring(1); // Npr. 'aktualne-rezervacije'
+        const ciljniHash = window.location.hash.substring(1);
 
         if (ciljniHash === 'aktualne-rezervacije') {
-            
-            // 🎯 POPRAVEK: Uporabljamo vaš natančen selektor: .profil-zavihek[data-target="aktualne-rezervacije"]
             const ciljniGumb = document.querySelector(`.profil-zavihek[data-target="${ciljniHash}"]`); 
             
             if (ciljniGumb) {
-                // Če najdemo gumb, simuliramo klik nanj
                 ciljniGumb.click(); 
-                
-                // Očistimo hash iz URL-ja
                 history.replaceState(null, null, 'profil.html'); 
-                
             } else {
-                console.warn(`Zavihek Aktualne Rezervacije ni bil najden. Preverite HTML za selektor: .profil-zavihek[data-target="${ciljniHash}"]`);
+                console.warn(`Zavihek Aktualne Rezervacije ni bil najden.`);
             }
         }
+    }
+    
+    preklopiZavihekPoHashu();
+});
+
+
+// =========================================================================
+// ⭐ IMPLEMENTACIJA FUNKCIJE ZA PRIKAZ MODALNEGA OKNA ZA PRENOS APLIKACIJE
+//    OPOMBA: Ta funkcija pokaže MODAL ZA PRENOS, NE za prijavo.
+// =========================================================================
+
+function showAppDownloadModal() {
+    const loginModal = document.getElementById('loginModal');
+    const loginContent = loginModal ? loginModal.querySelector('.login-content') : null;
+
+    if (!loginModal || !loginContent) {
+        console.error("Login modal ali vsebina nista bila najdena.");
+        return;
+    }
+
+    // 1. Zamenjava vsebine z vabilom za prenos aplikacije
+    loginContent.innerHTML = `
+        <span class="close-modal" id="zapriModalPrenos">×</span>
+        
+        <div class="app-download-content">
+            <h2 data-i18n="download.title">Prenesite našo aplikacijo</h2>
+            <p data-i18n="download.message">Za prijavo, registracijo in dostop do vseh funkcij je potrebna namestitev naše izvorne aplikacije:</p>
+            
+            <div class="app-store-links">
+                <a href="VAŠA_POVEZAVA_DO_GOOGLE_PLAY" target="_blank" class="store-link play-store">
+                    <i class="fab fa-google-play"></i> 
+                    Google Play
+                </a>
+                <a href="VAŠA_POVEZAVA_DO_APPLE_APP_STORE" target="_blank" class="store-link app-store">
+                    <i class="fab fa-apple"></i>
+                    App Store
+                </a>
+            </div>
+            
+            <p class="small-info" data-i18n="download.info">Dostop je mogoč samo preko aplikacije.</p>
+        </div>
+    `;
+
+    // 2. Prikaz modalnega okna
+    // Uporabimo 'flex' (ali 'block'), ki preglasi 'display: none', nastavljen v bloku !isMobileApp.
+    loginModal.style.display = 'flex'; 
+    
+    // 3. Dodajanje listenerja za zapiranje modalnega okna na novem gumbu
+    const zapriModalPrenos = document.getElementById('zapriModalPrenos');
+    if (zapriModalPrenos) {
+        zapriModalPrenos.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        }); 
     }
 
     // Zaženemo funkcijo ob nalaganju strani
     setTimeout(preklopiZavihekPoHashu, 100);
     
-});
+}
 
 </script>
     <div id="toaster-container">

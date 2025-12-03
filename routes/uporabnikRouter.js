@@ -105,27 +105,40 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.post('/registracija', async (req, res) => {
         console.log("🔥 DEBUG: Klic Registracije Prejet!"); 
 
-        const { ime, email, geslo, jeLastnik, cena } = req.body;
+        // ⭐ KLJUČNA SPREMEMBA: Iz req.body izluščimo VSA možna polja, ki jih shema pričakuje.
+        const { 
+            ime, 
+            priimek, 
+            telefon, 
+            email, 
+            geslo, 
+            jeLastnik, 
+            cena, 
+            fcmToken, // <--- KLJUČNO: Preprečitev napake 'undefined'
+        } = req.body;
         
-        if (!ime || !email || !geslo) return res.status(400).json({ msg: 'Vnesite vsa polja.' });
+        // Osnovna validacija
+        if (!ime || !email || !geslo) return res.status(400).json({ msg: 'Vnesite vsa obvezna polja: ime, e-mail in geslo.' });
         if (jeLastnik && (cena === undefined || cena === null))
             return res.status(400).json({ msg: 'Kot lastnik morate določiti ceno.' });
 
         try {
             const obstojec = await Uporabnik.findOne({ email });
-            if (obstojec) return res.status(400).json({ msg: 'Uporabnik že obstaja.' });
+            if (obstojec) return res.status(400).json({ msg: 'Uporabnik že obstaja s tem e-mailom.' });
 
             const salt = await bcrypt.genSalt(10);
             const hashiranoGeslo = await bcrypt.hash(geslo, salt);
 
+            // ⭐ POPRAVEK: V create metodo varno vstavimo VSE vrednosti.
             const novUporabnik = await Uporabnik.create({ 
                 ime, 
+                priimek: priimek || '',      // Varno, če ni posredovano
+                telefon: telefon || '',      // Varno, če ni posredovano
                 email, 
                 geslo: hashiranoGeslo, 
                 jeLastnik: jeLastnik || false, 
-                cena: cena || 0 
-                // Če ste v Mongoose shemi dodali tockeZvestobe z default: 0, 
-                // ga ni treba explicitno dodajati tukaj.
+                cena: cena || 0,
+                fcmToken: fcmToken || null   // KLJUČNO: Posredujemo null, če ga frontend ne pošlje
             });
             
             const zeton = generirajZeton(novUporabnik._id);
@@ -137,15 +150,19 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: novUporabnik.email,
                 jeLastnik: novUporabnik.jeLastnik,
                 cena: novUporabnik.cena,
-                // Predpostavimo, da je tockeZvestobe: 0, saj ga frontend trenutno ne rabi pri registraciji, ampak ga rabi pri profilu.
-                // 🚀 DODANO: Žeton za frontend (shranjevanje v localStorage)
                 zeton: zeton, 
                 msg: "Registracija uspešna. Žeton shranjen v varnem piškotku in JSON." 
             });
 
         } catch (err) {
-            console.error('❌ NAPAKA PRI REGISTRACIJI:', err);
-            res.status(500).json({ msg: 'Napaka strežnika pri registraciji.' });
+            // Obravnava morebitne preostale napake (vključno z MongoDB)
+            if (err.code === 11000) {
+                console.error('❌ NAPAKA PRI REGISTRACIJI (MongoDB Duplicate Key):', err.message);
+                return res.status(409).json({ msg: 'Vneseni e-mail je že v uporabi.' });
+            }
+            
+            console.error('❌ KRITIČNA NAPAKA PRI REGISTRACIJI:', err);
+            res.status(500).json({ msg: 'Napaka strežnika pri registraciji. Prosimo, poskusite znova.' });
         }
     });
 
