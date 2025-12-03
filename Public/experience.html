@@ -16,6 +16,29 @@
             /* 🔥 DODANO GLOBALNO OZADJE ZA CELOTNO STRAN */
             background-color: #f9f9f9; 
         }
+        body {
+    background-image: url('circles-and-roundabouts.png'); 
+    background-repeat: repeat; 
+    /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
+    background-color: #F5F5F5; 
+    
+    /* Preprečimo, da bi se vzorec premikal ob drsenju, če je to želeno */
+    /* background-attachment: fixed; */ 
+}
+body::before {
+    content: ''; /* Obvezno za pseudo-elemente */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
+    background-color: rgba(255, 255, 255, 0.511); /* Bela barva (255, 255, 255) z 50% prosojnostjo (0.5) */
+    
+    /* Zagotovimo, da je ta sloj pod vso vsebino */
+    z-index: -1; 
+}
         
         /* * ======================================
          * 1. ODSTRANITEV SVETLO MODREGA KVADRATA (FOCUS & TAP HIGHLIGHT)
@@ -137,7 +160,6 @@
         .exp-text-info {
             margin-top: -30px; 
             position: relative;
-            background-color: white; /* Ozadje, ki ustvari beli layer na mobilnih */
             padding-top: 20px;
             border-radius: 15px 15px 0 0; 
             box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
@@ -301,7 +323,7 @@
         }
         
         .offer-reserve-button {
-            background-color: #00979C; 
+            background-color: #076b6a; 
             color: white;
             padding: 8px 15px;
             border-radius: 25px;
@@ -311,7 +333,7 @@
         }
         
         .offer-reserve-button:hover {
-            background-color: #138b89; 
+            background-color: #076b6a; 
         }
 
         /*

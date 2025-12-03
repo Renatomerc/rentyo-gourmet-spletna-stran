@@ -59,11 +59,14 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             geslo, 
             jeLastnik, 
             cena, 
-            fcmToken, // KLJUČNO: Izluščimo fcmToken
+            fcmToken, 
+            drzava, // ⬅️ DODANO: Polje za državo
         } = req.body;
         
         // Osnovna validacija
-        if (!ime || !email || !geslo) return res.status(400).json({ msg: 'Vnesite vsa obvezna polja: ime, e-mail in geslo.' });
+        // ✅ POPRAVLJENO: Dodana validacija za drzava
+        if (!ime || !email || !geslo || !drzava) return res.status(400).json({ msg: 'Vnesite vsa obvezna polja: ime, e-mail, geslo in država.' });
+        
         if (jeLastnik && (cena === undefined || cena === null))
             return res.status(400).json({ msg: 'Kot lastnik morate določiti ceno.' });
 
@@ -83,6 +86,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 geslo: hashiranoGeslo, 
                 jeLastnik: jeLastnik || false, 
                 cena: cena || 0,
+                drzava: drzava, // ⬅️ DODANO: Vključimo državo
             };
 
             // ⭐ ZAOBID NAPAKE E11000: Dodaj fcmToken SAMO, če ima vrednost.
@@ -102,6 +106,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 email: novUporabnik.email,
                 jeLastnik: novUporabnik.jeLastnik,
                 cena: novUporabnik.cena,
+                drzava: novUporabnik.drzava, // ⬅️ DODANO: Vrnitev države
                 zeton: zeton, 
                 msg: "Registracija uspešna. Žeton shranjen v varnem piškotku in JSON." 
             });
@@ -184,6 +189,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                     email: uporabnikDB.email, 
                     jeLastnik: uporabnikDB.jeLastnik, 
                     cena: uporabnikDB.cena,
+                    drzava: uporabnikDB.drzava, // ⬅️ DODANO: Vrnitev države
                     // 🟢 NOVO: TOČKE ZVESTOBE
                     tockeZvestobe: uporabnikDB.tockeZvestobe 
                 }

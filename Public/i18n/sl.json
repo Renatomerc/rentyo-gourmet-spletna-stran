@@ -1,12 +1,12 @@
 {
   "app": {
     "title": "Iskanje Restavracij - Gourmet & Experience",
-    "profile_title": "Moj Profil - Gourmet & Experience",
-    "pageTitle": "Rentyo Ponudbe in Doživetja"
+    "profile_title": "Moj profil - Gourmet & Experience",
+    "pageTitle": "Rentyo ponudbe in doživetja"
   },
   "header": {
     "login": "Prijava",
-    "profile": "Moj Profil",
+    "profile": "Moj profil",
     "logout": "Odjava"
   },
   "hero": {
@@ -79,7 +79,7 @@
     "romantic_href": "experience.html?code=romantic-experience",
     "eco": "Ekološka kulinarika",
     "eco_href": "experience.html?code=eco-cuisine",
-    "pageTitle": "Rentyo Ponudbe in Doživetja",
+    "pageTitle": "Rentyo ponudbe in doživetja",
     "noActiveOffers": "Trenutno ni aktivnih posebnih ponudb."
   },
   "messages": {
@@ -133,14 +133,14 @@
     "tab_menu": "Meni",
     "tab_gallery": "Slike & Zemljevid",
     "tab_reviews": "Ocene",
-    "tab_special_offer": "Aktualna Ponudba",
+    "tab_special_offer": "Aktualna ponudba",
     "special_offer_title": "Posebna ponudba restavracije",
     "special_offer_default": "Trenutno ni aktivne posebne ponudbe ali sezonskega menija.",
     "no_reviews": "Trenutno ni na voljo podrobnih ocen za prikaz.",
     "no_menu": "Meni še ni na voljo.",
     "reserve_button": "Rezerviraj mizo",
     "gallery_title": "Galerija slik",
-    "map_title": "Zemljevid Lokacije",
+    "map_title": "Zemljevid lokacije",
     "reservation_persons": "Število oseb",
     "reservation_date": "Datum",
     "reservation_modal": {
@@ -151,7 +151,7 @@
       "duration_1_5h": "1 ura in pol (90 min)",
       "duration_2h": "2 uri",
       "confirm_button": "Potrdi trajanje in rezerviraj",
-      "qr_reminder": "Ne pozabite ob prihodu skenirajet QR kodo restavracije in pridobite točke in ugodnosti!"
+      "qr_reminder": "Ne pozabite ob prihodu skenirajte QR kodo restavracije in pridobite točke in ugodnosti!"
     }
   },
   "footer": {
@@ -184,11 +184,11 @@
     "copyright_text": "© 2025 Rentyo Gourmet. Vse pravice pridržane."
   },
   "profile": {
-    "title": "Moj Uporabniški Profil",
-    "tab_data": "Osebni Podatki",
-    "tab_current": "Aktualne Rezervacije",
-    "tab_history": "Zgodovina Rezervacij",
-    "tab_points_payment": "Točke in Plačilo",
+    "title": "Moj uporabniški profil",
+    "tab_data": "Osebni podatki",
+    "tab_current": "Aktualne rezervacije",
+    "tab_history": "Zgodovina rezervacij",
+    "tab_points_payment": "Točke in plačilo",
     "tab_notifications": "Obvestila",
     "data_subtitle": "Vaši podatki",
     "name_label": "Ime in priimek:",
@@ -199,7 +199,7 @@
     "cancel_button": "Prekliči",
     "history_subtitle": "Pretekle rezervacije",
     "no_history_reservations": "Zgodovina rezervacij je prazna.",
-    "points_payment_subtitle": "Točke in Plačilna sredstva",
+    "points_payment_subtitle": "Točke in plačilna sredstva",
     "points_title": "Vaše zbrane točke",
     "points_status": "Trenutno stanje: {{count}} točk (Dovolj za 10€ popusta)",
     "points_status_dynamic": "Trenutno stanje: {{count}} točk",
@@ -221,7 +221,7 @@
     "review_missing_data": "Napaka: Manjkajo podatki za oddajo ocene.",
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova.",
-    "scan_qr_main_text": "Skeniraj qr kodo in potrdi svoj prihod",
+    "scan_qr_main_text": "Skeniraj QR kodo in potrdi svoj prihod",
     "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste.",
     "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
     "status_confirmed": "Potrjeno",

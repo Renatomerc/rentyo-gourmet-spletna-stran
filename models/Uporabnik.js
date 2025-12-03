@@ -20,6 +20,15 @@ const UporabnikShema = new mongoose.Schema({
     jeLastnik: { type: Boolean, default: false },
     cena: { type: Number, default: 0, required: function() { return this.jeLastnik; } },
     
+    // ⭐ NOVO: POLJE ZA DRŽAVO
+    drzava: { 
+        type: String, 
+        required: true,      // Polje je obvezno pri novih registracijah
+        default: 'Neznano',  // Privzeta vrednost za nazaj združljivost (starejši uporabniki)
+        trim: true 
+    },
+    // ⭐ KONEC NOVEGA POLJA
+
     tockeZvestobe: {
         type: Number,
         default: 0

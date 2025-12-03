@@ -34,8 +34,8 @@
     </style>
 
     <style name="Rentyo_DatePickerStyle" parent="android:Widget.Material.Light.DatePicker">
-        <item name="android:headerBackground">#00979C</item>
-        <item name="android:colorControlActivated">#00979C</item>
+        <item name="android:headerBackground">#076b6a</item>
+        <item name="android:colorControlActivated">#076b6a</item>
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 

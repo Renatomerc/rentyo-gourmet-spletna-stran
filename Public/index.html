@@ -204,104 +204,125 @@
     }
     
     /*
-     * ========================================================================
-     * II. OSTALI STILI (MODALI, KARTICE, ITD.)
-     * ========================================================================
-     */
+ * ========================================================================
+ * II. OSTALI STILI (MODALI, KARTICE, ITD.)
+ * ========================================================================
+ */
 
-    /* ===== MODAL ZA PRIJAVO / REGISTRACIJO (OSTANE NESPREMENJENO) ===== */
-    .login-modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto; 
-    }
+/* ===== MODAL ZA PRIJAVO / REGISTRACIJO (OSTANE NESPREMENJENO) ===== */
+.login-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
 
-    .login-modal.active {
-      display: flex;
-    }
+.login-modal.active {
+    display: flex;
+}
 
+.login-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 350px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    margin: 50px auto;
+}
+
+@media (max-width: 600px) {
     .login-content {
-      background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      width: 350px;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-      position: relative;
-      animation: fadeIn 0.3s ease;
-      margin: 50px auto; 
+        padding: 20px;
+        margin: 20px auto;
     }
-
-    @media (max-width: 600px) {
-        .login-content {
-            padding: 20px;
-            margin: 20px auto;
-        }
-    }
+}
 
 
-    @keyframes fadeIn {
-      from {
+@keyframes fadeIn {
+    from {
         opacity: 0;
         transform: translateY(-10px);
-      }
-      to {
+    }
+    to {
         opacity: 1;
         transform: translateY(0);
-      }
     }
+}
 
-    .login-tabs {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
+.login-tabs {
+    /* POPRAVEK: Uporabimo center in nastavimo razmak s spodnjim robom */
+    display: flex !important; /* <--- DODANO ZA TESTIRANJE */
+    justify-content: center !important; /* <--- DODANO ZA TESTIRANJE */
+    margin-bottom: 20px;
+}
 
-    .login-tab {
-      flex: 1;
-      padding: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      border-bottom: 2px solid transparent;
-      transition: 0.2s;
-                /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
-        -webkit-tap-highlight-color: transparent;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
-        /* 👆 ZAKLJUČEK DODATKOV 👆 */
-    }
+.login-tab {
+    /* ⭐ AGRESIVNEJŠI POPRAVEK: Večji razmak in klikalno območje */
+    /* flex: 1; */
+    padding: 10px 20px; /* POVEČANO horizontalno oblazinjenje za boljši dotik (20px) */
+    margin: 0 15px;    /* POVEČAN horizontalni rob med zavihkoma (15px) */
+    cursor: pointer;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+    transition: 0.2s;
+    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+}
 
-    .login-tab.active {
-      
-      color: #20c0bd;
-      border-bottom: 2px solid #20c0bd; /* Dodan border za aktiven tab */
-    }
+.login-tab.active {
+    
+    color: #20c0bd;
+    border-bottom: 2px solid #20c0bd; /* Dodan border za aktiven tab */
+}
 
-    .login-form {
-      display: none;
-    }
+.login-form {
+    display: none;
+}
 
-    .login-form.active {
-      display: block;
-    }
+.login-form.active {
+    display: block;
+}
 
-    .login-form input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      /* POPRAVEK ZA ZOOM: Nastavimo velikost pisave na 16px, da preprečimo avtomatsko povečavo */
-      font-size: 16px !important; 
-    }
+/* ⭐ POPRAVLJEN BLOK: Vključujemo tudi SELECT element ⭐ */
+.login-form input,
+.login-form select { /* ⬅️ KLJUČNA SPREMEMBA: Dodan 'select' */
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* POPRAVEK ZA ZOOM: Nastavimo velikost pisave na 16px, da preprečimo avtomatsko povečavo */
+    font-size: 16px !important;
+    
+    /* Zagotavljanje pravilne poravnave in videza za <select> */
+    box-sizing: border-box; /* Ključno za širino 100% */
+    -webkit-appearance: none; /* Odstrani privzete sloge brskalnika */
+    -moz-appearance: none;
+    appearance: none;
+}
+/* ⭐ KONEC POPRAVLJENEGA BLOKA ⭐ */
+
+/* Dodatni stili za barvo besedila v spustnem meniju za boljši UX (neobvezno, a priporočljivo) */
+.login-form select:invalid {
+    color: #888; /* Sivo, ko je izbrana privzeta/neveljavna opcija */
+}
+
+.login-form select:valid {
+    color: #333; /* Temno, ko je izbrana veljavna opcija */
+}
 
     /* ----------------------------------------------------------------- */
     /* 🔥 NOVI STILI ZA POGOJE IN ONEMOGOČEN GUMB 🔥 */
@@ -338,7 +359,7 @@
     }
 
     .form-group-checkbox a {
-        color: #00979C;
+        color: #076b6a;
         font-weight: bold;
         text-decoration: none;
         transition: color 0.2s;
@@ -346,7 +367,7 @@
     }
 
     .form-group-checkbox a:hover {
-        color: #00979C;
+        color: #076b6a;
         text-decoration: underline;
         
     }
@@ -375,7 +396,7 @@
     }
 
     .login-form button:hover:not(:disabled) {
-      background-color: #00979C;
+      background-color: #076b6a;
     }
 
     /* Poseben stil, ko je gumb onemogočen (disabled) */
@@ -518,10 +539,10 @@
         }
         
         .duration-opcija.selected {
-            border-color: #148a86;
-            background-color: #148a86; /* Dodamo rahel odtenek za boljšo vidljivost izbrane opcije */
+            border-color: #076b6a;
+            background-color: #076b6a; /* Dodamo rahel odtenek za boljšo vidljivost izbrane opcije */
             /* Zamenjaj barvo poudarka za lažjo berljivost */
-            border-color: #148a86; 
+            border-color: #076b6a; 
             /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
         -webkit-tap-highlight-color: transparent;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -529,11 +550,11 @@
         }
         
         .duration-opcija.selected input[type="radio"]:checked {
-            border-color: #333;
+            border-color: #e1e1e1;
         }
 
         .duration-opcija.selected input[type="radio"]:checked::before {
-            background-color: #333;
+            background-color: #e1e1e1;
         }
 
 
@@ -543,10 +564,11 @@
             border: none;
             border-radius: 8px;
             background-color: #148a86;
-            color: #333;
+            color: #f2f2f2;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
         -webkit-tap-highlight-color: transparent;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -554,7 +576,7 @@
         }
 
         .gumb-potrdi-trajanje:hover {
-            background-color: #148a86;
+            background-color: #076b6a;
         }
         /* Slogi za opomnik o QR kodi in točkah znotraj modalnega okna */
 .duration-content .qr-reminder-text {
@@ -653,7 +675,7 @@
         }
 
         .gumb-razumem:hover {
-            background-color: #00979C;
+            background-color: #076b6a;
         }
 
         /* ===== GUMBI V GLAVI (OSTANE NESPREMENJENO) ===== */
@@ -663,7 +685,7 @@
         .gumb-odjava {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
+          gap: 10px;
           padding: 4px 12px;
           border-radius: 25px;
           font-weight: bold;
@@ -2372,7 +2394,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 100%;
     height: 100%;
     /* Barva ozadja je KONSTANTNO turkizna */
-    background-color: #00979C; 
+    background-color: #076b6a; 
     
     /* ⭐ KLJUČNO POPRAVLJENO: Privzeto skrij, da se ne prikaže na SPLETNI STRANI ⭐ */
     display: none !important; 
@@ -2564,21 +2586,21 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
    ★ 7. IZBRAN DAN — POLNA TURKIZNA BARVA
    ======================================================= */
 .is-selected .pika-button {
-    background: #00979C !important;
+    background: #076b6a !important;
     color: #fff !important;
     border-radius: 50% !important;
     width: 36px !important;
     height: 36px !important;
     line-height: 36px !important;
     font-weight: 600;
-    border: 2px solid #00979C !important;
+    border: 2px solid #076b6a !important;
 }
 
 /* =======================================================
    ★ 8. HOVER
    ======================================================= */
 .pika-button:hover {
-    background: #20c0bd !important;
+    background: #076b6a !important;
     color: #fff !important;
     border-radius: 50%;
 }
@@ -2623,7 +2645,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    color: #00979C; /* Barva neaktivne ikone */
+    color: #076b6a; /* Barva neaktivne ikone */
     font-size: 0.7rem;
     font-weight: 500;
     padding: 5px 0; /* POPRAVEK: Odstranimo horizontalni padding, da ima besedilo več prostora */
@@ -2644,7 +2666,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 /* Aktivni element ali poudarek (za Domov/Aktivno) */
 .taskbar-item.active,
 .taskbar-item:hover {
-    color: #00979C; /* Modra akcentna barva (prilagodite!) */
+    color: #076b6a; /* Modra akcentna barva (prilagodite!) */
 }
 
 /* ---------------------------------------------------- */
@@ -2669,9 +2691,9 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     width: 60px; 
     height: 60px;
     border-radius: 50%; /* Naredi krog */
-    background-color: #00979C; /* Modra barva ozadja (prilagodite!) */
-    color: #faf9f6;
-    box-shadow: 0 4px 10px rgba(4, 75, 62, 0.6); /* Poudarjena senca */
+    background-color: #88d82d; /* Modra barva ozadja (prilagodite!) */
+    color: #2e2e2e;
+    box-shadow: 0 4px 10px rgba(39, 39, 39, 0.339); /* Poudarjena senca */
     font-size: 1.6rem; /* POPRAVEK: Povečana velikost ikone */
     text-decoration: none;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -3082,24 +3104,55 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
             </div>
         </form>
 
-      <form class="login-form" id="formRegistracija">
-        <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
-        <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
-        <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+<form class="login-form" id="formRegistracija">
+    <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
+    <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+    <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+    
+    <select id="drzava" name="drzava" required>
+        <option value="" disabled selected data-i18n="registration.country_placeholder">Izberi državo (EU)</option>
         
-        <div class="form-group-checkbox">
-            <input type="checkbox" id="pogojiStrinjanje" name="pogojiStrinjanje" required>
-            <label for="pogojiStrinjanje">
-                <span data-i18n="registration.pogoji_strinjanje">Strinjam se s </span>
-                <a href="splosni-pogoji.html" target="_blank" data-i18n="registration.splosni_pogoji_link">Splošnimi pogoji</a>
-                <span data-i18n="registration.in_politiko"> in </span>
-                <a href="politika-zasebnosti.html" target="_blank" data-i18n="registration.politika_zasebnosti_link">Politiko zasebnosti</a>.
-                <span class="required-star">*</span>
-            </label>
-        </div>
-        <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
-      </form>
+        <option value="Avstrija">Avstrija</option>
+        <option value="Belgija">Belgija</option>
+        <option value="Bolgarija">Bolgarija</option>
+        <option value="Ciper">Ciper</option>
+        <option value="Češka">Češka</option>
+        <option value="Danska">Danska</option>
+        <option value="Estonija">Estonija</option>
+        <option value="Finska">Finska</option>
+        <option value="Francija">Francija</option>
+        <option value="Grčija">Grčija</option>
+        <option value="Hrvaška">Hrvaška</option>
+        <option value="Irska">Irska</option>
+        <option value="Italija">Italija</option>
+        <option value="Latvija">Latvija</option>
+        <option value="Litva">Litva</option>
+        <option value="Luksemburg">Luksemburg</option>
+        <option value="Madžarska">Madžarska</option>
+        <option value="Malta">Malta</option>
+        <option value="Nemčija">Nemčija</option>
+        <option value="Nizozemska">Nizozemska</option>
+        <option value="Poljska">Poljska</option>
+        <option value="Portugalska">Portugalska</option>
+        <option value="Romunija">Romunija</option>
+        <option value="Slovaška">Slovaška</option>
+        <option value="Slovenija">Slovenija</option>
+        <option value="Španija">Španija</option>
+        <option value="Švedska">Švedska</option>
+    </select>
+    <div class="form-group-checkbox">
+        <input type="checkbox" id="pogojiStrinjanje" name="pogojiStrinjanje" required>
+        <label for="pogojiStrinjanje">
+            <span data-i18n="registration.pogoji_strinjanje">Strinjam se s </span>
+            <a href="splosni-pogoji.html" target="_blank" data-i18n="registration.splosni_pogoji_link">Splošnimi pogoji</a>
+            <span data-i18n="registration.in_politiko"> in </span>
+            <a href="politika-zasebnosti.html" target="_blank" data-i18n="registration.politika_zasebnosti_link">Politiko zasebnosti</a>.
+            <span class="required-star">*</span>
+        </label>
     </div>
+    <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
+</form>
+</div>
 </div>
   
  <div class="duration-modal" id="durationModal">
@@ -3581,7 +3634,7 @@ function generateStarsHTML(rating) {
     let starsHTML = '';
     for (let i = 1; i <= maxStars; i++) {
         if (i <= roundedRating) {
-            starsHTML += `<span style="color: #00979C;">${fullStar}</span>`;
+            starsHTML += `<span style="color: #076b6a;">${fullStar}</span>`;
         } else {
             starsHTML += `<span style="color: #e0e0e0;">${fullStar}</span>`;
         }
@@ -3927,50 +3980,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if(formRegistracija) formRegistracija.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const pogojiCheckbox = document.getElementById('pogojiStrinjanje');
-        if (!pogojiCheckbox || !pogojiCheckbox.checked) {
-            prikaziSporocilo(i18next.t('messages.pogoji_required') || 'Za registracijo morate sprejeti Splošne pogoje.', 'error');
-            return;
+    e.preventDefault();
+    const pogojiCheckbox = document.getElementById('pogojiStrinjanje');
+    if (!pogojiCheckbox || !pogojiCheckbox.checked) {
+        prikaziSporocilo(i18next.t('messages.pogoji_required') || 'Za registracijo morate sprejeti Splošne pogoje.', 'error');
+        return;
+    }
+    
+    // ⭐ 1. ZAJEBAVANJE NOVEGA POLJA DRŽAVA ⭐
+    const drzavaInput = document.getElementById('drzava'); // Uporabimo ID iz HTML select polja
+    
+    const imeInput = formRegistracija.querySelector('input[name="ime"]') || formRegistracija.querySelector('input[type="text"]');
+    const emailInput = formRegistracija.querySelector('input[type="email"]');
+    const gesloInput = formRegistracija.querySelector('input[type="password"]');
+    
+    const ime = imeInput ? imeInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const geslo = gesloInput ? gesloInput.value.trim() : '';
+    const drzava = drzavaInput ? drzavaInput.value.trim() : ''; // Zajem vrednosti države
+
+    // 2. DODANA VALIDACIJA ZA DRŽAVO
+    if (!ime || !email || !geslo || !drzava) { // Dodamo preverjanje za drzava
+        prikaziSporocilo(i18next.t('messages.required_fields_missing') || 'Vnesite vsa polja, vključno z državo!', 'error');
+        return; 
+    }
+    
+    const jeLastnik = false; 
+    const cena = 0; 
+    const telefon = '040123456'; 
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/auth/registracija`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // ⭐ 3. DODAJANJE DRŽAVE V TELO ZAHTEVE ⭐
+            body: JSON.stringify({ ime, email, geslo, jeLastnik, cena, telefon, drzava }) 
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('zeton', data.zeton); 
+            localStorage.setItem('jeLastnik', jeLastnik); 
+            localStorage.setItem('ime', ime); 
+            localStorage.setItem('telefon', telefon); 
+            
+            setLoginStatus(true); 
+            if(modal) modal.classList.remove("active");
+            prikaziSporocilo(i18next.t('messages.registration_success') || 'Uspešna registracija!', 'success');
+        } else {
+            prikaziSporocilo(data.msg || i18next.t('messages.registration_failed') || 'Registracija neuspešna.', 'error');
         }
-        const imeInput = formRegistracija.querySelector('input[name="ime"]') || formRegistracija.querySelector('input[type="text"]');
-        const emailInput = formRegistracija.querySelector('input[type="email"]');
-        const gesloInput = formRegistracija.querySelector('input[type="password"]');
-        const ime = imeInput ? imeInput.value.trim() : '';
-        const email = emailInput ? emailInput.value.trim() : '';
-        const geslo = gesloInput ? gesloInput.value.trim() : '';
-        if (!ime || !email || !geslo) {
-            prikaziSporocilo(i18next.t('messages.required_fields_missing') || 'Vnesite vsa polja!', 'error');
-            return; 
-        }
-        const jeLastnik = false; 
-        const cena = 0; 
-        const telefon = '040123456'; 
-        
-        try {
-            const res = await fetch(`${API_BASE_URL}/auth/registracija`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ime, email, geslo, jeLastnik, cena, telefon })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                localStorage.setItem('zeton', data.zeton); 
-                localStorage.setItem('jeLastnik', jeLastnik); 
-                localStorage.setItem('ime', ime); 
-                localStorage.setItem('telefon', telefon); 
-                
-                setLoginStatus(true); 
-                if(modal) modal.classList.remove("active");
-                prikaziSporocilo(i18next.t('messages.registration_success') || 'Uspešna registracija!', 'success');
-            } else {
-                prikaziSporocilo(data.msg || i18next.t('messages.registration_failed') || 'Registracija neuspešna.', 'error');
-            }
-        } catch (err) {
-            console.error("Napaka pri klicu registracije:", err);
-            prikaziSporocilo(i18next.t('messages.server_error') || 'Napaka strežnika pri registraciji.', 'error');
-        }
-    });
+    } catch (err) {
+        console.error("Napaka pri klicu registracije:", err);
+        prikaziSporocilo(i18next.t('messages.server_error') || 'Napaka strežnika pri registraciji.', 'error');
+    }
+});
         
     const logoutListeners = [gumbOdjavaDesktop, gumbOdjavaMobilni].filter(btn => btn !== null);
     logoutListeners.forEach(btn => {
@@ -5917,7 +5980,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoggedIn) {
             // Uporabnik je prijavljen
             if (loginLink) loginLink.style.display = 'none'; // Skrij "Prijava"
-            if (profileContainer) profileContainer.style.display = 'block'; // Prikaži "Moj Profil / Odjava"
+            
+            // ⭐ POPRAVEK: Uporabite 'flex', da aktivirate Flexbox CSS pravila (gap, flex-direction)
+            if (profileContainer) profileContainer.style.display = 'flex'; // Prikaži "Moj Profil / Odjava"
+            
             console.log("UI posodobljen: Prikazan je profil.");
         } else {
             // Uporabnik ni prijavljen
@@ -6007,7 +6073,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     // 🚀 POPRAVLJENO: LOGIKA ZA ODJAVO (Poslušalec dogodkov na gumbu za odjavo)
     // -------------------------------------------------------------------------
-    // ⭐ KLJUČNA SPREMEMBA: ID gumba je zdaj 'gumbOdjavaMobilni' namesto 'gumbZaOdjavo'
     const logoutButton = document.getElementById('gumbOdjavaMobilni'); 
     
     if (logoutButton) {
@@ -6060,7 +6125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const downloadLink = document.createElement('a');
             downloadLink.href = "#";
             downloadLink.className = 'gumb-prenos-app';
-            downloadLink.innerHTML = '<i class="fas fa-mobile-alt"></i> Prenesi Aplikacijo';
+            downloadLink.innerHTML = '<i class="fas fa-mobile-alt"></i> Download now';
             
             // Dodamo dogodek za prikaz modalnega okna
             downloadLink.addEventListener('click', (e) => {
