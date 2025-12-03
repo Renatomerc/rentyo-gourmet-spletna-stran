@@ -6,8 +6,6 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const router = express.Router();
     const jwt = require('jsonwebtoken');
     const bcrypt = require('bcryptjs');
-    // ⭐ NOVO: Uvozimo Passport, ki mora biti nameščen (npm install passport)
-    const passport = require('passport'); 
     
     // ⭐ 1. Uvozimo Shemo in Sekundarno povezavo
     const UporabnikShema = require('../models/Uporabnik'); 
@@ -48,64 +46,11 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     };
     // ==========================================================
 
-    // ==========================================================
-    // 🟢 NOVO: RUTI ZA GOOGLE PRIJAVO (OAUTH)
-    // ==========================================================
-    
-    // 1. Pot, ki jo kliče frontend za začetek prijave (/api/auth/google)
-    router.get('/google', (req, res, next) => {
-        // Preberemo URL, kamor naj se uporabnik vrne po prijavi.
-        const redirectUrl = req.query.redirectUrl || '/'; 
-
-        // Svoj lasten RedirectUrl shranimo v Passport sejo
-        // Opomba: Ker tole uporablja Passport, mora biti sejna podpora v server.js omogočena.
-        req.session.oauthRedirectUrl = redirectUrl;
-
-        // Zaženemo Passport Google strategijo
-        passport.authenticate('google', { 
-            scope: ['profile', 'email'],
-        })(req, res, next);
-    });
-
-    // 2. Pot, kamor Google preusmeri brskalnik nazaj (/api/auth/google/callback)
-    router.get('/google/callback', 
-        // Uporabimo Passport za avtentikacijo in obravnavo odgovora od Googla
-        passport.authenticate('google', { 
-            failureRedirect: '/prijava?status=error', // Preusmeri na prijavo v primeru napake
-            session: true // Poskrbi, da se user shrani v req.user
-        }),
-        // Če je prijava uspešna, se izvede ta middleware:
-        async (req, res) => {
-            // Predpostavimo, da Passport prilepi prijavljenega uporabnika na req.user
-            const uporabnik = req.user;
-            
-            if (!uporabnik) {
-                 return res.redirect((req.session.oauthRedirectUrl || '/') + '?status=error&msg=Prijava+neuspešna.');
-            }
-            
-            // Generiraj žeton in ga nastavi v piškotek
-            const zeton = generirajZeton(uporabnik._id);
-            nastaviAuthPiškotek(res, zeton); 
-            
-            // Pridobimo Redirect URL, kamor želimo poslati frontend (iz seje)
-            const redirectUrl = req.session.oauthRedirectUrl || '/';
-            
-            // Očistimo sejo
-            req.session.oauthRedirectUrl = undefined;
-            
-            // Preusmerimo nazaj na frontend z vsemi potrebnimi podatki v URL-ju
-            res.redirect(`${redirectUrl}?zeton=${zeton}&jeLastnik=${uporabnik.jeLastnik}&ime=${encodeURIComponent(uporabnik.ime)}&telefon=${encodeURIComponent(uporabnik.telefon || '')}`);
-        }
-    );
-    
-    // ==========================================================
-
-
     // Registracija
     router.post('/registracija', async (req, res) => {
         console.log("🔥 DEBUG: Klic Registracije Prejet!"); 
 
-        // ⭐ KLJUČNA SPREMEMBA: Iz req.body izluščimo VSA možna polja
+        // ⭐ POPRAVEK: Iz req.body izluščimo VSA možna polja
         const { 
             ime, 
             priimek, 
@@ -114,7 +59,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             geslo, 
             jeLastnik, 
             cena, 
-            fcmToken,
+            fcmToken, // KLJUČNO: Izluščimo fcmToken
         } = req.body;
         
         // Osnovna validacija
@@ -132,20 +77,21 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             // ⭐ NOVO: Ustvarimo objekt s podatki za bazo
             const uporabnikData = { 
                 ime, 
-                priimek: priimek || '',      
-                telefon: telefon || '',      
+                priimek: priimek || '',      // Varno, če ni posredovano
+                telefon: telefon || '',      // Varno, če ni posredovano
                 email, 
                 geslo: hashiranoGeslo, 
                 jeLastnik: jeLastnik || false, 
                 cena: cena || 0,
             };
 
-            // ⭐ ZAOBID TEŽAVE S FCKTOKEN: Dodaj fcmToken SAMO, če je poslan in ni null
+            // ⭐ ZAOBID NAPAKE E11000: Dodaj fcmToken SAMO, če ima vrednost.
+            // S tem preprečimo vstavljanje eksplicitne vrednosti 'null' in zaobidemo napako.
             if (fcmToken) {
                 uporabnikData.fcmToken = fcmToken;
             }
             
-            const novUporabnik = await Uporabnik.create(uporabnikData); // Uporabimo novo definiran objekt
+            const novUporabnik = await Uporabnik.create(uporabnikData); // Uporabimo objekt uporabnikData
             
             const zeton = generirajZeton(novUporabnik._id);
             nastaviAuthPiškotek(res, zeton); 
@@ -161,10 +107,9 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             });
 
         } catch (err) {
-            // Obravnava morebitne preostale napake (vključno z MongoDB)
+            // ⭐ POPRAVEK: Obravnava E11000 napake
             if (err.code === 11000) {
                 console.error('❌ NAPAKA PRI REGISTRACIJI (MongoDB Duplicate Key):', err.message);
-                // Vrnemo generično napako, ker je E11000 lahko tudi fcmToken in ne le email (čeprav v tej kodi naj ne bi bil fcmToken)
                 return res.status(409).json({ msg: 'Vneseni e-mail ali drugi podatki so že v uporabi.' });
             }
             
