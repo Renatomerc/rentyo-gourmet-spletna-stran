@@ -25,12 +25,13 @@ const UporabnikShema = new mongoose.Schema({
         default: 0
     },
 
-    // 🔥 NOVO: Polje za shranjevanje Firebase Cloud Messaging (FCM) žetona
+    // 🔥 KRITIČNA ZAČASNA SPREMEMBA: Odstranitev default: null in unique: true
+    // To prisili Mongoose, da izbriše problematičen indeks 'fcmToken_1' v bazi.
     fcmToken: { 
         type: String, 
-        default: null, 
-        unique: true, 
-        sparse: true // Omogoča več dokumentov, ki nimajo tokena
+        // default: null, // IZBRISANO/ZAKOMENTIRANO
+        // unique: true,  // IZBRISANO/ZAKOMENTIRANO
+        sparse: true 
     },
 
 }, { timestamps: true });
