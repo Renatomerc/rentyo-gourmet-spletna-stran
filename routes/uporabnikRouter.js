@@ -105,7 +105,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.post('/registracija', async (req, res) => {
         console.log("🔥 DEBUG: Klic Registracije Prejet!"); 
 
-        // ⭐ KLJUČNA SPREMEMBA: Iz req.body izluščimo VSA možna polja, ki jih shema pričakuje.
+        // ⭐ KLJUČNA SPREMEMBA: Iz req.body izluščimo VSA možna polja
         const { 
             ime, 
             priimek, 
@@ -114,7 +114,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             geslo, 
             jeLastnik, 
             cena, 
-            fcmToken, // <--- KLJUČNO: Preprečitev napake 'undefined'
+            fcmToken,
         } = req.body;
         
         // Osnovna validacija
@@ -129,17 +129,23 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             const salt = await bcrypt.genSalt(10);
             const hashiranoGeslo = await bcrypt.hash(geslo, salt);
 
-            // ⭐ POPRAVEK: V create metodo varno vstavimo VSE vrednosti.
-            const novUporabnik = await Uporabnik.create({ 
+            // ⭐ NOVO: Ustvarimo objekt s podatki za bazo
+            const uporabnikData = { 
                 ime, 
-                priimek: priimek || '',      // Varno, če ni posredovano
-                telefon: telefon || '',      // Varno, če ni posredovano
+                priimek: priimek || '',      
+                telefon: telefon || '',      
                 email, 
                 geslo: hashiranoGeslo, 
                 jeLastnik: jeLastnik || false, 
                 cena: cena || 0,
-                fcmToken: fcmToken || null   // KLJUČNO: Posredujemo null, če ga frontend ne pošlje
-            });
+            };
+
+            // ⭐ ZAOBID TEŽAVE S FCKTOKEN: Dodaj fcmToken SAMO, če je poslan in ni null
+            if (fcmToken) {
+                uporabnikData.fcmToken = fcmToken;
+            }
+            
+            const novUporabnik = await Uporabnik.create(uporabnikData); // Uporabimo novo definiran objekt
             
             const zeton = generirajZeton(novUporabnik._id);
             nastaviAuthPiškotek(res, zeton); 
@@ -158,7 +164,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             // Obravnava morebitne preostale napake (vključno z MongoDB)
             if (err.code === 11000) {
                 console.error('❌ NAPAKA PRI REGISTRACIJI (MongoDB Duplicate Key):', err.message);
-                return res.status(409).json({ msg: 'Vneseni e-mail je že v uporabi.' });
+                // Vrnemo generično napako, ker je E11000 lahko tudi fcmToken in ne le email (čeprav v tej kodi naj ne bi bil fcmToken)
+                return res.status(409).json({ msg: 'Vneseni e-mail ali drugi podatki so že v uporabi.' });
             }
             
             console.error('❌ KRITIČNA NAPAKA PRI REGISTRACIJI:', err);

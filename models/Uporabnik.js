@@ -22,7 +22,7 @@ const UporabnikShema = new mongoose.Schema({
     
     tockeZvestobe: {
         type: Number,
-        default: 100
+        default: 0
     },
 
     // 🔥 NOVO: Polje za shranjevanje Firebase Cloud Messaging (FCM) žetona
