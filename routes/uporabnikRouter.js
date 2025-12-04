@@ -249,7 +249,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                     $set: { 
                         // Uporabimo arrayFilters za posodobitev samo relevantnega elementa v arrayu 'komentarji'
                         'komentarji.$[element].userId': null,
-                        'komentarji.$[element].uporabniskoIme': 'Anonimni uporabnik', 
+                        'komentarji.$[element].uporabniskoIme': 'GDPR Deleted User', 
                         'komentarji.$[element].email_gosta': null, 
                         'komentarji.$[element].je_anonimizirana': true 
                     }
