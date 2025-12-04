@@ -241,22 +241,52 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 }
             );
             
-            // 🚨 KRITIČNI POPRAVEK: IZBRIŠI OCENE/KOMENTARJE (namesto anonimizacije)
-            const rezultatKomentarji = await Restavracija.updateMany(
-                { 'komentarji.userId': uporabnikIdObject }, // Najdi restavracije z oceno tega uporabnika
-                { 
-                    $pull: { 
-                        // Uporabimo $pull za odstranitev celotnega vdelanega dokumenta iz arraya 'komentarji'
-                        'komentarji': { 
-                            userId: uporabnikIdObject 
-                        } 
-                    }
-                }
-            );
-            // ⚠️ OPOMBA: Če uporabljate polji ocena_povprecje in st_ocen, morate 
-            // sedaj ročno implementirati logiko za njuno preračunavanje!
+            // 🚨 KRITIČNI POPRAVEK: IZBRIŠI OCENE/KOMENTARJE (Popolnoma odstrani celoten vdelan dokument in preračuna)
             
-            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, IZBRISANIH KOMENTARJEV v restavracijah: ${rezultatKomentarji.modifiedCount}.`);
+            // 1. Poišči vse restavracije, ki imajo komentarje tega uporabnika, da lahko uporabimo .pull() in .save()
+            const restavracijeZaPreracun = await Restavracija.find({ 'komentarji.userId': uporabnikIdObject });
+            
+            let stIzbrisanihKomentarjev = 0;
+
+            // 2. Za vsako restavracijo izvedi izbris komentarja in preračun ocene
+            for (const restavracija of restavracijeZaPreracun) {
+                
+                // Opomba: Uporabimo .equals() za pravilno primerjavo tipa ObjectId
+                const komentarZaBrisanje = restavracija.komentarji.find(kom => 
+                    kom.userId && kom.userId.equals(uporabnikIdObject)
+                );
+
+                if (komentarZaBrisanje) {
+                    
+                    // 2a. ODSTRANITEV: Odstranimo CELOTEN komentar iz arraya z Mongoose .pull()
+                    // Ta metoda odstrani celoten vdelan dokument, vključno z oceno in imenom!
+                    restavracija.komentarji.pull(komentarZaBrisanje._id);
+                    stIzbrisanihKomentarjev++;
+
+                    // 2b. PRERAČUN: Preračunamo polja restavracije na podlagi PREOSTALIH komentarjev
+                    const stOcenPo = restavracija.komentarji.length;
+                    
+                    // Izračunamo vsoto ocen preostalih komentarjev
+                    const vsotaOcenPo = restavracija.komentarji.reduce((acc, kom) => acc + kom.ocena, 0);
+
+                    // Posodobimo polja
+                    restavracija.st_ocen = stOcenPo;
+                    
+                    if (stOcenPo > 0) {
+                        // Posodobimo povprečje (toFixed(1) za pravilno shranjevanje)
+                        restavracija.ocena_povprecje = parseFloat((vsotaOcenPo / stOcenPo).toFixed(1)); 
+                    } else {
+                        // Če ni ostalo nobenega komentarja
+                        restavracija.ocena_povprecje = 0;
+                    }
+
+                    // 2c. SHRANJEVANJE: Shranimo posodobljeno restavracijo 
+                    await restavracija.save();
+                }
+            }
+            
+            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, IZBRIS KOMENTARJEV in PRERAČUN OCEN v ${restavracijeZaPreracun.length} restavracijah. Število izbrisanih komentarjev: ${stIzbrisanihKomentarjev}.`);
+
 
             // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
             res.cookie('auth_token', '', { 

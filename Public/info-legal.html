@@ -99,7 +99,7 @@
         
         /* Stil za naslove v sekcijah */
         .content-title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 700;
             margin-bottom: 0.75rem;
             padding-bottom: 0.25rem;
@@ -361,7 +361,7 @@
 
     <script>
         // Objekt, ki vsebuje vse prevode (prevzeto iz prejšnjega odgovora)
-        const i18nData = {
+       const i18nData = {
             sl: {
                 "legal.page_title": "Informacije & Pravna obvestila",
                 "about.title": "O Rentyo Gourmet",
@@ -1029,99 +1029,144 @@
             }
         };
 
-        // ** POPRAVLJENA JAVASCRIPT KODA **
+        // =========================================================================
+        // POPRAVLJENA IN KLJUČNA FUNKCIJA ZA REŠITEV TEŽAVE
+        // =========================================================================
+        
+        /**
+         * Poišče prevod za dani ključ v jezikovnem objektu.
+         * Ključno: Najprej poskusi celoten ključ (za ravne strukture kot "about.title"), 
+         * nato poskusi ugnezdeno iskanje (za strukture kot { about: { title: "..." } }).
+         */
+        const getTranslationValue = (data, key) => {
+            // 1. Poskusi najti prevod s CELOTNIM ključem (za ploske ključe, ki vsebujejo piko)
+            if (data && data.hasOwnProperty(key)) {
+                return data[key];
+            }
+            
+            // 2. Poskusi ugnezdeno iskanje (če bi bili ključi v resnici ugnezdeni)
+            const keys = key.split('.');
+            let value = data;
+            
+            for (const k of keys) {
+                if (value && typeof value === 'object' && value.hasOwnProperty(k)) {
+                    value = value[k];
+                } else {
+                    return null; 
+                }
+            }
+            return value;
+        };
+
+        // =========================================================================
+        // GLAVNE FUNKCIJE ZA I18N
+        // =========================================================================
+
+        let currentLang = localStorage.getItem('currentLang') || 'sl';
+
+        const setLanguage = (lang) => {
+            if (!i18nData[lang]) {
+                console.warn(`Prevodi za jezik '${lang}' niso na voljo. Uporaba privzetega (sl).`);
+                lang = 'sl';
+            }
+            
+            currentLang = lang;
+            localStorage.setItem('currentLang', lang);
+            document.documentElement.lang = lang; // Nastavi lang atribut na HTML oznaki
+            
+            const translations = i18nData[lang];
+            
+            // 1. Prevajanje vseh elementov z data-i18n atributom
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                let translation = getTranslationValue(translations, key);
+
+                if (translation) {
+                    // Preverimo, ali prevod vsebuje HTML (npr. <a>)
+                    if (translation.includes('<a') || translation.includes('<span')) {
+                        element.innerHTML = translation;
+                    } else {
+                        element.textContent = translation;
+                    }
+                } else {
+                    console.warn(`Manjkajoči prevod za ključ: ${key} v jeziku ${lang}`);
+                }
+            });
+            
+            // 2. Prevajanje naslova strani (<title>)
+            const pageTitleElement = document.querySelector('title');
+            const pageTitleKey = pageTitleElement ? pageTitleElement.getAttribute('data-i18n') : null;
+            if (pageTitleElement && pageTitleKey) {
+                const titleTranslation = getTranslationValue(translations, pageTitleKey);
+                if (titleTranslation) {
+                    pageTitleElement.textContent = titleTranslation;
+                }
+            }
+            
+            // 3. Posodabljanje prikaza trenutnega jezika v meniju
+            const currentLangDisplay = document.getElementById('current-language');
+            if (currentLangDisplay) {
+                currentLangDisplay.textContent = lang.toUpperCase();
+            }
+
+            // 4. Posodabljanje aktivnega statusa v spustnem meniju
+            const optionsContainer = document.getElementById('language-options');
+            if (optionsContainer) {
+                optionsContainer.querySelectorAll('.language-option').forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.getAttribute('data-lang') === lang) {
+                        option.classList.add('selected');
+                    }
+                });
+            }
+        };
+
+        // =========================================================================
+        // INICIALIZACIJA IN DOGODKI
+        // =========================================================================
+
         document.addEventListener('DOMContentLoaded', () => {
             const dropdown = document.getElementById('language-dropdown');
+            const button = document.getElementById('language-button');
             const optionsContainer = document.getElementById('language-options');
-            const currentLangDisplay = document.getElementById('current-language');
             
-            // Določimo privzet jezik
-            let currentLang = 'sl'; 
+            // 1. Inicializacija jezika
+            setLanguage(currentLang);
 
-            // Pomožna funkcija za varno iskanje v ugnezdenem objektu
-            const getTranslationValue = (data, key) => {
-                const keys = key.split('.');
-                let value = data;
-                for (const k of keys) {
-                    if (value && typeof value === 'object' && value.hasOwnProperty(k)) {
-                        value = value[k];
-                    } else {
-                        return null; 
-                    }
-                }
-                return value;
-            };
-
-            // Glavna funkcija za preklop in prevod besedila
-            const setLanguage = (lang) => {
-                currentLang = lang;
-                
-                // 1. Posodobi naslov strani (<title> tag)
-                const titleElement = document.querySelector('title');
-                const pageTitleKey = titleElement.getAttribute('data-i18n');
-                const newTitle = getTranslationValue(i18nData[lang], pageTitleKey);
-                
-                if (newTitle) {
-                    titleElement.textContent = newTitle.replace(/<[^>]*>?/gm, ''); 
-                }
-
-                // 2. Posodobi vse elemente z data-i18n atributom
-                document.querySelectorAll('[data-i18n]').forEach(element => {
-                    const key = element.getAttribute('data-i18n');
-                    const value = getTranslationValue(i18nData[lang], key);
-                    
-                    if (value !== null) {
-                        if (element.tagName !== 'TITLE') {
-                            // Uporabimo innerHTML, da ohranimo morebitne HTML oznake (npr. <a> za linke)
-                            element.innerHTML = value;
+            // 2. Dodajanje dogodka za preklop jezika
+            if (optionsContainer) {
+                optionsContainer.addEventListener('click', (event) => {
+                    const option = event.target.closest('.language-option');
+                    if (option) {
+                        const newLang = option.getAttribute('data-lang');
+                        setLanguage(newLang);
+                        
+                        // Zapri spustni seznam po izbiri
+                        if (dropdown) {
+                            dropdown.classList.remove('open');
                         }
                     }
                 });
-                
-                // 3. Posodobi prikaz trenutnega jezika v gumbu
-                currentLangDisplay.textContent = lang.toUpperCase();
+            }
 
-                // 4. Posodobi izbran jezik v spustnem seznamu (dodaj/odstrani selected class)
-                document.querySelectorAll('.language-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                    if (opt.getAttribute('data-lang') === lang) {
-                        opt.classList.add('selected');
+            // 3. Preklapljanje spustnega seznama ob kliku na gumb
+            if (button && dropdown) {
+                button.addEventListener('click', () => {
+                    dropdown.classList.toggle('open');
+                });
+                
+                // Zapri spustni seznam, če uporabnik klikne kjerkoli zunaj njega
+                document.addEventListener('click', (event) => {
+                    if (!dropdown.contains(event.target)) {
+                        dropdown.classList.remove('open');
                     }
                 });
-            };
-
-            // Preklopi prikaz spustnega seznama
-            dropdown.addEventListener('click', (e) => {
-                // Poskrbimo, da se klik na opcijo ne šteje kot klik na celoten dropdown, da se dropdown takoj ne zapre
-                if (!e.target.closest('.language-options')) {
-                    dropdown.classList.toggle('open');
-                }
-            });
-
-            // Obdelava izbire jezika
-            optionsContainer.addEventListener('click', (e) => {
-                const selectedOption = e.target.closest('.language-option');
-                if (selectedOption) {
-                    const selectedLang = selectedOption.getAttribute('data-lang');
-                    
-                    // Prevedi vsebino
-                    setLanguage(selectedLang);
-
-                    // Zapri spustni seznam
-                    dropdown.classList.remove('open');
-                }
-            });
-            
-            // Zapri spustni seznam, če kliknemo kamorkoli drugam
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.classList.remove('open');
-                }
-            });
-
-            // Inicializiraj prevod ob nalaganju strani (privzeto na SL)
-            setLanguage(currentLang);
+            }
         });
+        
+        // =========================================================================
+        // KONEC: JS KODA
+        // =========================================================================
     </script>
 </body>
 </html>

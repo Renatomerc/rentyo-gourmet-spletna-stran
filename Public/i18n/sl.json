@@ -225,7 +225,9 @@
     "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste.",
     "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
     "status_confirmed": "Potrjeno",
-    "scan_unavailable": "Naloži aplikacijo in pridobi točke in popuste"
+    "scan_unavailable": "Naloži aplikacijo in pridobi točke in popuste",
+    "delete_account_confirmation": "Z izbrisom računa boste izbrisali vse svoje osebne podatke, kakor tudi vse ocene in komentarje restavracij",
+    "delete_account_button": "Izbriši moj račun"
   },
   "warning": {
     "title": "Opozorilo",
