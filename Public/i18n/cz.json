@@ -1,0 +1,273 @@
+{
+    "app": {
+      "title": "Vyhledávání Restaurací - Gourmet & Experience",
+      "profile_title": "Můj profil - Gourmet & Experience",
+      "pageTitle": "Rentyo nabídky a zážitky"
+    },
+    "header": {
+      "login": "Přihlášení",
+      "profile": "Můj profil",
+      "logout": "Odhlášení"
+    },
+    "hero": {
+      "title": "Gourmet & Experience"
+    },
+    "action_banner": {
+      "title": "Stále rezervujete restaurace telefonicky?",
+      "subtitle": "S námi najdete svou oblíbenou restauraci, zarezervujete ji a užijete si to, a to bez volání. Rentyo Gourmet & Experience"
+    },
+    "search": {
+      "restaurant_city_label": "Restaurace nebo město",
+      "restaurant_city_placeholder": "Zadejte jméno nebo město",
+      "date_label": "Datum",
+      "date_placeholder": "Vyberte datum",
+      "time_label": "Čas rezervace",
+      "select_time": "Vyberte čas",
+      "persons_label": "Počet osob",
+      "search_button": "Hledat",
+      "person_singular": "{{count}}",
+      "person_plural": "{{count}}"
+    },
+    "quick_search": {
+      "title": "Rychlý výběr kuchyně"
+    },
+    "cuisine": {
+      "meat": "Masová",
+      "vegetarian": "Vegi",
+      "fish": "Rybí",
+      "drinks": "Nápoje",
+      "brunch": "Brunch"
+    },
+    "results": {
+      "popular_title": "Oblíbené ve vaší blízkosti",
+      "featured_title": "Zvýrazněné",
+      "reserve_button": "Rezervovat",
+      "description_1": "Tradiční slovinská kuchyně a příjemná atmosféra.",
+      "description_2": "Moderní jídla z lokálních surovin.",
+      "description_3": "Autentické italské jídlo a vynikající pizzy.",
+      "description_4": "Vynikající rostlinná jídla pro každého.",
+      "description_5": "Vynikající brunche pro každého.",
+      "check_tables": "Zkontrolovat stoly v {{time}}",
+      "cuisine": "Kuchyně",
+      "na": "Žádná data",
+      "search_results": "Výsledky hledání",
+      "available_tomorrow": "Zítra v {{time}}",
+      "unavailable": "Žádné volné stoly",
+      "available_today": "Dostupné dnes",
+      "search_title": "Výsledky hledání"
+    },
+    "gourmet_explore": {
+      "title": "Prozkoumejte nezapomenutelné zážitky"
+    },
+    "experience": {
+      "mainTitle": "Exkluzivní nabídky a inzeráty",
+      "mainSubtitle": "Objevte speciální akce a doporučení od našich partnerů.",
+      "bestOffersTitle": "Naše nejlepší nabídky",
+      "fine_dining": "Jemné stolování",
+      "fine_dining_href": "experience.html?code=fine-dining",
+      "wine": "Degustace vína",
+      "wine_href": "experience.html?code=wine-tasting",
+      "adventure": "Venkovní dobrodružství",
+      "adventure_href": "experience.html?code=outdoor-adventure",
+      "slepa-kuhinja": "Slepá kuchyně",
+      "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
+      "sea": "Mořské zážitky",
+      "sea_href": "experience.html?code=sea-experience",
+      "city": "Městský gurmánský tour",
+      "city_href": "experience.html?code=city-gourmet-tour",
+      "romantic": "Romantické zážitky",
+      "romantic_href": "experience.html?code=romantic-experience",
+      "eco": "Ekologická kuchyně",
+      "eco_href": "experience.html?code=eco-cuisine",
+      "pageTitle": "Rentyo nabídky a zážitky",
+      "noActiveOffers": "Momentálně nejsou aktivní žádné speciální nabídky."
+    },
+    "messages": {
+      "enter_search_criteria": "Prosím, zadejte město nebo typ kuchyně pro hledání.",
+      "required_fields_missing": "Prosím, vyplňte všechna povinná pole: datum, čas a počet osob.",
+      "searching": "Hledání restaurací pro '{{criteria}}'...",
+      "search_success": "Nalezeno {{count}} restaurací.",
+      "search_error": "Hledání se nezdařilo.",
+      "no_restaurants_found": "Nebyly nalezeny žádné restaurace.",
+      "reserving": "Rezervuji pro {{stevilo}} osob v {{cas}}...",
+      "reservation_success": "Rezervace úspěšná! Stůl č. {{miza}} je rezervován na {{trajanje}}.",
+      "reservation_success_minimal": "Úspěšně rezervováno v {{cas}}!",
+      "reservation_failed": "Rezervace se nezdařila.",
+      "server_connection_error": "Připojení k serveru se nezdařilo.",
+      "server_connection_error_retry": "Chyba při připojení k serveru, zkuste to prosím znovu.",
+      "login_success": "Přihlášení úspěšné! Vítejte.",
+      "registration_success": "Úspěšná registrace!",
+      "login_failed": "Přihlášení neúspěšné.",
+      "registration_failed": "Registrace se nezdařila.",
+      "server_error": "Chyba serveru.",
+      "check_availability_prompt": "Zkontrolovat volné stoly",
+      "available_times_found": "Aktuálně volné termíny.",
+      "no_restaurant_selected": "Chyba: Není vybrána žádná restaurace.",
+      "select_reservation_date": "Prosím, vyberte datum rezervace.",
+      "pogoji_required": "Pro registraci musíte přijmout Všeobecné obchodní podmínky a Zásady ochrany osobních údajů.",
+      "login_required": "Pro rezervaci je nutné přihlášení. Prosím, přihlaste se.",
+      "google_reviews": "Google"
+    },
+    "duration": {
+      "one_hour": "1 hodina",
+      "one_half_hours": "1 a půl hodiny",
+      "two_hours": "2 hodiny"
+    },
+    "auth": {
+      "login_title": "Přihlášení",
+      "register_title": "Registrace",
+      "login_success": "Přihlášení úspěšné! Vítejte.",
+      "register_success": "Registrace úspěšná! Nyní se můžete přihlásit.",
+      "login_error": "Chyba při přihlašování.",
+      "register_error": "Registrace se nezdařila.",
+      "server_error": "Chyba při připojení k serveru."
+    },
+    "modal": {
+      "login_tab": "Přihlášení",
+      "register_tab": "Registrace",
+      "email_placeholder": "E-mail",
+      "password_placeholder": "Heslo",
+      "name_placeholder": "Jméno a příjmení",
+      "login_button": "Přihlásit se",
+      "register_button": "Vytvořit účet",
+      "tab_menu": "Menu",
+      "tab_gallery": "Obrázky a Mapa",
+      "tab_reviews": "Recenze",
+      "tab_special_offer": "Aktuální nabídka",
+      "special_offer_title": "Speciální nabídka restaurace",
+      "special_offer_default": "Momentálně nejsou aktivní žádné speciální nabídky ani sezónní menu.",
+      "no_reviews": "Momentálně nejsou k dispozici žádné podrobné recenze k zobrazení.",
+      "no_menu": "Menu ještě není k dispozici.",
+      "reserve_button": "Rezervovat stůl",
+      "gallery_title": "Galerie obrázků",
+      "map_title": "Mapa lokality",
+      "reservation_persons": "Počet osob",
+      "reservation_date": "Datum",
+      "reservation_modal": {
+        "title": "Vyberte délku návštěvy",
+        "duration_label": "Jak dlouho chcete zůstat?",
+        "duration_0_5h": "Půl hodiny (30 min)",
+        "duration_1h": "1 hodina",
+        "duration_1_5h": "1 a půl hodiny (90 min)",
+        "duration_2h": "2 hodiny",
+        "confirm_button": "Potvrdit délku a rezervovat",
+        "qr_reminder": "Nezapomeňte po příjezdu naskenovat QR kód restaurace a získat body a výhody!"
+      }
+    },
+    "footer": {
+      "about_company_title": "O Rentyo Gourmet",
+      "about_us": "O nás",
+      "about_us_href": "/cs/o-nas.html",
+      "contact": "Kontakt",
+      "contact_href": "/cs/kontakt.html",
+      "career": "Kariéra",
+      "career_href": "/cs/kariera.html",
+      "media_press": "Média / Tiskový koutek",
+      "media_press_href": "/cs/media-tisk.html",
+      "legal_info_title": "Právní informace",
+      "legal_info_href": "/cs/pravni-informace.html",
+      "privacy_policy": "Zásady ochrany osobních údajů",
+      "privacy_policy_href": "https://www.rentyo.com/cs/zasady-ochrany-osobnich-udaju.html",
+      "cookie_policy": "Soubory cookie",
+      "cookie_policy_href": "/cs/zasady-cookie.html",
+      "terms_of_use": "Podmínky používání",
+      "terms_of_use_href": "https://www.rentyo.com/cs/podminky-pouzivani.html",
+      "legal_notice": "Právní upozornění",
+      "legal_notice_href": "/cs/pravni-upozorneni.html",
+      "partnerships_title": "Partnerství",
+      "for_partners": "Pro partnery",
+      "for_partners_href": "/cs/partnerstvi.html#pro-partnery",
+      "affiliate_program": "Partnerský program",
+      "affiliate_program_href": "/cs/partnerstvi.html#partnersky-program",
+      "connect_title": "Spojte se s námi",
+      "payment_info_prefix": "Bezpečnou platbu zajišťuje",
+      "copyright_text": "© 2025 Rentyo Gourmet. Všechna práva vyhrazena."
+    },
+    "profile": {
+      "title": "Můj uživatelský profil",
+      "tab_data": "Osobní údaje",
+      "tab_current": "Aktuální rezervace",
+      "tab_history": "Historie rezervací",
+      "tab_points_payment": "Body a platba",
+      "tab_notifications": "Oznámení",
+      "data_subtitle": "Vaše údaje",
+      "name_label": "Jméno a příjmení:",
+      "email_label": "E-mail:",
+      "edit_button": "Upravit údaje",
+      "current_subtitle": "Aktivní rezervace",
+      "no_current_reservations": "Momentálně nemáte žádné aktivní rezervace.",
+      "cancel_button": "Zrušit",
+      "history_subtitle": "Minulé rezervace",
+      "no_history_reservations": "Historie rezervací je prázdná.",
+      "points_payment_subtitle": "Body a platební prostředky",
+      "points_title": "Vaše nasbírané body",
+      "points_status": "Aktuální stav: {{count}} bodů (Postačuje na 10€ slevu)",
+      "points_status_dynamic": "Aktuální stav: {{count}} bodů",
+      "card_title": "Uložená kreditní karta",
+      "card_info": "Visa končící na: **** 1234",
+      "add_card_button": "Přidat/Aktualizovat kartu",
+      "save_card_button": "Uložit kartu",
+      "hide_card_button": "Odstranit kartu",
+      "notifications_subtitle": "Vaše oznámení",
+      "status_completed": "Děkujeme za rezervaci",
+      "cancel_confirmation": "Opravdu chcete zrušit rezervaci?",
+      "cancel_success": "Rezervace byla úspěšně zrušena.",
+      "status_rated": "Již ohodnoceno",
+      "status_rate_now": "Klikněte pro ohodnocení",
+      "rate_title": "Ohodnotit Restauraci",
+      "rating_label": "Vaše Hodnocení",
+      "comment_label": "Komentář (Nepovinné)",
+      "submit_review": "Odeslat Hodnocení",
+      "review_missing_data": "Chyba: Chybí data pro odeslání hodnocení.",
+      "review_success": "Hodnocení úspěšně odesláno! Děkujeme.",
+      "review_error": "Chyba při odesílání hodnocení. Prosím, zkuste to znovu.",
+      "scan_qr_main_text": "Naskenujte QR kód a potvrďte svůj příchod",
+      "scan_qr_sub_text": "Potvrzením příchodu získáte 50 bodů a budoucí slevy.",
+      "status_error": "Momentálně nejste v časovém rámci pro potvrzení příchodu. Příchod můžete potvrdit 10 minut před rezervovaným termínem.",
+      "status_confirmed": "Potvrzeno",
+      "scan_unavailable": "Stáhněte si aplikaci a získejte body a slevy"
+    },
+    "warning": {
+      "title": "Upozornění",
+      "default_message": "Upozorňujeme, že zobrazené informace o dostupnosti a cenách jsou pouze informativního charakteru.",
+      "understand_button": "Rozumím"
+    },
+    "registration": {
+      "country_placeholder": "Vyberte Země (EU)",
+      "pogoji_strinjanje": "Souhlasím se ",
+      "splosni_pogoji_link": "Všeobecnými obchodními podmínkami",
+      "splosni_pogoji_href": "https://www.rentyo.com/cs/podminky-pouzivani.html",
+      "in_politiko": " a ",
+      "politika_zasebnosti_link": "Zásadami ochrany osobních údajů",
+      "politika_zasebnosti_href": "https://www.rentyo.com/cs/zasady-ochrany-osobnich-udaju.html"
+    },
+    "cookieConsent": {
+      "message": "Tato webová stránka používá soubory cookie k zajištění lepší uživatelské zkušenosti a analýzy provozu. Pro další používání žádáme o váš souhlas.",
+      "moreInfoLink": {
+        "text": "Přečtěte si více.",
+        "url": "zasady-ochrany-osobnich-udaju.html"
+      },
+      "buttons": [
+        {
+          "id": "decline-cookies",
+          "text": "Odmítnout (pouze nezbytné)"
+        },
+        {
+          "id": "accept-cookies",
+          "text": "Přijmout všechny"
+        }
+      ]
+    },
+    "global": {
+      "back": "Zpět",
+      "loadingOffers": "Načítání speciálních nabídek...",
+      "footerText": "© 2025 Rentyo Gourmet. Všechna práva vyhrazena.",
+      "location": "Lokalita",
+      "dateTime": "Datum/Čas",
+      "price": "Cena",
+      "noDescription": "Podrobný popis nabídky není k dispozici.",
+      "searchAndReserve": "Hledat a rezervovat",
+      "notSpecified": "Nespecifikováno",
+      "dataLoadError": "❌ CHYBA PŘI ČTENÍ DAT. Zkontrolujte API endpoint '/api/offers'."
+    }
+  }

@@ -284,8 +284,8 @@
 
 .login-tab.active {
     
-    color: #20c0bd;
-    border-bottom: 2px solid #20c0bd; /* Dodan border za aktiven tab */
+    color: #076b6a;
+    border-bottom: 2px solid #076b6a; /* Dodan border za aktiven tab */
 }
 
 .login-form {
@@ -340,7 +340,7 @@
         margin-right: 8px;
         margin-top: 3px; /* Lahka prilagoditev za vertikalno poravnavo */
         border-radius: 4px;
-        accent-color: #20c0bd; /* Barva kljukice */
+        accent-color: #076b6a; /* Barva kljukice */
                   /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
         -webkit-tap-highlight-color: transparent;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -384,8 +384,8 @@
       padding: 10px;
       border: none;
       border-radius: 8px;
-      background-color: #20c0bd;
-      color: white;
+      background-color: #076b6a;
+      color: #f3f3f3;
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
@@ -2797,12 +2797,19 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
   <div class="jezik-ovoj" id="jezikOvojDesktop">
     <i class="fas fa-globe"></i>
     <select class="izbira-jezika" id="izbiraJezikaDesktop">
-      <option value="sl">SL</option>
-      <option value="en">EN</option>
-      <option value="de">DE</option>
-      <option value="hr">HR</option>
-      <option value="it">IT</option>
-      <option value="fr">FR</option>
+         <option value="sl">SL</option>
+                    <option value="en">EN</option>
+                    <option value="de">DE</option>
+                    <option value="hr">HR</option>
+                    <option value="it">IT</option>
+                    <option value="fr">FR</option>
+                    <option value="hu">HU</option>
+                    <option value="cz">CZ</option>
+                    <option value="es">ES</option>
+                    <option value="et">ET</option>
+                    <option value="nl">NL</option>
+                    <option value="pt">PT</option>
+                    <option value="sk">SK</option>
     </select>
   </div>
 </div>
@@ -2834,6 +2841,13 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
                     <option value="hr">HR</option>
                     <option value="it">IT</option>
                     <option value="fr">FR</option>
+                    <option value="hu">HU</option>
+                    <option value="cz">CZ</option>
+                    <option value="es">ES</option>
+                    <option value="et">ET</option>
+                    <option value="nl">NL</option>
+                    <option value="pt">PT</option>
+                    <option value="sk">SK</option>
                 </select>
             </div>
         </div>
@@ -3425,7 +3439,7 @@ const pikadayLangs = {
         weekdaysShort : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
     },
     de: {
-        months        : ['Januar','Februar','März','April','Mai','Juni','Juli','Avgust','September','Oktober','November','Dezember'],
+        months        : ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
         weekdays      : ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
         weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']
     },
@@ -3443,6 +3457,41 @@ const pikadayLangs = {
         months        : ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
         weekdays      : ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
         weekdaysShort : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam']
+    },
+    hu: {
+        months        : ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'],
+        weekdays      : ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'],
+        weekdaysShort : ['V','H','K','Sze','Cs','P','Szo']
+    },
+    cz: { // Češčina
+        months        : ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+        weekdays      : ['Neděle','Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota'],
+        weekdaysShort : ['Ne','Po','Út','St','Čt','Pá','So']
+    },
+    sk: { // Slovaščina
+        months        : ['Január','Február','Marec','Apríl','Máj','Jún','Júl','August','September','Október','November','December'],
+        weekdays      : ['Nedeľa','Pondelok','Utorok','Streda','Štvrtok','Piatok','Sobota'],
+        weekdaysShort : ['Ne','Po','Ut','St','Št','Pi','So']
+    },
+    es: { // Španščina
+        months        : ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+        weekdays      : ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
+        weekdaysShort : ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+    },
+    pt: { // Portugalščina
+        months        : ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+        weekdays      : ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+        weekdaysShort : ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+    },
+    nl: { // Nizozemščina
+        months        : ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'],
+        weekdays      : ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'],
+        weekdaysShort : ['Zo','Ma','Di','Wo','Do','Vr','Za']
+    },
+    et: { // Estonščina
+        months        : ['Jaanuar','Veebruar','Märts','Aprill','Mai','Juuni','Juuli','August','September','Oktoober','November','Detsember'],
+        weekdays      : ['Pühapäev','Esmaspäev','Teisipäev','Kolmapäev','Neljapäev','Reede','Laupäev'],
+        weekdaysShort : ['Püh','Esm','Tei','Kol','Nel','Ree','Lau']
     }
 };
 
@@ -4065,47 +4114,60 @@ if(hamburgerGumb && mobilniMeni) {
 }
 
     // LOGIKA REZERVACIJSKEGA MODALA (API klic)
-    
+
 const currentLang = i18next.language; 
-// Preverimo, ali sta Pikaday in Moment.js na voljo
-if (modalDatumInput && typeof Pikaday !== "undefined" && typeof moment !== "undefined") {
-    
-  // ⭐ KRITIČNA ZAŠČITA ZA ANDROID/CAPACITOR:
-// Takoj odstrani fokus, da prepreči nativno tipkovnico/koledar.
-modalDatumInput.addEventListener('focus', (e) => {
-    e.preventDefault(); 
-    // e.target.blur();  <-- TO ODSTRANITE!
-});
-    
-    // Inicializacija Pikaday
-    const modalPicker = new Pikaday({
+let modalPicker = null; // hranimo globalno referenco
+
+// FUNKCIJA: ponovno ustvari Pikaday koledar
+function createModalPicker() {
+    if (modalPicker) {
+        modalPicker.destroy();
+    }
+
+    modalPicker = new Pikaday({
         field: modalDatumInput,
-        // ✅ POPRAVLJENO: Format brez presledkov
-        format: 'DD.MM.YYYY', // Moment.js format
+        format: 'DD.MM.YYYY',
         minDate: new Date(),
-        i18n: pikadayLangs[currentLang] || pikadayLangs['sl'], // Uporaba lokalizacije
+        i18n: pikadayLangs[i18next.language] || pikadayLangs['sl'],
         onSelect: function(date) {
-            // Uporabite Moment.js za formatiranje datuma v želeni obliki
-            // ✅ POPRAVLJENO: Format brez presledkov
             const dateStr = moment(date).format('DD.MM.YYYY'); 
-            
-            // Nastavitev vrednosti v input polje
             modalDatumInput.value = dateStr; 
             modalDatumInput.setAttribute('data-reserv-datum', dateStr);
-            
-            globalSelectedTime = null; // Ponastavitev časa
-            
-            if(prosteUreRezultati) prosteUreRezultati.innerHTML = 
-                '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
-            
-            // Če obstaja, pokliče posodobitev vsebine (npr. i18n prevodi)
+
+            globalSelectedTime = null;
+
+            if (prosteUreRezultati) {
+                prosteUreRezultati.innerHTML =
+                    '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
+            }
+
             if (typeof updateContent === 'function') {
-                updateContent(); 
+                updateContent();
             }
         },
-        bound: true // Koledar ostane znotraj vidnega območja
+        bound: true
     });
 }
+
+
+// -- Glavna inicializacija --
+if (modalDatumInput && typeof Pikaday !== "undefined" && typeof moment !== "undefined") {
+
+    // ⭐ KRITIČNA ZAŠČITA ZA ANDROID/CAPACITOR
+    modalDatumInput.addEventListener('focus', (e) => {
+        e.preventDefault();
+    });
+
+    // Ustvari začetni koledar
+    createModalPicker();
+}
+
+
+// -- POSLUŠALNIK: ob spremembi jezika ponovno naloži koledar --
+i18next.on('languageChanged', () => {
+    createModalPicker();
+});
+
 
     if (gumbRezervirajModal) {
         gumbRezervirajModal.onclick = null; 

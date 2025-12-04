@@ -1,0 +1,273 @@
+{
+    "app": {
+      "title": "Restaurant Zoeken - Gourmet & Experience",
+      "profile_title": "Mijn Profiel - Gourmet & Experience",
+      "pageTitle": "Rentyo Aanbiedingen en Ervaringen"
+    },
+    "header": {
+      "login": "Inloggen",
+      "profile": "Mijn Profiel",
+      "logout": "Uitloggen"
+    },
+    "hero": {
+      "title": "Gourmet & Experience"
+    },
+    "action_banner": {
+      "title": "Boekt u nog steeds restaurants telefonisch?",
+      "subtitle": "Bij ons vindt u uw favoriete restaurant, boekt u het en geniet u, en dat zonder te bellen. Rentyo Gourmet & Experience"
+    },
+    "search": {
+      "restaurant_city_label": "Restaurant of Stad",
+      "restaurant_city_placeholder": "Voer naam of stad in",
+      "date_label": "Datum",
+      "date_placeholder": "Selecteer datum",
+      "time_label": "Reserveringstijd",
+      "select_time": "Selecteer tijd",
+      "persons_label": "Aantal Personen",
+      "search_button": "Zoeken",
+      "person_singular": "{{count}}",
+      "person_plural": "{{count}}"
+    },
+    "quick_search": {
+      "title": "Snelle Keukenkeuze"
+    },
+    "cuisine": {
+      "meat": "Vlees",
+      "vegetarian": "Vega",
+      "fish": "Vis",
+      "drinks": "Dranken",
+      "brunch": "Brunch"
+    },
+    "results": {
+      "popular_title": "Populair bij u in de buurt",
+      "featured_title": "Uitgelicht",
+      "reserve_button": "Reserveer",
+      "description_1": "Traditionele Sloveense keuken en aangename sfeer.",
+      "description_2": "Moderne gerechten met lokale ingrediënten.",
+      "description_3": "Authentiek Italiaans eten en uitstekende pizza's.",
+      "description_4": "Uitstekende plantaardige gerechten voor iedereen.",
+      "description_5": "Uitstekende brunches voor iedereen.",
+      "check_tables": "Controleer tafels om {{time}}",
+      "cuisine": "Keuken",
+      "na": "Geen gegevens",
+      "search_results": "Zoekresultaten",
+      "available_tomorrow": "Morgen om {{time}}",
+      "unavailable": "Geen vrije tafels",
+      "available_today": "Vandaag beschikbaar",
+      "search_title": "Zoekresultaten"
+    },
+    "gourmet_explore": {
+      "title": "Ontdek onvergetelijke ervaringen"
+    },
+    "experience": {
+      "mainTitle": "Exclusieve Aanbiedingen en Advertenties",
+      "mainSubtitle": "Ontdek speciale promoties en aanbevelingen van onze partners.",
+      "bestOffersTitle": "Onze Beste Aanbiedingen",
+      "fine_dining": "Fine Dining",
+      "fine_dining_href": "experience.html?code=fine-dining",
+      "wine": "Wijnproeverij",
+      "wine_href": "experience.html?code=wine-tasting",
+      "adventure": "Buitenavontuur",
+      "adventure_href": "experience.html?code=outdoor-adventure",
+      "slepa-kuhinja": "Blinde Keuken",
+      "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
+      "sea": "Zee-ervaringen",
+      "sea_href": "experience.html?code=sea-experience",
+      "city": "Stads Gourmet Tour",
+      "city_href": "experience.html?code=city-gourmet-tour",
+      "romantic": "Romantische Ervaringen",
+      "romantic_href": "experience.html?code=romantic-experience",
+      "eco": "Eco Keuken",
+      "eco_href": "experience.html?code=eco-cuisine",
+      "pageTitle": "Rentyo Aanbiedingen en Ervaringen",
+      "noActiveOffers": "Er zijn momenteel geen actieve speciale aanbiedingen."
+    },
+    "messages": {
+      "enter_search_criteria": "Voer a.u.b. een stad of keuken type in om te zoeken.",
+      "required_fields_missing": "Vul a.u.b. alle verplichte gegevens in: datum, tijd en aantal personen.",
+      "searching": "Restaurants zoeken voor '{{criteria}}'...",
+      "search_success": "{{count}} restaurants gevonden.",
+      "search_error": "Zoeken mislukt.",
+      "no_restaurants_found": "Geen restaurants gevonden.",
+      "reserving": "Reserveren voor {{stevilo}} personen om {{cas}}...",
+      "reservation_success": "Reservering geslaagd! Tafel nr. {{miza}} is gereserveerd voor {{trajanje}}.",
+      "reservation_success_minimal": "Succesvol gereserveerd om {{cas}}!",
+      "reservation_failed": "Reservering mislukt.",
+      "server_connection_error": "Verbinding met de server mislukt.",
+      "server_connection_error_retry": "Fout bij serververbinding, probeer het opnieuw.",
+      "login_success": "Inloggen geslaagd! Welkom.",
+      "registration_success": "Registratie geslaagd!",
+      "login_failed": "Inloggen mislukt.",
+      "registration_failed": "Registratie mislukt.",
+      "server_error": "Serverfout.",
+      "check_availability_prompt": "Controleer vrije tafels",
+      "available_times_found": "Momenteel beschikbare tijden.",
+      "no_restaurant_selected": "Fout: Geen restaurant geselecteerd.",
+      "select_reservation_date": "Selecteer a.u.b. de reserveringsdatum.",
+      "pogoji_required": "Om te registreren moet u akkoord gaan met de Algemene Voorwaarden en het Privacybeleid.",
+      "login_required": "Inloggen is vereist voor reservering. Log a.u.b. in.",
+      "google_reviews": "Google"
+    },
+    "duration": {
+      "one_hour": "1 uur",
+      "one_half_hours": "1 en een half uur",
+      "two_hours": "2 uur"
+    },
+    "auth": {
+      "login_title": "Inloggen",
+      "register_title": "Registratie",
+      "login_success": "Inloggen geslaagd! Welkom.",
+      "register_success": "Registratie geslaagd! U kunt nu inloggen.",
+      "login_error": "Fout tijdens het inloggen.",
+      "register_error": "Registratie mislukt.",
+      "server_error": "Fout bij serververbinding."
+    },
+    "modal": {
+      "login_tab": "Inloggen",
+      "register_tab": "Registratie",
+      "email_placeholder": "E-mail",
+      "password_placeholder": "Wachtwoord",
+      "name_placeholder": "Naam en achternaam",
+      "login_button": "Inloggen",
+      "register_button": "Account aanmaken",
+      "tab_menu": "Menu",
+      "tab_gallery": "Afbeeldingen & Kaart",
+      "tab_reviews": "Beoordelingen",
+      "tab_special_offer": "Huidige Aanbieding",
+      "special_offer_title": "Speciale Aanbieding van het Restaurant",
+      "special_offer_default": "Er zijn momenteel geen actieve speciale aanbiedingen of seizoensmenu's.",
+      "no_reviews": "Er zijn momenteel geen gedetailleerde beoordelingen beschikbaar om weer te geven.",
+      "no_menu": "Het menu is nog niet beschikbaar.",
+      "reserve_button": "Tafel reserveren",
+      "gallery_title": "Afbeeldingengalerij",
+      "map_title": "Locatiekaart",
+      "reservation_persons": "Aantal personen",
+      "reservation_date": "Datum",
+      "reservation_modal": {
+        "title": "Selecteer de duur van het bezoek",
+        "duration_label": "Hoe lang wilt u blijven?",
+        "duration_0_5h": "Half uur (30 min)",
+        "duration_1h": "1 uur",
+        "duration_1_5h": "1 en een half uur (90 min)",
+        "duration_2h": "2 uur",
+        "confirm_button": "Duur bevestigen en reserveren",
+        "qr_reminder": "Vergeet niet de QR-code van het restaurant bij aankomst te scannen en punten en voordelen te ontvangen!"
+      }
+    },
+    "footer": {
+      "about_company_title": "Over Rentyo Gourmet",
+      "about_us": "Over ons",
+      "about_us_href": "/nl/over-ons.html",
+      "contact": "Contact",
+      "contact_href": "/nl/contact.html",
+      "career": "Carrière",
+      "career_href": "/nl/carriere.html",
+      "media_press": "Media / Pershoek",
+      "media_press_href": "/nl/media-pers.html",
+      "legal_info_title": "Juridische informatie",
+      "legal_info_href": "/nl/juridische-informatie.html",
+      "privacy_policy": "Privacybeleid",
+      "privacy_policy_href": "https://www.rentyo.com/nl/privacybeleid.html",
+      "cookie_policy": "Cookies",
+      "cookie_policy_href": "/nl/cookiebeleid.html",
+      "terms_of_use": "Gebruiksvoorwaarden",
+      "terms_of_use_href": "https://www.rentyo.com/nl/gebruiksvoorwaarden.html",
+      "legal_notice": "Wettelijke kennisgeving",
+      "legal_notice_href": "/nl/wettelijke-kennisgeving.html",
+      "partnerships_title": "Partnerschappen",
+      "for_partners": "Voor partners",
+      "for_partners_href": "/nl/partnerschappen.html#voor-partners",
+      "affiliate_program": "Affiliate Programma",
+      "affiliate_program_href": "/nl/partnerschappen.html#affiliate-programma",
+      "connect_title": "Maak contact met ons",
+      "payment_info_prefix": "Veilige betaling aangeboden door",
+      "copyright_text": "© 2025 Rentyo Gourmet. Alle rechten voorbehouden."
+    },
+    "profile": {
+      "title": "Mijn Gebruikersprofiel",
+      "tab_data": "Persoonlijke Gegevens",
+      "tab_current": "Huidige Reserveringen",
+      "tab_history": "Reserveringsgeschiedenis",
+      "tab_points_payment": "Punten en Betaling",
+      "tab_notifications": "Meldingen",
+      "data_subtitle": "Uw Gegevens",
+      "name_label": "Naam en achternaam:",
+      "email_label": "E-mail:",
+      "edit_button": "Gegevens bewerken",
+      "current_subtitle": "Actieve Reserveringen",
+      "no_current_reservations": "U heeft momenteel geen actieve reserveringen.",
+      "cancel_button": "Annuleren",
+      "history_subtitle": "Eerdere Reserveringen",
+      "no_history_reservations": "De reserveringsgeschiedenis is leeg.",
+      "points_payment_subtitle": "Punten en Betaalmiddelen",
+      "points_title": "Uw Verzamelde Punten",
+      "points_status": "Huidige status: {{count}} punten (Genoeg voor 10€ korting)",
+      "points_status_dynamic": "Huidige status: {{count}} punten",
+      "card_title": "Opgeslagen Creditcard",
+      "card_info": "Visa eindigend op: **** 1234",
+      "add_card_button": "Kaart Toevoegen/Updaten",
+      "save_card_button": "Kaart Opslaan",
+      "hide_card_button": "Kaart Verwijderen",
+      "notifications_subtitle": "Uw Meldingen",
+      "status_completed": "Bedankt voor de reservering",
+      "cancel_confirmation": "Weet u zeker dat u de reservering wilt annuleren?",
+      "cancel_success": "De reservering is succesvol geannuleerd.",
+      "status_rated": "Al beoordeeld",
+      "status_rate_now": "Klik om te beoordelen",
+      "rate_title": "Beoordeel Restaurant",
+      "rating_label": "Uw Beoordeling",
+      "comment_label": "Opmerking (Optioneel)",
+      "submit_review": "Beoordeling Indienen",
+      "review_missing_data": "Fout: Ontbrekende gegevens voor het indienen van de beoordeling.",
+      "review_success": "Beoordeling succesvol ingediend! Bedankt.",
+      "review_error": "Fout bij het indienen van de beoordeling. Probeer het opnieuw.",
+      "scan_qr_main_text": "Scan de QR-code en bevestig uw aankomst",
+      "scan_qr_sub_text": "Door de aankomst te bevestigen, ontvangt u 50 punten en toekomstige kortingen.",
+      "status_error": "U bevindt zich momenteel niet binnen het tijdsbestek om de aankomst te bevestigen. U kunt de aankomst 10 minuten voor de gereserveerde tijd bevestigen.",
+      "status_confirmed": "Bevestigd",
+      "scan_unavailable": "Download de app en ontvang punten en kortingen"
+    },
+    "warning": {
+      "title": "Waarschuwing",
+      "default_message": "Houd er rekening mee dat de weergegeven informatie over beschikbaarheid en prijzen alleen ter informatie is.",
+      "understand_button": "Ik Begrijp"
+    },
+    "registration": {
+      "country_placeholder": "Selecteer Land (EU)",
+      "pogoji_strinjanje": "Ik ga akkoord met de ",
+      "splosni_pogoji_link": "Algemene Voorwaarden",
+      "splosni_pogoji_href": "https://www.rentyo.com/nl/gebruiksvoorwaarden.html",
+      "in_politiko": " en het ",
+      "politika_zasebnosti_link": "Privacybeleid",
+      "politika_zasebnosti_href": "https://www.rentyo.com/nl/privacybeleid.html"
+    },
+    "cookieConsent": {
+      "message": "Deze website gebruikt cookies om een betere gebruikerservaring en verkeersanalyse te garanderen. Voor verder gebruik vragen wij uw toestemming.",
+      "moreInfoLink": {
+        "text": "Lees meer.",
+        "url": "privacybeleid.html"
+      },
+      "buttons": [
+        {
+          "id": "decline-cookies",
+          "text": "Weigeren (alleen noodzakelijk)"
+        },
+        {
+          "id": "accept-cookies",
+          "text": "Alles accepteren"
+        }
+      ]
+    },
+    "global": {
+      "back": "Terug",
+      "loadingOffers": "Speciale aanbiedingen laden...",
+      "footerText": "© 2025 Rentyo Gourmet. Alle rechten voorbehouden.",
+      "location": "Locatie",
+      "dateTime": "Datum/Tijd",
+      "price": "Prijs",
+      "noDescription": "Gedetailleerde aanbiedingsbeschrijving is niet beschikbaar.",
+      "searchAndReserve": "Zoeken en reserveren",
+      "notSpecified": "Niet gespecificeerd",
+      "dataLoadError": "❌ FOUT BIJ HET LEZEN VAN GEGEVENS. Controleer API-eindpunt '/api/offers'."
+    }
+  }

@@ -55,9 +55,16 @@ const updateContent = () => {
         modalReservationTitle.textContent = i18next.t('modal.reservation_title');
     }
 
+    // 6. POSODOBITEV PIKADAY KOLEDARJA (ključno za prevod po menjavi jezika)
+    // Klic initModalPicker() uniči staro instanco koledarja in ustvari novo 
+    // z nastavitvami za trenutno izbrani jezik.
+    if (typeof initModalPicker === 'function') {
+        initModalPicker();
+    }
+
 
     // -------------------------------------------------------------
-    // 6. LOGIKA ZA DINAMIČNO PREPISOVANJE LINKOV (HREF)
+    // 7. LOGIKA ZA DINAMIČNO PREPISOVANJE LINKOV (HREF)
     // -------------------------------------------------------------
     const currentLang = i18next.language || 'sl'; 
     

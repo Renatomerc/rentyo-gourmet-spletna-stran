@@ -383,8 +383,8 @@ body::before {
     /* Stil za ocenjene rezervacije, brez močne posivitve */
     .kartica-rezervacije.ocenjeno {
         cursor: default !important;
-        background-color: #e8fdfb !important; 
-        border: 1px solid #e8fdfb !important;
+        background-color: #8affdc !important; 
+        border: 1px solid #8affdc !important;
         border-left: 1px solid #e8fdfb !important; 
         transition: none !important;
     }
@@ -594,7 +594,74 @@ body::before {
         .kartica-formular input[type="month"] {
              margin-bottom: 5px; 
         }
+    
+        .rez-card {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+
+.rez-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 4px 0;
+}
+
+.rez-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rez-icon svg {
+    width: 22px;
+    height: 24px;
+    stroke: #076b6a;
+}
+
+.rez-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.3;
+}
+/* Stil za gumb za nevarna dejanja (izbris računa) */
+.gumb-nevarno {
+    /* Izgled gumba */
+    background-color: #dc3545; /* Močna rdeča barva (Bootstrap danger) */
+    color: white; /* Beli tekst */
+    border: 2px solid #dc3545; /* Rob enake barve kot ozadje */
+    
+    /* Oblika in robovi */
+    border-radius: 50px; /* Popolnoma zaobljeni robovi */
+    padding: 7px 20px; /* Notranji zamik */
+    cursor: pointer; /* Kazalec, da je klikljiv */
+    font-size: 1em; /* Velikost pisave */
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Stil za lebdenje (hover) in fokus (focus) */
+.gumb-nevarno:hover,
+.gumb-nevarno:focus {
+    background-color: #c82333; /* Malo temnejša rdeča pri lebdenju */
+    border-color: #bd2130;
+    outline: none; /* Odstrani privzeti fokusni rob v nekaterih brskalnikih */
+}
+
+/* Stil za gumb, ko je pritisnjen (active) */
+.gumb-nevarno:active {
+    background-color: #bd2130; 
+    border-color: #b21f2d;
+}
+
+/* Stil za ikono znotraj gumba (če uporabljate Font Awesome) */
+.gumb-nevarno .fas {
+    margin-right: 8px;
+}
     }
+    
   </style>
 </head>
 
@@ -622,14 +689,17 @@ body::before {
         <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
       </div>
 
-      <div class="vsebina-zavihek" id="osnovni-podatki">
-        <h3 data-i18n="profile.data_subtitle">Vaši podatki</h3>
-        <div class="kartica-podatkov">
-            <p id="profil-ime"><strong data-i18n="profile.name_label">Ime in priimek:</strong> <span class="placeholder-text">Nalaganje...</span></p>
-            <p id="profil-email"><strong data-i18n="profile.email_label">E-pošta:</strong> <span class="placeholder-text">Nalaganje...</span></p>
-            
-        </div>
-      </div>
+     <div class="vsebina-zavihek" id="osnovni-podatki">
+    <h3 data-i18n="profile.data_subtitle">Vaši podatki</h3>
+    <div class="kartica-podatkov">
+        <p id="profil-ime"><strong data-i18n="profile.name_label">Ime in priimek:</strong> <span class="placeholder-text">Nalaganje...</span></p>
+        <p id="profil-email"><strong data-i18n="profile.email_label">E-pošta:</strong> <span class="placeholder-text">Nalaganje...</span></p>
+    </div>
+    
+    <button id="gumb-izbris-racuna" class="gumb-nevarno" data-i18n="profile.delete_account_button" style="margin-top: 20px; float: right;">
+        <i class="fas fa-trash-alt"></i> Izbriši račun
+    </button>
+    </div>
 
       <div class="vsebina-zavihek active" id="aktualne-rezervacije">
         <h3 data-i18n="profile.current_subtitle">Aktivne rezervacije</h3>
@@ -749,6 +819,9 @@ body::before {
         
         // API poti
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
+        // NOVO: API pot za izbris računa
+        const IZBRIS_RACUNA_API_URL = `${BASE_URL}auth/profil`; // Običajno uporabljamo isti endpoint z DELETE metodo za profil
+        
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
         const PRETEKLE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`; 
         const PREKLIC_REZERVACIJE_API_URL = `${BASE_URL}restavracije/izbrisi_rezervacijo`;
@@ -1039,6 +1112,52 @@ const odjava = (e) => {
     window.location.href = 'index.html'; 
 };
 
+// ===========================================
+// NOVO: LOGIKA ZA IZBRIS RAČUNA
+// ===========================================
+
+const izbrisiRacun = async (e) => {
+    if (e) e.preventDefault();
+    
+    // Uporaba i18next za prevajanje besedila potrditve
+    if (!window.confirm(i18next.t('profile.delete_account_confirmation') || 'Ste prepričani, da želite trajno izbrisati račun? To je NEPOVRATNO!')) {
+        return;
+    }
+
+    if (!zeton) {
+         // Predpostavljamo, da funkcija prikaziSporocilo obstaja
+         prikaziSporocilo('error', i18next.t('profile.delete_no_auth') || 'Manjka avtentikacija.');
+         odjava();
+         return;
+    }
+    
+    try {
+        // Predpostavljamo, da je IZBRIS_RACUNA_API_URL definiran
+        const response = await fetch(IZBRIS_RACUNA_API_URL, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${zeton}` 
+            }
+        });
+
+        if (response.ok) {
+            prikaziSporocilo('success', i18next.t('profile.delete_success') || 'Račun uspešno izbrisan.');
+            // Po uspešnem izbrisu izbrišemo žeton in preusmerimo uporabnika
+            odjava(); 
+        } else {
+            const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+            console.error("SERVER RESPONSE ERROR on account deletion:", response.status, errorData);
+            prikaziSporocilo('error', `${i18next.t('profile.delete_error') || 'Napaka pri izbrisu'}: ${errorData.msg || response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Napaka pri komunikaciji z backendom:", error);
+        prikaziSporocilo('error', i18next.t('profile.server_error') || 'Napaka strežnika.');
+    }
+};
+
+// ===========================================
+
 const posodobiPrikazPodatka = (element, labelKey, value) => {
     if (element) {
         const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
@@ -1061,6 +1180,12 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
             const gumbOdjava = document.getElementById('gumb-odjava');
             if (gumbOdjava) {
                 gumbOdjava.addEventListener('click', odjava);
+            }
+            
+            // NOVO: Povezava gumba za izbris računa
+            const gumbIzbrisRacuna = document.getElementById('gumb-izbris-racuna');
+            if (gumbIzbrisRacuna) {
+                gumbIzbrisRacuna.addEventListener('click', izbrisiRacun);
             }
 
             try {
@@ -1260,36 +1385,48 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 podatkiDiv.classList.add('rezervacija-podatki');
                 
              let htmlContent = `
-                    <p style="font-weight: bold; margin: 0;">${rez.ime_restavracije}</p>
-                    
-                    <p style="margin: 5px 0 0 0; display: flex; align-items: center;" class="text-sm">
-                        
-                        <span class="flex items-center mr-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2"> 
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg> 
-                            <span>${rez.datum_rezervacije}</span>
-                        </span>
-                        
-                        <span class="flex items-center mr-6 ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg> 
-                            <span>${casIzpis}</span>
-                        </span>
-                        
-                        <span class="flex items-center ml-6"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle text-gray-500 mr-2">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                            </svg>
-                            <span>${rez.stevilo_oseb}</span>
-                        </span>
-                    </p>
-                `;
+    <div class="rez-card">
+        <p class="rez-title">${rez.ime_restavracije}</p>
+
+        <!-- Koledar -->
+        <div class="rez-row">
+            <div class="rez-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="M8 2v4"></path>
+                    <path d="M16 2v4"></path>
+                </svg>
+            </div>
+            <div class="rez-text">${rez.datum_rezervacije}</div>
+        </div>
+
+        <!-- Ura -->
+        <div class="rez-row">
+            <div class="rez-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 7v5l3 2"></path>
+                </svg>
+            </div>
+            <div class="rez-text">${casIzpis}</div>
+        </div>
+
+        <!-- Ena oseba -->
+        <div class="rez-row">
+            <div class="rez-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M4 21v-1a8 8 0 0 1 16 0v1"></path>
+                </svg>
+            </div>
+            <div class="rez-text">${rez.stevilo_oseb}</div>
+        </div>
+    </div>
+`;
+
+
+
 
                 // Logika za status v zgodovini
                 if (!jeAktivnaLista) {
@@ -1302,11 +1439,11 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color: orange;">${i18next.t('profile.status_cancelled')}</p>`;
                     } else if (jeZeOcenjeno) {
                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color: #575757;">
-                                            <i class="fas fa-check-circle" style="color: #20c0bd;"></i> 
+                                            <i class="fas fa-check-circle" style="color: #076b6a;"></i> 
                                             ${i18next.t('profile.status_rated')}
                                         </p>`;
                     } else if (currentStatus === 'POTRJENO_PRIHOD') { // Ko ni preklicano in še ni ocenjeno
-                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#20c0bd;">
+                         statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#076b6a;">
                                             ${i18next.t('profile.status_rate_now')}
                                         </p>`;
                     } else {
@@ -1498,7 +1635,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 const starValue = parseInt(star.getAttribute('data-value'));
                 
                 if (starValue <= numericValue) {
-                    star.style.color = '#20c0bd'; 
+                    star.style.color = '#076b6a'; 
                 } else {
                     star.style.color = '#ccc'; 
                 }

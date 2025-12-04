@@ -6,13 +6,22 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const router = express.Router();
     const jwt = require('jsonwebtoken');
     const bcrypt = require('bcryptjs');
-    
+    const mongoose = require('mongoose'); // Dodan uvoz za ObjectID
+
     // ⭐ 1. Uvozimo Shemo in Sekundarno povezavo
     const UporabnikShema = require('../models/Uporabnik'); 
+    // 🚨 NOVO: UVOZI MODELOV ZA KASKADNI IZBRIS
+    const RezervacijaShema = require('../models/Rezervacija'); // PREDPOSTAVKA
+    const RestavracijaShema = require('../models/Restavracija'); // PREDPOSTAVKA
+    
     const dbUsers = require('../dbUsers'); 
-
+    const dbRestavracije = require('../dbRestavracije'); // PREDPOSTAVKA: Povezava za Restavracije/Rezervacije
+    
     // ⭐ 2. KLJUČNO: Ustvarimo model, POVEZAN S SEKUNDARNO POVEZAVO
     const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+    // 🚨 NOVO: USTVARJANJE MODELOV ZA KASKADNI IZBRIS
+    const Rezervacija = dbRestavracije.model('Rezervacija', RezervacijaShema); 
+    const Restavracija = dbRestavracije.model('Restavracija', RestavracijaShema);
 
     // ==========================================================
     // 🔴 KONČNI POPRAVEK: VAREN JWT KLJUČ
@@ -165,16 +174,14 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         res.status(200).json({ msg: 'Uspešno odjavljen. Piškotek izbrisan.' });
     });
 
-    // Zaščitena pot: /api/auth/profil
-    // 🟢 POPRAVEK: Ruta je sedaj ASINHRONA in neposredno kliče bazo!
+    // Zaščitena pot: GET /api/auth/profil
     router.get('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
         
         // Uporabimo ID, ki ga dobimo iz JWT in je shranjen v req.uporabnik (ali req.user/req.payload)
         const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
 
         try {
-            // 🟢 KLJUČNA SPREMEMBA: Poiščemo uporabnika neposredno v bazi,
-            // da dobimo VSE POSODOBLJENE PODATKE, vključno s točkeZvestobe.
+            // Poiščemo uporabnika neposredno v bazi, da dobimo VSE POSODOBLJENE PODATKE
             const uporabnikDB = await Uporabnik.findById(uporabnikId).select('-geslo');
 
             if (!uporabnikDB) {
@@ -189,8 +196,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                     email: uporabnikDB.email, 
                     jeLastnik: uporabnikDB.jeLastnik, 
                     cena: uporabnikDB.cena,
-                    drzava: uporabnikDB.drzava, // ⬅️ DODANO: Vrnitev države
-                    // 🟢 NOVO: TOČKE ZVESTOBE
+                    drzava: uporabnikDB.drzava, 
                     tockeZvestobe: uporabnikDB.tockeZvestobe 
                 }
             });
@@ -198,6 +204,63 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         } catch (err) {
             console.error('❌ NAPAKA PRI NALAGANJU PROFILA IZ BAZE:', err);
             res.status(500).json({ msg: 'Napaka strežnika pri nalaganju profila.' });
+        }
+    });
+    
+    // ==========================================================
+    // 🗑️ NOVO: ZAŠČITENA POT ZA IZBRIS RAČUNA: DELETE /api/auth/profil
+    // ==========================================================
+    router.delete('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
+        // ID uporabnika, ki je shranjen v JWT žetonu
+        const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
+        
+        try {
+            // 1. IZBRIŠI UPORABNIKA
+            const rezultatUporabnik = await Uporabnik.findByIdAndDelete(uporabnikId);
+
+            if (!rezultatUporabnik) {
+                console.warn(`Uporabnik z ID ${uporabnikId} ni najden v zbirki Uporabnik.`);
+            }
+
+            // 2. KASKADNI IZBRIS IN ANONIMIZACIJA (GDPR)
+
+            // A) IZBRIŠI REZERVACIJE (VSEBUJEJO PREVEČ PII)
+            const rezultatRezervacije = await Rezervacija.deleteMany({ uporabnik: uporabnikId });
+            
+            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija)
+            // S tem ohranimo statistiko, a uničimo identiteto.
+            const anonimizacijaRezultat = await Restavracija.updateMany(
+                { 'komentarji.userId': new mongoose.Types.ObjectId(uporabnikId) }, // Najdi po ID
+                { 
+                    $set: { 
+                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa
+                        'komentarji.$[element].userId': null,
+                        'komentarji.$[element].uporabniskoIme': 'Anonimni uporabnik', 
+                        'komentarji.$[element].email_gosta': null, 
+                        'komentarji.$[element].je_anonimizirana': true 
+                    }
+                },
+                { 
+                    // Definicija arrayFilters: posodobi element, kjer je ID enak uporabnikovemu ID
+                    arrayFilters: [ { 'element.userId': new mongoose.Types.ObjectId(uporabnikId) } ] 
+                }
+            );
+
+            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Izbrisanih rezervacij: ${rezultatRezervacije.deletedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
+
+            // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
+            res.cookie('auth_token', '', { 
+                httpOnly: true, 
+                expires: new Date(0),
+                path: '/' 
+            });
+
+            // 4. VRNI USPEŠEN ODGOVOR
+            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani/anonimizirani.' });
+
+        } catch (err) {
+            console.error('❌ KRITIČNA NAPAKA PRI IZBRISU RAČUNA:', err);
+            res.status(500).json({ msg: 'Napaka strežnika pri trajnem izbrisu računa in podatkov.' });
         }
     });
 

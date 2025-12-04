@@ -233,6 +233,7 @@
     "understand_button": "Razumem"
   },
   "registration": {
+    "country_placeholder": "Izberi državo (EU)",
     "pogoji_strinjanje": "Strinjam se s ",
     "splosni_pogoji_link": "Splošnimi pogoji",
     "splosni_pogoji_href": "https://www.rentyo.com/sl/uvjeti-koristenja.html",
