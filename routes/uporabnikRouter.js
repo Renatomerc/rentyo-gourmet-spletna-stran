@@ -6,27 +6,25 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const router = express.Router();
     const jwt = require('jsonwebtoken');
     const bcrypt = require('bcryptjs');
-    const mongoose = require('mongoose'); // Glavna Mongoose instanca
+    const mongoose = require('mongoose'); 
 
-    // ⭐ 1. Uvozimo Shemo
+    // ⭐ 1. Uvozimo Shemo (za Uporabnik, ki očitno uporablja dbUsers ločeno povezavo)
     const UporabnikShema = require('../models/Uporabnik'); 
-    const RestavracijaShema = require('../models/Restavracija');
     
-    // 🚨 KRITIČNI POPRAVEK: ODSTRANIMO NEVELJAVNE POVEZAVE
-    // const dbUsers = require('../dbUsers'); // Če imate to ločeno, jo boste morda morali obdržati!
-    // const dbRestavracije = require('../dbRestavracije'); // To povzroča napako!
+    // 🚨 KRITIČNI POPRAVEK: Restavracija se uvaža kot CELOTEN MODEL, 
+    // s čimer se izognemo ponovni registraciji z 'mongoose.model' (in s tem napaki).
+    const Restavracija = require('../models/Restavracija');
     
-    // ⭐ 2. KLJUČNO: Ustvarimo model, POVEZAN Z GLAVNO POVEZAVO (mongoose)
-    // PREDPOSTAVKA: Uporabnik je na ločeni bazi, zato ohranjam dbUsers, če je to pravilno!
-    // Če tudi dbUsers ne obstaja, ga morate zamenjati z mongoose.model
-    const Uporabnik = require('../dbUsers').model('Uporabnik', UporabnikShema); 
+    // Ker se Uporabnik povezuje na ločeno bazo, ohranimo uvoz dbUsers.
+    const dbUsers = require('../dbUsers'); 
+
+    // ⭐ 2. KLJUČNO: Ustvarimo model Uporabnik, POVEZAN S SEKUNDARNO POVEZAVO
+    const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema); 
     
-    // 🚨 POPRAVEK: MODEL Restavracija ustvarimo z GLAVNO mongoose instanco
-    const Restavracija = mongoose.model('Restavracija', RestavracijaShema);
+    // 🚨 POPRAVEK: Registracijo modela Restavracija smo premaknili v uvoz!
 
     // ==========================================================
     // 🔴 KONČNI POPRAVEK: VAREN JWT KLJUČ
-    // ... (OSTALA KODA OSTANE ENAKA) ...
     // ==========================================================
     const TAJNI_KLJUC = JWT_SECRET_KEY; 
 
