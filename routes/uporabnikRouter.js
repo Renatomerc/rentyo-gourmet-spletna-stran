@@ -223,7 +223,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 console.warn(`Uporabnik z ID ${uporabnikId} ni najden v zbirki Uporabnik.`);
             }
 
-            // 2. KASKADNI IZBRIS IN ANONIMIZACIJA (GDPR)
+            // 2. KASKADNI IZBRIS (GDPR)
 
             // A) IZBRIŠI REZERVACIJE (So gnezdeni v Restavracija.mize.rezervacije)
             // Uporabimo $pull operacijo na vseh mizah v vseh restavracijah, da odstranimo rezervacije tega uporabnika.
@@ -241,26 +241,22 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 }
             );
             
-            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija.komentarji)
-            // S tem ohranimo statistiko, a uničimo identiteto.
-            const anonimizacijaRezultat = await Restavracija.updateMany(
+            // 🚨 KRITIČNI POPRAVEK: IZBRIŠI OCENE/KOMENTARJE (namesto anonimizacije)
+            const rezultatKomentarji = await Restavracija.updateMany(
                 { 'komentarji.userId': uporabnikIdObject }, // Najdi restavracije z oceno tega uporabnika
                 { 
-                    $set: { 
-                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa v arrayu 'komentarji'
-                        'komentarji.$[element].userId': null,
-                        'komentarji.$[element].uporabniskoIme': 'Anonimni uporabnik', 
-                        'komentarji.$[element].email_gosta': null, 
-                        'komentarji.$[element].je_anonimizirana': true 
+                    $pull: { 
+                        // Uporabimo $pull za odstranitev celotnega vdelanega dokumenta iz arraya 'komentarji'
+                        'komentarji': { 
+                            userId: uporabnikIdObject 
+                        } 
                     }
-                },
-                { 
-                    // Definicija arrayFilters: posodobi element, kjer je ID enak uporabnikovemu ID
-                    arrayFilters: [ { 'element.userId': uporabnikIdObject } ] 
                 }
             );
-
-            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
+            // ⚠️ OPOMBA: Če uporabljate polji ocena_povprecje in st_ocen, morate 
+            // sedaj ročno implementirati logiko za njuno preračunavanje!
+            
+            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, IZBRISANIH KOMENTARJEV v restavracijah: ${rezultatKomentarji.modifiedCount}.`);
 
             // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
             res.cookie('auth_token', '', { 
@@ -270,7 +266,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             });
 
             // 4. VRNI USPEŠEN ODGOVOR
-            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani/anonimizirani.' });
+            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani.' });
 
         } catch (err) {
             console.error('❌ KRITIČNA NAPAKA PRI IZBRISU RAČUNA:', err);
