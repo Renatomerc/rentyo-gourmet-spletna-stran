@@ -223,7 +223,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 console.warn(`Uporabnik z ID ${uporabnikId} ni najden v zbirki Uporabnik.`);
             }
 
-            // 2. KASKADNI IZBRIS (GDPR)
+            // 2. KASKADNI IZBRIS IN ANONIMIZACIJA (GDPR)
 
             // A) IZBRIŠI REZERVACIJE (So gnezdeni v Restavracija.mize.rezervacije)
             // Uporabimo $pull operacijo na vseh mizah v vseh restavracijah, da odstranimo rezervacije tega uporabnika.
@@ -241,52 +241,26 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 }
             );
             
-            // 🚨 KRITIČNI POPRAVEK: IZBRIŠI OCENE/KOMENTARJE (Popolnoma odstrani celoten vdelan dokument in preračuna)
-            
-            // 1. Poišči vse restavracije, ki imajo komentarje tega uporabnika, da lahko uporabimo .pull() in .save()
-            const restavracijeZaPreracun = await Restavracija.find({ 'komentarji.userId': uporabnikIdObject });
-            
-            let stIzbrisanihKomentarjev = 0;
-
-            // 2. Za vsako restavracijo izvedi izbris komentarja in preračun ocene
-            for (const restavracija of restavracijeZaPreracun) {
-                
-                // Opomba: Uporabimo .equals() za pravilno primerjavo tipa ObjectId
-                const komentarZaBrisanje = restavracija.komentarji.find(kom => 
-                    kom.userId && kom.userId.equals(uporabnikIdObject)
-                );
-
-                if (komentarZaBrisanje) {
-                    
-                    // 2a. ODSTRANITEV: Odstranimo CELOTEN komentar iz arraya z Mongoose .pull()
-                    // Ta metoda odstrani celoten vdelan dokument, vključno z oceno in imenom!
-                    restavracija.komentarji.pull(komentarZaBrisanje._id);
-                    stIzbrisanihKomentarjev++;
-
-                    // 2b. PRERAČUN: Preračunamo polja restavracije na podlagi PREOSTALIH komentarjev
-                    const stOcenPo = restavracija.komentarji.length;
-                    
-                    // Izračunamo vsoto ocen preostalih komentarjev
-                    const vsotaOcenPo = restavracija.komentarji.reduce((acc, kom) => acc + kom.ocena, 0);
-
-                    // Posodobimo polja
-                    restavracija.st_ocen = stOcenPo;
-                    
-                    if (stOcenPo > 0) {
-                        // Posodobimo povprečje (toFixed(1) za pravilno shranjevanje)
-                        restavracija.ocena_povprecje = parseFloat((vsotaOcenPo / stOcenPo).toFixed(1)); 
-                    } else {
-                        // Če ni ostalo nobenega komentarja
-                        restavracija.ocena_povprecje = 0;
+            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija.komentarji)
+            // S tem ohranimo statistiko, a uničimo identiteto.
+            const anonimizacijaRezultat = await Restavracija.updateMany(
+                { 'komentarji.userId': uporabnikIdObject }, // Najdi restavracije z oceno tega uporabnika
+                { 
+                    $set: { 
+                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa v arrayu 'komentarji'
+                        'komentarji.$[element].userId': null,
+                        'komentarji.$[element].uporabniskoIme': 'Anonimni uporabnik', 
+                        'komentarji.$[element].email_gosta': null, 
+                        'komentarji.$[element].je_anonimizirana': true 
                     }
-
-                    // 2c. SHRANJEVANJE: Shranimo posodobljeno restavracijo 
-                    await restavracija.save();
+                },
+                { 
+                    // Definicija arrayFilters: posodobi element, kjer je ID enak uporabnikovemu ID
+                    arrayFilters: [ { 'element.userId': uporabnikIdObject } ] 
                 }
-            }
-            
-            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, IZBRIS KOMENTARJEV in PRERAČUN OCEN v ${restavracijeZaPreracun.length} restavracijah. Število izbrisanih komentarjev: ${stIzbrisanihKomentarjev}.`);
+            );
 
+            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
 
             // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
             res.cookie('auth_token', '', { 
@@ -296,7 +270,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             });
 
             // 4. VRNI USPEŠEN ODGOVOR
-            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani.' });
+            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani/anonimizirani.' });
 
         } catch (err) {
             console.error('❌ KRITIČNA NAPAKA PRI IZBRISU RAČUNA:', err);
