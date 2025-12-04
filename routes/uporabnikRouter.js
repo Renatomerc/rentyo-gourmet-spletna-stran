@@ -6,21 +6,19 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const router = express.Router();
     const jwt = require('jsonwebtoken');
     const bcrypt = require('bcryptjs');
-    const mongoose = require('mongoose'); // Dodan uvoz za ObjectID
+    const mongoose = require('mongoose'); // Dodan uvoz za ObjectId
 
     // ⭐ 1. Uvozimo Shemo in Sekundarno povezavo
     const UporabnikShema = require('../models/Uporabnik'); 
-    // 🚨 NOVO: UVOZI MODELOV ZA KASKADNI IZBRIS
-    const RezervacijaShema = require('../models/Rezervacija'); // PREDPOSTAVKA
+    // 🚨 KRITIČNI POPRAVEK: UVOZIMO SAMO RestavracijaShema (Rezervacije so gnezdeni del Restavracije)
     const RestavracijaShema = require('../models/Restavracija'); // PREDPOSTAVKA
     
     const dbUsers = require('../dbUsers'); 
-    const dbRestavracije = require('../dbRestavracije'); // PREDPOSTAVKA: Povezava za Restavracije/Rezervacije
+    const dbRestavracije = require('../dbRestavracije'); // PREDPOSTAVKA: Povezava za Restavracije
     
     // ⭐ 2. KLJUČNO: Ustvarimo model, POVEZAN S SEKUNDARNO POVEZAVO
     const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
-    // 🚨 NOVO: USTVARJANJE MODELOV ZA KASKADNI IZBRIS
-    const Rezervacija = dbRestavracije.model('Rezervacija', RezervacijaShema); 
+    // 🚨 POPRAVEK: USTVARIMO SAMO MODEL Restavracija
     const Restavracija = dbRestavracije.model('Restavracija', RestavracijaShema);
 
     // ==========================================================
@@ -213,7 +211,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.delete('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
         // ID uporabnika, ki je shranjen v JWT žetonu
         const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
-        
+        const uporabnikIdObject = new mongoose.Types.ObjectId(uporabnikId); // Potrebno za $pull
+
         try {
             // 1. IZBRIŠI UPORABNIKA
             const rezultatUporabnik = await Uporabnik.findByIdAndDelete(uporabnikId);
@@ -224,16 +223,29 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
 
             // 2. KASKADNI IZBRIS IN ANONIMIZACIJA (GDPR)
 
-            // A) IZBRIŠI REZERVACIJE (VSEBUJEJO PREVEČ PII)
-            const rezultatRezervacije = await Rezervacija.deleteMany({ uporabnik: uporabnikId });
+            // A) IZBRIŠI REZERVACIJE (So gnezdeni v Restavracija.mize.rezervacije)
+            // Uporabimo $pull operacijo na vseh mizah v vseh restavracijah, da odstranimo rezervacije tega uporabnika.
+            const rezultatRezervacije = await Restavracija.updateMany(
+                // Iskalni pogoj: restavracije, ki imajo rezervacije tega uporabnika
+                { 'mize.rezervacije.uporabnikId': uporabnikIdObject }, 
+                { 
+                    $pull: { 
+                        // Uporabimo $[] za aplikacijo $pull na VSE elemente v arrayu 'mize'
+                        // Odstrani vse elemente iz 'rezervacije' arraya, kjer se uporabnikId ujema.
+                        'mize.$[].rezervacije': { 
+                            uporabnikId: uporabnikIdObject 
+                        } 
+                    } 
+                }
+            );
             
-            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija)
+            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija.komentarji)
             // S tem ohranimo statistiko, a uničimo identiteto.
             const anonimizacijaRezultat = await Restavracija.updateMany(
-                { 'komentarji.userId': new mongoose.Types.ObjectId(uporabnikId) }, // Najdi po ID
+                { 'komentarji.userId': uporabnikIdObject }, // Najdi restavracije z oceno tega uporabnika
                 { 
                     $set: { 
-                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa
+                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa v arrayu 'komentarji'
                         'komentarji.$[element].userId': null,
                         'komentarji.$[element].uporabniskoIme': 'Anonimni uporabnik', 
                         'komentarji.$[element].email_gosta': null, 
@@ -242,11 +254,11 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
                 },
                 { 
                     // Definicija arrayFilters: posodobi element, kjer je ID enak uporabnikovemu ID
-                    arrayFilters: [ { 'element.userId': new mongoose.Types.ObjectId(uporabnikId) } ] 
+                    arrayFilters: [ { 'element.userId': uporabnikIdObject } ] 
                 }
             );
 
-            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Izbrisanih rezervacij: ${rezultatRezervacije.deletedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
+            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
 
             // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
             res.cookie('auth_token', '', { 
