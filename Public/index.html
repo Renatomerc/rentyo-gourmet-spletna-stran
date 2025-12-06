@@ -3916,7 +3916,9 @@ const checkUrlForAuthToken = () => {
         localStorage.setItem('zeton', zeton);
         // Pretvori jeLastnik v boolean
         if (jeLastnik !== null) {
-            localStorage.setItem('jeLastnik', jeLastnik === 'true' || jeLastnik === '1');
+            // ⭐ KLJUČNO: Shranimo kot string 'true' ali 'false' za doslednost
+            const jeLastnikString = jeLastnik === 'true' || jeLastnik === '1' ? 'true' : 'false';
+            localStorage.setItem('jeLastnik', jeLastnikString);
         } else {
             localStorage.removeItem('jeLastnik');
         }
@@ -4011,8 +4013,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             if (res.ok) {
                 localStorage.setItem('zeton', data.zeton); 
-                const jeLastnik = data.zelastnik !== undefined ? data.zelastnik : data.jeLastnik; 
-                localStorage.setItem('jeLastnik', jeLastnik); 
+                const jeLastnikAPI = data.zelastnik !== undefined ? data.zelastnik : data.jeLastnik; 
+                
+                // ⭐ POPRAVEK: Shranjevanje lastnika kot string 'true' ali 'false'
+                const jeLastnikString = jeLastnikAPI === true || jeLastnikAPI === 'true' ? 'true' : 'false';
+                localStorage.setItem('jeLastnik', jeLastnikString); 
+                
                 if (data.ime) localStorage.setItem('ime', data.ime); 
                 if (data.telefon) localStorage.setItem('telefon', data.telefon); 
                 
@@ -4068,7 +4074,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         if (res.ok) {
             localStorage.setItem('zeton', data.zeton); 
-            localStorage.setItem('jeLastnik', jeLastnik); 
+            
+            // ⭐ POPRAVEK: Shranjevanje lastnika kot string 'false' za doslednost
+            localStorage.setItem('jeLastnik', 'false'); 
+            
             localStorage.setItem('ime', ime); 
             localStorage.setItem('telefon', telefon); 
             

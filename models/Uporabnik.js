@@ -1,6 +1,7 @@
 // ========================================
 // 🟢 uporabnik.js — Uporabnik model (Sedaj izvaža samo SHEMO!)
 // POPRAVLJENO: Dodan fcmToken za PUSH obvestila
+// POPRAVLJENO: Dodana podpora za AppleId in posodobljena validacija gesla
 // ========================================
 
 const mongoose = require('mongoose');
@@ -12,34 +13,45 @@ const UporabnikShema = new mongoose.Schema({
     telefon: { type: String },
     
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    // Pomembno: geslo ni obvezno, če je prisoten googleId
-    geslo: { type: String, required: function() { return !this.googleId; } }, 
+    
+    // ⭐ POSODOBLJENO: Geslo ni obvezno, če je prisoten googleId ALI appleId
+    geslo: { 
+        type: String, 
+        required: function() { 
+            // Geslo je obvezno, samo če ni prisoten socialni ID
+            return !this.googleId && !this.appleId; 
+        } 
+    }, 
     
     googleId: { type: String, unique: true, sparse: true }, 
+    
+    // ⭐ NOVO: POLJE ZA APPLE ID
+    appleId: { 
+        type: String, 
+        unique: true, 
+        sparse: true 
+    }, 
 
     jeLastnik: { type: Boolean, default: false },
     cena: { type: Number, default: 0, required: function() { return this.jeLastnik; } },
     
-    // ⭐ NOVO: POLJE ZA DRŽAVO
+    // ⭐ POLJE ZA DRŽAVO
     drzava: { 
         type: String, 
         required: true,      // Polje je obvezno pri novih registracijah
         default: 'Neznano',  // Privzeta vrednost za nazaj združljivost (starejši uporabniki)
         trim: true 
     },
-    // ⭐ KONEC NOVEGA POLJA
+    // ⭐ KONEC POLJA
 
     tockeZvestobe: {
         type: Number,
         default: 0
     },
 
-    // 🔥 KRITIČNA ZAČASNA SPREMEMBA: Odstranitev default: null in unique: true
-    // To prisili Mongoose, da izbriše problematičen indeks 'fcmToken_1' v bazi.
+    // 🔥 POPRAVKI ZA FCM TOKEN: Odstranitev default: null in unique: true
     fcmToken: { 
         type: String, 
-        // default: null, // IZBRISANO/ZAKOMENTIRANO
-        // unique: true,  // IZBRISANO/ZAKOMENTIRANO
         sparse: true 
     },
 
@@ -47,7 +59,8 @@ const UporabnikShema = new mongoose.Schema({
 
 // Metoda za primerjavo gesla
 UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
-    if (!this.geslo || this.googleId) {
+    // ⭐ POSODOBLJENO: Preveri tudi, ali obstaja Apple ID
+    if (!this.geslo || this.googleId || this.appleId) {
         return false; 
     }
     return bcrypt.compare(vnesenoGeslo, this.geslo);

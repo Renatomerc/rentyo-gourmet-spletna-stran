@@ -1,5 +1,6 @@
 // ========================================
 // 🟢 passportConfig.js — Konfiguracija Passport.js (POPRAVLJENO)
+// ⭐ POSODOBLJENO: Odstranjeno ustvarjanje fiktivnega gesla
 // ========================================
 
 // 1. NALOŽI OKOLJSKE SPREMENLJIVKE TAKOJ!
@@ -66,14 +67,13 @@ function setupPassport(app) {
                     console.log('Google uporabnik že registriran:', currentUser.ime);
                     done(null, currentUser);
                 } else {
-                    // Dodajanje privzetega gesla za Google uporabnike, da se izognemo Mongoose validaciji
-                    const novoGeslo = 'google_oauth_user_no_password_set_' + profile.id; 
+                    // ⭐ POPRAVLJENO: ODSTRANJENA sta ustvarjanje in dodajanje "novoGeslo"
                     
                     const newUser = await Uporabnik.create({
                         googleId: profile.id,
                         ime: profile.displayName,
                         email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : 'ni-emaila@google.com',
-                        geslo: novoGeslo, // Dodano, da model Uporabnik Shema ni prekršena
+                        // Polje 'geslo' se izpusti, ker MongooseShema zdaj dovoli null vrednost ob prisotnosti googleId/appleId
                         tockeZvestobe: 100 // Dodana privzeta vrednost
                     });
                     console.log('Nov Google uporabnik ustvarjen:', newUser.ime);
@@ -110,17 +110,18 @@ function setupPassport(app) {
                     done(null, currentUser);
                 } else {
                     const email = profile.email || 'skrit-email@apple.com';
+                    // Poskušamo pridobiti ime, če ga je posredoval Apple
                     const name = (req.body && req.body.user && req.body.user.name && req.body.user.name.firstName) 
                                  ? `${req.body.user.name.firstName} ${req.body.user.name.lastName}`
                                  : 'Apple Uporabnik';
 
-                    const novoGeslo = 'apple_oauth_user_no_password_set_' + appleId;
+                    // ⭐ POPRAVLJENO: ODSTRANJENA sta ustvarjanje in dodajanje "novoGeslo"
                                  
                     const newUser = await Uporabnik.create({
                         appleId: appleId,
                         ime: name,
                         email: email,
-                        geslo: novoGeslo, // Dodano
+                        // Polje 'geslo' se izpusti
                         tockeZvestobe: 100 // Dodano
                     });
                     console.log('Nov Apple uporabnik ustvarjen:', newUser.ime);

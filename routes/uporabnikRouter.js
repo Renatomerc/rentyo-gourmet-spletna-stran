@@ -7,6 +7,9 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const jwt = require('jsonwebtoken');
     const bcrypt = require('bcryptjs');
     const mongoose = require('mongoose'); 
+    
+    // ⭐ NOVO: Uvoz Passport.js
+    const passport = require('passport'); 
 
     // ⭐ 1. Uvozimo Shemo (za Uporabnik, ki očitno uporablja dbUsers ločeno povezavo)
     const UporabnikShema = require('../models/Uporabnik'); 
@@ -277,6 +280,82 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
             res.status(500).json({ msg: 'Napaka strežnika pri trajnem izbrisu računa in podatkov.' });
         }
     });
+    
+    // ==========================================================
+    // ⭐ NOVO: SOCIALNA PRIJAVA Z GOOGLE & APPLE RUTE
+    // ==========================================================
+
+    // --- GOOGLE PRIJAVA ---
+    // 1. Začetek Google prijave: Kliče se iz frontenda (/api/auth/google)
+    // Preusmeri uporabnika na Google za avtentikacijo.
+    router.get('/google', (req, res, next) => {
+        // Shranimo redirectUrl iz frontenda (ki ga Passport.js pričakuje kot 'state')
+        const redirectUrl = req.query.redirectUrl || '/'; 
+        passport.authenticate('google', { 
+            scope: ['profile', 'email'],
+            state: redirectUrl // Uporaba state za shranjevanje URL-ja za povratek
+        })(req, res, next);
+    });
+
+
+    // 2. Google Povratni Klic: Kliče ga Google
+    // Passport.js preveri žeton in ustvari/prijavi uporabnika.
+    router.get('/google/callback', 
+        passport.authenticate('google', { 
+            session: false, // Ne uporabljamo Express seje, temveč JWT
+            // V primeru neuspeha poskusimo uporabiti shranjen state ali privzeti URL
+            failureRedirect: `${req.query.state || '/'}?status=error&msg=Go_neuspešno`
+        }), 
+        (req, res) => {
+            // Avtentikacija je uspela, req.user je Mongoose uporabniški objekt
+            
+            // a) Generiraj vaš JWT
+            const zeton = generirajZeton(req.user._id);
+
+            // b) Nastavi piškotek (HTTP-Only)
+            nastaviAuthPiškotek(res, zeton); 
+
+            // c) Preusmeri nazaj na frontend (z žetonom v URL-ju, kot ga pričakuje JS koda)
+            const frontendRedirectUrl = req.query.state || '/';
+            
+            res.redirect(`${frontendRedirectUrl}?zeton=${zeton}&ime=${req.user.ime}&jeLastnik=${req.user.jeLastnik || false}&telefon=${req.user.telefon || ''}`);
+        }
+    );
+
+
+    // --- APPLE PRIJAVA ---
+    // 3. Začetek Apple prijave: Kliče se iz frontenda (/api/auth/apple)
+    router.get('/apple', (req, res, next) => {
+        const redirectUrl = req.query.redirectUrl || '/';
+        passport.authenticate('apple', { 
+            scope: ['name', 'email'],
+            state: redirectUrl 
+        })(req, res, next);
+    });
+
+
+    // 4. Apple Povratni Klic: Kliče ga Apple (POST zahteva)
+    router.post('/apple/callback', 
+        passport.authenticate('apple', { 
+            session: false, 
+            // Pri Apple-u je state (redirectUrl) v telesu zahteve (req.body)
+            failureRedirect: `${req.body.state || '/'}?status=error&msg=Ap_neuspešno`
+        }), 
+        (req, res) => {
+            // Avtentikacija je uspela
+            
+            // a) Generiraj vaš JWT
+            const zeton = generirajZeton(req.user._id);
+
+            // b) Nastavi piškotek (HTTP-Only)
+            nastaviAuthPiškotek(res, zeton); 
+
+            // c) Preusmeri nazaj na frontend (redirectUrl je v req.body.state)
+            const frontendRedirectUrl = req.body.state || '/';
+            
+            res.redirect(`${frontendRedirectUrl}?zeton=${zeton}&ime=${req.user.ime}&jeLastnik=${req.user.jeLastnik || false}&telefon=${req.user.telefon || ''}`);
+        }
+    );
 
     return router; 
 };

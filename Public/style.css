@@ -93,7 +93,7 @@ a:hover {
     display: flex;
     align-items: center;
     border: 0px solid #ccc;
-    border-radius: 5px;
+    border-radius: 25px;
     background-color: white;
     padding: 5px;
 }
