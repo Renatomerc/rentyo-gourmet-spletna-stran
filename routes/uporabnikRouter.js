@@ -1,5 +1,5 @@
 // module.exports sedaj izvaža FUNKCIJO, ki prejme tajni ključ IN middleware.
-// 👇 KLJUČNO: SPREJMEMO TRI PARAMETRE!
+// 👇 KLJUČNO: SPREJEMEMO TRI PARAMETRE!
 module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => { 
 
     const express = require('express');
@@ -303,8 +303,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.get('/google/callback', 
         passport.authenticate('google', { 
             session: false, // Ne uporabljamo Express seje, temveč JWT
-            // V primeru neuspeha poskusimo uporabiti shranjen state ali privzeti URL
-            failureRedirect: `${req.query.state || '/'}?status=error&msg=Go_neuspešno`
+            // ✅ POPRAVEK: failureRedirect mora biti statičen niz!
+            failureRedirect: '/?status=error&msg=Go_neuspešno' // Uporabimo statičen redirect
         }), 
         (req, res) => {
             // Avtentikacija je uspela, req.user je Mongoose uporabniški objekt
@@ -338,8 +338,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.post('/apple/callback', 
         passport.authenticate('apple', { 
             session: false, 
-            // Pri Apple-u je state (redirectUrl) v telesu zahteve (req.body)
-            failureRedirect: `${req.body.state || '/'}?status=error&msg=Ap_neuspešno`
+            // ✅ POPRAVEK: failureRedirect mora biti statičen niz!
+            failureRedirect: '/?status=error&msg=Ap_neuspešno' // Uporabimo statičen redirect
         }), 
         (req, res) => {
             // Avtentikacija je uspela
