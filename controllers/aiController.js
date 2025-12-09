@@ -1,4 +1,4 @@
-// /controllers/aiController.js - KONČNA VERZIJA Z RAG, VEČJEZIČNO PODPORO IN ČIŠČENJEM ODGOVORA
+// /controllers/aiController.js - KONČNA VERZIJA Z RAG, VEČJEZIČNO PODPORO IN ANTI-HALUCINACIJSKIM PROMPTOM
 
 const { GoogleGenAI } = require('@google/genai');
 // ⭐ Uvoz Mongoose modela za dostop do kolekcije 'restavracijas'
@@ -45,15 +45,15 @@ exports.askAssistant = async (req, res) => {
         // Podatke konvertiramo v čitljiv JSON string
         const restavracijeJson = JSON.stringify(restavracije, null, 2);
 
-        // ⭐ KORAK RAG 2: IZBOLJŠANJE PROMPTA ZA JEZIKE IN STIL
+        // ⭐ KORAK RAG 2: KONČNI IZBOLJŠANI PROMPT
         const systemInstruction = `
             Ti si Rentyo Gourmet virtualni pomočnik.
             
-            **Pomembno: Pri odgovarjanju uporabi ENAK JEZIK, kot ga je uporabil uporabnik (npr. če vpraša v angleščini, odgovori v angleščini).** Uporabljaj tekoč, naraven in prijazen jezik. Striktno NE UPORABLJAJ oblikovanja Markdown (ne uporabi *, #, ** ali -).
+            **IZJEMNO POMEMBNO: KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU.** STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH (npr. ne predlagajte restavracij, ki niso omenjene v JSON-u). Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
-            Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu. Ta JSON vsebuje tudi podatke o jedeh v polju 'meni'.
+            Pri odgovarjanju uporabi ENAK JEZIK, kot ga je uporabil uporabnik. Uporabljaj tekoč, naraven in prijazen jezik. Striktno NE UPORABLJAJ oblikovanja Markdown (*, #, ** ali -).
             
-            Če te uporabnik prosi za prevod informacij (opis, meni) iz JSON konteksta v njegov jezik, mu ugodi.
+            Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu. Če te uporabnik prosi za prevod informacij (opis, meni) iz JSON konteksta v njegov jezik, mu ugodi.
             
             --- ZNANJE IZ BAZE (RESTAVRACIJE & MENIJI) ---
             ${restavracijeJson}
