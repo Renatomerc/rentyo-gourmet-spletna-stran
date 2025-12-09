@@ -3422,79 +3422,99 @@ body.is-capacitor-app #aiChatModal {
     <div class="login-content">
       <span class="close-modal" id="zapriModal">×</span>
 
-      <div class="login-tabs">
-        <div class="login-tab active" id="tabPrijava" data-i18n="modal.login_tab">Prijava</div>
-        <div class="login-tab" id="tabRegistracija" data-i18n="modal.register_tab">Registracija</div>
+      <div id="loginRegisterView"> 
+        
+        <div class="login-tabs">
+          <div class="login-tab active" id="tabPrijava" data-i18n="modal.login_tab">Prijava</div>
+          <div class="login-tab" id="tabRegistracija" data-i18n="modal.register_tab">Registracija</div>
+        </div>
+
+        <form class="login-form active" id="formPrijava">
+          <input type="email" id="prijavaEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+          <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+          
+          <p id="prijavaStatus" class="status-message" style="color:red;"></p>
+          
+          <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
+          
+          <div class="prijava-info-text">
+              <p data-i18n="modal.prijava_info">
+                  Prosimo, uporabite vaš e-poštni naslov in geslo za dostop.
+              </p>
+          </div>
+
+          <div class="forgot-password-container">
+              <a href="#" id="pozabljenoGesloLink" data-i18n="modal.forgot_password_link">Pozabljeno geslo?</a>
+          </div>
+        </form>
+
+        <form class="login-form" id="formRegistracija">
+            <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
+            <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+            <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+            
+            <select id="drzava" name="drzava" required>
+                <option value="" disabled selected data-i18n="registration.country_placeholder">Izberi državo (EU)</option>
+                
+                <option value="Avstrija">Avstrija</option>
+                <option value="Belgija">Belgija</option>
+                <option value="Bolgarija">Bolgarija</option>
+                <option value="Ciper">Ciper</option>
+                <option value="Češka">Češka</option>
+                <option value="Danska">Danska</option>
+                <option value="Estonija">Estonija</option>
+                <option value="Finska">Finska</option>
+                <option value="Francija">Francija</option>
+                <option value="Grčija">Grčija</option>
+                <option value="Hrvaška">Hrvaška</option>
+                <option value="Irska">Irska</option>
+                <option value="Italija">Italija</option>
+                <option value="Latvija">Latvija</option>
+                <option value="Litva">Litva</option>
+                <option value="Luksemburg">Luksemburg</option>
+                <option value="Madžarska">Madžarska</option>
+                <option value="Malta">Malta</option>
+                <option value="Nemčija">Nemčija</option>
+                <option value="Nizozemska">Nizozemska</option>
+                <option value="Poljska">Poljska</option>
+                <option value="Portugalska">Portugalska</option>
+                <option value="Romunija">Romunija</option>
+                <option value="Slovaška">Slovaška</option>
+                <option value="Slovenija">Slovenija</option>
+                <option value="Španija">Španija</option>
+                <option value="Švedska">Švedska</option>
+            </select>
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="pogojiStrinjanje" name="pogojiStrinjanje" required>
+                <label for="pogojiStrinjanje">
+                    <span data-i18n="registration.pogoji_strinjanje">Strinjam se s </span>
+                    <a href="splosni-pogoji.html" target="_blank" data-i18n="registration.splosni_pogoji_link">Splošnimi pogoji</a>
+                    <span data-i18n="registration.in_politiko"> in </span>
+                    <a href="politika-zasebnosti.html" target="_blank" data-i18n="registration.politika_zasebnosti_link">Politiko zasebnosti</a>.
+                    <span class="required-star">*</span>
+                </label>
+            </div>
+            <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
+        </form>
+        
       </div>
+      <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
+          <h3>Ponastavitev Gesla</h3>
+          <p>Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
 
-      <form class="login-form active" id="formPrijava">
-        <input type="email" id="prijavaEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
-        <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
-        
-        <p id="prijavaStatus" class="status-message" style="color:red;"></p>
-        
-        <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
-        
-        <div class="prijava-info-text">
-            <p data-i18n="modal.prijava_info">
-                Prosimo, uporabite vaš e-poštni naslov in geslo za dostop.
-            </p>
-        </div>
+          <form id="zahtevaResetForm">
+              <input type="email" id="resetEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+              
+              <p id="resetStatus" class="status-message"></p>
 
-        <div class="forgot-password-container">
-            <a href="#" id="pozabljenoGesloLink" data-i18n="modal.forgot_password_link">Pozabljeno geslo?</a>
-        </div>
-      </form>
-
-<form class="login-form" id="formRegistracija">
-    <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
-    <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
-    <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
-    
-    <select id="drzava" name="drzava" required>
-        <option value="" disabled selected data-i18n="registration.country_placeholder">Izberi državo (EU)</option>
-        
-        <option value="Avstrija">Avstrija</option>
-        <option value="Belgija">Belgija</option>
-        <option value="Bolgarija">Bolgarija</option>
-        <option value="Ciper">Ciper</option>
-        <option value="Češka">Češka</option>
-        <option value="Danska">Danska</option>
-        <option value="Estonija">Estonija</option>
-        <option value="Finska">Finska</option>
-        <option value="Francija">Francija</option>
-        <option value="Grčija">Grčija</option>
-        <option value="Hrvaška">Hrvaška</option>
-        <option value="Irska">Irska</option>
-        <option value="Italija">Italija</option>
-        <option value="Latvija">Latvija</option>
-        <option value="Litva">Litva</option>
-        <option value="Luksemburg">Luksemburg</option>
-        <option value="Madžarska">Madžarska</option>
-        <option value="Malta">Malta</option>
-        <option value="Nemčija">Nemčija</option>
-        <option value="Nizozemska">Nizozemska</option>
-        <option value="Poljska">Poljska</option>
-        <option value="Portugalska">Portugalska</option>
-        <option value="Romunija">Romunija</option>
-        <option value="Slovaška">Slovaška</option>
-        <option value="Slovenija">Slovenija</option>
-        <option value="Španija">Španija</option>
-        <option value="Švedska">Švedska</option>
-    </select>
-    <div class="form-group-checkbox">
-        <input type="checkbox" id="pogojiStrinjanje" name="pogojiStrinjanje" required>
-        <label for="pogojiStrinjanje">
-            <span data-i18n="registration.pogoji_strinjanje">Strinjam se s </span>
-            <a href="splosni-pogoji.html" target="_blank" data-i18n="registration.splosni_pogoji_link">Splošnimi pogoji</a>
-            <span data-i18n="registration.in_politiko"> in </span>
-            <a href="politika-zasebnosti.html" target="_blank" data-i18n="registration.politika_zasebnosti_link">Politiko zasebnosti</a>.
-            <span class="required-star">*</span>
-        </label>
-    </div>
-    <button type="submit" data-i18n="modal.register_button">Ustvari račun</button>
-</form>
-    </div>
+              <button type="submit" id="posljiResetNavodila">Pošlji navodila</button>
+          </form>
+          
+          <div class="back-to-login-container">
+              <a href="#" id="nazajNaPrijavoLink">← Nazaj na prijavo</a>
+          </div>
+      </div>
+      </div>
 </div>
   
  <div class="duration-modal" id="durationModal">
@@ -3698,12 +3718,45 @@ body.is-capacitor-app #aiChatModal {
 // ⭐ POPRAVEK: Uporaba varnostne kopije za SocialLogin
 const { Capacitor, Plugins } = window; // Zagotovimo, da imamo dostop do globalnega Capacitor objekta
 
+// ⭐ NOVO: Uvoz App plugina za Deep Linking ⭐
+const { App } = Plugins; 
+
 const SocialLogin = 
     Plugins.SocialLogin || 
     Plugins.CapgoCapacitorSocialLogin; // Poskus s polnim imenom razreda
 
 const PushNotifications = Plugins.PushNotifications;
 
+
+// ==========================================================
+// ⭐ NOVO: LOGIKA ZA DEEP LINKS (Obravnava URL-jev) ⭐
+// ==========================================================
+if (App) {
+    App.addListener('appUrlOpen', (data) => {
+        const url = data.url;
+
+        // Preverite, ali URL ustreza poti za ponastavitev gesla
+        if (url && url.includes('/reset-password/')) {
+            
+            // Izlušči žeton (token) iz URL-ja
+            // Regex išče kar koli, kar sledi /reset-password/
+            const tokenMatch = url.match(/\/reset-password\/(.+)/);
+            const token = tokenMatch ? tokenMatch[1] : null;
+
+            if (token) {
+                console.log("Deep link uspešno prestrežen! Token:", token);
+                
+                // ⭐ KLJUČNO: Preusmerite uporabnika na HTML stran z žetonom kot parametrom ⭐
+                // Ta stran mora obstajati!
+                window.location.href = `reset-password.html?token=${token}`; 
+
+            } else {
+                console.error("Deep link zaznan, a žeton ni bil najden.");
+            }
+        }
+    });
+}
+// ==========================================================
 
 const initializePushNotifications = async () => {
     
@@ -3902,24 +3955,14 @@ const chatModal = document.getElementById('aiChatModal');
 // ==========================================================
 // ⭐ NOVE DEFINICIJE ZA PONASTAVITEV GESLA (IZ HTML-ja) ⭐
 // ==========================================================
-// Vnosno polje E-mail v prijavni formi (uporabno za avtomatsko izpolnjevanje)
-const prijavaEmailInput = document.getElementById('prijavaEmail'); 
-// Gumb/Povezava za sprožitev ponastavitve
-const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink'); 
-// Prostor za sporočila pri prijavi
-const prijavaStatus = document.getElementById('prijavaStatus');
-
-// Formular za vnos E-maila za ponastavitev (formPozabljenoGeslo)
-const formPozabljenoGeslo = document.getElementById('formPozabljenoGeslo'); 
-// Vnosno polje E-mail v formularju za ponastavitev
+// Globalni elementi, ki smo jih definirali v HTML
+const loginRegisterView = document.getElementById('loginRegisterView');
+const forgotPasswordView = document.getElementById('forgotPasswordView');
+const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink'); // Link "Pozabljeno geslo?"
+const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');     // Link "← Nazaj na prijavo"
+const zahtevaResetForm = document.getElementById('zahtevaResetForm');
 const resetEmailInput = document.getElementById('resetEmail');
-// Gumb za pošiljanje navodil
-const sendResetEmailBtn = document.getElementById('sendResetEmailBtn');
-// Prostor za statusna sporočila pri ponastavitvi (uspešno/napaka)
 const resetStatus = document.getElementById('resetStatus');
-// Povezava za vrnitev na prijavo
-const backToLoginLink = document.getElementById('backToLogin');
-
 </script>
 
 <script>
@@ -4431,6 +4474,18 @@ const checkUrlForAuthToken = () => {
 // --- LISTENERJI (Se izvedejo ob DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => { 
     
+    // ⭐ NOVO: DEFINICIJA ELEMENTOV ZA PONASTAVITEV GESLA (Pred DOMContentLoaded jih ni bilo) ⭐
+    const loginRegisterView = document.getElementById('loginRegisterView'); 
+    const forgotPasswordView = document.getElementById('forgotPasswordView');
+    const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink');
+    const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');
+    
+    const zahtevaResetForm = document.getElementById('zahtevaResetForm');
+    const resetEmailInput = document.getElementById('resetEmail');
+    const resetStatus = document.getElementById('resetStatus');
+    const prijavaEmailInput = document.getElementById('prijavaEmail');
+    const sendResetEmailBtn = document.getElementById('posljiResetNavodila');
+    
     // Preveri, ali so v URL-ju parametri prijave (Za social login)
     checkUrlForAuthToken();
 
@@ -4456,12 +4511,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === modal) modal.classList.remove("active");
     });
 
+    // ⭐ POPRAVEK: Preklapljanje med zavihki naj sedaj skrije 'forgotPasswordView', če je viden ⭐
     if (tabPrijava && tabRegistracija && formPrijava && formRegistracija) {
         tabPrijava.addEventListener("click", () => {
           tabPrijava.classList.add("active");
           tabRegistracija.classList.remove("active");
           formPrijava.classList.add("active");
           formRegistracija.classList.remove("active");
+
+          // Skrije pogled za ponastavitev gesla (če je bil viden)
+          if(forgotPasswordView) forgotPasswordView.style.display = 'none';
+          if(loginRegisterView) loginRegisterView.style.display = 'block';
         });
 
         tabRegistracija.addEventListener("click", () => {
@@ -4469,6 +4529,10 @@ document.addEventListener('DOMContentLoaded', () => {
           tabPrijava.classList.remove("active");
           formRegistracija.classList.add("active");
           formPrijava.classList.remove("active");
+
+          // Skrije pogled za ponastavitev gesla (če je bil viden)
+          if(forgotPasswordView) forgotPasswordView.style.display = 'none';
+          if(loginRegisterView) loginRegisterView.style.display = 'block';
         });
     }
 
@@ -4485,18 +4549,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ==========================================================
-    // ⭐ NOVE FUNKCIONALNOSTI ZA PONASTAVITEV GESLA ⭐
+    // ⭐ NOVE FUNKCIONALNOSTI ZA PONASTAVITEV GESLA (POPOLNI POPRAVEK) ⭐
     // ==========================================================
     
     // 1. LOGIKA PRIKAZOVANJA/SKRIVANJA (Toggle)
-    if (pozabljenoGesloLink && formPrijava && formPozabljenoGeslo) {
+    
+    // Pojdi na formular za ponastavitev gesla
+    if (pozabljenoGesloLink && forgotPasswordView && loginRegisterView) {
         pozabljenoGesloLink.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // 1. Skrij formular za prijavo in pokaži formular za ponastavitev
-            formPrijava.style.display = 'none';
-            // Predpostavimo, da je formPozabljenoGeslo stiliziran z 'display: block' ali 'flex'
-            formPozabljenoGeslo.style.display = 'block'; 
+            // 1. Skrij glavni pogled (Prijava/Registracija) in pokaži pogled za ponastavitev
+            loginRegisterView.style.display = 'none';
+            forgotPasswordView.style.display = 'block'; 
 
             // 2. Poskusi avtomatično izpolniti e-mail
             if (prijavaEmailInput && resetEmailInput && prijavaEmailInput.value) {
@@ -4509,17 +4574,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Vrnitev na formular za prijavo
-    if (backToLoginLink && formPrijava && formPozabljenoGeslo) {
-        backToLoginLink.addEventListener('click', (e) => {
+    if (nazajNaPrijavoLink && forgotPasswordView && loginRegisterView) {
+        nazajNaPrijavoLink.addEventListener('click', (e) => {
             e.preventDefault();
-            formPozabljenoGeslo.style.display = 'none';
-            formPrijava.style.display = 'flex'; // Uporabite stil, ki ustreza vaši postavitvi
+            forgotPasswordView.style.display = 'none';
+            loginRegisterView.style.display = 'block';
+            
+            // Avtomatsko preklopi na zavihek Prijava
+            if (tabPrijava) tabPrijava.click();
         });
     }
 
     // 2. KLIC NA BACKEND (/forgot-password)
-    if (formPozabljenoGeslo) {
-        formPozabljenoGeslo.addEventListener('submit', async (e) => {
+    if (zahtevaResetForm) {
+        zahtevaResetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = resetEmailInput.value;
@@ -4577,7 +4645,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(formPrijava) formPrijava.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = formPrijava.querySelector('input[type="email"]').value;
-        const geslo = formPrijava.querySelector('input[type="password"]').value;
+        const geslo = formPrija.querySelector('input[type="password"]').value;
         try {
             const res = await fetch(`${API_BASE_URL}/auth/prijava`, {
                 method: 'POST',
