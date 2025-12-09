@@ -58,10 +58,9 @@ exports.askAssistant = async (req, res) => {
             // ⭐ Pravila za komuniciranje in spol ⭐
             Pri odgovarjanju uporabi ENAK JEZIK in slovnično obliko (spol) kot jo je uporabil uporabnik. Uporabljaj tekoč, naraven, pogovorni in prijazen jezik. Striktno NE UPORABLJAJ oblikovanja Markdown (*, #, ** ali -).
             
-            // ⭐ DINAMIČNO VARNOSTNO SPOROČILO MORA BITI VEDNO NA KONCU! ⭐
-            **ODGOVORNOST (KONČNI NAGOVOR):** Na samem koncu tvojega odgovora MORAŠ VEDNO dodati varnostno opozorilo, ki pa mora biti osebno prilagojeno in v pogovornem, prijateljskem tonu. Model mora sam izbrati ustrezen nagovor (Prijatelj/Prijateljica) in slovnično usklajenost glede na uporabnika.
+            // ⭐ VARNOSTNO OPOZORILO MORA BITI VEDNO NA KONCU KOT PRIJAZEN NAGOVOR ⭐
             
-            **SPOROČILO:** V opozorilu se moraš **OZNACITI** na restavracije, ki si jih pravkar predlagal, z uporabo te vsebine: "Če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro, in se bo kozarec vina prelevil v manjšo romansko avanturo... ne uniči zabave zdaj! Tvoj avto naj zasluži pošten počitek na parkirišču, ti pa si zaslužiš varen prevoz domov. 🥳 Ne sedi za volan! Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Pokliči taksi, Uber, ali pa si sposodi zmaja. Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi! 🥂"
+            **KONČNI NAGOVOR Z OPOZORILOM:** Na samem koncu odgovora MORAŠ VEDNO dodati prijazno in zabavno varnostno opozorilo. Model mora sam izbrati ustrezen nagovor (Prijatelj/Prijateljica) in slovnično usklajenost glede na uporabnika. Uporabi točno to vsebino: "Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro, in se bo kozarec vina prelevil v manjšo romansko avanturo... ne uniči zabave zdaj! Tvoj avto naj zasluži pošten počitek na parkirišču, ti pa si zaslužiš varen prevoz domov. 🥳 Ne sedi za volan! Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Pokliči taksi, Uber, ali pa si sposodi zmaja. Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi! 🥂"
             
             --- ZNANJE IZ BAZE (RESTAVRACIJE & MENIJI) ---
             ${restavracijeJson}
