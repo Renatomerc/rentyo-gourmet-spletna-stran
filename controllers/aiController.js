@@ -1,4 +1,4 @@
-// /controllers/aiController.js - KONČNA VERZIJA Z RAG IN DOSTOPOM DO MENIJEV
+// /controllers/aiController.js - KONČNA VERZIJA Z RAG, VEČJEZIČNO PODPORO IN ČIŠČENJEM ODGOVORA
 
 const { GoogleGenAI } = require('@google/genai');
 // ⭐ Uvoz Mongoose modela za dostop do kolekcije 'restavracijas'
@@ -37,9 +37,7 @@ exports.askAssistant = async (req, res) => {
     try {
         
         // ⭐ KORAK RAG 1: Pridobivanje podatkov z MENIJI
-        // Poizvedba uporablja model Restavracija, ki je vezan na kolekcijo 'restavracijas'.
         const restavracije = await Restavracija.find({})
-            // ⭐ DODANO/POPRAVLJENO: Vključimo polje 'meni'
             .select('ime lokacija opis meni') 
             .limit(10) 
             .lean();
@@ -47,14 +45,15 @@ exports.askAssistant = async (req, res) => {
         // Podatke konvertiramo v čitljiv JSON string
         const restavracijeJson = JSON.stringify(restavracije, null, 2);
 
-        // ⭐ KORAK RAG 2: Izdelava VODILNEGA PROMPTA (z opozorilom na meni)
+        // ⭐ KORAK RAG 2: IZBOLJŠANJE PROMPTA ZA JEZIKE IN STIL
         const systemInstruction = `
-            Ti si Rentyo Gourmet virtualni pomočnik. 
-            Odgovarjaj na vprašanja uporabnika v slovenskem jeziku, bodi prijazen in strokoven.
+            Ti si Rentyo Gourmet virtualni pomočnik.
             
-            **Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu. Ta JSON vsebuje tudi podatke o jedeh v polju 'meni'.**
+            **Pomembno: Pri odgovarjanju uporabi ENAK JEZIK, kot ga je uporabil uporabnik (npr. če vpraša v angleščini, odgovori v angleščini).** Uporabljaj tekoč, naraven in prijazen jezik. Striktno NE UPORABLJAJ oblikovanja Markdown (ne uporabi *, #, ** ali -).
             
-            Če te uporabnik vpraša po jedeh, ki jih ponujajo restavracije (npr. 'hamburger', 'pizza', 'vegetarijansko'), prebrskaj polje 'meni' in predlagaj ustrezne restavracije.
+            Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu. Ta JSON vsebuje tudi podatke o jedeh v polju 'meni'.
+            
+            Če te uporabnik prosi za prevod informacij (opis, meni) iz JSON konteksta v njegov jezik, mu ugodi.
             
             --- ZNANJE IZ BAZE (RESTAVRACIJE & MENIJI) ---
             ${restavracijeJson}
@@ -72,10 +71,14 @@ exports.askAssistant = async (req, res) => {
             contents: [{ role: "user", parts: [{ text: prompt }] }],
         });
 
+        // ⭐ KORAK 3: ČIŠČENJE ODGOVORA PRED VRNITVIJO
         const answer = response.text;
+        // Odstranimo * ali ** (za odebelitev) ter # iz odgovora
+        const cleanAnswer = answer.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '');
 
-        // 4. Vrnemo odgovor nazaj na frontend
-        res.json({ answer: answer });
+
+        // 4. Vrnemo očiščen odgovor nazaj na frontend
+        res.json({ answer: cleanAnswer });
         
     } catch (error) {
         // Če je napaka v API ključu ali omrežju
