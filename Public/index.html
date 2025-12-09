@@ -2848,54 +2848,92 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     position: fixed; 
     z-index: 1000; 
     
-    /* Odstranitev celozaslonskega prekrivnega sloja */
-    left: auto; /* Pusti avtomatsko */
-    top: auto; /* Pusti avtomatsko */
-    right: 20px; /* Odmik od desnega roba */
-    bottom: 150px; /* Odmik od spodnjega roba */
-    width: 300px; /* Nastavi fiksno širino */
-    height: 400px; /* Nastavi fiksno višino */
+    /* Namizne dimenzije (DEFAULT) */
+    left: auto; 
+    top: auto; 
+    right: 20px; 
+    bottom: 150px; 
+    width: 300px; 
+    height: 400px; 
     
     /* ODSTRANIMO zatemnjeno ozadje (da se ne zatemni) */
     background-color: transparent; 
-    overflow: visible; /* Ne potrebuje celozaslonskega pomikanja */
+    overflow: visible; 
 }
 
-/* Okno z vsebino (Content Box) - Sedaj zavzema 100% starševskega elementa (#aiChatModal) */
+/* Okno z vsebino (Content Box) */
 .chat-modal-content {
-    /* ⭐ SPREMENJENO: BELO OZADJE ⭐ */
     background-color: #ffffff; 
-    /* ⭐ SPREMENJENO: ČRNA PISAVA (Podlaga za vse elemente) ⭐ */
     color: #2a2a2a; 
     padding: 0;
-    width: 100%; /* Zavzame celotno širino #aiChatModal */
-    height: 100%; /* Zavzame celotno višino #aiChatModal */
+    width: 100%; 
+    height: 100%; 
     max-width: none; 
     margin: 0;
     display: flex;
     flex-direction: column;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Dodaj senco za 3D efekt */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
     overflow: hidden;
 }
 
-/* Mobilna postavitev (Prilagoditev velikosti, da ni preveliko) */
+
+/* ======================================================== */
+/* ⭐ PRILAGODITEV ZA CAPACITOR/MOBILNI POGLED (80% VELIKOST) ⭐ */
+/* Okno sedaj zavzame 80% širine in višine. */
+/* ======================================================== */
+body.is-capacitor-app #aiChatModal {
+    /* Uporabi 80% širine zaslona (10% rob na vsaki strani) */
+    width: 80%; 
+    
+    /* Centriranje s 10% robovi */
+    right: 10%; 
+    left: 10%; 
+
+    /* Določimo TOP in BOTTOM, ki določata VIŠINO (približno 80vh). */
+    top: calc(10vh + env(safe-area-inset-top)); /* 10% od vrha + safe area */
+    bottom: calc(30vh + env(safe-area-inset-bottom)); /* 10% od dna + safe area */
+    
+    /* ⭐⭐⭐ KLJUČNI POPRAVEK: DODAJANJE ANIMACIJE ⭐⭐⭐ */
+    /* To omogoča gladko premikanje elementa, ko ga JS dinamično dvigne nad tipkovnico. */
+    transition: bottom 0.3s ease-out; 
+    
+    /* Odstranimo transformacijo, če je bila kje nastavljena */
+    transform: none; 
+}
+
+
 @media (max-width: 500px) {
     #aiChatModal {
-        /* Za manjše zaslone zmanjšamo velikost in robove */
+        /* Ta pravila veljajo za standardne mobilne brskalnike */
         width: 90%; 
-        height: 90vh; /* Uporabi 80% višine zaslona */
-        right: 5%; /* Centriranje z robovi */
+        height: 75vh; 
+        right: 5%; 
         bottom: 5%;
         left: 5%;
+        top: 5%;
     }
     
-    /* Prilagoditev za Capacitor (če je statusna vrstica prisotna) */
+    /* ⭐ PREGLASITEV!
+       Tudi za manjše zaslone v Capacitorju obdržimo 80% velikost in dinamičen bottom. */
     body.is-capacitor-app #aiChatModal {
-        /* Če statusna vrstica moti, lahko to prilagodite */
-        /* bottom: calc(20px + env(safe-area-inset-bottom)); */
+        width: 80%; 
+        right: 10%; 
+        left: 10%;
+        top: calc(10vh + env(safe-area-inset-top));
+        bottom: calc(30vh + env(safe-area-inset-bottom));
+        
+        /* ⭐⭐ POPRAVEK: Dodamo transition tudi v tem @media bloku ⭐⭐ */
+        transition: bottom 0.3s ease-out; 
+        
+        transform: none;
     }
 }
+
+
+/* ========================================= */
+/* --- E. NADALJEVANJE OBLIKOVANJA (HEADER & FOOTER) --- */
+/* ========================================= */
 
 .chat-header {
     display: flex;
@@ -2931,34 +2969,93 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 
 .chat-input {
     display: flex;
-    /* ⭐ SPREMENJENO: POVEČAN PADDING NA 15PX ZA BOLJ ROBUSTN VIDEZ ⭐ */
     padding: 15px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #ddd;
+    background-color: #ffffff;
+    border-top: 0px solid #ddd;
 }
 
 .chat-input input[type="text"] {
     flex-grow: 1;
-    /* ⭐ SPREMENJENO: POVEČAN PADDING ZA VEČJO VIŠINO POLJA ⭐ */
     padding: 12px; 
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd; /* Dodan nežen rob */
+    border-radius: 25px; /* Bolj zaobljeni robovi */
     margin-right: 10px;
     background-color: #ffffff;
     color: #2a2a2a;
-    /* ⭐ NOVO: DODANA SENČKA ZA GLOBINO (boljši videz) ⭐ */
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); 
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Rahla senca */
 }
 
 .chat-input button {
     background-color: #88d82d; 
     color: #2a2a2a;
     border: none;
-    /* ⭐ SPREMENJENO: PRILAGOJEN PADDING, DA SE VIŠINA GUMBA UJEMA Z INPUT POLJEM ⭐ */
     padding: 12px 15px;
     border-radius: 25px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.chat-input button:hover {
+    background-color: #70b925; /* Temnejši odtenek za hover */
+}
+
+
+/* ========================================= */
+/* --- F. OBLIKOVANJE SPOROČIL (USER IN LEO) --- */
+/* ========================================= */
+
+.chat-message {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    border-radius: 18px;
+    line-height: 1.4;
+    word-wrap: break-word; /* Zlom dolgih besed */
+}
+
+/* ⭐ SPOROČILA UPORABNIKA ⭐ */
+.chat-message.user-message {
+    background-color: #f0f0f0; /* Svetlo sivo ozadje */
+    color: #2a2a2a;
+    align-self: flex-end; /* Poravnano na desno */
+    margin-left: auto;
+    border-radius: 18px 18px 4px 18px; /* Zaobljeni robovi, oster spodaj desno */
+}
+
+/* ⭐ SPOROČILA AI (LEO) ⭐ */
+.chat-message.ai-message {
+    background-color: #88d82d; /* Vaša želena zelena barva */
+    color: #2a2a2a; /* Temnejše besedilo za kontrast */
+    align-self: flex-start; /* Poravnano na levo */
+    margin-right: auto;
+    border-radius: 18px 18px 18px 4px; /* Zaobljeni robovi, oster spodaj levo */
+}
+
+
+/* ⭐ ANIMACIJA NALAGANJA (LOADING DOTS) - POSODOBITEV ⭐ */
+/* To ustvarja bolj gladek horizontalni učinek namesto utripanja/izginjanja. */
+
+/* To je primarno za vidno polje pike/pikic */
+#ai-loading-message p::after {
+    content: '...'; 
+    display: inline-block;
+    margin-left: 5px;
+    font-weight: bold;
+    /* Poglej Keyframes spodaj: */
+    animation: simple-dots-animation 1.5s infinite; 
+}
+
+@keyframes simple-dots-animation {
+    0% {
+        opacity: 0.2; /* Zelo bleda */
+    }
+    50% {
+        opacity: 1.0; /* Polno vidna */
+    }
+    100% {
+        opacity: 0.2; /* Zelo bleda, in ponovi */
+    }
 }
 
 
@@ -3071,7 +3168,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     <div class="chat-modal-content">
         
         <div class="chat-header">
-            <h3>AI Pomočnik</h3>
+            <h3>Leo</h3>
             <button class="close-chat-btn" onclick="toggleChat()">&times;</button> 
         </div>
 
@@ -6712,15 +6809,52 @@ function showAppDownloadModal() {
 }
 // ===========================================
 // 🔥 GLAVNA IZVEDBENA KODA
-// Zagotavlja, da se koda izvede šele, ko je DOM popolnoma naložen.
 // ===========================================
+
+// ⭐ PREDVIDENI URL ZA KLIC NA VAŠ NODE.JS BACKEND ⭐
+// Uporabljamo vaš potrjeni API Base URL za Render in dodamo pot /assistant/ask
+const RENDER_API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; 
+const API_ENDPOINT = `${RENDER_API_BASE_URL}/assistant/ask`; 
+
+// ⭐ GLOBALNA SPREMENLJIVKA ZA SHRANJEVANJE PRIVZETE POZICIJE ⭐
+let defaultModalBottom = '10vh'; // Varnostna kopija
+
 document.addEventListener('DOMContentLoaded', () => {
     
     const modal = document.getElementById('aiChatModal');
+    
+    // ⭐ LOGIKA ZA PRIDOBITEV IZRAČUNANE VREDNOSTI BOTTOM PO ZAGONU (V PIKSLIH) ⭐
+    // To je ključno za natančno vračanje modala po zaprtju tipkovnice.
+    if (modal) {
+         // Kratka zamuda, da se prepričamo, da je CSS izračunan
+         setTimeout(() => {
+            // Pridobite dejansko izračunano vrednost spodnjega roba (v pikslih)
+            defaultModalBottom = window.getComputedStyle(modal).bottom;
+            console.log('Izračunan privzeti spodnji rob (defaultModalBottom):', defaultModalBottom);
+        }, 200); 
+    }
 
     // Preverjanje, ali se aplikacija izvaja v Capacitorju
     if (window.Capacitor) {
         document.body.classList.add('is-capacitor-app');
+        
+        // ⭐ POSLUŠALCI ZA CAPACITOR TIPKOVNICO ⭐
+        if (window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard) {
+            
+            // Poslušalec za Android/iOS, ko se tipkovnica pokaže
+            Capacitor.Plugins.Keyboard.addListener('keyboardWillShow', info => {
+                console.log('Tipkovnica se prikazuje, višina:', info.keyboardHeight);
+                // Posredujemo shranjeno privzeto vrednost
+                handleKeyboard(true, info.keyboardHeight); 
+            });
+
+            // Poslušalec, ko se tipkovnica skrije
+            Capacitor.Plugins.Keyboard.addListener('keyboardWillHide', () => {
+                console.log('Tipkovnica se skriva.');
+                handleKeyboard(false, 0);
+            });
+        }
+        // ------------------------------------------
     }
 
     if (modal) {
@@ -6758,13 +6892,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * Funkcija preklopi vidnost pogovornega okna (Kliče se iz HTML onclick="toggleChat()").
+ * ⭐ POSODOBLJENO: Dodano preverjanje in uvodno sporočilo (Leo).
  */
 function toggleChat() {
-    // 1. Poišči element pogovornega okna
+    // 1. Poišči element pogovornega okna in telo klepetalnice
     const modal = document.getElementById('aiChatModal');
+    const inputField = modal ? modal.querySelector('.chat-input input[type="text"]') : null;
+    const chatBody = modal ? modal.querySelector('.chat-body') : null; // ⭐ NOVO
+    
+    const isCapacitor = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard);
 
-    if (!modal) {
-        console.error("Pogovorno okno z ID 'aiChatModal' ni najdeno.");
+    if (!modal || !chatBody) {
+        console.error("Pogovorno okno ali telo klepetalnice ni najdeno.");
         return;
     }
 
@@ -6772,15 +6911,35 @@ function toggleChat() {
     if (modal.style.display === 'block') {
         // Skrij okno
         modal.style.display = 'none';
+        
+        // ⭐ NOVO: Skrij tipkovnico ob zaprtju ⭐
+        if (isCapacitor) {
+            Capacitor.Plugins.Keyboard.hide();
+        }
+        
         console.log('Pogovorno okno zaprto.');
     } else {
         // Prikaži okno
         modal.style.display = 'block';
         
-        // ⭐ NOVO: Fokusiraj vnosno polje, ko se okno odpre (izboljša UX)
-        const inputField = modal.querySelector('.chat-input input[type="text"]');
+        // ⭐ UVODNO SPOROČILO (Leo) ⭐
+        // Preverimo, ali je v telesu klepetalnice sploh kakšna vsebina
+        if (chatBody.children.length === 0) {
+            const welcomeMessage = "Pozdravljen/a! Sem Leo, tvoj osebni gurmanski asistent.";
+            appendMessage(welcomeMessage, 'ai');
+        }
+        
         if (inputField) {
+            // 1. Fokusiraj vnosno polje
             inputField.focus();
+            
+            // ⭐ NOVO: Prikaži tipkovnico ob odprtju ⭐
+            // Uporabimo setTimeout, da se prepričamo, da je modal in fokus polja res stabilen, preden se odpre tipkovnica.
+            if (isCapacitor) {
+                 setTimeout(() => {
+                    Capacitor.Plugins.Keyboard.show(); 
+                 }, 50); // Kratka zamuda
+            }
         }
         
         console.log('Pogovorno okno odprto.');
@@ -6788,34 +6947,103 @@ function toggleChat() {
 }
 
 /**
- * ⭐ NOVA FUNKCIJA: Dodajanje sporočila v pogovorno okno ⭐
+ * ⭐ POSODOBLJENA FUNKCIJA: Dodajanje sporočila v pogovorno okno ⭐
  * @param {string} text Sporočilo, ki ga je treba prikazati.
  * @param {string} sender Pošiljatelj ('user' ali 'ai').
+ * @param {boolean} isLoading Ali je to sporočilo za nalaganje (če je, mu dodamo poseben ID/razred).
  */
-function appendMessage(text, sender) {
+function appendMessage(text, sender, isLoading = false) {
     const chatBody = document.querySelector('#aiChatModal .chat-body');
     if (!chatBody) return;
 
-    // Ustvarimo nov div element za sporočilo
+    // Če je to sporočilo za nalaganje IN že obstaja, ga ne dodajamo dvakrat
+    if (isLoading && document.getElementById('ai-loading-message')) {
+        return; 
+    }
+    
     const messageElement = document.createElement('div');
-    messageElement.classList.add('chat-message');
+    messageElement.classList.add('chat-message', sender + '-message');
     
-    // Dodamo specifičen razred glede na pošiljatelja za oblikovanje (CSS)
-    messageElement.classList.add(sender + '-message');
+    if (isLoading) {
+        messageElement.id = 'ai-loading-message'; // Unikaten ID za lažje odstranjevanje
+        messageElement.innerHTML = `<p>${text}<span class="loading-dots">. . .</span></p>`; // Dodamo pikice
+    } else {
+        messageElement.innerHTML = `<p>${text}</p>`;
+    }
     
-    // Dodamo samo besedilo
-    messageElement.innerHTML = `<p>${text}</p>`;
-
-    // Dodamo sporočilo v chat-body
     chatBody.appendChild(messageElement);
 
     // Samodejno pomikanje na dno (če je vsebina daljša)
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
+/**
+ * ⭐ NOVA FUNKCIJA: Za odstranitev sporočila o nalaganju ⭐
+ */
+function removeLoadingMessage() {
+    const loadingMessage = document.getElementById('ai-loading-message');
+    if (loadingMessage) {
+        loadingMessage.remove();
+    }
+}
+
 
 /**
- * ⭐ IZBOLJŠANA FUNKCIJA: Obravnava pošiljanje sporočila (povezava z AI kontrolerjem) ⭐
+ * ⭐ NOVA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor. ⭐
+ * @param {string} prompt Sporočilo uporabnika.
+ */
+async function fetchAiResponse(prompt) {
+    
+    // 1. Prikaz "loading" sporočila od AI, dokler čaka na odgovor
+    appendMessage("Leo razmišlja", 'ai', true); // ⭐ POPRAVLJENO: Uporaba imena Leo ⭐
+
+    try {
+        const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt: prompt }),
+        });
+
+        // Preverimo, ali je bil klic uspešen (Status koda 200)
+        if (!response.ok) {
+            // Poskusimo dobiti podrobnejšo napako s strežnika
+            const errorText = await response.text(); 
+            let errorMessage = `Status ${response.status}. Napaka na strežniku.`;
+            
+            // Izboljšana obravnava napak, ki zajame HTML (Unexpected token <)
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.error || errorMessage;
+            } catch {
+                // Če je odgovor HTML, pokažemo informativnejše sporočilo
+                if (errorText.trim().startsWith('<')) {
+                     errorMessage = `Napaka pri komunikaciji: Strežnik ni vrnil JSON-a. Preverite, ali je API pot pravilna: ${API_ENDPOINT}`;
+                } else {
+                     errorMessage = `Status ${response.status}. Napaka: ${errorText}`;
+                }
+            }
+            throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        
+        // 2. Počistimo začasno sporočilo in prikažemo pravi odgovor
+        removeLoadingMessage(); 
+        appendMessage(data.answer, 'ai'); // Prikažemo pravi odgovor
+        
+    } catch (error) {
+        // Obravnavamo morebitne napake (omrežje, napačen ključ, strežnik)
+        console.error('Napaka pri komunikaciji z AI API-jem:', error);
+        removeLoadingMessage(); 
+        appendMessage(`Žal mi je, prišlo je do napake: ${error.message}. Prosim, poskusite znova. 😔`, 'ai');
+    }
+}
+
+
+/**
+ * ⭐ IZBOLJŠANA FUNKCIJA: Obravnava pošiljanje sporočila (zdaj kliče backend API) ⭐
  */
 function handleSend() {
     const inputField = document.querySelector('#aiChatModal .chat-input input[type="text"]');
@@ -6831,14 +7059,41 @@ function handleSend() {
 
         console.log('Sporočilo poslano AI-ju:', message);
         
-        // 🚨 TUKAJ VSTAVITE LOGIKO ZA POŠILJANJE SPOROČILA AI API-ju 🚨
-        // Npr.: aiController.sendMessage(message); 
+        // 3. KLIC NA DEJANJSI AI API
+        fetchAiResponse(message);
+    }
+}
+
+
+/**
+ * ⭐ POPRAVLJENA FUNKCIJA: Prilagodi pozicijo pogovornega okna, ko se prikaže virtualna tipkovnica.
+ */
+function handleKeyboard(isOpen, keyboardHeight) {
+    const modal = document.getElementById('aiChatModal');
+    if (!modal) return;
+
+    // Uporabimo shranjeno izračunano vrednost iz DOMContentLoaded
+    const modalBottomDefault = defaultModalBottom; 
+    
+    // Nastavimo samo, če je aplikacija Capacitor in modal je prikazan
+    if (window.Capacitor && modal.style.display === 'block') {
         
-        // Primer: Simulacija AI odgovora po 1 sekundi
-        setTimeout(() => {
-            const aiResponse = `Hvala za sporočilo "${message}". Sem AI pomočnik in sem pripravljen pomagati!`;
-            appendMessage(aiResponse, 'ai');
-        }, 1000); // Odgovor pride po 1 sekundi
+        // Opomba: CSS je že nastavljen z 'transition: bottom 0.3s ease-out'
+        
+        if (isOpen) {
+            // Dodamo majhen varnostni rob, da se vnosno polje ne dotika tipkovnice.
+            const OFFSET = 10; 
+            
+            // Tipkovnica je odprta
+            // Spodnji rob se premakne navzgor za višino tipkovnice + rob
+            modal.style.bottom = `${keyboardHeight + OFFSET}px`;
+            
+        } else {
+            // Tipkovnica je zaprta
+
+            // Vrnemo se na prvotno pozicijo (CSS nato doda env(safe-area-inset-bottom))
+            modal.style.bottom = modalBottomDefault;
+        }
     }
 }
 
