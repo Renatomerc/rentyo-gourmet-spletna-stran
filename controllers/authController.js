@@ -1,6 +1,5 @@
 // ==========================================================
 // 🟢 /controllers/authController.js — Controller za Avtentikacijo
-// Vključuje logiko prijave, registracije in ponastavitve gesla.
 // ==========================================================
 
 // Uvoz potrebnih modulov
@@ -40,11 +39,10 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
     };
     
     // ⭐ 2. KONFIGURACIJA NODEMAILERJA
-    // OPOMBA: Vse te spremenljivke MORAJO biti nastavljene v vašem .env datoteki!
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
-        secure: process.env.NODE_ENV === 'production', // true za 465, false za ostalo
+        secure: process.env.NODE_ENV === 'production', 
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS
@@ -196,12 +194,22 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         }
 
         // 1. Generiraj žeton in nastavi čas poteka
+        // Predpostavlja, da Uporabnik model ima metodo getResetPasswordToken()
         const resetToken = user.getResetPasswordToken(); 
         await user.save({ validateBeforeSave: false }); 
 
         // 2. Pripravi in pošlji e-pošto
-        // Ta del ustvari URL za ponastavitev na podlagi protokola in gostitelja
-        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+        // 🔴 POPRAVEK: Uporabi process.env.FRONTEND_URL namesto req.get('host')
+        if (!process.env.FRONTEND_URL) {
+             console.error("❌ KRITIČNA NAPAKA: FRONTEND_URL ni definiran. Ponastavitev gesla ne bo delovala!");
+             // Poskušaj se rešiti tako, da še vedno vrneš 200, a ne pošlješ maila
+             user.resetPasswordToken = undefined;
+             user.resetPasswordExpires = undefined;
+             await user.save({ validateBeforeSave: false });
+             return res.status(200).json({ message: 'Začasna napaka strežnika, poskusite znova. (FRONTEND_URL manjka)' });
+        }
+
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         
         const mailOptions = {
             from: process.env.SMTP_USER,

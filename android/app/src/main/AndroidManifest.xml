@@ -43,9 +43,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="com.googleusercontent.apps.656400083949-nuj4kg2rvofjjecmtcoo29191erlkula"
-                      android:host="oauth2redirect" />  </intent-filter>
+                      android:host="oauth2redirect" />
+            </intent-filter>
 
-        </activity>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="rentyo.eu" android:pathPrefix="/reset-password/" />
+            </intent-filter>
+            </activity>
 
     </application>
 

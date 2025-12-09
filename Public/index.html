@@ -3428,8 +3428,11 @@ body.is-capacitor-app #aiChatModal {
       </div>
 
       <form class="login-form active" id="formPrijava">
-        <input type="email" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+        <input type="email" id="prijavaEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
         <input type="password" data-i18n="[placeholder]modal.password_placeholder" placeholder="Geslo" required>
+        
+        <p id="prijavaStatus" class="status-message" style="color:red;"></p>
+        
         <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
         
         <div class="prijava-info-text">
@@ -3437,7 +3440,11 @@ body.is-capacitor-app #aiChatModal {
                 Prosimo, uporabite vaš e-poštni naslov in geslo za dostop.
             </p>
         </div>
-        </form>
+
+        <div class="forgot-password-container">
+            <a href="#" id="pozabljenoGesloLink" data-i18n="modal.forgot_password_link">Pozabljeno geslo?</a>
+        </div>
+      </form>
 
 <form class="login-form" id="formRegistracija">
     <input type="text" data-i18n="[placeholder]modal.name_placeholder" placeholder="Ime in priimek" required>
@@ -3886,13 +3893,33 @@ const modalOsebeInput = document.getElementById('modalOsebe');
 const gumbRezervirajModal = document.querySelector('.gumb-rezerviraj-modal'); 
 const iskalnik = document.querySelector('.iskalnik');
 const prosteUreRezultati = document.getElementById('prosteUreRezultati'); 
-const tabOcene = document.getElementById('tabOcene'); // Element za ocene
+const tabOcene = document.getElementById('tabOcene'); 
 // 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
 const appleLoginBtn = document.getElementById('apple-sign-in-btn');
-
-// Definicija chatModal mora biti tukaj, če jo uporabljate spodaj:
 const chatModal = document.getElementById('aiChatModal');
+
+// ==========================================================
+// ⭐ NOVE DEFINICIJE ZA PONASTAVITEV GESLA (IZ HTML-ja) ⭐
+// ==========================================================
+// Vnosno polje E-mail v prijavni formi (uporabno za avtomatsko izpolnjevanje)
+const prijavaEmailInput = document.getElementById('prijavaEmail'); 
+// Gumb/Povezava za sprožitev ponastavitve
+const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink'); 
+// Prostor za sporočila pri prijavi
+const prijavaStatus = document.getElementById('prijavaStatus');
+
+// Formular za vnos E-maila za ponastavitev (formPozabljenoGeslo)
+const formPozabljenoGeslo = document.getElementById('formPozabljenoGeslo'); 
+// Vnosno polje E-mail v formularju za ponastavitev
+const resetEmailInput = document.getElementById('resetEmail');
+// Gumb za pošiljanje navodil
+const sendResetEmailBtn = document.getElementById('sendResetEmailBtn');
+// Prostor za statusna sporočila pri ponastavitvi (uspešno/napaka)
+const resetStatus = document.getElementById('resetStatus');
+// Povezava za vrnitev na prijavo
+const backToLoginLink = document.getElementById('backToLogin');
+
 </script>
 
 <script>
@@ -4258,9 +4285,9 @@ const removeSecureToken = async () => {
 };
 
 
-// =================================================================
+// ==========================================================
 // II. LOGIKA PRIJAVE/ODJAVE, MODALOV IN SOCIALNA PRIJAVA
-// =================================================================
+// ==========================================================
 
 // FUNKCIJA SPREMENJENA V ASINHRONO
 const setLoginStatus = async (isLoggedIn) => { 
@@ -4456,7 +4483,97 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+    
+    // ==========================================================
+    // ⭐ NOVE FUNKCIONALNOSTI ZA PONASTAVITEV GESLA ⭐
+    // ==========================================================
+    
+    // 1. LOGIKA PRIKAZOVANJA/SKRIVANJA (Toggle)
+    if (pozabljenoGesloLink && formPrijava && formPozabljenoGeslo) {
+        pozabljenoGesloLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // 1. Skrij formular za prijavo in pokaži formular za ponastavitev
+            formPrijava.style.display = 'none';
+            // Predpostavimo, da je formPozabljenoGeslo stiliziran z 'display: block' ali 'flex'
+            formPozabljenoGeslo.style.display = 'block'; 
 
+            // 2. Poskusi avtomatično izpolniti e-mail
+            if (prijavaEmailInput && resetEmailInput && prijavaEmailInput.value) {
+                 resetEmailInput.value = prijavaEmailInput.value;
+            }
+            
+            // 3. Počisti statusna sporočila
+            if (resetStatus) resetStatus.textContent = ''; 
+        });
+    }
+
+    // Vrnitev na formular za prijavo
+    if (backToLoginLink && formPrijava && formPozabljenoGeslo) {
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            formPozabljenoGeslo.style.display = 'none';
+            formPrijava.style.display = 'flex'; // Uporabite stil, ki ustreza vaši postavitvi
+        });
+    }
+
+    // 2. KLIC NA BACKEND (/forgot-password)
+    if (formPozabljenoGeslo) {
+        formPozabljenoGeslo.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = resetEmailInput.value;
+            if (!email) {
+                if(resetStatus) {
+                    resetStatus.style.color = 'red';
+                    resetStatus.textContent = 'Prosimo, vnesite e-mail naslov.';
+                }
+                return;
+            }
+
+            // Priprava za klic
+            if (resetStatus) {
+                resetStatus.style.color = 'black';
+                resetStatus.textContent = 'Pošiljam navodila...';
+            }
+            if(sendResetEmailBtn) sendResetEmailBtn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    if (resetStatus) {
+                        resetStatus.style.color = 'green';
+                        resetStatus.textContent = data.message || 'Navodila so bila poslana na vaš e-mail naslov (preverite tudi vsiljeno pošto).';
+                    }
+                } else {
+                    if (resetStatus) {
+                        resetStatus.style.color = 'red';
+                        resetStatus.textContent = data.message || `Napaka strežnika: ${res.status}. Poskusite znova.`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Napaka omrežja:', error);
+                if (resetStatus) {
+                    resetStatus.style.color = 'red';
+                    resetStatus.textContent = 'Napaka pri povezavi z omrežjem.';
+                }
+            } finally {
+                if(sendResetEmailBtn) sendResetEmailBtn.disabled = false;
+            }
+        });
+    }
+    // ==========================================================
+    
+    // Nadaljevanje vaše obstoječe kode:
+    
     if(formPrijava) formPrijava.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = formPrijava.querySelector('input[type="email"]').value;
