@@ -1,330 +1,81 @@
-// module.exports sedaj izvaža FUNKCIJO, ki prejme tajni ključ IN middleware.
-// 👇 KLJUČNO: SPREJEMEMO TRI PARAMETRE!
+// ==========================================================
+// 🟢 POSODOBLJENA uporabnikRoutes.js — Router za Avtentikacijo
+// Logika PREMAKNJENA v authController.js! Ta datoteka sedaj samo USMERJA.
+// ==========================================================
 module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => { 
 
     const express = require('express');
     const router = express.Router();
-    const jwt = require('jsonwebtoken');
-    const bcrypt = require('bcryptjs');
+    // Odstranjeni uvozi: jwt, bcrypt (so v Controllerju)
     const mongoose = require('mongoose'); 
-    
-    // ⭐ NOVO: Uvoz Passport.js
     const passport = require('passport'); 
 
-    // ⭐ 1. Uvozimo Shemo (za Uporabnik, ki očitno uporablja dbUsers ločeno povezavo)
+    // ⭐ 1. Uvoz Shem in Modelov
     const UporabnikShema = require('../models/Uporabnik'); 
-    
-    // 🚨 KRITIČNI POPRAVEK: Restavracija se uvaža kot CELOTEN MODEL, 
-    // s čimer se izognemo ponovni registraciji z 'mongoose.model' (in s tem napaki).
     const Restavracija = require('../models/Restavracija');
-    
-    // Ker se Uporabnik povezuje na ločeno bazo, ohranimo uvoz dbUsers.
     const dbUsers = require('../dbUsers'); 
 
-    // ⭐ 2. KLJUČNO: Ustvarimo model Uporabnik, POVEZAN S SEKUNDARNO POVEZAVO
+    // ⭐ 2. KLJUČNO: Ustvarimo model Uporabnik (na sekundarni povezavi)
     const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema); 
     
-    // 🚨 POPRAVEK: Registracijo modela Restavracija smo premaknili v uvoz!
-
-    // ==========================================================
-    // 🔴 KONČNI POPRAVEK: VAREN JWT KLJUČ
-    // ==========================================================
-    const TAJNI_KLJUC = JWT_SECRET_KEY; 
-
-    if (!TAJNI_KLJUC) {
-        console.error("❌ KRITIČNA NAPAKA: JWT_SECRET_KEY ni bil prenesen v uporabnikRouter.js. Preverite server.js!");
-    }
-
-    const generirajZeton = (uporabnikId) => {
-        if (!TAJNI_KLJUC) {
-            throw new Error("Napaka JWT: Tajni ključ ni na voljo.");
-        }
-        return jwt.sign({ id: uporabnikId }, TAJNI_KLJUC, { expiresIn: '7d' }); 
-    };
+    // ⭐ 3. KLJUČNO: UVOZIMO CELOTEN AUTH CONTROLLER!
+    // Controller sedaj prejme ključ in modele, ki jih potrebuje za izvajanje logike.
+    const authController = require('../controllers/authController')(
+        JWT_SECRET_KEY, 
+        Uporabnik, 
+        Restavracija 
+    );
     
     // ==========================================================
-    // ✅ POPRAVLJENO: Pomožna funkcija za nastavitev piškotka
-    // ==========================================================
-    const nastaviAuthPiškotek = (res, zeton) => {
-        const isProduction = process.env.NODE_ENV === 'production';
-        res.cookie('auth_token', zeton, {
-            httpOnly: true,
-            signed: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dni
-            secure: isProduction, // ✅ HTTPS samo v produkciji
-            sameSite: isProduction ? 'None' : 'Lax', // ✅ deluje lokalno in v CORS
-            path: '/'
-        });
-    };
+    // 🟠 GLAVNE RUTe, KI KLIČEJO FUNKCIJE IZ CONTROLLERJA
     // ==========================================================
 
-    // Registracija
-    router.post('/registracija', async (req, res) => {
-        console.log("🔥 DEBUG: Klic Registracije Prejet!"); 
+    // Prijava / Registracija / Odjava
+    // Logika je v authController.js
+    router.post('/registracija', authController.registracija);
+    router.post('/prijava', authController.prijava);
+    router.post('/odjava', authController.odjava);
 
-        // ⭐ POPRAVEK: Iz req.body izluščimo VSA možna polja
-        const { 
-            ime, 
-            priimek, 
-            telefon, 
-            email, 
-            geslo, 
-            jeLastnik, 
-            cena, 
-            fcmToken, 
-            drzava, // ⬅️ DODANO: Polje za državo
-        } = req.body;
-        
-        // Osnovna validacija
-        // ✅ POPRAVLJENO: Dodana validacija za drzava
-        if (!ime || !email || !geslo || !drzava) return res.status(400).json({ msg: 'Vnesite vsa obvezna polja: ime, e-mail, geslo in država.' });
-        
-        if (jeLastnik && (cena === undefined || cena === null))
-            return res.status(400).json({ msg: 'Kot lastnik morate določiti ceno.' });
-
-        try {
-            const obstojec = await Uporabnik.findOne({ email });
-            if (obstojec) return res.status(400).json({ msg: 'Uporabnik že obstaja s tem e-mailom.' });
-
-            const salt = await bcrypt.genSalt(10);
-            const hashiranoGeslo = await bcrypt.hash(geslo, salt);
-
-            // ⭐ NOVO: Ustvarimo objekt s podatki za bazo
-            const uporabnikData = { 
-                ime, 
-                priimek: priimek || '',      // Varno, če ni posredovano
-                telefon: telefon || '',      // Varno, če ni posredovano
-                email, 
-                geslo: hashiranoGeslo, 
-                jeLastnik: jeLastnik || false, 
-                cena: cena || 0,
-                drzava: drzava, // ⬅️ DODANO: Vključimo državo
-            };
-
-            // ⭐ ZAOBID NAPAKE E11000: Dodaj fcmToken SAMO, če ima vrednost.
-            // S tem preprečimo vstavljanje eksplicitne vrednosti 'null' in zaobidemo napako.
-            if (fcmToken) {
-                uporabnikData.fcmToken = fcmToken;
-            }
-            
-            const novUporabnik = await Uporabnik.create(uporabnikData); // Uporabimo objekt uporabnikData
-            
-            const zeton = generirajZeton(novUporabnik._id);
-            nastaviAuthPiškotek(res, zeton); 
-
-            res.status(201).json({
-                _id: novUporabnik._id,
-                ime: novUporabnik.ime,
-                email: novUporabnik.email,
-                jeLastnik: novUporabnik.jeLastnik,
-                cena: novUporabnik.cena,
-                drzava: novUporabnik.drzava, // ⬅️ DODANO: Vrnitev države
-                zeton: zeton, 
-                msg: "Registracija uspešna. Žeton shranjen v varnem piškotku in JSON." 
-            });
-
-        } catch (err) {
-            // ⭐ POPRAVEK: Obravnava E11000 napake
-            if (err.code === 11000) {
-                console.error('❌ NAPAKA PRI REGISTRACIJI (MongoDB Duplicate Key):', err.message);
-                return res.status(409).json({ msg: 'Vneseni e-mail ali drugi podatki so že v uporabi.' });
-            }
-            
-            console.error('❌ KRITIČNA NAPAKA PRI REGISTRACIJI:', err);
-            res.status(500).json({ msg: 'Napaka strežnika pri registraciji. Prosimo, poskusite znova.' });
-        }
-    });
-
-    // Prijava
-    router.post('/prijava', async (req, res) => {
-        console.log("🔥 DEBUG: Klic Prijave Prejet!"); 
-        
-        const { email, geslo } = req.body;
-        try {
-            // Uporabnik je v tem klicu že najden v DB, zato je polje tockeZvestobe že na voljo
-            const uporabnik = await Uporabnik.findOne({ email });
-            if (!uporabnik) return res.status(401).json({ msg: 'Neveljavne poverilnice.' });
-
-            const gesloPravilno = await bcrypt.compare(geslo, uporabnik.geslo);
-            if (!gesloPravilno) return res.status(401).json({ msg: 'Neveljavne poverilnice.' });
-
-            const zeton = generirajZeton(uporabnik._id);
-            nastaviAuthPiškotek(res, zeton); 
-
-            res.json({
-                _id: uporabnik._id,
-                ime: uporabnik.ime,
-                email: uporabnik.email,
-                jeLastnik: uporabnik.jeLastnik,
-                cena: uporabnik.cena,
-                // 🚀 DODANO: Žeton za frontend (shranjevanje v localStorage)
-                zeton: zeton, // ⬅️ KLJUČNO!
-                msg: "Prijava uspešna. Žeton shranjen v varnem piškotku in JSON." 
-            });
-        } catch (err) {
-            console.error('❌ NAPAKA PRI PRIJAVI:', err);
-            res.status(500).json({ msg: 'Napaka strežnika pri prijavi.' });
-        }
-    });
+    // Profil (Zaščitene poti)
+    router.get('/profil', preveriGosta, zahtevajPrijavo, authController.profil);
+    router.delete('/profil', preveriGosta, zahtevajPrijavo, authController.izbrisProfila);
     
-    // Odjava
-    router.post('/odjava', (req, res) => {
-        res.cookie('auth_token', '', { 
-            httpOnly: true, 
-            expires: new Date(0),
-            path: '/' 
-        });
-        res.status(200).json({ msg: 'Uspešno odjavljen. Piškotek izbrisan.' });
-    });
-
-    // Zaščitena pot: GET /api/auth/profil
-    router.get('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
-        
-        // Uporabimo ID, ki ga dobimo iz JWT in je shranjen v req.uporabnik (ali req.user/req.payload)
-        const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
-
-        try {
-            // Poiščemo uporabnika neposredno v bazi, da dobimo VSE POSODOBLJENE PODATKE
-            const uporabnikDB = await Uporabnik.findById(uporabnikId).select('-geslo');
-
-            if (!uporabnikDB) {
-                return res.status(404).json({ msg: 'Profilni podatki niso najdeni v bazi.' });
-            }
-            
-            res.json({
-                msg: "Podatki profila uspešno pridobljeni.",
-                uporabnik: { 
-                    _id: uporabnikDB._id, 
-                    ime: uporabnikDB.ime, 
-                    email: uporabnikDB.email, 
-                    jeLastnik: uporabnikDB.jeLastnik, 
-                    cena: uporabnikDB.cena,
-                    drzava: uporabnikDB.drzava, 
-                    tockeZvestobe: uporabnikDB.tockeZvestobe 
-                }
-            });
-
-        } catch (err) {
-            console.error('❌ NAPAKA PRI NALAGANJU PROFILA IZ BAZE:', err);
-            res.status(500).json({ msg: 'Napaka strežnika pri nalaganju profila.' });
-        }
-    });
     
+    // ⭐ NOVE POTI ZA PONASTAVITEV GESLA ⭐
+    // Obe funkciji kličeta logiko iz Controllerja
+    router.post('/forgot-password', authController.forgotPassword);
+    router.post('/reset-password/:token', authController.resetPassword);
+
     // ==========================================================
-    // 🗑️ NOVO: ZAŠČITENA POT ZA IZBRIS RAČUNA: DELETE /api/auth/profil
-    // ==========================================================
-    router.delete('/profil', preveriGosta, zahtevajPrijavo, async (req, res) => {
-        // ID uporabnika, ki je shranjen v JWT žetonu
-        const uporabnikId = req.uporabnik._id || req.uporabnik.id; 
-        const uporabnikIdObject = new mongoose.Types.ObjectId(uporabnikId); // Potrebno za $pull
-
-        try {
-            // 1. IZBRIŠI UPORABNIKA
-            const rezultatUporabnik = await Uporabnik.findByIdAndDelete(uporabnikId);
-
-            if (!rezultatUporabnik) {
-                console.warn(`Uporabnik z ID ${uporabnikId} ni najden v zbirki Uporabnik.`);
-            }
-
-            // 2. KASKADNI IZBRIS IN ANONIMIZACIJA (GDPR)
-
-            // A) IZBRIŠI REZERVACIJE (So gnezdeni v Restavracija.mize.rezervacije)
-            // Uporabimo $pull operacijo na vseh mizah v vseh restavracijah, da odstranimo rezervacije tega uporabnika.
-            const rezultatRezervacije = await Restavracija.updateMany(
-                // Iskalni pogoj: restavracije, ki imajo rezervacije tega uporabnika
-                { 'mize.rezervacije.uporabnikId': uporabnikIdObject }, 
-                { 
-                    $pull: { 
-                        // Uporabimo $[] za aplikacijo $pull na VSE elemente v arrayu 'mize'
-                        // Odstrani vse elemente iz 'rezervacije' arraya, kjer se uporabnikId ujema.
-                        'mize.$[].rezervacije': { 
-                            uporabnikId: uporabnikIdObject 
-                        } 
-                    } 
-                }
-            );
-            
-            // B) ANONIMIZIRAJ OCENE/KOMENTARJE (So gnezdeni v Restavracija.komentarji)
-            // S tem ohranimo statistiko, a uničimo identiteto.
-            const anonimizacijaRezultat = await Restavracija.updateMany(
-                { 'komentarji.userId': uporabnikIdObject }, // Najdi restavracije z oceno tega uporabnika
-                { 
-                    $set: { 
-                        // Uporabimo arrayFilters za posodobitev samo relevantnega elementa v arrayu 'komentarji'
-                        'komentarji.$[element].userId': null,
-                        'komentarji.$[element].uporabniskoIme': 'GDPR Deleted User', 
-                        'komentarji.$[element].email_gosta': null, 
-                        'komentarji.$[element].je_anonimizirana': true 
-                    }
-                },
-                { 
-                    // Definicija arrayFilters: posodobi element, kjer je ID enak uporabnikovemu ID
-                    arrayFilters: [ { 'element.userId': uporabnikIdObject } ] 
-                }
-            );
-
-            console.log(`✅ Uporabnik izbrisan: ${uporabnikId}. Posodobljenih restavracij (izbris rezervacij): ${rezultatRezervacije.modifiedCount}, anonimiziranih komentarjev: ${anonimizacijaRezultat.modifiedCount}.`);
-
-            // 3. IZBRIŠI PIŠKOTEK (Za popolno odjavo)
-            res.cookie('auth_token', '', { 
-                httpOnly: true, 
-                expires: new Date(0),
-                path: '/' 
-            });
-
-            // 4. VRNI USPEŠEN ODGOVOR
-            res.status(200).json({ msg: 'Račun in vsi povezani osebni podatki so bili trajno izbrisani/anonimizirani.' });
-
-        } catch (err) {
-            console.error('❌ KRITIČNA NAPAKA PRI IZBRISU RAČUNA:', err);
-            res.status(500).json({ msg: 'Napaka strežnika pri trajnem izbrisu računa in podatkov.' });
-        }
-    });
-    
-    // ==========================================================
-    // ⭐ NOVO: SOCIALNA PRIJAVA Z GOOGLE & APPLE RUTE
+    // 🔴 SOCIALNA PRIJAVA Z GOOGLE & APPLE RUTE (OSTANEJO TUKAJ!)
+    // Ker potrebujejo Passport.js (req, res, next) in generiranje tokena
     // ==========================================================
 
     // --- GOOGLE PRIJAVA ---
-    // 1. Začetek Google prijave: Kliče se iz frontenda (/api/auth/google)
-    // Preusmeri uporabnika na Google za avtentikacijo.
     router.get('/google', (req, res, next) => {
-        // Shranimo redirectUrl iz frontenda (ki ga Passport.js pričakuje kot 'state')
         const redirectUrl = req.query.redirectUrl || '/'; 
         passport.authenticate('google', { 
             scope: ['profile', 'email'],
-            state: redirectUrl // Uporaba state za shranjevanje URL-ja za povratek
+            state: redirectUrl 
         })(req, res, next);
     });
 
-
-    // 2. Google Povratni Klic: Kliče ga Google
-    // Passport.js preveri žeton in ustvari/prijavi uporabnika.
     router.get('/google/callback', 
         passport.authenticate('google', { 
-            session: false, // Ne uporabljamo Express seje, temveč JWT
-            // ✅ POPRAVEK: failureRedirect mora biti statičen niz!
-            failureRedirect: '/?status=error&msg=Go_neuspešno' // Uporabimo statičen redirect
+            session: false, 
+            failureRedirect: '/?status=error&msg=Go_neuspešno' 
         }), 
         (req, res) => {
-            // Avtentikacija je uspela, req.user je Mongoose uporabniški objekt
+            // Uporabimo pomožne funkcije iz Controllerja!
+            const zeton = authController.generirajZeton(req.user._id);
+            authController.nastaviAuthPiškotek(res, zeton); 
             
-            // a) Generiraj vaš JWT
-            const zeton = generirajZeton(req.user._id);
-
-            // b) Nastavi piškotek (HTTP-Only)
-            nastaviAuthPiškotek(res, zeton); 
-
-            // c) Preusmeri nazaj na frontend (z žetonom v URL-ju, kot ga pričakuje JS koda)
             const frontendRedirectUrl = req.query.state || '/';
-            
             res.redirect(`${frontendRedirectUrl}?zeton=${zeton}&ime=${req.user.ime}&jeLastnik=${req.user.jeLastnik || false}&telefon=${req.user.telefon || ''}`);
         }
     );
 
-
     // --- APPLE PRIJAVA ---
-    // 3. Začetek Apple prijave: Kliče se iz frontenda (/api/auth/apple)
     router.get('/apple', (req, res, next) => {
         const redirectUrl = req.query.redirectUrl || '/';
         passport.authenticate('apple', { 
@@ -333,26 +84,17 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
         })(req, res, next);
     });
 
-
-    // 4. Apple Povratni Klic: Kliče ga Apple (POST zahteva)
     router.post('/apple/callback', 
         passport.authenticate('apple', { 
             session: false, 
-            // ✅ POPRAVEK: failureRedirect mora biti statičen niz!
-            failureRedirect: '/?status=error&msg=Ap_neuspešno' // Uporabimo statičen redirect
+            failureRedirect: '/?status=error&msg=Ap_neuspešno' 
         }), 
         (req, res) => {
-            // Avtentikacija je uspela
-            
-            // a) Generiraj vaš JWT
-            const zeton = generirajZeton(req.user._id);
+            // Uporabimo pomožne funkcije iz Controllerja!
+            const zeton = authController.generirajZeton(req.user._id);
+            authController.nastaviAuthPiškotek(res, zeton); 
 
-            // b) Nastavi piškotek (HTTP-Only)
-            nastaviAuthPiškotek(res, zeton); 
-
-            // c) Preusmeri nazaj na frontend (redirectUrl je v req.body.state)
             const frontendRedirectUrl = req.body.state || '/';
-            
             res.redirect(`${frontendRedirectUrl}?zeton=${zeton}&ime=${req.user.ime}&jeLastnik=${req.user.jeLastnik || false}&telefon=${req.user.telefon || ''}`);
         }
     );

@@ -2,10 +2,13 @@
 // 🟢 uporabnik.js — Uporabnik model (Sedaj izvaža samo SHEMO!)
 // POPRAVLJENO: Dodan fcmToken za PUSH obvestila
 // POPRAVLJENO: Dodana podpora za AppleId in posodobljena validacija gesla
+// ⭐ NOVO: Dodana podpora za ponastavitev gesla
 // ========================================
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
+// ⭐ NOVO: Uvoz vgrajenega modula Crypto za generiranje varnih žetonov
+const crypto = require('crypto');
 
 const UporabnikShema = new mongoose.Schema({
     ime: { type: String, required: true, trim: true },
@@ -54,6 +57,10 @@ const UporabnikShema = new mongoose.Schema({
         type: String, 
         sparse: true 
     },
+    
+    // ⭐ NOVO: POLJA ZA PONASTAVITEV GESLA ⭐
+    resetPasswordToken: { type: String, select: false }, // 'select: false' za varnost - polje se ne vrne pri standardnem find()
+    resetPasswordExpires: { type: Date, select: false },
 
 }, { timestamps: true });
 
@@ -64,6 +71,26 @@ UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
         return false; 
     }
     return bcrypt.compare(vnesenoGeslo, this.geslo);
+};
+
+
+// ⭐ NOVO: METODA ZA GENERIRANJE ŽETONA ZA PONASTAVITEV GESLA
+UporabnikShema.methods.getResetPasswordToken = function() {
+    // 1. Generiramo naključni žeton (raw token)
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // 2. Hashiramo ta žeton (samo za shranjevanje v bazo, ker je žeton javno poslan po e-pošti)
+    // To je dobra praksa, čeprav nekateri sistemi shranijo žeton v čitljivi obliki. Hashiranje poveča varnost.
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // 3. Nastavimo čas poteka žetona (npr. 1 ura)
+    this.resetPasswordExpires = Date.now() + 3600000; // 3600000 ms = 1 ura
+
+    // 4. Vrnemo NE-HASHIRAN (raw) žeton, ki ga bomo poslali po e-pošti
+    return resetToken;
 };
 
 
