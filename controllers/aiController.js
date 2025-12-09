@@ -1,4 +1,4 @@
-// /controllers/aiController.js
+// /controllers/aiController.js - KONČNA VERZIJA Z RAG IN DOSTOPOM DO MENIJEV
 
 const { GoogleGenAI } = require('@google/genai');
 // ⭐ Uvoz Mongoose modela za dostop do kolekcije 'restavracijas'
@@ -36,26 +36,27 @@ exports.askAssistant = async (req, res) => {
 
     try {
         
-        // ⭐ KORAK RAG 1: Pridobitev relevantnih podatkov iz MongoDB
+        // ⭐ KORAK RAG 1: Pridobivanje podatkov z MENIJI
         // Poizvedba uporablja model Restavracija, ki je vezan na kolekcijo 'restavracijas'.
         const restavracije = await Restavracija.find({})
-            .select('ime lokacija opis') // Izberemo samo ključne podatke, da zmanjšamo porabo žetonov
+            // ⭐ DODANO/POPRAVLJENO: Vključimo polje 'meni'
+            .select('ime lokacija opis meni') 
             .limit(10) 
             .lean();
             
         // Podatke konvertiramo v čitljiv JSON string
         const restavracijeJson = JSON.stringify(restavracije, null, 2);
 
-        // ⭐ KORAK RAG 2: Izdelava VODILNEGA PROMPTA (s kontekstom)
+        // ⭐ KORAK RAG 2: Izdelava VODILNEGA PROMPTA (z opozorilom na meni)
         const systemInstruction = `
             Ti si Rentyo Gourmet virtualni pomočnik. 
             Odgovarjaj na vprašanja uporabnika v slovenskem jeziku, bodi prijazen in strokoven.
             
-            **Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu, ki predstavlja podatke o restavracijah.**
+            **Uporabljaj samo informacije, ki so ti posredovane v spodnjem JSON objektu. Ta JSON vsebuje tudi podatke o jedeh v polju 'meni'.**
             
-            Če te uporabnik vpraša po restavracijah ali njihovih lastnostih (ime, lokacija, opis), odgovori na podlagi JSON podatkov.
+            Če te uporabnik vpraša po jedeh, ki jih ponujajo restavracije (npr. 'hamburger', 'pizza', 'vegetarijansko'), prebrskaj polje 'meni' in predlagaj ustrezne restavracije.
             
-            --- ZNANJE IZ BAZE ---
+            --- ZNANJE IZ BAZE (RESTAVRACIJE & MENIJI) ---
             ${restavracijeJson}
             --- KONEC ZNANJA IZ BAZE ---
         `;
