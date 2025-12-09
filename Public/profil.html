@@ -660,6 +660,7 @@ body::before {
 .gumb-nevarno .fas {
     margin-right: 8px;
 }
+
     }
     
   </style>
@@ -897,43 +898,21 @@ body::before {
         });
 
 
-   // ===========================================
-// 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (CAPACITOR INTEGRACIJA) 🚀
-// Uporablja stabilnejši Community vtičnik.
+ // ===========================================
+// 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (ML KIT) 🚀
 // ===========================================
 
-// Preveri, ali se izvaja v Capacitor okolju
-const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isPluginAvailable('BarcodeScanner');
+// Ali tečemo v Capacitor okolju?
+const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform();
 
-/**
- * Pomožna funkcija za čiščenje UI in prisilno ustavljanje kamere.
- * Zdaj vključuje klic showBackground in stopScan za Community vtičnik.
- */
+// UI cleanup (ML Kit ne uporablja stopScan ali showBackground!)
 const stopHighlight = async () => { 
-     if (isCapacitorApp) {
-         try {
-             const { BarcodeScanner } = Capacitor.Plugins;
-             
-             // 🚨 KRITIČNO: Community vtičnik zahteva to za ustavitev kamere.
-             await BarcodeScanner.stopScan(); 
-             
-             // Community vtičnik zahteva, da je ozadje spet vidno.
-             await BarcodeScanner.showBackground();
-             
-         } catch (e) {
-             console.log("BarcodeScanner.stopScan/showBackground failed, likely due to previous crash. Ignoring error.");
-         }
-         
-         // Odstranitev celozaslonskega premaza (če se je uporabil za UI)
-         document.body.classList.remove('barcode-scanner-active');
-     }
-}
+    document.body.classList.remove('barcode-scanner-active');
+};
 
 
 /**
- * 1. Pošlje restavracijaId na strežnik za potrditev prihoda in dodelitev točk.
- * (Ta funkcija ostaja večinoma enaka, popravljen je le klic stopHighlight.)
- * @param {string} restavracijaId ID restavracije, skeniran iz QR kode.
+ * 1. Pošlje restavracijaId na strežnik
  */
 const potrdiPrihodNaStrežniku = async (restavracijaId) => {
     if (!zeton) {
@@ -960,138 +939,108 @@ const potrdiPrihodNaStrežniku = async (restavracijaId) => {
 
         if (response.ok) {
             prikaziSporocilo('success', data.msg);
-            
+
             if (scanStatusElement) {
                 const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
                 scanStatusElement.textContent = statusMsg;
                 scanStatusElement.style.color = 'green';
             }
-            
-            // 1. Posodobitev točk in profila
-            naloziPodatkeProfila(); 
-            
-            // 2. Premik rezervacije: Ponovno naloži aktivne (izgine/posodobi status)
+
+            naloziPodatkeProfila();
             naloziAktivneRezervacije();
-            
-            // 3. Premik rezervacije: Ponovno naloži pretekle (se prikaže)
             naloziPretekleRezervacije();
 
         } else {
-            console.error("Napaka pri potrditvi prihoda:", data);
-            const errorMsg = i18next.t('profile.status_error') + `: ${data.msg || response.statusText}`;
+            const errorMsg = i18next.t('profile.status_error') + `: ${data.msg}`;
             prikaziSporocilo('error', errorMsg);
-             if (scanStatusElement) {
+
+            if (scanStatusElement) {
                 scanStatusElement.textContent = errorMsg;
                 scanStatusElement.style.color = 'red';
             }
         }
+
     } catch (error) {
-        console.error("Kritična napaka pri potrditvi prihoda:", error);
         prikaziSporocilo('error', i18next.t('profile.server_error'));
-         if (scanStatusElement) {
+
+        if (scanStatusElement) {
             scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
             scanStatusElement.style.color = 'red';
         }
     }
-    // 🚨 Klic stopHighlight mora počakati na ustavitev kamere.
+
     await stopHighlight(); 
 };
 
 
 /**
- * 2. Zažene Community BarcodeScanner.
+ * 2. ML Kit skeniranje (KONČNA POPRAVLJENA VERZIJA)
  */
 const zacniSkeniranje = async () => {
+    
     if (!isCapacitorApp) {
-        prikaziSporocilo('error', i18next.t('profile.scan_unavailable') || 'Skeniranje ni na voljo.');
+        prikaziSporocilo('error', i18next.t('profile.scan_unavailable'));
         return;
     }
-    
+
     const { BarcodeScanner } = Capacitor.Plugins;
 
     try {
-        // --- 🚨 KRITIČNA SPREMEMBA 1: Preverjanje in zahtevanje dovoljenja ---
         
-        // Community vtičnik (za razliko od ML Kit) uporablja get/requestPermission()
-        let status = await BarcodeScanner.checkPermission();
-
-        if (status.granted === false) {
-            status = await BarcodeScanner.requestPermission();
-        }
+        // 1. Preverjanje dovoljenj
+        const permissions = await BarcodeScanner.requestPermissions();
         
-        if (status.granted === false) {
-             const msg = i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.';
+        if (permissions.camera !== 'granted') {
+             const msg = i18next.t('profile.camera_permission_required') || 'Za skeniranje je potrebno dovoljenje za kamero.';
              prikaziSporocilo('error', msg);
-             if (scanStatusElement) scanStatusElement.textContent = msg;
-             
-             stopHighlight(); 
-             return;
+             return; 
         }
-        
-        // --- 🚨 KRITIČNA SPREMEMBA 2: Community vtičnik potrebuje transparentno ozadje ---
-        
-        // Naredi ozadje WebViewa transparentno, da se skozi njega vidi kamera.
-        await BarcodeScanner.hideBackground();
-        
-        // Ta klic pustimo, saj generira celozaslonski premaz/ozadje:
-        document.body.classList.add('barcode-scanner-active'); 
         
         if (scanStatusElement) {
-            scanStatusElement.textContent = i18next.t('profile.status_scanning') || 'Skeniranje v teku...';
+            scanStatusElement.textContent = i18next.t('profile.status_scanning');
             scanStatusElement.style.color = '#1BC0BB';
         }
 
-        // --- 🚨 KRITIČNA SPREMEMBA 3: Community vtičnik deluje s poslušanjem dogodkov ---
+        // 2. Native ML Kit Activity
+        const result = await BarcodeScanner.scan(); 
         
-        // Community vtičnik uporablja startScan z zanko (ne odpira nove Activity)
-        const result = await BarcodeScanner.startScan();
+        await stopHighlight();
         
-        // Ustavitev je v Community vtičniku izrecno potrebna
-        await stopHighlight(); 
-        
-        // ***************************************************************
-        // KRITIČNA OBRAVNAVA: Preveri, ali je rezultat definiran in ima vsebino
-        // ***************************************************************
-        if (!result || result.hasContent === false) {
-            // To se zgodi, če je skeniranje prekinjeno ali vtičnik ni našel vsebine.
-            const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano.';
+        // ⭐ POPRAVEK: Preverjamo result.barcodes[0] in ne result.barcode
+        if (!result.barcodes || result.barcodes.length === 0 || !result.barcodes[0].rawValue) {
+            const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano ali neuspešno.';
             prikaziSporocilo('error', msg);
-            if (scanStatusElement) {
-                scanStatusElement.textContent = msg;
-                scanStatusElement.style.color = 'orange';
-            }
+            if (scanStatusElement) scanStatusElement.textContent = msg;
             return;
         }
 
-
-        // Logika se nadaljuje le, če je result definiran in ima vsebino:
-        const restavracijaId = result.content; 
+        // ⭐ Pravilno pridobivanje rawValue iz tabelary result.barcodes
+        const rawValue = result.barcodes[0].rawValue; 
         
-        // Validacija formata: 24 znakov (MongoDB ObjectId)
-        if (restavracijaId.length !== 24 || !restavracijaId.match(/^[0-9a-fA-F]{24}$/)) {
-            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljaven format QR kode. Skenirajte čisto besedilo (ID restavracije).';
+        // 3. Čiščenje in Validacija
+        let restavracijaId = rawValue
+            .trim()
+            .replace(/[^0-9a-fA-F]/g, '');
+
+        // STRIKTA VALIDACIJA (24-mestni format)
+        if (!restavracijaId || restavracijaId.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(restavracijaId)) {
+            
+            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljavna oblika QR kode (pričakovan 24-mestni ID).';
             prikaziSporocilo('error', msg);
-             if (scanStatusElement) scanStatusElement.textContent = msg;
+            if (scanStatusElement) scanStatusElement.textContent = msg;
             return;
         }
 
+        // ⭐ KONČNI PUSH: Klic na strežnik s potrjenim in očiščenim ID-jem
         potrdiPrihodNaStrežniku(restavracijaId);
-        
-        
+
     } catch (error) {
-        // Obravnava kritičnih napak
-        
-        if (error.message && error.message.includes('permission')) {
-             prikaziSporocilo('error', i18next.t('profile.permission_denied') || 'Dovoljenje za kamero zavrnjeno.');
-        } else {
-             prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
-        }
-       
-        console.error('Napaka pri Community BarcodeScannerju:', error);
-        
+        prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
+        console.error("ML Kit napaka:", error);
         await stopHighlight();
     }
 };
+
 
 // ===========================================
 // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV

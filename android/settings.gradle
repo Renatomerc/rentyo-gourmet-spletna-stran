@@ -1,31 +1,5 @@
-// To je ključna datoteka za konfiguracijo repozitorijev!
-dependencyResolutionManagement {
-    // POPRAVEK: Uporabljamo PREFER_SETTINGS, da ustavimo build napake,
-    // hkrati pa zagotovimo, da so vsi potrebni repozitoriji definirani centralno.
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) 
-    
-    repositories {
-        google()
-        mavenCentral()
-        
-        // KLJUČNO: Dodamo lokalne repozitorije, da preprečimo, da bi jih Capacitor sam dodajal in povzročal konflikt.
-        flatDir {
-            dirs 'libs'
-        }
-    }
-}
-
-rootProject.name = "Rentyo-gourmet-spletna-stran"
-
-// Eksplicitno vključimo Capacitor Android modul in določimo njegovo pot, 
-// da popravimo napako, ki izhaja iz node_modules.
 include ':app'
-include ':capacitor-android' 
 include ':capacitor-cordova-android-plugins'
-
-// Poti projektov
-project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
 
-// To je specifična datoteka, ki vključi vse ostale Capacitor vtičnike
 apply from: 'capacitor.settings.gradle'

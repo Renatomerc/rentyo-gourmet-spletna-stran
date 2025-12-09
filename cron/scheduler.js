@@ -98,9 +98,10 @@ const checkAndSendReminders = async () => {
             // 2. Razdeli rezervacije
             { $unwind: "$mize.rezervacije" },
             
-            // 3. Match: Potrjeno in opomnik še ni bil poslan
+            // 3. Match: AKTIVNO in opomnik še ni bil poslan
             { $match: {
-                "mize.rezervacije.status": "POTRJENO", // Uporaba POTRJENO (velika tiskana) iz modela
+                // ⭐ POPRAVEK: Iščemo status "AKTIVNO" (namesto "POTRJENO")
+                "mize.rezervacije.status": "AKTIVNO", 
                 "mize.rezervacije.opomnikPoslan": { $ne: true }
             }},
             
@@ -127,6 +128,7 @@ const checkAndSendReminders = async () => {
         ]);
 
         if (reservationsData.length === 0) {
+            console.log('[Scheduler] Ni najdenih AKTIVNIH rezervacij, ki čakajo na opomnik.');
             return;
         }
 
@@ -147,6 +149,10 @@ const checkAndSendReminders = async () => {
             // Izračunamo, koliko minut je do rezervacije
             const minutesUntilReservation = rezervacijaDateTime.diff(currentTime, 'minutes');
             
+            // ⭐ DODANO ZA DEBUGIRANJE: Izpišemo VSAKEGA kandidata, da vidimo, kje se ustavi
+            console.log(`[Scheduler Debug] KANDIDAT: ID=${rezervacija.rezervacijaId}, Čas: ${rezervacija.datum} ${casString}, Preostalo: ${minutesUntilReservation} minut.`);
+
+
             // Pogoj za opomnik: pošlji točno, ko je med 15 in 16 minut pred rezervacijo
             if (minutesUntilReservation === 15) {
                 

@@ -979,13 +979,17 @@ body.is-capacitor .iskalnik-sekcija {
 .platform-android header {
     /* Fiksna pozicija in barva ostanejo enake */
     position: fixed !important;
-    top: 0 !important;
+    
+    /* 🔑 KLJUČNO POPRAVLJENO: ZAMENJAJTE staro variablo z novo, injicirano iz Jave. 
+       To prisilno premakne glavo pod Status Bar. */
+    top: var(--native-status-bar-height, 0) !important;
+    
     left: 0 !important;
     width: 100% !important;
     background-color: #076b6a !important;
     z-index: 1000;
     
-    /* KLJUČNO: POVEČANJE ROBE */
+    /* KLJUČNO: POVEČANJE ROBE (Vaš obstoječi padding) */
     /* Zgornji rob: 130px (Dodatno povečano za več prostora nad logotipom) */
     padding-top: 130px !important; 
     

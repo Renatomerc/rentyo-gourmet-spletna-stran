@@ -6,16 +6,16 @@ const appAssetsDir = path.join(androidDir, "app", "src", "main", "assets");
 
 // ===============================================
 // 1. FUNKCIJA ZA KOPIRANJE MANJKAJOČE DATOTEKE capacitor.js
+// POPRAVLJENO: Pot spremenjena iz @capacitor/android na @capacitor/core/dist, ker je datoteka v android paketu manjkajoča.
 // ===============================================
 function copyCapacitorJs() {
   const sourcePath = path.join(
     __dirname,
     "node_modules",
     "@capacitor",
-    "android",
-    "assets",
-    "web",
-    "capacitor.js"
+    "core", // <--- POPRAVLJENA POT!
+    "dist", // <--- POPRAVLJENA POT!
+    "capacitor.js" 
   );
   const destinationPath = path.join(appAssetsDir, "capacitor.js");
 
@@ -30,7 +30,7 @@ function copyCapacitorJs() {
     console.log(`✔ Kopirano: capacitor.js -> ${destinationPath}`);
   } catch (error) {
     console.error(
-      "❌ KRITIČNA NAPAKA: Kopiranje capacitor.js neuspešno! Preverite, ali je @capacitor/android nameščen.",
+      "❌ KRITIČNA NAPAKA: Kopiranje capacitor.js neuspešno! Preverite, ali je @capacitor/core/dist nameščen.",
       error
     );
   }
@@ -96,4 +96,4 @@ copyCapacitorJs();
 
 // 2. Popravite Gradle datoteke
 patchAllGradleFiles("android");
-console.log("✔ All Gradle patches applied.");
+console.log("✔ All Gradle patches applied."); // POPRAVEK: Dodano ) in ;

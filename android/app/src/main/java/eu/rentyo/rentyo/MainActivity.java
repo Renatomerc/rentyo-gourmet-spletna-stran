@@ -1,84 +1,55 @@
 package eu.rentyo.rentyo;
 
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Build;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import com.getcapacitor.BridgeActivity;
-import androidx.core.splashscreen.SplashScreen;
-import android.graphics.Color;
-import java.util.concurrent.TimeUnit;
-import android.content.Intent;
-import android.util.Log;
+import android.view.WindowInsetsController;
+// ⭐ Potrebna uvoza
+import android.graphics.Color; // Dodajte, če ga še nimate
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.messaging.FirebaseMessaging;
+import androidx.core.view.WindowCompat;
+import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
-    private static final long MINIMUM_SPLASH_TIME = TimeUnit.SECONDS.toMillis(3);
-    private long startTime;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        
+        // ⭐ 1. Nastavitev barve DECOR VIEW (to že imate in je pravilno) ⭐
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+             getWindow().getDecorView().setBackgroundColor(0xFF076B6A);
+        }
+        
+        super.onCreate(savedInstanceState); // Inicializacija Capacitorjevega 'bridge'
 
-        // Splash screen
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-        startTime = System.currentTimeMillis();
-
-        splashScreen.setKeepOnScreenCondition(() -> {
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            return elapsedTime < MINIMUM_SPLASH_TIME;
-        });
-
-        super.onCreate(savedInstanceState);
-
-        // Inicializacija Firebase
-        if (FirebaseApp.getApps(this).isEmpty()) {
-            FirebaseApp.initializeApp(this);
+        // ⭐ 2. KLJUČNA NOVITETA: NASTAVITEV BARVE OZADJA SAMEMU WebViewu ⭐
+        // Ta koda se izvede po inicializaciji mostu (bridge).
+        // 0xFF076B6A je ARGB koda za vašo turkizno barvo.
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            this.bridge.getWebView().setBackgroundColor(0xFF076B6A);
         }
 
-        // 🔥 Log FCM Token – da bo v Logcatu vedno prikazan!
-        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token -> {
-            Log.i("FCM_TOKEN", "Firebase Token: " + token);
-        });
+        // 1. Izklopi edge-to-edge, da app NE gre pod status bar
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
-        // WebView barva (da ni bel fleš)
-        this.getBridge().getWebView().setBackgroundColor(Color.parseColor("#20c0bd"));
-
-        final Window window = getWindow();
-        int turkiznaBarva = getResources().getColor(R.color.turkizna_status_bar);
-
+        // 2. Nastavi barvo status bara na #076B6A
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(0xFF076B6A);
+        }
+        // ... ostala koda ...
+        
+        // 3. Nastavi BELE ikone v status baru
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            final int visibility = window.getDecorView().getSystemUiVisibility();
-            window.getDecorView().setSystemUiVisibility(
-                    visibility & ~View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            );
-            window.setStatusBarColor(turkiznaBarva);
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(turkiznaBarva);
-        }
-
-        // Registracija dodatnega Capacitor plugina
-        registerPlugin(MinimalistDatePickerPlugin.class);
-    }
-
-    // 👉 Ključno za push obvestila, ko klikneš na notification
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        if (intent != null) {
-            getBridge().onNewIntent(intent);
-
-            if (intent.getExtras() != null) {
-                Log.d("PUSH_INTENT", "Prejel push obvestilo z extra podatki.");
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.setSystemBarsAppearance(
+                    0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                );
             }
+        } else {
+            // Na starejših Android verzijah odstrani LIGHT_STATUS_BAR flag (bele ikone)
+            getWindow().getDecorView().setSystemUiVisibility(0);
         }
     }
 }

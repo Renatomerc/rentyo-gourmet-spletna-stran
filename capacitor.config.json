@@ -1,19 +1,39 @@
 {
   "appId": "eu.rentyo.rentyo",
   "appName": "Rentyo",
-  "webDir": "public",  
+  "webDir": "public",
   "bundledWebRuntime": false,
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0,             
-      "launchAutoHide": false,             
-      "backgroundColor": "#FFFFFF",         
+      "launchShowDuration": 0,
+      "launchAutoHide": false,
+      "backgroundColor": "#076B6A",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
-      "splashFullScreen": true,
-      "splashImmersive": true
+      "splashFullScreen": false,
+      "splashImmersive": false
     },
-    "BarcodeScanner": {}
+    "BarcodeScanner": {},
+    
+    
+    "StatusBar": {
+      "style": "DARK",
+      "overlay": false,
+      "backgroundColor": "#076B6A"
+    },
+    
+    
+    "SocialLogin": { 
+      "google": {
+        "clientId": "656400083949-nuj4kg2rvofjjecmtcoo29191erlkula.apps.googleusercontent.com",
+        "redirectUri": "com.googleusercontent.apps.656400083949-nuj4kg2rvofjjecmtcoo29191erlkula:/oauth2redirect",
+        "scopes": [
+          "profile",
+          "email"
+        ]
+      }
+    }
+    
   },
   "cordova": {}
 }
