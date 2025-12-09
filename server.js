@@ -151,6 +151,7 @@ function startApp() {
     let userRoutes;
     let uploadRouter;
     let offersRouter; 
+    let aiRouter; // ⭐ NOVO: Deklaracija za AI router
     let authMiddleware; 
     let preveriGosta; 
     let zahtevajPrijavo; 
@@ -168,8 +169,10 @@ function startApp() {
         restavracijaRouter = require('./routes/restavracijaRoutes')(preveriGosta);
         userRoutes = require('./routes/uporabnikRouter')(JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo); 
         uploadRouter = require('./routes/uploadRoutes');
-        
         offersRouter = require('./routes/offersRoutes'); 
+        
+        // ⭐ NOVO: Inicializacija AI Routerja
+        aiRouter = require('./routes/aiRouter'); 
 
     } catch (e) {
         console.error("❌ Kritična napaka pri nalaganju routerjev. Preverite poti modelov znotraj routerjev:", e.message);
@@ -201,6 +204,12 @@ function startApp() {
     if (uploadRouter) {
         app.use('/api/upload', uploadRouter); 
         console.log("✅ API Pot za Nalaganje (/api/upload) je uspešno priključena.");
+    }
+    
+    // ⭐ NOVO: Priključitev API Poti za AI Asistenta
+    if (aiRouter) {
+        app.use('/api/assistant', aiRouter);
+        console.log("✅ API Pot za AI Asistenta (/api/assistant) je uspešno priključena.");
     }
 
 
