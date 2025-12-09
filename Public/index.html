@@ -2761,6 +2761,205 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     font-size: 0.9em;
     color: #888;
 }
+/* --- A. Splošna pravila za mobilno ikono (Vedno vidna in obarvana) --- */
+
+/* ⭐ NOVO: Velikost/Dimenzije celotnega klikabilnega območja ikone (opcijsko) ⭐ */
+.ikona-ai {
+    /* Nastavite širino in višino kontejnerja, da je lažje klikniti */
+    width: 40px; 
+    height: 40px; 
+    display: flex;
+    justify-content: center; /* Center ikone horizontalno */
+    align-items: center; /* Center ikone vertikalno */
+    /* Lahko dodate background-color: #f0f0f0; in border-radius: 50%; za krog */
+}
+
+/* ⭐ NOVO: Velikost in Barva same ikone (Glavno pravilo za spreminjanje) ⭐ */
+.ikona-ai i.far.fa-comment-dots { /* Posodobljeno na far.fa-comment-dots (Obris) */
+    /* Zagotovi, da je ikona vedno vidna in ima barvo */
+    font-size: 30px; /* Lahko povečate/zmanjšate to vrednost za spremembo velikosti */
+    color: #f2f2f2; /* Barva ikone */
+    transition: transform 0.2s; /* Lepa animacija pri kliku/dotiku */
+}
+
+/* --- B. Skrivanje AI ikone na Desktopu --- */
+
+#ai-chat-icon-mobile-global {
+    /* Skrij to ikono v standardnem (desktop) pogledu */
+    display: none; 
+}
+
+
+/* --- C. Pravila za Mobilni Pogled (GLAVNI POPRAVEK) --- */
+
+@media (max-width: 768px) {
+    
+    /* Prikaz ikone: */
+    #ai-chat-icon-mobile-global {
+        display: block !important; 
+    }
+
+    /* ⭐ KLJUČNA FLEXBOX PRAVILA ZA HEADR GLAVO ⭐ */
+    header.glava {
+        display: flex;
+        align-items: center; /* Navpična poravnava */
+        justify-content: space-between; /* Razporedi logotip na levo in ikone na desno */
+        padding: 10px 15px; /* Dodajte robove, če jih še nimate */
+    }
+    
+    /* 1. Poravnava ikon na desno stran: */
+    #ai-chat-icon-mobile-global {
+        margin-left: auto; /* Potisne AI ikono skrajno na desno */
+        margin-right: 60px; /* POVEČANO: Ustvari večji razmik med AI ikono in hamburger gumbom */
+        padding: 5px
+    }
+    
+    /* ⭐ NOV DEL: PRAVILA ZA CAPACITOR (Header Safe Area) ⭐ */
+    body.is-capacitor-app header.glava {
+        /* Povečajte polnilo na vrhu za statusno vrstico OS */
+        padding-top: calc(10px + env(safe-area-inset-top));
+    }
+    
+    /* Prav tako lahko izboljšate poravnavo gumba za hamburger (kar smo obravnavali prej) */
+    #hamburgerGumb {
+        display: flex;
+        align-items: center; 
+        justify-content: center;
+        width: 40px; 
+        height: 40px; 
+        padding: 0; 
+    }
+    
+    /* Če imate elemente, ki so namenjeni samo za desktop, jih skrijte */
+    #desktopAkcije {
+        display: none;
+    }
+}
+
+/* ========================================= */
+/* --- D. CSS PRAVILA ZA AI POGOVORNO OKNO (CHAT WIDGET) --- */
+/* ========================================= */
+
+#aiChatModal {
+    /* Skrije se, dokler ga JS funkcija toggleChat() ne prikaže */
+    display: none; 
+    
+    /* ⭐ KLJUČNO: Nastavi fiksno pozicijo (spodaj desno) ⭐ */
+    position: fixed; 
+    z-index: 1000; 
+    
+    /* Odstranitev celozaslonskega prekrivnega sloja */
+    left: auto; /* Pusti avtomatsko */
+    top: auto; /* Pusti avtomatsko */
+    right: 20px; /* Odmik od desnega roba */
+    bottom: 150px; /* Odmik od spodnjega roba */
+    width: 300px; /* Nastavi fiksno širino */
+    height: 400px; /* Nastavi fiksno višino */
+    
+    /* ODSTRANIMO zatemnjeno ozadje (da se ne zatemni) */
+    background-color: transparent; 
+    overflow: visible; /* Ne potrebuje celozaslonskega pomikanja */
+}
+
+/* Okno z vsebino (Content Box) - Sedaj zavzema 100% starševskega elementa (#aiChatModal) */
+.chat-modal-content {
+    /* ⭐ SPREMENJENO: BELO OZADJE ⭐ */
+    background-color: #ffffff; 
+    /* ⭐ SPREMENJENO: ČRNA PISAVA (Podlaga za vse elemente) ⭐ */
+    color: #2a2a2a; 
+    padding: 0;
+    width: 100%; /* Zavzame celotno širino #aiChatModal */
+    height: 100%; /* Zavzame celotno višino #aiChatModal */
+    max-width: none; 
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Dodaj senco za 3D efekt */
+    overflow: hidden;
+}
+
+/* Mobilna postavitev (Prilagoditev velikosti, da ni preveliko) */
+@media (max-width: 500px) {
+    #aiChatModal {
+        /* Za manjše zaslone zmanjšamo velikost in robove */
+        width: 90%; 
+        height: 90vh; /* Uporabi 80% višine zaslona */
+        right: 5%; /* Centriranje z robovi */
+        bottom: 5%;
+        left: 5%;
+    }
+    
+    /* Prilagoditev za Capacitor (če je statusna vrstica prisotna) */
+    body.is-capacitor-app #aiChatModal {
+        /* Če statusna vrstica moti, lahko to prilagodite */
+        /* bottom: calc(20px + env(safe-area-inset-bottom)); */
+    }
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #076b6a;
+    border-bottom: 1px solid #076b6a;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #f2f2f2; 
+}
+
+.close-chat-btn {
+    color: #f2f2f2;
+    font-size: 28px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+}
+
+.chat-body {
+    flex-grow: 1; 
+    padding: 15px;
+    overflow-y: auto; 
+}
+
+.chat-input {
+    display: flex;
+    /* ⭐ SPREMENJENO: POVEČAN PADDING NA 15PX ZA BOLJ ROBUSTN VIDEZ ⭐ */
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #ddd;
+}
+
+.chat-input input[type="text"] {
+    flex-grow: 1;
+    /* ⭐ SPREMENJENO: POVEČAN PADDING ZA VEČJO VIŠINO POLJA ⭐ */
+    padding: 12px; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #ffffff;
+    color: #2a2a2a;
+    /* ⭐ NOVO: DODANA SENČKA ZA GLOBINO (boljši videz) ⭐ */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); 
+}
+
+.chat-input button {
+    background-color: #88d82d; 
+    color: #2a2a2a;
+    border: none;
+    /* ⭐ SPREMENJENO: PRILAGOJEN PADDING, DA SE VIŠINA GUMBA UJEMA Z INPUT POLJEM ⭐ */
+    padding: 12px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+}
 
 
 
@@ -2797,6 +2996,12 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
         </div>
         
   <div class="akcije" id="desktopAkcije">
+  
+    <div id="ai-chat-icon-desktop" onclick="toggleChat()" style="cursor: pointer; margin-right: 15px;" class="ikona-ai">
+        <i class="far fa-comment-dots" aria-label="AI Pomočnik"></i> 
+    </div>
+    
+  
   <div class="jezik-ovoj" id="jezikOvojDesktop">
     <i class="fas fa-globe"></i>
     <select class="izbira-jezika" id="izbiraJezikaDesktop">
@@ -2816,8 +3021,13 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     </select>
   </div>
 </div>
+
         
-   <button class="hamburger-gumb" id="hamburgerGumb">
+   <div id="ai-chat-icon-mobile-global" onclick="toggleChat()" style="cursor: pointer; margin-right: 25px;" class="ikona-ai mobilna-vidna">
+        <i class="far fa-comment-dots" aria-label="AI Pomočnik"></i> 
+    </div>
+
+<button class="hamburger-gumb" id="hamburgerGumb">
     <i class="fas fa-user-circle"></i> 
 </button>
 
@@ -2854,8 +3064,28 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
                 </select>
             </div>
         </div>
+        
 
     </header>
+    <div id="aiChatModal" class="chat-modal-overlay">
+    <div class="chat-modal-content">
+        
+        <div class="chat-header">
+            <h3>AI Pomočnik</h3>
+            <button class="close-chat-btn" onclick="toggleChat()">&times;</button> 
+        </div>
+
+        <div class="chat-body">
+            <p>Pozdravljen! Kako ti lahko pomagam danes?</p>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" placeholder="Vnesite sporočilo...">
+            <button>Pošlji</button>
+        </div>
+
+    </div>
+</div>
 
     <main>
         <section class="naslovna-slika">
@@ -3355,6 +3585,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     </div>
 </div>
 
+
   
 <script src="capacitor.js"></script>
 <script type="module" src="script.js"></script>
@@ -3571,6 +3802,9 @@ const tabOcene = document.getElementById('tabOcene'); // Element za ocene
 // 🔥 POPRAVLJENI ID-ji iz vašega HTML-ja
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
 const appleLoginBtn = document.getElementById('apple-sign-in-btn');
+
+// Definicija chatModal mora biti tukaj, če jo uporabljate spodaj:
+const chatModal = document.getElementById('aiChatModal');
 </script>
 
 <script>
@@ -6476,6 +6710,138 @@ function showAppDownloadModal() {
     setTimeout(preklopiZavihekPoHashu, 100);
     
 }
+// ===========================================
+// 🔥 GLAVNA IZVEDBENA KODA
+// Zagotavlja, da se koda izvede šele, ko je DOM popolnoma naložen.
+// ===========================================
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const modal = document.getElementById('aiChatModal');
+
+    // Preverjanje, ali se aplikacija izvaja v Capacitorju
+    if (window.Capacitor) {
+        document.body.classList.add('is-capacitor-app');
+    }
+
+    if (modal) {
+        // Skrij modal ob zagonu (če CSS ni bil dovolj)
+        modal.style.display = 'none';
+        
+        // ⭐ PRIPENJANJE FUNKCIONALNOSTI VNOSNEGA POLJA ⭐
+        const sendButton = modal.querySelector('.chat-input button');
+        const inputField = modal.querySelector('.chat-input input[type="text"]');
+
+        if (sendButton && inputField) {
+            // Pripenjanje funkcije na klik gumba Pošlji
+            sendButton.addEventListener('click', handleSend);
+            
+            // Pripenjanje funkcije na pritisk tipke Enter v polju
+            inputField.addEventListener('keypress', (event) => {
+                // Preverimo, če je pritisnjena tipka Enter (ključno za klepetalnice)
+                if (event.key === 'Enter') {
+                    handleSend();
+                    event.preventDefault(); // Prepreči standardno obnašanje (npr. submit forme)
+                }
+            });
+        }
+    }
+    
+    // ⭐ DODATEN KORAK: Zapiranje okna s tipko ESCAPE (izboljša UX)
+    document.addEventListener('keydown', (event) => {
+        if (modal && modal.style.display === 'block' && event.key === 'Escape') {
+            toggleChat();
+        }
+    });
+
+}); 
+
+
+/**
+ * Funkcija preklopi vidnost pogovornega okna (Kliče se iz HTML onclick="toggleChat()").
+ */
+function toggleChat() {
+    // 1. Poišči element pogovornega okna
+    const modal = document.getElementById('aiChatModal');
+
+    if (!modal) {
+        console.error("Pogovorno okno z ID 'aiChatModal' ni najdeno.");
+        return;
+    }
+
+    // 2. Preveri trenutno stanje in ga preklopi
+    if (modal.style.display === 'block') {
+        // Skrij okno
+        modal.style.display = 'none';
+        console.log('Pogovorno okno zaprto.');
+    } else {
+        // Prikaži okno
+        modal.style.display = 'block';
+        
+        // ⭐ NOVO: Fokusiraj vnosno polje, ko se okno odpre (izboljša UX)
+        const inputField = modal.querySelector('.chat-input input[type="text"]');
+        if (inputField) {
+            inputField.focus();
+        }
+        
+        console.log('Pogovorno okno odprto.');
+    }
+}
+
+/**
+ * ⭐ NOVA FUNKCIJA: Dodajanje sporočila v pogovorno okno ⭐
+ * @param {string} text Sporočilo, ki ga je treba prikazati.
+ * @param {string} sender Pošiljatelj ('user' ali 'ai').
+ */
+function appendMessage(text, sender) {
+    const chatBody = document.querySelector('#aiChatModal .chat-body');
+    if (!chatBody) return;
+
+    // Ustvarimo nov div element za sporočilo
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message');
+    
+    // Dodamo specifičen razred glede na pošiljatelja za oblikovanje (CSS)
+    messageElement.classList.add(sender + '-message');
+    
+    // Dodamo samo besedilo
+    messageElement.innerHTML = `<p>${text}</p>`;
+
+    // Dodamo sporočilo v chat-body
+    chatBody.appendChild(messageElement);
+
+    // Samodejno pomikanje na dno (če je vsebina daljša)
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+
+/**
+ * ⭐ IZBOLJŠANA FUNKCIJA: Obravnava pošiljanje sporočila (povezava z AI kontrolerjem) ⭐
+ */
+function handleSend() {
+    const inputField = document.querySelector('#aiChatModal .chat-input input[type="text"]');
+    // Uporabimo .trim() za odstranitev belih presledkov in preverjanje, ali je vnos prazen
+    const message = inputField.value.trim();
+    
+    if (message !== "") {
+        // 1. Prikaz uporabnikovega sporočila TAKOJ
+        appendMessage(message, 'user');
+        
+        // 2. Počistimo vnosno polje
+        inputField.value = ''; 
+
+        console.log('Sporočilo poslano AI-ju:', message);
+        
+        // 🚨 TUKAJ VSTAVITE LOGIKO ZA POŠILJANJE SPOROČILA AI API-ju 🚨
+        // Npr.: aiController.sendMessage(message); 
+        
+        // Primer: Simulacija AI odgovora po 1 sekundi
+        setTimeout(() => {
+            const aiResponse = `Hvala za sporočilo "${message}". Sem AI pomočnik in sem pripravljen pomagati!`;
+            appendMessage(aiResponse, 'ai');
+        }, 1000); // Odgovor pride po 1 sekundi
+    }
+}
+
 
 </script>
     <div id="toaster-container">
