@@ -29,6 +29,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
 /* =================================================================
@@ -2973,30 +2974,66 @@ body.is-capacitor-app #aiChatModal {
     border-top: 0px solid #ddd;
 }
 
+/* ============================================================== */
+/* ⭐ OBLIKOVANJE MIKROFONA IN GUMBA ZA POŠILJANJE (BREZ OZADJA) ⭐ */
+/* ============================================================== */
+
+/* SKUPNA PRAVILA ZA OBA GUMBA V ČETU (#mic-button in #send-button) */
+.chat-input #mic-button,
+.chat-input #send-button {
+    /* Naredi gumb okrogel in transparenten */
+    background-color: transparent; 
+    border: none;
+    padding: 0; 
+    width: 48px; 
+    height: 48px; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    
+    /* Barva pisave na gumbu (če ni v spanu) */
+    color: #88d82d;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover efekt za transparentne gumbe */
+.chat-input #mic-button:hover,
+.chat-input #send-button:hover {
+    background-color: #ffffff; /* Rahlo sivo ozadje ob hoverju */
+}
+
+/* POSEBNO OBLIKOVANJE ZA MIKROFON (da ostane rob med njim in vnosnim poljem) */
+.chat-input #mic-button {
+    margin-right: 10px;
+}
+
+/* Velikost IKON ZNOTRAJ gumbov (Mic in Send) */
+.chat-input #mic-button .material-icons,
+.chat-input #send-button .material-icons {
+    font-size: 28px; 
+    color: #88d82d; /* Primarna zelena barva */
+    transition: color 0.2s, transform 0.2s;
+}
+
+/* Barvna sprememba IKONE ob hoverju */
+.chat-input #mic-button:hover .material-icons,
+.chat-input #send-button:hover .material-icons {
+    color: #70b925; /* Temnejši odtenek zelene ob hoverju */
+}
+
+
+/* Stili za input field so nespremenjeni */
 .chat-input input[type="text"] {
     flex-grow: 1;
     padding: 12px; 
-    border: 1px solid #ddd; /* Dodan nežen rob */
+    border: 0px solid #ddd; /* Dodan nežen rob */
     border-radius: 25px; /* Bolj zaobljeni robovi */
     margin-right: 10px;
     background-color: #ffffff;
-    color: #2a2a2a;
+    color: #303030;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Rahla senca */
-}
-
-.chat-input button {
-    background-color: #88d82d; 
-    color: #2a2a2a;
-    border: none;
-    padding: 12px 15px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-.chat-input button:hover {
-    background-color: #70b925; /* Temnejši odtenek za hover */
 }
 
 
@@ -3275,22 +3312,27 @@ body.is-capacitor-app #aiChatModal {
         </div>
         
 
-    </header>
+</header>
     <div id="aiChatModal" class="chat-modal-overlay">
     <div class="chat-modal-content">
-        
+
         <div class="chat-header">
             <h3>Leo</h3>
-            <button class="close-chat-btn" onclick="toggleChat()">&times;</button> 
+            <button class="close-chat-btn" onclick="toggleChat()">&times;</button>
         </div>
 
         <div class="chat-body">
             <p>Pozdravljen! Kako ti lahko pomagam danes?</p>
         </div>
-        
+
         <div class="chat-input">
-            <input type="text" placeholder="Vnesite sporočilo...">
-            <button>Pošlji</button>
+            <button id="mic-button" title="Glasovni vnos">
+                <span class="material-icons">mic</span>
+            </button>
+            <input type="text" id="user-input" placeholder="Vnesite sporočilo...">
+            <button id="send-button">
+                <span class="material-icons">send</span>
+            </button>
         </div>
 
     </div>
@@ -7152,8 +7194,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
         
         // ⭐ PRIPENJANJE FUNKCIONALNOSTI VNOSNEGA POLJA ⭐
-        const sendButton = modal.querySelector('.chat-input button');
-        const inputField = modal.querySelector('.chat-input input[type="text"]');
+        // 🔥 POPRAVLJENO: Uporabimo ID-je za natančno izbiro!
+        const sendButton = modal.querySelector('#send-button'); 
+        const inputField = modal.querySelector('#user-input'); // Predvidevam, da je ID dodan v HTML
+        const micButton = modal.querySelector('#mic-button'); 
 
         if (sendButton && inputField) {
             // Pripenjanje funkcije na klik gumba Pošlji
@@ -7167,6 +7211,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     event.preventDefault(); // Prepreči standardno obnašanje (npr. submit forme)
                 }
             });
+        }
+        
+        // ⭐ PRIKLOP FUNKCIONALNOSTI MIKROFONA ⭐
+        // OPOMBA: Funkcija 'startVoiceInput' mora biti definirana!
+        if (micButton && typeof startVoiceInput === 'function') {
+             micButton.addEventListener('click', startVoiceInput);
+        } else if (micButton) {
+             console.warn("Manjka funkcija startVoiceInput za mikrofon!");
         }
     }
     
@@ -7187,7 +7239,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleChat() {
     // 1. Poišči element pogovornega okna in telo klepetalnice
     const modal = document.getElementById('aiChatModal');
-    const inputField = modal ? modal.querySelector('.chat-input input[type="text"]') : null;
+    // Uporaba ID-ja na input fieldu
+    const inputField = modal ? modal.querySelector('#user-input') : null; 
     const chatBody = modal ? modal.querySelector('.chat-body') : null; // ⭐ NOVO
     
     const isCapacitor = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard);
@@ -7387,7 +7440,8 @@ async function fetchAiResponse(prompt) {
  * ⭐ IZBOLJŠANA FUNKCIJA: Obravnava pošiljanje sporočila (zdaj kliče backend API) ⭐
  */
 function handleSend() {
-    const inputField = document.querySelector('#aiChatModal .chat-input input[type="text"]');
+    // 🔥 POPRAVLJENO: Uporabimo ID za pridobitev vnosnega polja
+    const inputField = document.querySelector('#aiChatModal #user-input'); 
     // Uporabimo .trim() za odstranitev belih presledkov in preverjanje, ali je vnos prazen
     const message = inputField.value.trim();
     

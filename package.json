@@ -4,6 +4,7 @@
     "cap-sync": "npx cap sync android && node fix-cap.js"
   },
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
     "@capacitor-mlkit/barcode-scanning": "^7.4.0",
     "@capacitor/android": "^7.4.4",
     "@capacitor/browser": "^7.0.2",
