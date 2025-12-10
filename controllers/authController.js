@@ -184,7 +184,7 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
     };
 
     // ==========================================================
-    // ⭐ NOVE FUNKCIJE ZA PONASTAVITEV GESLA ⭐
+    // ⭐ NOVE FUNKCIJE ZA PONASTAVITEV GESLA (Z DEEP LINKINGOM) ⭐
     // ==========================================================
 
     exports.forgotPassword = async (req, res) => {
@@ -201,12 +201,12 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         await user.save({ validateBeforeSave: false }); 
 
         // 2. Pripravi in pošlji e-pošto
-        if (!process.env.FRONTEND_URL) {
-             console.error("❌ KRITIČNA NAPAKA: FRONTEND_URL ni definiran. Ponastavitev gesla ne bo delovala!");
+        if (!process.env.APP_DEEP_LINK_BASE) { // 🔥 PREVERJAMO APP_DEEP_LINK_BASE NAMSTO FRONTEND_URL
+             console.error("❌ KRITIČNA NAPAKA: APP_DEEP_LINK_BASE (npr. rentyo://reset-password) ni definiran. Pošiljanje ne bo delovalo!");
              user.resetPasswordToken = undefined;
              user.resetPasswordExpires = undefined;
              await user.save({ validateBeforeSave: false });
-             return res.status(200).json({ message: 'Začasna napaka strežnika, poskusite znova. (FRONTEND_URL manjka)' });
+             return res.status(500).json({ message: 'Napaka strežnika, manjka konfiguracija za aplikacijo (Deep Link).' });
         }
         if (!process.env.BREVO_API_KEY) {
              user.resetPasswordToken = undefined;
@@ -215,13 +215,14 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
              return res.status(500).json({ message: 'Napaka pri strežniku: Manjka Brevo API ključ.' });
         }
 
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+        // ⭐ USTVARIMO DEEP LINK: rentyo://reset-password?token=XYZ
+        const resetUrl = `${process.env.APP_DEEP_LINK_BASE}?token=${resetToken}`;
         
-        // Pripravi HTML vsebino
+        // Pripravi HTML vsebino (Besedilo prilagojeno Deep Linku)
         const htmlContent = `
             <p>Pozdravljeni ${user.ime},</p>
-            <p>Prejeli smo zahtevo za ponastavitev gesla za vaš račun. Prosimo, kliknite na to povezavo. Povezava je veljavna samo 1 uro.</p>
-            <p style="text-align: center; margin: 20px 0;"><a href="${resetUrl}" style="background-color: #076b6a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">PONASTAVI GESLO</a></p>
+            <p>Prejeli smo zahtevo za ponastavitev gesla za vaš račun. Prosimo, kliknite na to povezavo, da odprete mobilno aplikacijo Rentyo, kjer boste lahko nastavili novo geslo. Povezava je veljavna samo 1 uro.</p>
+            <p style="text-align: center; margin: 20px 0;"><a href="${resetUrl}" style="background-color: #076b6a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">ODPRI APLIKACIJO ZA PONASTAVITEV GESLA</a></p>
             <p>Če niste zahtevali ponastavitve, prosimo, ignorirajte to sporočilo.</p>
         `;
 
@@ -229,17 +230,17 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
         
         sendSmtpEmail = {
-            // ⭐ POPRAVEK: Uporaba SENDER_EMAIL in pravilno IME 
+            // ⭐ Pravilni SENDER_EMAIL in IME 
             sender: { email: process.env.SENDER_EMAIL, name: "Rentyo Gourmet & Experience" }, 
             to: [{ email: user.email, name: user.ime }],
-            subject: 'Zahteva za ponastavitev gesla - Rentyo Gourmet & Experience',
+            subject: 'Zahteva za ponastavitev gesla - Rentyo Gourmet & Experience (APLIKACIJA)',
             htmlContent: htmlContent,
         };
 
         try {
             // Pošlje e-pošto preko HTTP API-ja (ne preko SMTP)
             await apiInstance.sendTransacEmail(sendSmtpEmail); 
-            res.status(200).json({ message: 'Navodila za ponastavitev gesla so bila uspešno poslana na vaš e-poštni naslov.' });
+            res.status(200).json({ message: 'Navodila za ponastavitev gesla so bila uspešno poslana na vaš e-poštni naslov. Povezava bo odprla aplikacijo.' });
         } catch (error) {
             // V primeru napake pri pošiljanju počistimo token za varnost
             user.resetPasswordToken = undefined;
