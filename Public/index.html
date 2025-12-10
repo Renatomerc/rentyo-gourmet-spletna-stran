@@ -4758,7 +4758,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if(formPrijava) formPrijava.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = formPrijava.querySelector('input[type="email"]').value;
-        const geslo = formPrija.querySelector('input[type="password"]').value;
+        // ✅ POPRAVLJENO: 'formPrija' spremenjeno v 'formPrijava'
+        const geslo = formPrijava.querySelector('input[type="password"]').value; 
         try {
             const res = await fetch(`${API_BASE_URL}/auth/prijava`, {
                 method: 'POST',
