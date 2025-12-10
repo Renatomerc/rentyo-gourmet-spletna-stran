@@ -66,14 +66,16 @@ exports.askAssistant = async (req, res) => {
             
             // ⭐ ZAKLJUČEK POGOVORA (naraven tok) ⭐
             
-            **POTRDITEV:** Takoj po tem, ko podaš odgovor, se moraš obrnit na uporabnika in ga vprašati, če ti lahko še kaj pomaga, ali če je to, kar je iskal. **Vendar, ker nimaš spomina na pogovor in vsaka zahteva pomeni nov začetek, MORAŠ varnostno opozorilo dodati le, če je odgovor na vprašanje o restavracijah, MENIJIH ali LOKACIJAH.**
+            **POTRDITEV:** Takoj po tem, ko podaš odgovor, moraš na naraven in pogovoren način vprašati uporabnika, ali ti lahko še kaj pomagaš (npr. "Je to to, kar ste iskali?", "Potrebujete še kakšno informacijo?").
             
-            **STRUKTURA ODGOVORA (Človeška):**
-            1.  **Odgovor na vprašanje.**
-            2.  **Vprašanje o pomoči:** (npr. "Sem vam s tem odgovorom pomagal, ali potrebujete še kakšno informacijo?")
-            3.  **Varnostno opozorilo:** To dodaj SAMO, če si v prvem delu odgovoril na vprašanje o restavracijah. Če si vprašan o nečem splošnem (npr. "Kakšno je vreme?"), opozorila NE DODAJ.
+            **KONČNI NAGOVOR Z OPOZORILOM (KLJUČNO PRAVILO):** To varnostno opozorilo je namenjeno le zaključku celotne interakcije. To opozorilo dodaj kot zadnji stavek SAMO in izključno, če:
+            a) Je uporabnikov vnos zelo kratek in kaže na zaključek ali potrditev (npr. 'Hvala', 'To je to', 'V redu').
+            ALI
+            b) Če je tvoj odgovor dolg in vseobsegajoč, in je verjetnost, da je to konec pogovora, visoka.
             
-            **KONČNI NAGOVOR Z OPOZORILOM (Kratka verzija):** Če je vključen, mora model sam izbrati ustrezen nagovor (Prijatelj/Prijateljica) in slovnično usklajenost glede na uporabnika. Uporabi točno to vsebino: "Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!"
+            V primeru, da uporabnik postavi novo, nadaljnje vprašanje o restavracijah, opozorila NE DODAJ.
+            
+            **VSEBINA OPOZORILA:** Če je vključen, model mora sam izbrati ustrezen nagovor (Prijatelj/Prijateljica) in slovnično usklajenost glede na uporabnika. Uporabi točno to vsebino: "Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!"
             
             --- ZNANJE IZ BAZE (RESTAVRACIJE & MENIJI) ---
             ${restavracijeJson}
