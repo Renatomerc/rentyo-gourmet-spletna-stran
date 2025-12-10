@@ -2775,11 +2775,10 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 }
 
 /* ⭐ NOVO: Velikost in Barva same ikone (Glavno pravilo za spreminjanje) ⭐ */
-.ikona-ai i.far.fa-comment-dots { /* Posodobljeno na far.fa-comment-dots (Obris) */
-    /* Zagotovi, da je ikona vedno vidna in ima barvo */
-    font-size: 30px; /* Lahko povečate/zmanjšate to vrednost za spremembo velikosti */
-    color: #f2f2f2; /* Barva ikone */
-    transition: transform 0.2s; /* Lepa animacija pri kliku/dotiku */
+.ikona-ai i.fas.fa-comment.fa-flip-horizontal { /* Zamenjano: fas.fa-comment (ovalna) + zrcalno */
+    font-size: 30px;
+    color: #88d82d;
+    transition: transform 0.2s;
 }
 
 /* --- B. Skrivanje AI ikone na Desktopu --- */
@@ -3057,6 +3056,119 @@ body.is-capacitor-app #aiChatModal {
         opacity: 0.2; /* Zelo bleda, in ponovi */
     }
 }
+/* ========================================================== */
+/* Oblikovanje MODALNEGA OKNA ZA PONASTAVITEV GESLA */
+/* ========================================================== */
+
+.reset-password-view {
+    /* Uporaba fleksibilnega box modela za centriranje elementov */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px; /* Notranji robovi */
+    text-align: center;
+    max-width: 350px; /* Največja širina okna */
+    margin: auto; /* Centriranje v primeru, da ni polni zaslon */
+}
+
+.reset-password-view h3 {
+    font-size: 1.8em;
+    color: #333; /* Temno siva barva naslova */
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.reset-password-view p {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+/* --- Oblikovanje vnosnega polja in gumbov --- */
+
+#zahtevaResetForm {
+    width: 100%;
+}
+
+.reset-password-view input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc; /* Svetlo siv okvir */
+    border-radius: 8px; /* Zaobljeni robovi */
+    font-size: 1em;
+    box-sizing: border-box; /* Ključno za pravilno širino */
+    transition: border-color 0.3s;
+}
+
+.reset-password-view input[type="email"]:focus {
+    border-color: #076b6a; /* Barva poudarka ob fokusu (Vaša barva blagovne znamke) */
+    outline: none;
+    box-shadow: 0 0 5px rgba(7, 107, 106, 0.3);
+}
+
+/* --- Oblikovanje gumba "Pošlji navodila" --- */
+
+#posljiResetNavodila {
+    width: 100%;
+    padding: 12px;
+    background-color: #076b6a; /* Barva blagovne znamke */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#posljiResetNavodila:hover {
+    background-color: #054f4e; /* Temnejša barva ob prehodu z miško */
+}
+
+/* --- Sporočilo o statusu (Uspeh/Napaka) --- */
+
+.status-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    text-align: center;
+    min-height: 20px; /* Ohranite prostor */
+}
+
+/* Specificne barve za uspeh in napako (po potrebi) */
+#resetStatus.success {
+    background-color: #e6ffed; /* Svetlo zelena */
+    color: #008000; /* Temno zelena */
+    border: 1px solid #c8e6c9;
+}
+
+#resetStatus.error {
+    background-color: #ffe6e6; /* Svetlo rdeča */
+    color: #cc0000; /* Temno rdeča */
+    border: 1px solid #e6c8c8;
+}
+
+/* --- Povezava za nazaj na prijavo --- */
+
+.back-to-login-container {
+    margin-top: 20px;
+}
+
+#nazajNaPrijavoLink {
+    color: #076b6a; /* Enaka barva kot gumb */
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+#nazajNaPrijavoLink:hover {
+    color: #054f4e;
+    text-decoration: underline;
+}
 
 
 
@@ -3095,7 +3207,7 @@ body.is-capacitor-app #aiChatModal {
   <div class="akcije" id="desktopAkcije">
   
     <div id="ai-chat-icon-desktop" onclick="toggleChat()" style="cursor: pointer; margin-right: 15px;" class="ikona-ai">
-        <i class="far fa-comment-dots" aria-label="AI Pomočnik"></i> 
+        <i class="fas fa-comment fa-flip-horizontal" aria-label="AI Pomočnik"></i> 
     </div>
     
   
@@ -3121,7 +3233,7 @@ body.is-capacitor-app #aiChatModal {
 
         
    <div id="ai-chat-icon-mobile-global" onclick="toggleChat()" style="cursor: pointer; margin-right: 25px;" class="ikona-ai mobilna-vidna">
-        <i class="far fa-comment-dots" aria-label="AI Pomočnik"></i> 
+        <i class="fas fa-comment fa-flip-horizontal" aria-label="AI Pomočnik"></i> 
     </div>
 
 <button class="hamburger-gumb" id="hamburgerGumb">
@@ -3498,22 +3610,23 @@ body.is-capacitor-app #aiChatModal {
         </form>
         
       </div>
-      <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
-          <h3>Ponastavitev Gesla</h3>
-          <p>Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
+     <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
+    <h3 data-i18n="auth.reset_title">Ponastavitev Gesla</h3>
+    
+    <p data-i18n="auth.reset_instructions">Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
 
-          <form id="zahtevaResetForm">
-              <input type="email" id="resetEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
-              
-              <p id="resetStatus" class="status-message"></p>
+    <form id="zahtevaResetForm">
+        <input type="email" id="resetEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+        
+        <p id="resetStatus" class="status-message"></p>
 
-              <button type="submit" id="posljiResetNavodila">Pošlji navodila</button>
-          </form>
-          
-          <div class="back-to-login-container">
-              <a href="#" id="nazajNaPrijavoLink">← Nazaj na prijavo</a>
-          </div>
-      </div>
+        <button type="submit" id="posljiResetNavodila" data-i18n="auth.send_instructions_button">Pošlji navodila</button>
+    </form>
+    
+    <div class="back-to-login-container">
+        <a href="#" id="nazajNaPrijavoLink" data-i18n="auth.back_to_login_link">Nazaj na prijavo</a>
+    </div>
+</div>
       </div>
 </div>
   
