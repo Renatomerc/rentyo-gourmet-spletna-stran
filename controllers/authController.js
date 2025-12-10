@@ -229,9 +229,10 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
         
         sendSmtpEmail = {
-            sender: { email: process.env.SMTP_USER, name: "Leo Gourmet" }, 
+            // ⭐ POPRAVEK: Uporaba SENDER_EMAIL in pravilno IME 
+            sender: { email: process.env.SENDER_EMAIL, name: "Rentyo Gourmet & Experience" }, 
             to: [{ email: user.email, name: user.ime }],
-            subject: 'Zahteva za ponastavitev gesla - Leo Gourmet',
+            subject: 'Zahteva za ponastavitev gesla - Rentyo Gourmet & Experience',
             htmlContent: htmlContent,
         };
 
