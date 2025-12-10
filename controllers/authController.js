@@ -7,7 +7,10 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // Za generiranje žetonov
-const nodemailer = require('nodemailer'); // Za pošiljanje e-pošte
+// const nodemailer = require('nodemailer'); // ❌ ODSTRANJENO: NE SMEMO UVOZITI NODEMAILERJA!
+
+// 🔥 NOVO: Uvoz Brevo API klienta (sib-api-v3-sdk)
+const SibApiV3Sdk = require('sib-api-v3-sdk'); 
 
 // ⭐ KLJUČNO: Controller izvaža FUNKCIJO, ki prejme zunanje spremenljivke (ključi, modeli)!
 module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
@@ -38,29 +41,20 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         });
     };
     
-    // ⭐ 2. KONFIGURACIJA NODEMAILERJA
-    const transporter = nodemailer.createTransport({
-        // POPRAVEK: Dodajanje rezervnih vrednosti, če okoljske spremenljivke niso prebrane.
-        host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-        port: process.env.SMTP_PORT || 587,
-        
-        // 🔥 KLJUČNI POPRAVEK ZA 587 (STARTTLS): secure mora biti FALSE, dodan requireTLS: true
-        secure: false, 
-        requireTLS: true, 
-        
-        // Dodana povečana časovna omejitev za izogib 'ETIMEDOUT' na Render/v oblaku
-        connectionTimeout: 20000, 
-        greetingTimeout: 15000,
-        
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
-    });
+    // ⭐ 2. KONFIGURACIJA BREVO API (Nadomestilo za Nodemailer/SMTP)
+    
+    // Inicializacija klienta in nastavitev API ključa
+    SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+
+    let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    
+    if (!process.env.BREVO_API_KEY) {
+        console.error("❌ KRITIČNA NAPAKA: BREVO_API_KEY ni definiran. Pošiljanje e-pošte ne bo delovalo!");
+    }
 
 
     // ==========================================================
-    // 🟠 OBSTAJEČE FUNKCIJE (Iz 'uporabnikRoutes.js')
+    // 🟠 OBSTAJEČE FUNKCIJE (Registracija, Prijava, Profil itd. - NESPREMENJENO)
     // ==========================================================
 
     // Registracija
@@ -203,37 +197,47 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         }
 
         // 1. Generiraj žeton in nastavi čas poteka
-        // Predpostavlja, da Uporabnik model ima metodo getResetPasswordToken()
         const resetToken = user.getResetPasswordToken(); 
         await user.save({ validateBeforeSave: false }); 
 
         // 2. Pripravi in pošlji e-pošto
-        // 🔴 POPRAVEK: Uporabi process.env.FRONTEND_URL namesto req.get('host')
         if (!process.env.FRONTEND_URL) {
              console.error("❌ KRITIČNA NAPAKA: FRONTEND_URL ni definiran. Ponastavitev gesla ne bo delovala!");
-             // Poskušaj se rešiti tako, da še vedno vrneš 200, a ne pošlješ maila
              user.resetPasswordToken = undefined;
              user.resetPasswordExpires = undefined;
              await user.save({ validateBeforeSave: false });
              return res.status(200).json({ message: 'Začasna napaka strežnika, poskusite znova. (FRONTEND_URL manjka)' });
         }
+        if (!process.env.BREVO_API_KEY) {
+             user.resetPasswordToken = undefined;
+             user.resetPasswordExpires = undefined;
+             await user.save({ validateBeforeSave: false });
+             return res.status(500).json({ message: 'Napaka pri strežniku: Manjka Brevo API ključ.' });
+        }
 
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         
-        const mailOptions = {
-            from: process.env.SMTP_USER,
-            to: user.email,
+        // Pripravi HTML vsebino
+        const htmlContent = `
+            <p>Pozdravljeni ${user.ime},</p>
+            <p>Prejeli smo zahtevo za ponastavitev gesla za vaš račun. Prosimo, kliknite na to povezavo. Povezava je veljavna samo 1 uro.</p>
+            <p style="text-align: center; margin: 20px 0;"><a href="${resetUrl}" style="background-color: #076b6a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">PONASTAVI GESLO</a></p>
+            <p>Če niste zahtevali ponastavitve, prosimo, ignorirajte to sporočilo.</p>
+        `;
+
+        // 🔥 KLJUČNA SPREMEMBA: Uporaba Brevo API za pošiljanje
+        let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
+        
+        sendSmtpEmail = {
+            sender: { email: process.env.SMTP_USER, name: "Leo Gourmet" }, 
+            to: [{ email: user.email, name: user.ime }],
             subject: 'Zahteva za ponastavitev gesla - Leo Gourmet',
-            html: `
-                <p>Pozdravljeni ${user.ime},</p>
-                <p>Prejeli smo zahtevo za ponastavitev gesla za vaš račun. Prosimo, kliknite na to povezavo. Povezava je veljavna samo 1 uro.</p>
-                <p style="text-align: center; margin: 20px 0;"><a href="${resetUrl}" style="background-color: #076b6a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">PONASTAVI GESLO</a></p>
-                <p>Če niste zahtevali ponastavitve, prosimo, ignorirajte to sporočilo.</p>
-            `
+            htmlContent: htmlContent,
         };
 
         try {
-            await transporter.sendMail(mailOptions);
+            // Pošlje e-pošto preko HTTP API-ja (ne preko SMTP)
+            await apiInstance.sendTransacEmail(sendSmtpEmail); 
             res.status(200).json({ message: 'Navodila za ponastavitev gesla so bila uspešno poslana na vaš e-poštni naslov.' });
         } catch (error) {
             // V primeru napake pri pošiljanju počistimo token za varnost
@@ -241,8 +245,8 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
             user.resetPasswordExpires = undefined;
             await user.save({ validateBeforeSave: false });
             
-            console.error('❌ NAPAKA PRI POŠILJANJU E-POŠTE ZA PONASTAVITEV:', error);
-            res.status(500).json({ message: 'Napaka pri pošiljanju e-pošte. Preverite nastavitve SMTP.' });
+            console.error('❌ NAPAKA PRI POŠILJANJU E-POŠTE ZA PONASTAVITEV (BREVO API):', error.message || error);
+            res.status(500).json({ message: 'Napaka pri pošiljanju e-pošte. Prosimo, preverite Brevo API ključ in status.' });
         }
     };
 
