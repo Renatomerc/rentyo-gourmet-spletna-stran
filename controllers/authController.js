@@ -41,10 +41,17 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
     // ⭐ 2. KONFIGURACIJA NODEMAILERJA
     const transporter = nodemailer.createTransport({
         // POPRAVEK: Dodajanje rezervnih vrednosti, če okoljske spremenljivke niso prebrane.
-        // To rešuje napako ECONNREFUSED 127.0.0.1.
         host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
         port: process.env.SMTP_PORT || 587,
-        secure: process.env.NODE_ENV === 'production', // V produkciji je 'secure' lahko true (za 465) ali false (za 587). Za 587 je pogosto false.
+        
+        // 🔥 KLJUČNI POPRAVEK ZA 587 (STARTTLS): secure mora biti FALSE, dodan requireTLS: true
+        secure: false, 
+        requireTLS: true, 
+        
+        // Dodana povečana časovna omejitev za izogib 'ETIMEDOUT' na Render/v oblaku
+        connectionTimeout: 20000, 
+        greetingTimeout: 15000,
+        
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS

@@ -3313,7 +3313,7 @@ body.is-capacitor-app #aiChatModal {
         
 
 </header>
-    <div id="aiChatModal" class="chat-modal-overlay">
+<div id="aiChatModal" class="chat-modal-overlay">
     <div class="chat-modal-content">
 
         <div class="chat-header">
@@ -3322,13 +3322,10 @@ body.is-capacitor-app #aiChatModal {
         </div>
 
         <div class="chat-body">
-            <p>Pozdravljen! Kako ti lahko pomagam danes?</p>
+            <p>Hi there!</p>
         </div>
 
         <div class="chat-input">
-            <button id="mic-button" title="Glasovni vnos">
-                <span class="material-icons">mic</span>
-            </button>
             <input type="text" id="user-input" placeholder="Vnesite sporočilo...">
             <button id="send-button">
                 <span class="material-icons">send</span>
@@ -7140,30 +7137,32 @@ function showAppDownloadModal() {
     
 }
 // ===========================================
-// 🔥 GLAVNA IZVEDBENA KODA
+// 🔥 GLAVNA IZVEDBENA KODA - POPRAVLJENA ZA MIKROFON
 // ===========================================
 
 // ⭐ PREDVIDENI URL ZA KLIC NA VAŠ NODE.JS BACKEND ⭐
 // Uporabljamo vaš potrjeni API Base URL za Render in dodamo pot /assistant/ask
-const RENDER_API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; 
-const API_ENDPOINT = `${RENDER_API_BASE_URL}/assistant/ask`; 
+const RENDER_API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+const API_ENDPOINT = `${RENDER_API_BASE_URL}/assistant/ask`;
 
-// ⭐ GLOBALNA SPREMENLJIVKA ZA SHRANJEVANJE PRIVZETE POZICIJE ⭐
+// ⭐ GLOBALNA SPREMENLJIVKA ZA SHRANJEVANJE PRIVZETE POZICIJE MODALA ⭐
 let defaultModalBottom = '10vh'; // Varnostna kopija
+
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     
     const modal = document.getElementById('aiChatModal');
     
     // ⭐ LOGIKA ZA PRIDOBITEV IZRAČUNANE VREDNOSTI BOTTOM PO ZAGONU (V PIKSLIH) ⭐
-    // To je ključno za natančno vračanje modala po zaprtju tipkovnice.
     if (modal) {
          // Kratka zamuda, da se prepričamo, da je CSS izračunan
          setTimeout(() => {
             // Pridobite dejansko izračunano vrednost spodnjega roba (v pikslih)
             defaultModalBottom = window.getComputedStyle(modal).bottom;
             console.log('Izračunan privzeti spodnji rob (defaultModalBottom):', defaultModalBottom);
-        }, 200); 
+        }, 200);
     }
 
     // Preverjanje, ali se aplikacija izvaja v Capacitorju
@@ -7177,7 +7176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Capacitor.Plugins.Keyboard.addListener('keyboardWillShow', info => {
                 console.log('Tipkovnica se prikazuje, višina:', info.keyboardHeight);
                 // Posredujemo shranjeno privzeto vrednost
-                handleKeyboard(true, info.keyboardHeight); 
+                handleKeyboard(true, info.keyboardHeight);
             });
 
             // Poslušalec, ko se tipkovnica skrije
@@ -7195,9 +7194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // ⭐ PRIPENJANJE FUNKCIONALNOSTI VNOSNEGA POLJA ⭐
         // 🔥 POPRAVLJENO: Uporabimo ID-je za natančno izbiro!
-        const sendButton = modal.querySelector('#send-button'); 
+        const sendButton = modal.querySelector('#send-button');
         const inputField = modal.querySelector('#user-input'); // Predvidevam, da je ID dodan v HTML
-        const micButton = modal.querySelector('#mic-button'); 
+        const micButton = modal.querySelector('#mic-button');
 
         if (sendButton && inputField) {
             // Pripenjanje funkcije na klik gumba Pošlji
@@ -7214,11 +7213,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // ⭐ PRIKLOP FUNKCIONALNOSTI MIKROFONA ⭐
-        // OPOMBA: Funkcija 'startVoiceInput' mora biti definirana!
+        // POVEZANO NA NOVO FUNKCIJO startVoiceInput (definirana spodaj)
         if (micButton && typeof startVoiceInput === 'function') {
              micButton.addEventListener('click', startVoiceInput);
+             console.log("✅ Gumb za mikrofon je povezan s funkcijo startVoiceInput.");
         } else if (micButton) {
-             console.warn("Manjka funkcija startVoiceInput za mikrofon!");
+             console.warn("❌ Manjka funkcija startVoiceInput za mikrofon! (Preverite definicijo)");
         }
     }
     
@@ -7228,8 +7228,122 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleChat();
         }
     });
+    
+    // ⭐ KLJUČNO POPRAVILO: ZAŽENEMO PRIDOBIVANJE LOKACIJE OB ZAGONU APLIKACIJE ⭐
+    // Pokličemo jo s forceRefresh=true, da se posodobi iz localStorage/API.
+    setTimeout(() => {
+         getUserLocation(true);
+    }, 1000);
 
-}); 
+});
+
+
+/**
+ * ⭐ NOVA FUNKCIJA: Prepoznavanje govora in pošiljanje na chat.
+ * POSODOBLJENO: Prioritetna uporaba Capacitor Speech Recognition Vtičnika (za reševanje 'not allowed' napake).
+ */
+async function startVoiceInput() {
+    const isCapacitorSR = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
+    const inputField = document.querySelector('#aiChatModal #user-input');
+    const micButton = document.querySelector('#mic-button');
+    const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
+    const originalPlaceholder = selectedLang.startsWith('en') ? "Enter message..." : "Vnesite sporočilo...";
+
+    // --- Pomožni funkciji za vizualno stanje ---
+    const setListeningState = (isListening) => {
+        if (isListening) {
+            micButton.classList.add('recording');
+            inputField.placeholder = "Poslušam... Govorite, prosim...";
+        } else {
+            micButton.classList.remove('recording');
+            inputField.placeholder = originalPlaceholder;
+        }
+    };
+    // ---------------------------------------------
+
+
+    // 1. ZAGON V CAPACITOR OKOLJU (Če je vtičnik SpeechRecognition nameščen)
+    if (isCapacitorSR) {
+        try {
+             const { SpeechRecognition } = window.Capacitor.Plugins;
+             
+             // Dinamična zahteva dovoljenja
+             const available = await SpeechRecognition.available();
+             if (!available.available) {
+                 alert("Capacitor Speech Recognition ni na voljo na tej napravi.");
+                 return;
+             }
+             
+             const permission = await SpeechRecognition.requestPermission();
+             
+             if (permission.permission !== 'granted') {
+                 alert("Dovoljenje za mikrofon je zavrnjeno s strani uporabnika.");
+                 return;
+             }
+             
+             // Zaženemo poslušanje
+             setListeningState(true);
+
+             const options = {
+                 language: selectedLang,
+                 partialResults: false
+             };
+
+             SpeechRecognition.start(options)
+                .then(result => {
+                    setListeningState(false);
+                    const transcript = result.matches[0];
+                    if (transcript && transcript.trim() !== "") {
+                        inputField.value = transcript;
+                        handleSend();
+                    }
+                })
+                .catch(error => {
+                    setListeningState(false);
+                    console.error('Capacitor Speech Recognition napaka:', error);
+                    alert(`Capacitor Speech Recognition napaka: ${error.message}`);
+                });
+             
+             return;
+        
+        } catch (error) {
+            console.warn("Capacitor SpeechRecognition vtičnik ne deluje. Poskušam Web Speech API.", error);
+            // Nadaljujemo z brskalniškim API-jem (točka 2)
+        }
+    }
+
+
+    // 2. ZAGON V BRSKALNIKU (Web Speech API - fallback)
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Žal mi je, prepoznavanje govora ni podprto v tem brskalniku (potreben je HTTPS ali pa ni podprto).");
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = selectedLang;
+
+    setListeningState(true);
+    recognition.start();
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript.trim() !== "") {
+             inputField.value = transcript;
+             handleSend();
+        }
+    };
+
+    recognition.onerror = (event) => {
+        setListeningState(false);
+        console.error('Napaka pri prepoznavanju govora:', event.error);
+        alert(`Napaka pri prepoznavanju govora: ${event.error}. Preverite, ali je brskalnik dovolil uporabo mikrofona.`);
+    };
+
+    recognition.onend = () => {
+        setListeningState(false);
+    };
+}
 
 
 /**
@@ -7240,7 +7354,7 @@ function toggleChat() {
     // 1. Poišči element pogovornega okna in telo klepetalnice
     const modal = document.getElementById('aiChatModal');
     // Uporaba ID-ja na input fieldu
-    const inputField = modal ? modal.querySelector('#user-input') : null; 
+    const inputField = modal ? modal.querySelector('#user-input') : null;
     const chatBody = modal ? modal.querySelector('.chat-body') : null; // ⭐ NOVO
     
     const isCapacitor = (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard);
@@ -7265,10 +7379,19 @@ function toggleChat() {
         // Prikaži okno
         modal.style.display = 'block';
         
-        // ⭐ UVODNO SPOROČILO (Leo) ⭐
-        // Preverimo, ali je v telesu klepetalnice sploh kakšna vsebina
+        // ⭐ POPRAVEK: LOKALIZACIJA UVODNEGA SPOROČILA ⭐
         if (chatBody.children.length === 0) {
-            const welcomeMessage = "Pozdravljen/a! Sem Leo, tvoj osebni gurmanski asistent.";
+            
+            // Pridobitev trenutnega jezika (privzeto na 'sl')
+            const currentLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
+            
+            let welcomeMessage;
+            if (currentLang.startsWith('en')) {
+                welcomeMessage = "Hello! I am Leo, your personal gourmet assistant. How can I help you today?";
+            } else {
+                welcomeMessage = "Pozdravljen/a! Sem Leo, tvoj osebni gurmanski asistent. Kako ti lahko pomagam danes?";
+            }
+            
             appendMessage(welcomeMessage, 'ai');
         }
         
@@ -7280,7 +7403,7 @@ function toggleChat() {
             // Uporabimo setTimeout, da se prepričamo, da je modal in fokus polja res stabilen, preden se odpre tipkovnica.
             if (isCapacitor) {
                  setTimeout(() => {
-                    Capacitor.Plugins.Keyboard.show(); 
+                    Capacitor.Plugins.Keyboard.show();
                  }, 50); // Kratka zamuda
             }
         }
@@ -7301,7 +7424,7 @@ function appendMessage(text, sender, isLoading = false) {
 
     // Če je to sporočilo za nalaganje IN že obstaja, ga ne dodajamo dvakrat
     if (isLoading && document.getElementById('ai-loading-message')) {
-        return; 
+        return;
     }
     
     const messageElement = document.createElement('div');
@@ -7331,57 +7454,113 @@ function removeLoadingMessage() {
 }
 
 
-// ⭐ NOVA FUNKCIJA: PRIDOBIVANJE UPORABNIKOVE LOKACIJE ⭐
+// ⭐ ZAMENJANA FUNKCIJA: HIBRIDNA FUNKCIJA ZA PRIDOBIVANJE UPORABNIKOVE LOKACIJE (ZA KARTICE IN AI) ⭐
 /**
- * Pridobi trenutno geolokacijo uporabnika z uporabo Capacitor Geolocation API.
- * Vrne objekt { userLat, userLon } ali null, če je napaka/nedovoljenje.
+ * Pridobi trenutno geolokacijo uporabnika z uporabo Capacitor ali Web API.
+ * Posodobi globalno 'userLocation' (za kartice) in vrne format za AI ({ userLat, userLon }).
+ * @param {boolean} forceRefresh Ali naj ignorira localStorage in prisili posodobitev.
  */
-async function getUserLocation() {
-    // Preverimo, ali je Capacitor Geolocation na voljo
-    if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.Geolocation) {
-        console.warn("Capacitor Geolocation ni na voljo. Nadaljujem brez lokacije.");
+async function getUserLocation(forceRefresh = false) {
+    
+    // Pomožna funkcija za obdelavo uspešne pozicije in posodobitev globalnega stanja
+    const handleSuccess = (lat, lon) => {
+        // ⭐ KLJUČNO ZA KARTICE: Nastavi GLOBALNO userLocation z lat/lon ključi ⭐
+        userLocation = { lat: lat, lon: lon };
+        localStorage.setItem('userLocation', JSON.stringify(userLocation));
+        console.log(`✅ Lokacija uspešno pridobljena in shranjena globalno: ${lat}, ${lon}`);
+        
+        // ⭐ Prikaže KM na karticah, če obstaja funkcija filterAndRenderRestavracije() ⭐
+        if (typeof filterAndRenderRestavracije === 'function') {
+             filterAndRenderRestavracije();
+        }
+        
+        // Vrni format, ki ga AI Chat pričakuje
+        return { userLat: lat, userLon: lon };
+    };
+
+    const handleError = (message) => {
+        console.warn(`❌ Napaka pri pridobivanju lokacije: ${message}`);
+        userLocation = { lat: DEFAULT_LAT, lon: DEFAULT_LON }; // Nastavi privzeto lokacijo za kartice
+        // Tukaj se pokliče funkcija prikaziSporocilo, če obstaja
+        if (typeof prikaziSporocilo === 'function') {
+             prikaziSporocilo('Lokacija ni na voljo. Razdalje so izračunane iz privzete točke.', 'warning');
+        }
         return null;
+    };
+    
+    // 1. Preveri Stored Location
+    const storedLocation = localStorage.getItem('userLocation');
+    if (storedLocation && !forceRefresh) {
+        userLocation = JSON.parse(storedLocation);
+        console.log("Lokacija pridobljena iz localStorage.");
+        return { userLat: userLocation.lat, userLon: userLocation.lon };
     }
     
-    try {
-        const { Geolocation } = window.Capacitor.Plugins;
-        
-        // Zahteva trenutno pozicijo
-        const position = await Geolocation.getCurrentPosition({
-            enableHighAccuracy: false, 
-            timeout: 5000, 
-        });
-        
-        const userLat = position.coords.latitude;
-        const userLon = position.coords.longitude;
-        
-        console.log(`✅ Geolokacija pridobljena: Lat=${userLat}, Lon=${userLon}`);
-        return { userLat, userLon };
-        
-    } catch (error) {
-        // Uporabnik je zavrnil dovoljenje ali prišlo je do napake
-        console.error('❌ Napaka pri pridobivanju geolokacije:', error.message);
-        return null; 
+    // --- 2. Capacitor (za mobilno aplikacijo) ---
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation) {
+        try {
+            const { Geolocation } = window.Capacitor.Plugins;
+            
+            // 🔥 POPRAVEK: enableHighAccuracy: TRUE za uporabo GPS-a 🔥
+            const position = await Geolocation.getCurrentPosition({ 
+                enableHighAccuracy: true,    // Uporaba GPS za natančnost do nekaj metrov
+                timeout: 15000,              // Povečan timeout (15 sekund) za daljše iskanje satelitov
+                maximumAge: 0                // Prisilimo napravo, da ne uporabi stare lokacije
+            });
+            
+            return handleSuccess(position.coords.latitude, position.coords.longitude);
+        } catch (error) {
+            console.error('❌ Napaka pri pridobivanju geolokacije (Capacitor):', error.message);
+            // Nadaljujemo z Web API kot rezervo
+        }
     }
+    
+    // --- 3. Web API (za brskalnik/PWA in rezervo v Capacitor) ---
+    if ('geolocation' in navigator) {
+        // Uporabite Promise za obdelavo asinhronosti
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve(handleSuccess(position.coords.latitude, position.coords.longitude));
+                },
+                (error) => {
+                    resolve(handleError(error.message));
+                },
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 }
+            );
+        });
+    }
+
+    // --- 4. Končni Neuspeh ---
+    return handleError("Geolokacija ni podprta in ni shranjena.");
 }
 
 
 /**
- * ⭐ POSODOBLJENA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor, 
+ * ⭐ POSODOBLJENA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor,
  * vključno z geolokacijo, če je na voljo. ⭐
  * * @param {string} prompt Sporočilo uporabnika.
  * @param {string} languageCode Koda izbranega jezika ('sl', 'en', itd.). <--- NOVI PARAMETER
  */
-async function fetchAiResponse(prompt, languageCode) { // <--- SPREMENJEN TUKAJ
+async function fetchAiResponse(prompt, languageCode) {
+    
+    // ⭐ POPRAVEK: LOKALIZACIJA LOADING SPOROČILA ⭐
+    let loadingText;
+    if (languageCode.startsWith('en')) {
+        loadingText = "Leo is thinking";
+    } else {
+        loadingText = "Leo razmišlja";
+    }
     
     // 1. Prikaz "loading" sporočila od AI, dokler čaka na odgovor
-    appendMessage("Leo razmišlja", 'ai', true); 
+    appendMessage(loadingText, 'ai', true);
 
     // ⭐ NOVI KORAK: POSKUS PRIDOBITVE LOKACIJE ⭐
-    const locationData = await getUserLocation(); 
+    // Kličemo brez forceRefresh=true, da se uporabi že shranjena lokacija, razen če je napaka
+    const locationData = await getUserLocation();
     
     // Priprava telesa zahteve - vedno vključi prompt
-    const requestBody = { 
+    const requestBody = {
         prompt: prompt,
         languageCode: languageCode // <--- DODANO: KODA JEZIKA
     };
@@ -7399,13 +7578,13 @@ async function fetchAiResponse(prompt, languageCode) { // <--- SPREMENJEN TUKAJ
                 'Content-Type': 'application/json',
             },
             // ⭐ SPREMENJENO: Sedaj pošlje prompt, languageCode, userLat in userLon
-            body: JSON.stringify(requestBody), 
+            body: JSON.stringify(requestBody),
         });
 
         // Preverimo, ali je bil klic uspešen (Status koda 200)
         if (!response.ok) {
             // Poskusimo dobiti podrobnejšo napako s strežnika
-            const errorText = await response.text(); 
+            const errorText = await response.text();
             let errorMessage = `Status ${response.status}. Napaka na strežniku.`;
             
             // Izboljšana obravnava napak, ki zajame HTML (Unexpected token <)
@@ -7426,13 +7605,13 @@ async function fetchAiResponse(prompt, languageCode) { // <--- SPREMENJEN TUKAJ
         const data = await response.json();
         
         // 2. Počistimo začasno sporočilo in prikažemo pravi odgovor
-        removeLoadingMessage(); 
+        removeLoadingMessage();
         appendMessage(data.answer, 'ai'); // Prikažemo pravi odgovor
         
     } catch (error) {
         // Obravnavamo morebitne napake (omrežje, napačen ključ, strežnik)
         console.error('Napaka pri komunikaciji z AI API-jem:', error);
-        removeLoadingMessage(); 
+        removeLoadingMessage();
         appendMessage(`Žal mi je, prišlo je do napake: ${error.message}. Prosim, poskusite znova. 😔`, 'ai');
     }
 }
@@ -7443,7 +7622,7 @@ async function fetchAiResponse(prompt, languageCode) { // <--- SPREMENJEN TUKAJ
  */
 function handleSend() {
     // 🔥 POPRAVLJENO: Uporabimo ID za pridobitev vnosnega polja
-    const inputField = document.querySelector('#aiChatModal #user-input'); 
+    const inputField = document.querySelector('#aiChatModal #user-input');
     // Uporabimo .trim() za odstranitev belih presledkov in preverjanje, ali je vnos prazen
     const message = inputField.value.trim();
     
@@ -7452,7 +7631,7 @@ function handleSend() {
         appendMessage(message, 'user');
         
         // 2. Počistimo vnosno polje
-        inputField.value = ''; 
+        inputField.value = '';
 
         // ⭐ NOVO: Pridobitev trenutnega jezika preko i18next ⭐
         // Če i18next.language ni na voljo (ali i18next še ni inicializiran), privzeto uporabimo 'sl'.
@@ -7474,7 +7653,7 @@ function handleKeyboard(isOpen, keyboardHeight) {
     if (!modal) return;
 
     // Uporabimo shranjeno izračunano vrednost iz DOMContentLoaded
-    const modalBottomDefault = defaultModalBottom; 
+    const modalBottomDefault = defaultModalBottom;
     
     // Nastavimo samo, če je aplikacija Capacitor in modal je prikazan
     if (window.Capacitor && modal.style.display === 'block') {
@@ -7483,40 +7662,7 @@ function handleKeyboard(isOpen, keyboardHeight) {
         
         if (isOpen) {
             // Dodamo majhen varnostni rob, da se vnosno polje ne dotika tipkovnice.
-            const OFFSET = 10; 
-            
-            // Tipkovnica je odprta
-            // Spodnji rob se premakne navzgor za višino tipkovnice + rob
-            modal.style.bottom = `${keyboardHeight + OFFSET}px`;
-            
-        } else {
-            // Tipkovnica je zaprta
-
-            // Vrnemo se na prvotno pozicijo (CSS nato doda env(safe-area-inset-bottom))
-            modal.style.bottom = modalBottomDefault;
-        }
-    }
-}
-
-
-/**
- * ⭐ POPRAVLJENA FUNKCIJA: Prilagodi pozicijo pogovornega okna, ko se prikaže virtualna tipkovnica.
- */
-function handleKeyboard(isOpen, keyboardHeight) {
-    const modal = document.getElementById('aiChatModal');
-    if (!modal) return;
-
-    // Uporabimo shranjeno izračunano vrednost iz DOMContentLoaded
-    const modalBottomDefault = defaultModalBottom; 
-    
-    // Nastavimo samo, če je aplikacija Capacitor in modal je prikazan
-    if (window.Capacitor && modal.style.display === 'block') {
-        
-        // Opomba: CSS je že nastavljen z 'transition: bottom 0.3s ease-out'
-        
-        if (isOpen) {
-            // Dodamo majhen varnostni rob, da se vnosno polje ne dotika tipkovnice.
-            const OFFSET = 10; 
+            const OFFSET = 10;
             
             // Tipkovnica je odprta
             // Spodnji rob se premakne navzgor za višino tipkovnice + rob
