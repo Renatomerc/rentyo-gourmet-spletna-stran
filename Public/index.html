@@ -7278,22 +7278,73 @@ function removeLoadingMessage() {
 }
 
 
+// ⭐ NOVA FUNKCIJA: PRIDOBIVANJE UPORABNIKOVE LOKACIJE ⭐
 /**
- * ⭐ NOVA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor. ⭐
+ * Pridobi trenutno geolokacijo uporabnika z uporabo Capacitor Geolocation API.
+ * Vrne objekt { userLat, userLon } ali null, če je napaka/nedovoljenje.
+ */
+async function getUserLocation() {
+    // Preverimo, ali je Capacitor Geolocation na voljo
+    if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.Geolocation) {
+        console.warn("Capacitor Geolocation ni na voljo. Nadaljujem brez lokacije.");
+        return null;
+    }
+    
+    try {
+        const { Geolocation } = window.Capacitor.Plugins;
+        
+        // Zahteva trenutno pozicijo
+        const position = await Geolocation.getCurrentPosition({
+            enableHighAccuracy: false, 
+            timeout: 5000, 
+        });
+        
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        
+        console.log(`✅ Geolokacija pridobljena: Lat=${userLat}, Lon=${userLon}`);
+        return { userLat, userLon };
+        
+    } catch (error) {
+        // Uporabnik je zavrnil dovoljenje ali prišlo je do napake
+        console.error('❌ Napaka pri pridobivanju geolokacije:', error.message);
+        return null; 
+    }
+}
+
+
+/**
+ * ⭐ POSODOBLJENA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor, 
+ * vključno z geolokacijo, če je na voljo. ⭐
  * @param {string} prompt Sporočilo uporabnika.
  */
 async function fetchAiResponse(prompt) {
     
     // 1. Prikaz "loading" sporočila od AI, dokler čaka na odgovor
-    appendMessage("Leo razmišlja", 'ai', true); // ⭐ POPRAVLJENO: Uporaba imena Leo ⭐
+    appendMessage("Leo razmišlja", 'ai', true); 
 
+    // ⭐ NOVI KORAK: POSKUS PRIDOBITVE LOKACIJE ⭐
+    const locationData = await getUserLocation(); 
+    
+    // Priprava telesa zahteve - vedno vključi prompt
+    const requestBody = { 
+        prompt: prompt 
+    };
+    
+    // Dodamo koordinate, če so bile uspešno pridobljene
+    if (locationData) {
+        requestBody.userLat = locationData.userLat;
+        requestBody.userLon = locationData.userLon;
+    }
+    
     try {
         const response = await fetch(API_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ prompt: prompt }),
+            // ⭐ SPREMENJENO: Sedaj pošlje prompt, userLat in userLon (če so na voljo)
+            body: JSON.stringify(requestBody), 
         });
 
         // Preverimo, ali je bil klic uspešen (Status koda 200)
@@ -7349,7 +7400,7 @@ function handleSend() {
 
         console.log('Sporočilo poslano AI-ju:', message);
         
-        // 3. KLIC NA DEJANJSI AI API
+        // 3. KLIC NA DEJANJSI AI API (sedaj pošlje tudi lokacijo)
         fetchAiResponse(message);
     }
 }
