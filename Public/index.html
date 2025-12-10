@@ -2952,7 +2952,7 @@ body.is-capacitor-app #aiChatModal {
 
 .close-chat-btn {
     color: #f2f2f2;
-    font-size: 28px;
+    font-size: 25px;
     font-weight: bold;
     background: none;
     border: none;
@@ -2985,8 +2985,8 @@ body.is-capacitor-app #aiChatModal {
     background-color: transparent; 
     border: none;
     padding: 0; 
-    width: 48px; 
-    height: 48px; 
+    width: 40px; 
+    height: 40px; 
     display: flex; 
     justify-content: center;
     align-items: center;
@@ -7369,9 +7369,10 @@ async function getUserLocation() {
 /**
  * ⭐ POSODOBLJENA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor, 
  * vključno z geolokacijo, če je na voljo. ⭐
- * @param {string} prompt Sporočilo uporabnika.
+ * * @param {string} prompt Sporočilo uporabnika.
+ * @param {string} languageCode Koda izbranega jezika ('sl', 'en', itd.). <--- NOVI PARAMETER
  */
-async function fetchAiResponse(prompt) {
+async function fetchAiResponse(prompt, languageCode) { // <--- SPREMENJEN TUKAJ
     
     // 1. Prikaz "loading" sporočila od AI, dokler čaka na odgovor
     appendMessage("Leo razmišlja", 'ai', true); 
@@ -7381,7 +7382,8 @@ async function fetchAiResponse(prompt) {
     
     // Priprava telesa zahteve - vedno vključi prompt
     const requestBody = { 
-        prompt: prompt 
+        prompt: prompt,
+        languageCode: languageCode // <--- DODANO: KODA JEZIKA
     };
     
     // Dodamo koordinate, če so bile uspešno pridobljene
@@ -7396,7 +7398,7 @@ async function fetchAiResponse(prompt) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // ⭐ SPREMENJENO: Sedaj pošlje prompt, userLat in userLon (če so na voljo)
+            // ⭐ SPREMENJENO: Sedaj pošlje prompt, languageCode, userLat in userLon
             body: JSON.stringify(requestBody), 
         });
 
@@ -7452,10 +7454,47 @@ function handleSend() {
         // 2. Počistimo vnosno polje
         inputField.value = ''; 
 
-        console.log('Sporočilo poslano AI-ju:', message);
+        // ⭐ NOVO: Pridobitev trenutnega jezika preko i18next ⭐
+        // Če i18next.language ni na voljo (ali i18next še ni inicializiran), privzeto uporabimo 'sl'.
+        const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
         
-        // 3. KLIC NA DEJANJSI AI API (sedaj pošlje tudi lokacijo)
-        fetchAiResponse(message);
+        console.log('Sporočilo poslano AI-ju v jeziku:', selectedLang);
+        
+        // 3. KLIC NA DEJANJSI AI API - POSREDUJEMO JEZIK
+        fetchAiResponse(message, selectedLang); // <--- SPREMENJEN TUKAJ
+    }
+}
+
+
+/**
+ * ⭐ POPRAVLJENA FUNKCIJA: Prilagodi pozicijo pogovornega okna, ko se prikaže virtualna tipkovnica.
+ */
+function handleKeyboard(isOpen, keyboardHeight) {
+    const modal = document.getElementById('aiChatModal');
+    if (!modal) return;
+
+    // Uporabimo shranjeno izračunano vrednost iz DOMContentLoaded
+    const modalBottomDefault = defaultModalBottom; 
+    
+    // Nastavimo samo, če je aplikacija Capacitor in modal je prikazan
+    if (window.Capacitor && modal.style.display === 'block') {
+        
+        // Opomba: CSS je že nastavljen z 'transition: bottom 0.3s ease-out'
+        
+        if (isOpen) {
+            // Dodamo majhen varnostni rob, da se vnosno polje ne dotika tipkovnice.
+            const OFFSET = 10; 
+            
+            // Tipkovnica je odprta
+            // Spodnji rob se premakne navzgor za višino tipkovnice + rob
+            modal.style.bottom = `${keyboardHeight + OFFSET}px`;
+            
+        } else {
+            // Tipkovnica je zaprta
+
+            // Vrnemo se na prvotno pozicijo (CSS nato doda env(safe-area-inset-bottom))
+            modal.style.bottom = modalBottomDefault;
+        }
     }
 }
 

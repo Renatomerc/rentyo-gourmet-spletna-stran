@@ -8,7 +8,7 @@ const Restavracija = require('../models/Restavracija');
 // da se prepreči napaka 'undefined' ob zagonu strežnika.
 
 /**
- * Obdeluje POST zahtevo, ki vsebuje vprašanje (prompt) in (opcijsko) lokacijo.
+ * Obdeluje POST zahtevo, ki vsebuje vprašanje (prompt), jezik (languageCode) in (opcijsko) lokacijo.
  */
 exports.askAssistant = async (req, res) => {
     
@@ -24,9 +24,12 @@ exports.askAssistant = async (req, res) => {
     // Inicializacija AI modela (zdaj varno znotraj funkcije)
     const ai = new GoogleGenAI(AI_API_KEY); 
 
-    // 1. Pridobitev vprašanja, Latitude in Longitude iz telesa zahteve (JSON body)
-    const { prompt, userLat, userLon } = req.body;
+    // 1. Pridobitev vprašanja, Latitude, Longitude IN JEZIKA iz telesa zahteve (JSON body)
+    const { prompt, userLat, userLon, languageCode } = req.body; // ⭐ DODANO: languageCode
     
+    // Privzeti jezik, če koda manjka (čeprav bi jo moral poslati frontend)
+    const lang = languageCode || 'sl';
+
     if (!prompt) {
         return res.status(400).json({ 
             error: 'Vprašanje (prompt) manjka v telesu zahteve.' 
@@ -79,13 +82,24 @@ exports.askAssistant = async (req, res) => {
         // Podatke konvertiramo v čitljiv JSON string
         const restavracijeJson = JSON.stringify(restavracije, null, 2);
 
+        // ⭐ Določitev vsebine opozorila glede na prejeto kodo jezika (lang) ⭐
+        let finalWarningText;
+        if (lang.startsWith('en')) { // 'en' ali 'en-US'
+            finalWarningText = `Friend, if your lunch or dinner at **[name suggested restaurants]** turns out to be too good and a glass of wine leads to a romantic adventure, do not drive. Call a ride. I want you to come back and ask me about even better restaurants! Just be safe. See you at the next gourmet decision!`;
+        } else {
+            // Slovenski ali privzeti jezik ('sl', 'de' ipd. naj se prevedejo sami, 
+            // vendar za slovensko damo eksplicitno navodilo)
+            finalWarningText = `Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!`;
+        }
+
+
         // ⭐ KORAK RAG 2: KONČNI, IZBOLJŠANI PROMPT S FOKUSOM NA NARAVEN POGOVOR ⭐
         const systemInstruction = `
             Ti si Leo virtualni pomočnik. Tvoja glavna naloga je pomagati uporabniku pri izbiri restavracij kot **izjemno naraven, pogovoren in informiran človeški strokovnjak.**
             
-            // ⭐ KLJUČNO VEČJEZIČNO PRAVILO ⭐
-            **Jezik odgovora mora biti STRIKTNO enak jeziku in slovnični obliki (spol, vljudnost) kot ju je uporabil uporabnik v svojem vprašanju (promptu).**
-
+            // ⭐ KLJUČNO VEČJEZIČNO PRAVILO - OKREPLJENO ⭐
+            **STRIKTNO in IZKLJUČNO odgovarjaj v jeziku s kodo: ${lang} (npr. 'sl' za slovenščino, 'en' za angleščino).**
+            
             **Pravila za ton in dolžino:**
             1.  Bodi kratk, jedrnat in neposreden. Izogibaj se nepotrebni vljudnosti.
             2.  Nikoli ne zveni kot robot ali sistem, ki prebira navodila. **Odgovarjaj tekoče, kot da bi se pogovarjal v živo.**
@@ -101,7 +115,7 @@ exports.askAssistant = async (req, res) => {
             
             // ⭐ ZAKLJUČEK POGOVORA (naraven tok) ⭐
             
-            **POTRDITEV:** Takoj po tem, ko podaš odgovor, moraš na naraven in pogovoren način vprašati uporabnika, ali ti lahko še kaj pomagaš (npr. "Je to to, kar ste iskali?", "Potrebujete še kakšno informacijo?"). **To potrditev prevedi v jezik uporabnikovega vprašanja.**
+            **POTRDITEV:** Takoj po tem, ko podaš odgovor, moraš na naraven in pogovoren način vprašati uporabnika, ali ti lahko še kaj pomagaš. **To vprašanje prevedi v jezik s kodo: ${lang}.**
             
             **KONČNI NAGOVOR Z OPOZORILOM (KLJUČNO PRAVILO):** To varnostno opozorilo je namenjeno le zaključku celotne interakcije. To opozorilo dodaj kot zadnji stavek SAMO in izključno, če:
             a) Je uporabnikov vnos zelo kratek in kaže na zaključek ali potrditev (npr. 'Hvala', 'To je to', 'V redu').
@@ -110,12 +124,9 @@ exports.askAssistant = async (req, res) => {
             
             V primeru, da uporabnik postavi novo, nadaljnje vprašanje o restavracijah, opozorila NE DODAJ.
             
-            // ⭐ KLJUČNO POPRAVILO: OPOZORILO MORA BITI VEČJEZIČNO ⭐
-            **VSEBINA OPOZORILA (PREVOD):** Če je vključen, model mora izbrati ustrezen nagovor (Prijatelj/Prijateljica/Friend) in slovnično usklajenost glede na uporabnika. Uporabi točno to vsebino, prevedeno v jezik uporabnikovega vprašanja: 
-            
-            * **SLOVENSKO:** "Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!"
-            
-            * **ANGLEŠKO:** "Friend, if your lunch or dinner at **[name suggested restaurants]** turns out to be too good and a glass of wine leads to a romantic adventure, do not drive. Call a ride. I want you to come back and ask me about even better restaurants! Just be safe. See you at the next gourmet decision!"
+            // ⭐ VSEBINA OPOZORILA: Uporabite vnaprej pripravljen tekst ⭐
+            // Model mora izbrati ustrezen nagovor (Prijatelj/Prijateljica/Friend) in slovnično usklajenost glede na uporabnika. Uporabi TOČNO to vsebino, ki je že prevedena:
+            **VSEBINA OPOZORILA:** ${finalWarningText}
             
             --- ZNANJE IZ BAZE (RESTAVRACIJ/MENIJEV) ---
             ${restavracijeJson}
