@@ -44,9 +44,9 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
 
-    // ✅ POPRAVLJENO: Ohranimo samo odvisnost, ki uporablja Google Play Services
-    implementation 'com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0'
-    // ❌ Odstranjeno: Odvisnost 'com.google.mlkit:barcode-scanning:17.2.0' je bila vir konflikta ('Module is already installed')
+    // 🔥 KLJUČNI POPRAVEK: Uporaba BUNDLED ML Kit knjižnice. 
+    // Ta vključi modul neposredno v APK, brez zanašanja na Google Play Services.
+    implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 }
 
 // ⚠️ DODANA STRATEGIJA ZA RAZREŠEVANJE KONFLIKTOV GMS (Google Mobile Services)

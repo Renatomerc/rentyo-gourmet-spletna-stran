@@ -1,15 +1,13 @@
 // ==========================================================
 // 🟢 /controllers/authController.js — Controller za Avtentikacijo
+// (POPRAVEK: Implementacija OTP/PIN kode namesto Deep Linkov)
 // ==========================================================
 
 // Uvoz potrebnih modulov
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto'); // Za generiranje žetonov
-// const nodemailer = require('nodemailer'); // ❌ ODSTRANJENO: NE SMEMO UVOZITI NODEMAILERJA!
-
-// 🔥 NOVO: Uvoz Brevo API klienta (sib-api-v3-sdk)
+// const crypto = require('crypto'); // NI POTREBNO: Ne hashiramo več žetona
 const SibApiV3Sdk = require('sib-api-v3-sdk'); 
 
 // ⭐ KLJUČNO: Controller izvaža FUNKCIJO, ki prejme zunanje spremenljivke (ključi, modeli)!
@@ -41,9 +39,8 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         });
     };
     
-    // ⭐ 2. KONFIGURACIJA BREVO API (Nadomestilo za Nodemailer/SMTP)
+    // ⭐ 2. KONFIGURACIJA BREVO API
     
-    // Inicializacija klienta in nastavitev API ključa
     SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 
     let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
@@ -51,10 +48,16 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
     if (!process.env.BREVO_API_KEY) {
         console.error("❌ KRITIČNA NAPAKA: BREVO_API_KEY ni definiran. Pošiljanje e-pošte ne bo delovalo!");
     }
+    
+    // Pomožna funkcija za generiranje 6-mestne kode
+    const generirajOtpKodo = () => {
+        // Generira naključno število med 100000 in 999999
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    };
 
 
     // ==========================================================
-    // 🟠 OBSTAJEČE FUNKCIJE (Registracija, Prijava, Profil itd. - NESPREMENJENO)
+    // 🟠 OBSTAJEČE FUNKCIJE (Registracija, Prijava, Profil, Odjava, Izbris - NESPREMENJENO)
     // ==========================================================
 
     // Registracija
@@ -184,30 +187,28 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
     };
 
     // ==========================================================
-    // ⭐ NOVE FUNKCIJE ZA PONASTAVITEV GESLA (Z DEEP LINKINGOM) ⭐
+    // ⭐ NOVE FUNKCIJE ZA PONASTAVITEV GESLA (OTP/PIN KODA) ⭐
+    // (Zamenjava za staro Deep Link logiko)
     // ==========================================================
 
-    exports.forgotPassword = async (req, res) => {
+    // 1. Pošlji zahtevo za kodo (Faza 0)
+    exports.requestPasswordResetOtp = async (req, res) => {
         const { email } = req.body;
         
         const user = await Uporabnik.findOne({ email });
         if (!user) {
-            // Varnost: VEDNO splošno sporočilo
-            return res.status(200).json({ message: 'Če je vaš e-poštni naslov registriran, boste prejeli navodila za ponastavitev gesla.' });
+            // Varnost: VEDNO splošno sporočilo, da preprečimo 'fishing' (izdajo obstoja računa)
+            return res.status(200).json({ message: 'Če je vaš e-poštni naslov registriran, boste prejeli kodo za ponastavitev gesla.' });
         }
 
-        // 1. Generiraj žeton in nastavi čas poteka
-        const resetToken = user.getResetPasswordToken(); 
+        // 1. Generiraj PIN/OTP kodo in nastavi čas poteka (10 minut)
+        const otpCode = generirajOtpKodo();
+        
+        user.resetPasswordToken = otpCode; 
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minut veljavnosti
         await user.save({ validateBeforeSave: false }); 
 
-        // 2. Pripravi in pošlji e-pošto
-        if (!process.env.APP_DEEP_LINK_BASE) { // 🔥 PREVERJAMO APP_DEEP_LINK_BASE NAMSTO FRONTEND_URL
-             console.error("❌ KRITIČNA NAPAKA: APP_DEEP_LINK_BASE (npr. rentyo://reset-password) ni definiran. Pošiljanje ne bo delovalo!");
-             user.resetPasswordToken = undefined;
-             user.resetPasswordExpires = undefined;
-             await user.save({ validateBeforeSave: false });
-             return res.status(500).json({ message: 'Napaka strežnika, manjka konfiguracija za aplikacijo (Deep Link).' });
-        }
+        // 2. Preverjanje API ključa za Brevo
         if (!process.env.BREVO_API_KEY) {
              user.resetPasswordToken = undefined;
              user.resetPasswordExpires = undefined;
@@ -215,79 +216,71 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
              return res.status(500).json({ message: 'Napaka pri strežniku: Manjka Brevo API ključ.' });
         }
 
-        // ⭐ USTVARIMO DEEP LINK: rentyo://reset-password?token=XYZ
-        const resetUrl = `${process.env.APP_DEEP_LINK_BASE}?token=${resetToken}`;
-        
-        // Pripravi HTML vsebino (Besedilo prilagojeno Deep Linku)
+        // Pripravi HTML vsebino (Besedilo prilagojeno PIN kodi)
         const htmlContent = `
             <p>Pozdravljeni ${user.ime},</p>
-            <p>Prejeli smo zahtevo za ponastavitev gesla za vaš račun. Prosimo, kliknite na to povezavo, da odprete mobilno aplikacijo Rentyo, kjer boste lahko nastavili novo geslo. Povezava je veljavna samo 1 uro.</p>
-            <p style="text-align: center; margin: 20px 0;"><a href="${resetUrl}" style="background-color: #076b6a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">ODPRI APLIKACIJO ZA PONASTAVITEV GESLA</a></p>
+            <p>Prejeli smo zahtevo za ponastavitev gesla. Vaša enkratna koda (PIN/OTP) za ponastavitev je:</p>
+            <h2 style="text-align: center; color: #076b6a; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">${otpCode}</h2>
+            <p>Prosimo, vnesite to kodo v aplikacijo. Koda poteče v 10 minutah.</p>
             <p>Če niste zahtevali ponastavitve, prosimo, ignorirajte to sporočilo.</p>
         `;
 
-        // 🔥 KLJUČNA SPREMEMBA: Uporaba Brevo API za pošiljanje
+        // Uporaba Brevo API za pošiljanje
         let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
         
         sendSmtpEmail = {
-            // ⭐ Pravilni SENDER_EMAIL in IME 
             sender: { email: process.env.SENDER_EMAIL, name: "Rentyo Gourmet & Experience" }, 
             to: [{ email: user.email, name: user.ime }],
-            subject: 'Zahteva za ponastavitev gesla - Rentyo Gourmet & Experience (APLIKACIJA)',
+            subject: 'Koda za ponastavitev gesla (PIN/OTP) - Rentyo Gourmet & Experience',
             htmlContent: htmlContent,
         };
 
         try {
-            // Pošlje e-pošto preko HTTP API-ja (ne preko SMTP)
             await apiInstance.sendTransacEmail(sendSmtpEmail); 
-            res.status(200).json({ message: 'Navodila za ponastavitev gesla so bila uspešno poslana na vaš e-poštni naslov. Povezava bo odprla aplikacijo.' });
+            // Vrni sporočilo in sessionId za uporabo v naslednjem koraku
+            res.status(200).json({ message: 'Koda je bila uspešno poslana na vaš e-poštni naslov.', sessionId: user._id });
         } catch (error) {
-            // V primeru napake pri pošiljanju počistimo token za varnost
             user.resetPasswordToken = undefined;
             user.resetPasswordExpires = undefined;
             await user.save({ validateBeforeSave: false });
             
-            console.error('❌ NAPAKA PRI POŠILJANJU E-POŠTE ZA PONASTAVITEV (BREVO API):', error.message || error);
-            res.status(500).json({ message: 'Napaka pri pošiljanju e-pošte. Prosimo, preverite Brevo API ključ in status.' });
+            console.error('❌ NAPAKA PRI POŠILJANJU E-POŠTE ZA PONASTAVITEV (BREVO OTP):', error.message || error);
+            res.status(500).json({ message: 'Napaka pri pošiljanju e-pošte za kodo.' });
         }
     };
 
 
-    exports.resetPassword = async (req, res) => {
-        const { token } = req.params; // Nehashiran žeton iz URL-ja
-        const { newPassword } = req.body; 
+    // 2. Potrdi kodo in nastavi novo geslo (Faza 1)
+    exports.resetPasswordWithOtp = async (req, res) => {
+        const { email, code, newPassword } = req.body; 
 
-        // 1. Hashiraj žeton iz URL-ja
-        const resetPasswordTokenHash = crypto
-            .createHash('sha256')
-            .update(token)
-            .digest('hex');
-
-        // 2. Poišči uporabnika (preveri hash in veljavnost)
+        // 1. Poišči uporabnika in preveri veljavnost kode
         const user = await Uporabnik.findOne({
-            resetPasswordToken: resetPasswordTokenHash, 
-            resetPasswordExpires: { $gt: Date.now() } 
+            email: email,
+            resetPasswordToken: code, // Preverjamo shranjeno OTP kodo (string)
+            resetPasswordExpires: { $gt: Date.now() } // Preverjamo, ali je koda še veljavna
         });
 
         if (!user) {
-            return res.status(400).json({ error: 'Žeton za ponastavitev je neveljaven ali je potekel. Prosimo, zahtevajte novo ponastavitev.' });
+            return res.status(400).json({ error: 'Koda je neveljavna, potekla ali se ne ujema z e-poštnim naslovom. Prosimo, poskusite znova.' });
         }
         
-        // 3. Hashiraj novo geslo
+        // 2. Hashiraj novo geslo
         const salt = await bcrypt.genSalt(10);
         user.geslo = await bcrypt.hash(newPassword, salt);
         
-        // 4. Počisti žeton in veljavnost
+        // 3. Počisti žeton/kodo in veljavnost
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
         await user.save({ validateBeforeSave: false }); 
 
-        res.status(200).json({ message: 'Geslo je bilo uspešno ponastavljeno. Sedaj se lahko prijavite z novim geslom.' });
+        res.status(200).json({ message: 'Geslo je bilo uspešno ponastavljeno.' });
     };
+
     
     // ==========================================================
-    // ⭐ IZVOZ VSEH FUNKCIJ (Vključno s tistimi za Passport.js, ki jih uporablja router)
+    // ⭐ IZVOZ VSEH FUNKCIJ (POSODOBITEV - ODSTRANJENA Deep Link logika)
     // ==========================================================
     return { 
         registracija: exports.registracija, 
@@ -295,9 +288,14 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         odjava: exports.odjava,
         profil: exports.profil,
         izbrisProfila: exports.izbrisProfila,
-        forgotPassword: exports.forgotPassword, 
-        resetPassword: exports.resetPassword,
-        // Izvoz pomožnih funkcij, ki jih potrebuje uporabnikRoutes.js za socialno prijavo:
+        
+        // ⭐ NOVO: IZVAŽAMO SAMO FUNKCIJE ZA PONASTAVITEV S KODO ⭐
+        requestPasswordResetOtp: exports.requestPasswordResetOtp,
+        resetPasswordWithOtp: exports.resetPasswordWithOtp,
+
+        // ODSTRANJENO: forgotPassword in resetPassword (Deep Link)
+        
+        // Izvoz pomožnih funkcij:
         generirajZeton: generirajZeton,
         nastaviAuthPiškotek: nastaviAuthPiškotek
     };
