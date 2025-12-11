@@ -27,7 +27,7 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     );
     
     // ==========================================================
-    // 🟠 GLAVNE RUTe, KI KLIČEJO FUNKCIJE IZ CONTROLLERJA
+    // 🟠 GLAVNE RUTe, KI KLIČEJO FUNKCIJE IZ CONTROLLERJA
     // ==========================================================
 
     // Prijava / Registracija / Odjava
@@ -41,10 +41,16 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     router.delete('/profil', preveriGosta, zahtevajPrijavo, authController.izbrisProfila);
     
     
-    // ⭐ NOVE POTI ZA PONASTAVITEV GESLA ⭐
-    // Obe funkciji kličeta logiko iz Controllerja
+    // ==========================================================
+    // ⭐ NOVE POTI ZA PONASTAVITEV GESLA (Z PIN KODO) ⭐
+    // ==========================================================
+    
+    // 1. Zahteva PIN kode (klic exports.forgotPassword)
     router.post('/forgot-password', authController.forgotPassword);
-    router.post('/reset-password/:token', authController.resetPassword);
+    
+    // 2. Potrditev PIN kode in ponastavitev gesla (klic exports.confirmResetPassword)
+    // Opomba: Stara pot /reset-password/:token je odstranjena.
+    router.post('/reset-password/confirm', authController.confirmResetPassword);
 
     // ==========================================================
     // 🔴 SOCIALNA PRIJAVA Z GOOGLE & APPLE RUTE (OSTANEJO TUKAJ!)

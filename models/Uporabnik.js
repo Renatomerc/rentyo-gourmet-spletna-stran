@@ -2,13 +2,13 @@
 // 🟢 uporabnik.js — Uporabnik model (Sedaj izvaža samo SHEMO!)
 // POPRAVLJENO: Dodan fcmToken za PUSH obvestila
 // POPRAVLJENO: Dodana podpora za AppleId in posodobljena validacija gesla
-// ⭐ NOVO: Dodana podpora za ponastavitev gesla
+// ⭐ NOVO: Polja za ponastavitev gesla so ostala, a je odstranjena metoda getResetPasswordToken, saj sedaj uporabljamo OTP v Controllerju
 // ========================================
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
-// ⭐ NOVO: Uvoz vgrajenega modula Crypto za generiranje varnih žetonov
-const crypto = require('crypto');
+// ⭐ OPOMBA: Uvoz 'crypto' ni več potreben v tem modelu, ker je odstranjena funkcija getResetPasswordToken
+// const crypto = require('crypto'); // Odstranjeno, ker ni več potrebno
 
 const UporabnikShema = new mongoose.Schema({
     ime: { type: String, required: true, trim: true },
@@ -59,7 +59,8 @@ const UporabnikShema = new mongoose.Schema({
     },
     
     // ⭐ NOVO: POLJA ZA PONASTAVITEV GESLA ⭐
-    resetPasswordToken: { type: String, select: false }, // 'select: false' za varnost - polje se ne vrne pri standardnem find()
+    // Ta polja uporabljamo za shranjevanje NEHEŠIRANE 6-mestne kode in 5-minutnega časa poteka (logika je v authController.js)
+    resetPasswordToken: { type: String, select: false }, 
     resetPasswordExpires: { type: Date, select: false },
 
 }, { timestamps: true });
@@ -74,25 +75,8 @@ UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {
 };
 
 
-// ⭐ NOVO: METODA ZA GENERIRANJE ŽETONA ZA PONASTAVITEV GESLA
-UporabnikShema.methods.getResetPasswordToken = function() {
-    // 1. Generiramo naključni žeton (raw token)
-    const resetToken = crypto.randomBytes(20).toString('hex');
-
-    // 2. Hashiramo ta žeton (samo za shranjevanje v bazo, ker je žeton javno poslan po e-pošti)
-    // To je dobra praksa, čeprav nekateri sistemi shranijo žeton v čitljivi obliki. Hashiranje poveča varnost.
-    this.resetPasswordToken = crypto
-        .createHash('sha256')
-        .update(resetToken)
-        .digest('hex');
-
-    // 3. Nastavimo čas poteka žetona (npr. 1 ura)
-    this.resetPasswordExpires = Date.now() + 3600000; // 3600000 ms = 1 ura
-
-    // 4. Vrnemo NE-HASHIRAN (raw) žeton, ki ga bomo poslali po e-pošti
-    return resetToken;
-};
-
+// ❌ ODSTRANJENO: Stara metoda getResetPasswordToken, ki je heširala žetone, je odstranjena.
+// Celotna logika (generiranje OTP in shranjevanje) se zdaj izvaja v authController.js.
 
 // ⭐ KRITIČEN POPRAVEK: Izvažamo SAMO Shemo, ne modela.
 // Model bo definiran ločeno na primarni (mongoose) in sekundarni (dbUsers) povezavi.
