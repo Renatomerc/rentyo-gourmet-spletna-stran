@@ -3206,131 +3206,6 @@ body.is-capacitor-app #aiChatModal {
     color: #054f4e;
     text-decoration: underline;
 }
-/*
- * ========================================
- * CSS STILI ZA NOVO DODANE ELEMENTE (Ponastavitev Gesla)
- * ========================================
- */
-
-/* ========================================
- * ⭐ KLJUČNE KLASE ZA JAVASCRIPT PREKLOP ⭐
- * (Dodane za zanesljivo skritje/prikaz v mobilnem okolju)
- * ========================================
- */
-
-/* KLASA 1: ZANESLJIVO SKRITJE ELEMENTOV 
-   Uporablja se za executeResetContainer, requestResetContainer, loginRegisterView, itd. */
-.hidden {
-    display: none !important; 
-}
-
-/* KLASA 2: ZANESLJIV PRIKAZ MODALA 
-   Uporablja se za odpiranje modala z JavaScriptom. */
-.modal-active {
-    display: block !important;
-}
-
-
-.reset-password-view {
-    padding: 20px;
-    text-align: center;
-    /* Zagotovi, da ta pogled zasede celoten login-content, ko je aktiven */
-}
-
-.reset-password-view h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-    color: #333; /* Uporabi glavno barvo teksta */
-}
-
-.reset-password-view p {
-    margin-bottom: 20px;
-    color: #666;
-    line-height: 1.4;
-    font-size: 0.95rem;
-}
-
-/* Stili za oba formularja za ponastavitev (zahteva in izvedba) */
-#zahtevaResetForm,
-#resetPasswordForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Razmik med inputi in gumbi */
-}
-
-/* Skupni input stil za reset */
-#resetPasswordForm input[type="password"],
-#zahtevaResetForm input[type="email"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1rem;
-}
-
-/* Stili za input polja znotraj executeResetContainer */
-#resetPasswordForm .form-group {
-    text-align: left; /* Poravnaj labele na levo */
-}
-
-#resetPasswordForm label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-    font-size: 0.9rem;
-}
-
-/* Stil za gumba za pošiljanje / ponastavitev */
-#posljiResetNavodila,
-#submitResetBtn {
-    background-color: #e04a4a; /* Gumb za prijavo se pogosto uporablja rdeč */
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-}
-
-#posljiResetNavodila:hover,
-#submitResetBtn:hover {
-    background-color: #c93b3b;
-}
-
-.status-message {
-    font-size: 0.9rem;
-    min-height: 1.2rem; /* Rezervira prostor za sporočila */
-    color: #e04a4a; /* Rdeča za opozorila/status */
-}
-
-.back-to-login-container {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-#nazajNaPrijavoLink {
-    color: #007bff; /* Modra barva za povezave */
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-#nazajNaPrijavoLink:hover {
-    text-decoration: underline;
-}
-
-/* Dodatni stil za modal, ki že obstaja, vendar zagotavlja dobro centriranje za reset view */
-#loginModal .login-content {
-    /* Predpostavimo, da že ima max-width in se centrira */
-    padding: 30px;
-}
 
 
 
@@ -3393,7 +3268,8 @@ body.is-capacitor-app #aiChatModal {
   </div>
 </div>
 
-    <div id="ai-chat-icon-mobile-global" onclick="toggleChat()" style="cursor: pointer; margin-right: 25px;" class="ikona-ai mobilna-vidna">
+        
+   <div id="ai-chat-icon-mobile-global" onclick="toggleChat()" style="cursor: pointer; margin-right: 25px;" class="ikona-ai mobilna-vidna">
         <i class="fas fa-comment fa-flip-horizontal" aria-label="AI Pomočnik"></i> 
     </div>
 
@@ -3596,6 +3472,8 @@ body.is-capacitor-app #aiChatModal {
 
 </section>
 
+
+    
 </main>
     
    <div id="restavracijaModal" class="restavracija-modal">
@@ -3771,67 +3649,21 @@ body.is-capacitor-app #aiChatModal {
         </form>
         
       </div>
-    <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
+     <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
     <h3 data-i18n="auth.reset_title">Ponastavitev Gesla</h3>
     
-    <div id="requestResetContainer">
-        <p data-i18n="auth.reset_instructions">
-            Vnesite vaš e-poštni naslov in prejmite kodo PIN. Nato vnesite PIN in novo geslo spodaj.
-        </p>
+    <p data-i18n="auth.reset_instructions">Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
 
-        <form id="resetOneStepForm"> 
-            
-            <div class="form-group" id="emailGroup">
-                 <label for="resetEmailOne" style="display: none;">E-pošta</label>
-                 <input type="email" id="resetEmailOne" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
-            </div>
-           
-            <p id="resetStatus" class="status-message"></p>
+    <form id="zahtevaResetForm">
+        <input type="email" id="resetEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
+        
+        <p id="resetStatus" class="status-message"></p>
 
-            <button type="submit" id="posljiResetNavodila" data-i18n="auth.send_instructions_button">Pošlji kodo</button>
-            
-            <div class="resend-code-container" id="resendCodeContainer" style="margin-top: 15px; display: none;">
-                <a href="#" id="resendCodeLink" data-i18n="auth.resend_code_link">Ponovno pošlji kodo</a>
-            </div>
-            
-            <div id="otpPasswordFields" style="margin-top: 25px;">
-                
-                <div class="form-group" id="verificationCodeGroup">
-                    <label for="verificationCodeOne">Koda za preverjanje (PIN):</label>
-                    <input type="text" id="verificationCodeOne" 
-                           placeholder="Vnesite 6-mestno kodo" 
-                           maxlength="6" required disabled>
-                </div>
-                
-                <div class="form-group" id="newPasswordGroup">
-                    <label for="newPasswordOne" data-i18n="reset.new_password">Novo Geslo</label>
-                    <input type="password" id="newPasswordOne" required minlength="8" 
-                           placeholder="Minimalno 8 znakov" disabled>
-                </div>
-                
-                <div class="form-group" id="confirmNewPasswordGroup">
-                    <label for="confirmNewPasswordOne" data-i18n="reset.confirm_password">Potrdi Novo Geslo</label>
-                    <input type="password" id="confirmNewPasswordOne" required minlength="8" 
-                           placeholder="Ponovite novo geslo" disabled>
-                </div>
-                
-                <p id="resetExecuteMessage" class="status-message"></p>
-                
-                </div>
-            
-            <input type="hidden" id="resetSessionIdField" value="">
-            
-        </form>
-    </div>
-    
-    <div id="emailSentMessageContainer" style="display: none;">
-        <p data-i18n="auth.email_sent_confirmation">
-            Koda je bila poslana na vaš e-poštni naslov. Prosimo, izpolnite polja spodaj.
-        </p>
-    </div>
+        <button type="submit" id="posljiResetNavodila" data-i18n="auth.send_instructions_button">Pošlji navodila</button>
+    </form>
     
     <div class="back-to-login-container">
-        <a href="#" id="nazajNaPrijavoLink" data-i18n="auth.back_to_login_link">← Nazaj na prijavo</a>
+        <a href="#" id="nazajNaPrijavoLink" data-i18n="auth.back_to_login_link">Nazaj na prijavo</a>
     </div>
 </div>
       </div>
@@ -4020,6 +3852,8 @@ body.is-capacitor-app #aiChatModal {
     </div>
 </div>
 
+
+  
 <script src="capacitor.js"></script>
 <script type="module" src="script.js"></script>
 
@@ -4046,7 +3880,34 @@ const SocialLogin =
 const PushNotifications = Plugins.PushNotifications;
 
 
+// ==========================================================
+// ⭐ NOVO: LOGIKA ZA DEEP LINKS (Obravnava URL-jev) ⭐
+// ==========================================================
+if (App) {
+    App.addListener('appUrlOpen', (data) => {
+        const url = data.url;
 
+        // Preverite, ali URL ustreza poti za ponastavitev gesla
+        if (url && url.includes('/reset-password/')) {
+            
+            // Izlušči žeton (token) iz URL-ja
+            // Regex išče kar koli, kar sledi /reset-password/
+            const tokenMatch = url.match(/\/reset-password\/(.+)/);
+            const token = tokenMatch ? tokenMatch[1] : null;
+
+            if (token) {
+                console.log("Deep link uspešno prestrežen! Token:", token);
+                
+                // ⭐ KLJUČNO: Preusmerite uporabnika na HTML stran z žetonom kot parametrom ⭐
+                // Ta stran mora obstajati!
+                window.location.href = `reset-password.html?token=${token}`; 
+
+            } else {
+                console.error("Deep link zaznan, a žeton ni bil najden.");
+            }
+        }
+    });
+}
 // ==========================================================
 
 const initializePushNotifications = async () => {
@@ -4251,23 +4112,9 @@ const loginRegisterView = document.getElementById('loginRegisterView');
 const forgotPasswordView = document.getElementById('forgotPasswordView');
 const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink'); // Link "Pozabljeno geslo?"
 const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');     // Link "← Nazaj na prijavo"
-
-// POZOR: Če ste uporabili moj zadnji HTML, so se ID-ji spremenili
-// Uporabljam ID-je iz vašega zadnjega HTML-ja:
-const resetOneStepForm = document.getElementById('resetOneStepForm'); // Celoten obrazec za reset
-const resetEmailInput = document.getElementById('resetEmailOne');     // E-mail (prej resetEmail)
-const verificationCodeInput = document.getElementById('verificationCodeOne'); // PIN polje
-const newPasswordInput = document.getElementById('newPasswordOne');         // Novo geslo
-const confirmNewPasswordInput = document.getElementById('confirmNewPasswordOne'); // Potrditev gesla
-const submitButton = document.getElementById('posljiResetNavodila');      // Gumb za pošiljanje / potrditev
-const resetStatus = document.getElementById('resetStatus');                 // Sporočilo o statusu
-const resendCodeLink = document.getElementById('resendCodeLink');           // Link za ponovno pošiljanje kode
-
-// Naslednji elementi so bili odstranjeni v enovitem pogledu, a jih puščam, če jih še vedno potrebujete
-const requestResetContainer = document.getElementById('requestResetContainer');
-const emailSentMessageContainer = document.getElementById('emailSentMessageContainer');
-const executeResetContainer = document.getElementById('executeResetContainer');
-const resetTokenField = document.getElementById('resetSessionIdField'); // Popravljeno iz resetTokenField
+const zahtevaResetForm = document.getElementById('zahtevaResetForm');
+const resetEmailInput = document.getElementById('resetEmail');
+const resetStatus = document.getElementById('resetStatus');
 </script>
 
 <script>
@@ -7829,272 +7676,6 @@ function handleKeyboard(isOpen, keyboardHeight) {
         }
     }
 }
-// ==========================================================
-// LOGIKA ZA ENOTNO PONASTAVITEV GESLA (E-mail -> Koda/Geslo)
-// ==========================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    // POZOR: Predpostavljamo, da so vsi DOM elementi (resetOneStepForm, 
-    // verificationCodeInput, submitButton, itd.) in AUTH_API_URL že globalno definirani.
-
-    // Status za upravljanje faze: 0=Vnos E-maila, 1=Vnos PIN/Gesla
-    let currentResetStep = 0; 
-
-    // Prilagodi polja in gumb ob zagonu (prva faza - vnos emaila)
-    function initializeResetForm() {
-        currentResetStep = 0;
-        
-        // Prikaz/Skrivanje DOM elementov (predpostavljamo, da imajo vaši HTML oviji te ID-je)
-        const emailGroup = document.getElementById('emailGroup');
-        const codeGroup = document.getElementById('codeGroup');
-        const passwordGroup = document.getElementById('passwordGroup');
-
-        if (resetStatus) resetStatus.textContent = '';
-        
-        if (resetEmailInput) {
-            resetEmailInput.disabled = false;
-            resetEmailInput.style.display = 'block';
-            resetEmailInput.value = '';
-        }
-        
-        if (codeGroup) codeGroup.style.display = 'none';
-        if (passwordGroup) passwordGroup.style.display = 'none';
-
-        if (verificationCodeInput) verificationCodeInput.value = '';
-        if (newPasswordInput) newPasswordInput.value = '';
-        if (confirmNewPasswordInput) confirmNewPasswordInput.value = '';
-        
-        if (submitButton) {
-            submitButton.textContent = window.i18next ? i18next.t('auth.send_code') : 'Pošlji kodo';
-            submitButton.setAttribute('data-i18n', 'auth.send_code'); 
-        }
-        
-        const resendContainer = document.getElementById('resendCodeContainer');
-        if (resendContainer) resendContainer.style.display = 'none';
-    }
-
-    // Funkcija za preklop na drugo fazo (vnos kode in gesla)
-    function switchToCodePhase() {
-        currentResetStep = 1;
-        
-        // Onemogočimo email polje, da ga ne more spreminjati
-        if (resetEmailInput) resetEmailInput.disabled = true;
-        
-        // Prikaz/Skrivanje DOM elementov
-        const emailGroup = document.getElementById('emailGroup');
-        const codeGroup = document.getElementById('codeGroup');
-        const passwordGroup = document.getElementById('passwordGroup');
-        
-        if (emailGroup) emailGroup.style.display = 'block'; // Ostaneta vidna za referenco
-        if (codeGroup) codeGroup.style.display = 'block';
-        if (passwordGroup) passwordGroup.style.display = 'block';
-        
-        if (resetStatus) resetStatus.innerHTML = `<span style="color: green;">${window.i18next ? i18next.t('auth.code_sent_success') : 'Koda PIN je bila poslana na vaš e-poštni naslov.'}</span>`;
-
-        if (submitButton) {
-            submitButton.textContent = window.i18next ? i18next.t('auth.reset_submit') : 'Ponastavi Geslo';
-            submitButton.setAttribute('data-i18n', 'auth.reset_submit');
-        }
-        
-        const resendContainer = document.getElementById('resendCodeContainer');
-        if (resendContainer) resendContainer.style.display = 'block';
-    }
-
-    // Upravljanje oddaje obrazca (klik na gumb)
-    // OPOMBA: Uporabljamo predpostavljene globalne spremenljivke
-    const resetOneStepForm = document.getElementById('resetOneStepForm');
-    const resetStatus = document.getElementById('resetStatus'); 
-    const submitButton = document.getElementById('submitButton');
-    const resetEmailInput = document.getElementById('resetEmailInput');
-    const verificationCodeInput = document.getElementById('verificationCodeInput');
-    const newPasswordInput = document.getElementById('newPasswordInput');
-    const confirmNewPasswordInput = document.getElementById('confirmNewPasswordInput');
-    const resendCodeLink = document.getElementById('resendCodeLink');
-    const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');
-    const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink');
-    const loginRegisterView = document.getElementById('loginRegisterView');
-    const forgotPasswordView = document.getElementById('forgotPasswordView');
-
-
-    if (resetOneStepForm) {
-        resetOneStepForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (resetStatus) resetStatus.textContent = window.i18next ? i18next.t('messages.loading') : 'Nalaganje...';
-            if (submitButton) submitButton.disabled = true;
-
-            if (currentResetStep === 0) {
-                // ==========================================
-                // FAZA 0: POŠLJI ZAHTEVO ZA PIN/KODO
-                // ==========================================
-                const email = resetEmailInput.value.trim();
-                
-                if (!email) {
-                    if (resetStatus) resetStatus.textContent = window.i18next ? i18next.t('auth.email_required') : 'Vnesite e-poštni naslov.';
-                    if (submitButton) submitButton.disabled = false;
-                    return;
-                }
-                
-                try {
-                    // 🔥 KRITIČEN POPRAVEK: Uporaba pravilne poti iz authController.js
-                    const response = await fetch(`${AUTH_API_URL}/request-password-reset-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        // resetSessionId = data.sessionId; // ODSTRANJENO: sessionId ni več potreben
-                        switchToCodePhase();
-                    } else {
-                        // Varnost: Tudi pri neuspešnem klicu, če API vrne 200/splošno sporočilo, ohranimo to sporočilo
-                        if (resetStatus) resetStatus.textContent = data.message || (window.i18next ? i18next.t('auth.error_sending_code') : 'Napaka pri pošiljanju kode. Poskusite znova.');
-                    }
-                } catch (error) {
-                    console.error('Napaka pri pošiljanju kode:', error);
-                    if (resetStatus) resetStatus.textContent = (window.i18next ? i18next.t('messages.system_error') : 'Prišlo je do sistemske napake.');
-                }
-
-            } else if (currentResetStep === 1) {
-                // ==========================================
-                // FAZA 1: POTRDI PIN IN NASTAVI NOVO GESLO
-                // ==========================================
-                const pinCode = verificationCodeInput.value.trim();
-                const newPassword = newPasswordInput.value;
-                const confirmPassword = confirmNewPasswordInput.value;
-                const email = resetEmailInput.value.trim(); // Uporabljamo shranjen email
-
-                if (newPassword !== confirmPassword) {
-                    if (resetStatus) resetStatus.textContent = window.i18next ? i18next.t('auth.passwords_dont_match') : 'Gesli se ne ujemata!';
-                    if (submitButton) submitButton.disabled = false;
-                    return;
-                }
-                if (pinCode.length !== 6 || !/^\d+$/.test(pinCode)) { // Dodano preverjanje, da je 6 števk
-                     if (resetStatus) resetStatus.textContent = window.i18next ? i18next.t('auth.pin_length_error') : 'Koda PIN mora vsebovati 6 števk.';
-                    if (submitButton) submitButton.disabled = false;
-                    return;
-                }
-                // Lahko dodate preverjanje dolžine/kompleksnosti gesla
-
-                try {
-                    // 🔥 KRITIČEN POPRAVEK: Uporaba pravilne poti iz authController.js
-                    const response = await fetch(`${AUTH_API_URL}/reset-password-with-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            email: email,
-                            code: pinCode,
-                            newPassword: newPassword,
-                            // sessionId: resetSessionId // ODSTRANJENO: sessionId ni več potreben
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        if (resetStatus) resetStatus.innerHTML = `<span style="color: green; font-weight: bold;">${window.i18next ? i18next.t('auth.reset_success') : 'Geslo uspešno ponastavljeno! Preusmerjam na prijavo...'}</span>`;
-                        
-                        setTimeout(() => {
-                            // Ponastavitev formularja in preklop na prijavni pogled
-                            if (nazajNaPrijavoLink) nazajNaPrijavoLink.click();
-                            initializeResetForm();
-                        }, 3000);
-
-                    } else {
-                        if (resetStatus) resetStatus.textContent = data.error || data.message || (window.i18next ? i18next.t('auth.reset_error') : 'Napačna koda ali napaka pri ponastavitvi gesla.');
-                    }
-                } catch (error) {
-                    console.error('Napaka pri potrditvi gesla:', error);
-                    if (resetStatus) resetStatus.textContent = (window.i18next ? i18next.t('messages.system_error') : 'Prišlo je do sistemske napake pri ponastavitvi.');
-                }
-            }
-            
-            if (submitButton) submitButton.disabled = false;
-        });
-    }
-    
-    // Funkcija za ponovno pošiljanje kode
-    if (resendCodeLink) {
-        resendCodeLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            // Preprečimo ponovni klik, dokler se ne izteče časovnik
-            if (resendCodeLink.style.pointerEvents === 'none') return;
-            
-            resendCodeLink.style.pointerEvents = 'none';
-            resendCodeLink.textContent = window.i18next ? i18next.t('auth.resending') : 'Pošiljam...';
-
-            const email = resetEmailInput.value.trim();
-            if (!email) return; // Ne moremo ponovno poslati, če ni emaila
-
-            try {
-                // 🔥 POPRAVEK: Uporaba iste poti, saj generira in pošlje novo kodo
-                const response = await fetch(`${AUTH_API_URL}/request-password-reset-otp`, { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Napaka pri API klicu');
-                }
-
-                if (resetStatus) resetStatus.innerHTML = `<span style="color: orange;">${window.i18next ? i18next.t('auth.new_code_sent') : 'Nova koda je bila poslana. Preverite e-mail.'}</span>`;
-
-                let timer = 60;
-                const interval = setInterval(() => {
-                    timer--;
-                    // 🔥 POPRAVEK: Uporaba ustreznega i18n prevoda
-                    const timerText = window.i18next ? i18next.t('auth.resend_code_timer_format', { seconds: timer }) : `Ponovno pošlji kodo (${timer}s)`;
-                    resendCodeLink.textContent = timerText;
-                    
-                    if (timer <= 0) {
-                        clearInterval(interval);
-                        resendCodeLink.textContent = window.i18next ? i18next.t('auth.resend_code') : 'Ponovno pošlji kodo';
-                        resendCodeLink.style.pointerEvents = 'auto';
-                    }
-                }, 1000);
-
-            } catch (error) {
-                console.error('Napaka pri ponovnem pošiljanju kode:', error);
-                if (resetStatus) resetStatus.textContent = window.i18next ? i18next.t('auth.resend_error') : 'Napaka pri ponovnem pošiljanju kode.';
-                resendCodeLink.textContent = window.i18next ? i18next.t('auth.resend_code') : 'Ponovno pošlji kodo';
-                resendCodeLink.style.pointerEvents = 'auto';
-            }
-        });
-    }
-
-    // Upravljanje klika na "Pozabljeno geslo?"
-    if (pozabljenoGesloLink) {
-        pozabljenoGesloLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (loginRegisterView) loginRegisterView.style.display = 'none';
-            if (forgotPasswordView) forgotPasswordView.style.display = 'block';
-            
-            initializeResetForm();
-        });
-    }
-
-    // Ponastavitev obrazca, ko se uporabnik vrne na prijavo
-    if (nazajNaPrijavoLink) {
-        nazajNaPrijavoLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            if (loginRegisterView) loginRegisterView.style.display = 'block';
-            if (forgotPasswordView) forgotPasswordView.style.display = 'none';
-            
-            initializeResetForm();
-        });
-    }
-    
-    // Inicializacija stanja obrazca ob prvem nalaganju
-    initializeResetForm();
-});
-
 
 
 </script>
