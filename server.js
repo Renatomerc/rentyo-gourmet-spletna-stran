@@ -197,9 +197,8 @@ function startApp() {
     }
 
     if (userRoutes) {
-        // ⭐⭐ KLJUČNI POPRAVEK: Sprememba poti iz '/api/auth' v '/api/users'
-        app.use('/api/users', userRoutes); 
-        console.log("✅ API Pot za Uporabnike/Avtentikacijo (/api/users) je uspešno priključena.");
+        app.use('/api/auth', userRoutes); 
+        console.log("✅ API Pot za Avtentikacijo (/api/auth) je uspešno priključena.");
     }
 
     if (uploadRouter) {
