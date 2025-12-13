@@ -86,13 +86,13 @@ module.exports = (preveriGosta) => {
     /**
      * GET /api/restavracije/uporabnik/priljubljene
      */
-    router.get('/uporabnik/priljubljene', preveriGosta, restavracijaController.getPriljubljeneRestavracije); // <-- DODANO
+    router.get('/uporabnik/priljubljene', preveriGosta, restavracijaController.getFavoriteRestaurants); // <-- POPRAVLJENO! Uporabljamo getFavoriteRestaurants
 
     // NOVO: Preklopi stanje (dodaj/odstrani) priljubljene restavracije
     /**
      * POST /api/restavracije/uporabnik/priljubljene/toggle
      */
-    router.post('/uporabnik/priljubljene/toggle', preveriGosta, restavracijaController.togglePriljubljeno); // <-- DODANO
+    router.post('/uporabnik/priljubljene/toggle', preveriGosta, restavracijaController.toggleFavorite); // <-- POPRAVLJENO! Uporabljamo toggleFavorite
 
     /**
      * GET /api/restavracije/uporabnik/aktivne
