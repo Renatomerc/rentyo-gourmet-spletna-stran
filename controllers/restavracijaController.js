@@ -1498,40 +1498,50 @@ exports.toggleFavorite = async (req, res) => {
 
 /**
  * Pridobitev podrobnosti vseh priljubljenih restavracij za prijavljenega uporabnika.
- * GET /api/restavracije/favorites/
+ * GET /api/restavracije/uporabnik/priljubljene
  * @access Private
  */
 exports.getFavoriteRestaurants = async (req, res) => {
-    const userId = req.uporabnik ? req.uporabnik.id : null;
+    // ID uporabnika je priložen iz JWT žetona (middleware)
+    const userId = req.uporabnik ? req.uporabnik.id : null; 
 
     if (!userId) {
         return res.status(401).json({ msg: 'Neavtorizirano: Prijavite se za ogled priljubljenih.' });
     }
 
     try {
-        const userIdObj = new mongoose.Types.ObjectId(userId);
-
-        // 1. Poišči uporabnika in "populiraj" (nanesi) podatke o restavracijah
-        const uporabnik = await Uporabnik.findById(userIdObj)
-            .populate({
-                path: 'favorite_restaurants', // Polje, ki ga populiramo
-                model: 'Restavracija',      // Uporabimo model Restavracija
-                select: 'ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija' // Izberemo samo ključna polja
-            })
+        // 1. POIŠČI UPORABNIKA IN SAMO ID-JE PRILJUBLJENIH RESTAVRACIJ
+        // Izognemo se ročni pretvorbi new mongoose.Types.ObjectId(userId) in pustimo Mongooseu, 
+        // da to stori sam (s tem se izognemo morebitnim napakam pri uvozu/inicializaciji Mongoose tipov).
+        const uporabnik = await Uporabnik.findById(userId) 
             .select('favorite_restaurants')
-            .lean(); // Vrnemo kot navaden JS objekt za lažjo manipulacijo
+            .lean(); 
 
         if (!uporabnik) {
             return res.status(404).json({ msg: 'Uporabnik ni najden.' });
         }
         
-        // 2. Preverimo in vrnemo samo seznam restavracij (lahko tudi v primeru, če je seznam prazen)
-        const priljubljene = uporabnik.favorite_restaurants || [];
+        const favoriteIds = uporabnik.favorite_restaurants || [];
+        
+        if (favoriteIds.length === 0) {
+            // Če je seznam prazen, vrni prazen array in končaj
+            return res.status(200).json([]); 
+        }
 
-        res.status(200).json(priljubljene);
+        // 2. ROČNO POIŠČI VSE RESTAVRACIJE GLEDE NA PRIDOBLJENE ID-je
+        // Model 'Restavracija' je povezan z glavno bazo, zato ta klic deluje.
+        const priljubljeneRestavracije = await Restavracija.find({
+            _id: { $in: favoriteIds }
+        })
+        .select('ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija');
+
+
+        // 3. VRNITEV REZULTATA
+        res.status(200).json(priljubljeneRestavracije);
 
     } catch (error) {
-        console.error('❌ Napaka pri pridobivanju priljubljenih restavracij:', error);
-        res.status(500).json({ msg: 'Napaka strežnika pri nalaganju priljubljenih restavracij.' });
+        console.error('❌ Napaka pri pridobivanju priljubljenih restavracij:', error.message);
+        // Bolj informativen status 500
+        res.status(500).json({ msg: 'Napaka strežnika pri nalaganju priljubljenih restavracij. Preverite log strežnika!' });
     }
 };

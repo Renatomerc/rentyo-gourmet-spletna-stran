@@ -815,13 +815,13 @@ body::before {
         </div>
     </div>
     </main>
-  <script>
+<script>
         // ===========================================
         // GLAVNE SPREMENLJIVKE STANJA IN API KONFIGURACIJA
         // ===========================================
         
         // KRITIČNO: Globalne spremenljivke stanja (brez ponovne deklaracije)
-        let zeton = localStorage.getItem('zeton'); // Uporabljamo let, ker se lahko spremeni (npr. odjava)
+        let zeton = localStorage.getItem('zeton'); 
         let profilniPodatki = null;
         
         // Globalna spremenljivka za shranjevanje ID-jev priljubljenih restavracij
@@ -830,12 +830,15 @@ body::before {
         // Preverjanje okolja za QR skeniranje (iz prvega dela)
         const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform();
 
+        // ===========================================
         // API KONFIGURACIJA
+        // ===========================================
+        // OPOMBA: To je pravilna baza, če Express server klic prestreže na /api/restavracije
         const BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/';
         
-        // API poti
+        // API poti (OSTALE)
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
-        const IZBRIS_RACUNA_API_URL = `${BASE_URL}auth/profil`; 
+        const IZBRIS_RACUNA_API_URL = `${BASE_URL}auth/profil`;
         
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
         const PRETEKLE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`; 
@@ -843,12 +846,12 @@ body::before {
         const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
         const QR_API_URL = `${BASE_URL}restavracije/potrdi_prihod`; 
 
-        // API POTI ZA PRILJUBLJENE (Favorites)
+        // 🔥 KRITIČNO DODANO: API POTI ZA PRILJUBLJENE (Favorites)
         const FAVORITES_API_URL = `${BASE_URL}restavracije/uporabnik/priljubljene`; 
         const TOGGLE_FAVORITE_API_URL = `${BASE_URL}restavracije/uporabnik/priljubljene/toggle`; 
 
         // ===========================================
-        // DOM ELEMENTI
+        // Elementi modala in podatki
         // ===========================================
         const modalOcena = document.getElementById('modal-ocena');
         const modalZapriGumb = document.querySelector('#modal-ocena .zapri-gumb');
@@ -860,7 +863,7 @@ body::before {
         
         // Elementi za zvezdice
         const visualRating = document.getElementById('visual-rating');
-        const hiddenSelect = document.getElementById('ocena-skrita'); // Ni uporabljen, ampak OK
+        const hiddenSelect = document.getElementById('ocena-skrita');
         
         // Elemente za prikaz podatkov
         const podatkiImeElement = document.getElementById('profil-ime'); 
@@ -868,9 +871,8 @@ body::before {
         const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
         const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
         const tockeStatusElement = document.getElementById('tocke-status-prikaz');
-        const priljubljeneRestavracijeKontejner = document.getElementById('priljubljene');
         
-        // Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
+        // 🚀 Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
         let scanStatusElement = document.getElementById('scan-status');
 
 
