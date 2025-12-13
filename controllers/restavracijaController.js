@@ -6,11 +6,12 @@
 // ⚠️ OPOMBA: Če se strežnik zatakne, je najverjetnejša težava pri uvozu ali definiciji modela.
 const Restavracija = require('../models/Restavracija'); 
 const mongoose = require('mongoose');
+const asyncHandler = require('express-async-handler'); // 💡 UVOZ DODAN ZARADI STANDARDA ZA ASINHRONE KLICE
 
 // 🟢 DODANO: Uvozimo model Uporabnik iz sekundarne povezave
 const UporabnikShema = require('../models/Uporabnik'); 
 const dbUsers = require('../dbUsers');
-const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
+const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema); // 💡 Uporabnik model mora biti dostopen tukaj
 
 // 🚀 KRITIČNI UVOZ: Za dinamično obravnavanje časovnih pasov (letni/zimski čas)
 const moment = require('moment-timezone'); 
@@ -21,7 +22,7 @@ const seRezervacijiPrekrivata = (novaCasStart, novaTrajanje, obstojeceCasStart, 
     // Pretvori vse v števila
     novaCasStart = parseFloat(novaCasStart);
     novaTrajanje = parseFloat(novaTrajanje);
-    obstojeceCasStart = parseFloat(obstojeceCasStart);
+    obstojeceCasStart = parseFloat(obstojeCasStart);
     obstojeceTrajanje = parseFloat(obstojeceTrajanje);
     
     const novaCasKonec = novaCasStart + novaTrajanje;
@@ -636,7 +637,7 @@ exports.izbrisiRezervacijo = async (req, res) => {
 
 
 // =================================================================
-// 💥 4. FUNKCIJE ZA PROFIL UPORABNIKA (POPRAVLJENE)
+// 💥 4. FUNKCIJE ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA/PRILJUBLJENE)
 // =================================================================
 
 /**
@@ -822,6 +823,77 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
         res.status(500).json({ msg: 'Napaka strežnika pri nalaganju zgodovine rezervacij.' });
     }
 };
+
+// =================================================================
+// 🚨 NOVE FUNKCIJE ZA PRILJUBLJENE (FAVORITES) 🚨
+// =================================================================
+
+// @desc    Naloži vse priljubljene restavracije za prijavljenega uporabnika
+// @route   GET /api/restavracije/uporabnik/priljubljene
+// @access  Private 
+const getPriljubljeneRestavracije = asyncHandler(async (req, res) => {
+    // req.uporabnik.id je na voljo zaradi 'preveriGosta' middleware-a
+    
+    // Uporabimo .populate() za pridobitev vseh podatkov o restavracijah, ne le ID-jev.
+    const uporabnik = await Uporabnik.findById(req.uporabnik.id)
+        .select('favorite_restaurants')
+        .populate('favorite_restaurants'); 
+        
+    if (!uporabnik) {
+        res.status(404);
+        throw new Error('Uporabnik ni najden.');
+    }
+    
+    // Vrni samo seznam restavracij
+    res.status(200).json(uporabnik.favorite_restaurants);
+});
+
+
+// @desc    Preklopi (dodaj/odstrani) restavracijo iz priljubljenih
+// @route   POST /api/restavracije/uporabnik/priljubljene/toggle
+// @access  Private 
+const togglePriljubljeno = asyncHandler(async (req, res) => {
+    const { restavracijaId } = req.body;
+    
+    if (!restavracijaId || !mongoose.Types.ObjectId.isValid(restavracijaId)) {
+        res.status(400);
+        throw new Error('Manjka veljaven ID restavracije.');
+    }
+
+    // 1. Poišči uporabnika
+    const uporabnik = await Uporabnik.findById(req.uporabnik.id);
+
+    if (!uporabnik) {
+        res.status(404);
+        throw new Error('Uporabnik ni najden.');
+    }
+    
+    // 2. Preveri, ali je restavracija že v seznamu
+    const restavracijaIdString = restavracijaId.toString();
+    const jeZePriljubljeno = uporabnik.favorite_restaurants.some(
+        favId => favId.toString() === restavracijaIdString
+    );
+    
+    let action;
+
+    if (jeZePriljubljeno) {
+        // ODSTRANITEV (pull)
+        uporabnik.favorite_restaurants.pull(restavracijaId);
+        action = 'removed';
+    } else {
+        // DODAJANJE (push)
+        uporabnik.favorite_restaurants.push(restavracijaId);
+        action = 'added';
+    }
+
+    await uporabnik.save();
+
+    res.status(200).json({ 
+        msg: action === 'added' ? 'Restavracija dodana med priljubljene.' : 'Restavracija odstranjena iz priljubljenih.', 
+        action: action,
+        newFavoritesCount: uporabnik.favorite_restaurants.length
+    });
+});
 
 
 // =================================================================
@@ -1421,3 +1493,42 @@ exports.oznaciPretekleRezervacije = async () => {
         return 0;
     }
 }
+
+// =================================================================
+// 🔥 IZVOZ FUNKCIJ (POSODOBLJENO!)
+// =================================================================
+
+module.exports = {
+    // 1. CRUD
+    getPrivzetoRestavracije,
+    getIzpostavljeneRestavracije,
+    pridobiVseRestavracije,
+    ustvariRestavracijo,
+    pridobiRestavracijoPoId,
+    posodobiRestavracijo,
+    izbrisiRestavracijo,
+    
+    // 2. GEOSPATIAL / REZERVACIJE
+    pridobiRestavracijePoBlizini,
+    pridobiProsteUre,
+    ustvariRezervacijo,
+    izbrisiRezervacijo,
+    
+    // 3. PROFIL UPORABNIKA
+    pridobiAktivneRezervacijeUporabnika,
+    pridobiZgodovinoRezervacijUporabnika,
+    
+    // ⭐ NOVO: FUNKCIJI ZA PRILJUBLJENE
+    getPriljubljeneRestavracije,
+    togglePriljubljeno,
+    
+    // 4. ADMIN / ZAKLJUČEVANJE
+    posodobiAdminVsebino,
+    potrdiPrihodInDodelitevTock,
+    oznaciRezervacijoKotZakljuceno,
+    oznaciPretekleRezervacije, // Za Cron job
+    
+    // 5. OCENJEVANJE / ISKANJE
+    oddajOcenoInKomentar,
+    isciRestavracije
+};

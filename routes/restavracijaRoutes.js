@@ -8,10 +8,6 @@ module.exports = (preveriGosta) => {
     const router = express.Router();
     
     // 🔥 KLJUČNO: Uvozimo vse funkcije iz controllerja
-    // 🚨 KRITIČNA POT: Če klic './controllers/restavracijaController' ne deluje,
-    // in klic '../controllers/restavracijaController' ne deluje, preverite,
-    // ali je mapa 'controllers' dejansko znotraj /src ali v katerem drugem korenu.
-    // Ohranimo standardno pot:
     const restavracijaController = require('../controllers/restavracijaController');
     
     
@@ -83,8 +79,21 @@ module.exports = (preveriGosta) => {
     
     
     // -----------------------------------------------------------------
-    // 🟢 NOVO: POTI ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA)
+    // 🟢 NOVO: POTI ZA PROFIL UPORABNIKA (AKTIVNE/ZGODOVINA/PRILJUBLJENE)
     // -----------------------------------------------------------------
+    
+    // NOVO: Pridobi seznam priljubljenih restavracij
+    /**
+     * GET /api/restavracije/uporabnik/priljubljene
+     */
+    router.get('/uporabnik/priljubljene', preveriGosta, restavracijaController.getPriljubljeneRestavracije); // <-- DODANO
+
+    // NOVO: Preklopi stanje (dodaj/odstrani) priljubljene restavracije
+    /**
+     * POST /api/restavracije/uporabnik/priljubljene/toggle
+     */
+    router.post('/uporabnik/priljubljene/toggle', preveriGosta, restavracijaController.togglePriljubljeno); // <-- DODANO
+
     /**
      * GET /api/restavracije/uporabnik/aktivne
      */
@@ -122,7 +131,7 @@ module.exports = (preveriGosta) => {
      * POST /api/restavracije/oceni/:restavracijaId
      * Shrani komentar v polje 'komentarji' in posodobi 'ocena_povprecje' in 'st_ocen'.
      */
-    router.post('/oceni/:restavracijaId', preveriGosta, restavracijaController.oddajOcenoInKomentar); // <-- NOVA RUTA
+    router.post('/oceni/:restavracijaId', preveriGosta, restavracijaController.oddajOcenoInKomentar); 
     
     
     // -----------------------------------------------------------------
@@ -133,7 +142,7 @@ module.exports = (preveriGosta) => {
      * Čeprav je javna, dodajanje preveriGosta zagotovi, da se morebitni neveljavni žetoni 
      * obdelajo na način, ki ne povzroči avtomatske napake 401.
      */
-    router.post('/isci', preveriGosta, restavracijaController.isciRestavracije); // <--- POPRAVEK
+    router.post('/isci', preveriGosta, restavracijaController.isciRestavracije); 
     // -----------------------------------------------------------------
 
 
