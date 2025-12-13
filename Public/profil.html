@@ -872,6 +872,9 @@ body::before {
         const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
         const tockeStatusElement = document.getElementById('tocke-status-prikaz');
         
+        // 🔥 KRITIČNO DODANO: KONTEJNER ZA PRILJUBLJENE (Odpravlja ReferenceError)
+        const priljubljeneRestavracijeKontejner = document.getElementById('priljubljene');
+
         // 🚀 Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
         let scanStatusElement = document.getElementById('scan-status');
 
@@ -1650,57 +1653,75 @@ body::before {
         };
 
 
-        /**
-         * NOVO: POENOSTAVLJENA RENDER FUNKCIJA ZA PRILJUBLJENE
-         */
-        const renderPriljubljene = (restavracije, kontejnerElement) => {
-            
-            // Začnemo z naslovom
-            kontejnerElement.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
-            
-            restavracije.forEach(rest => {
-                // Poskrbimo, da imamo ID (če je bil populate na backendu, je ID na rest._id)
-                const restavracijaId = rest._id;
+   /**
+ * NOVO: POENOSTAVLJENA RENDER FUNKCIJA ZA PRILJUBLJENE
+ */
+const renderPriljubljene = (restavracije, kontejnerElement) => {
+    
+    // Začnemo z naslovom
+    kontejnerElement.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
+    
+    restavracije.forEach(rest => {
+        const restavracijaId = rest._id;
 
-                const kartica = document.createElement('div');
-                kartica.classList.add('kartica-rezervacije', 'kartica-podatkov', 'priljubljena-kartica'); 
-                kartica.style.padding = '15px 20px';
-                kartica.style.marginBottom = '10px';
-                kartica.style.border = '1px solid #ccc';
-                kartica.style.borderRadius = '8px';
-                kartica.style.display = 'flex';
-                kartica.style.justifyContent = 'space-between'; 
-                kartica.style.alignItems = 'center';
-                kartica.style.backgroundColor = '#fff';
-                
-                
-                const jePriljubljeno = globalFavoritesList.includes(restavracijaId);
-                const favoriteClass = jePriljubljeno ? 'fas' : 'far';
-                
-                kartica.innerHTML = `
-                    <div>
-                        <p class="rez-title" style="margin: 0; font-size: 1.1em; font-weight: bold;">${rest.ime || rest.name}</p>
-                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;">${rest.naslov || i18next.t('profile.address_unknown')}</p>
-                        <a href="restavracija.html?id=${restavracijaId}" style="font-size: 0.9em; color: #076b6a; text-decoration: none; display: block; margin-top: 10px;">
-                            <i class="fas fa-external-link-alt"></i> ${i18next.t('profile.go_to_restaurant') || 'Prikaži restavracijo'}
-                        </a>
-                    </div>
-                    <div class="favorite-icon-wrapper" data-id="${restavracijaId}" style="flex-shrink: 0;">
-                        <i class="${favoriteClass} fa-heart favorite-icon" data-restavracija-id="${restavracijaId}" style="font-size: 1.5rem; color: #e74c3c; cursor: pointer;"></i>
-                    </div>
-                `;
+        const kartica = document.createElement('div');
+        kartica.classList.add('kartica-rezervacije', 'kartica-podatkov', 'priljubljena-kartica'); 
+        kartica.style.padding = '15px 20px';
+        kartica.style.marginBottom = '10px';
+        kartica.style.border = '1px solid solid #ccc';
+        kartica.style.borderRadius = '8px';
+        kartica.style.display = 'flex';
+        kartica.style.justifyContent = 'space-between'; 
+        kartica.style.alignItems = 'center';
+        kartica.style.backgroundColor = '#fff';
+        kartica.style.cursor = 'pointer'; 
+        
+        
+        const jePriljubljeno = globalFavoritesList.includes(restavracijaId);
+        
+        // Srce je pravilno nastavljeno: 'fas' (polno) ali 'far' (obris)
+        const favoriteClass = jePriljubljeno ? 'fas' : 'far'; 
+        
+        kartica.innerHTML = `
+            <div style="flex-grow: 1;">
+                <p class="rez-title" style="margin: 0; font-size: 1.1em; font-weight: bold;">${rest.ime || rest.name}</p>
+            </div>
+            <div class="favorite-icon-wrapper" data-id="${restavracijaId}" style="flex-shrink: 0;">
+                <i class="${favoriteClass} fa-heart favorite-icon" data-restavracija-id="${restavracijaId}" style="font-size: 1.5rem; color: #e74c3c; cursor: pointer;"></i>
+            </div>
+        `;
 
-                const favoriteIcon = kartica.querySelector('.favorite-icon');
-                if (favoriteIcon) {
-                    favoriteIcon.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        toggleFavorite(restavracijaId);
-                    });
+        // ===============================================
+        // 🔥 KLIK NA CELOTNO KARTICO ZA PREUSMERITEV NA INDEX.HTML
+        // ===============================================
+        
+        // 1. Event listener za preusmeritev (obnovitev)
+        kartica.addEventListener('click', () => {
+            // 🔥 POPRAVEK: Preusmerimo na index.html in pošljemo ID
+            window.location.href = `index.html?openRestavracijaId=${restavracijaId}`; 
+        });
+
+        // 2. Event listener za ikono srca (ostane enak, da prepreči preusmeritev)
+        const favoriteIcon = kartica.querySelector('.favorite-icon');
+        if (favoriteIcon) {
+            favoriteIcon.addEventListener('click', (e) => {
+                e.stopPropagation(); // KRITIČNO: Prepreči, da bi klik na srce sprožil klik na kartico
+                toggleFavorite(restavracijaId);
+                
+                // Ročna posodobitev ikone:
+                if (globalFavoritesList.includes(restavracijaId)) {
+                    favoriteIcon.classList.remove('far');
+                    favoriteIcon.classList.add('fas');
+                } else {
+                    favoriteIcon.classList.remove('fas');
+                    favoriteIcon.classList.add('far');
                 }
-                
-                kontejnerElement.appendChild(kartica);
             });
         }
+        
+        kontejnerElement.appendChild(kartica);
+    });
+}
 
 
         // ===========================================

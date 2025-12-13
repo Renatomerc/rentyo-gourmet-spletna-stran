@@ -70,7 +70,11 @@ const UporabnikShema = new mongoose.Schema({
     resetPasswordToken: { type: String, select: false }, 
     resetPasswordExpires: { type: Date, select: false },
 
-}, { timestamps: true });
+}, { 
+    timestamps: true,
+    // 🔥 KRITIČEN POPRAVEK: Določitev imena zbirke (kolekcije)
+    collection: 'uporabniks' 
+});
 
 // Metoda za primerjavo gesla
 UporabnikShema.methods.primerjajGeslo = async function(vnesenoGeslo) {

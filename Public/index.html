@@ -8144,6 +8144,42 @@ function startNavigation(buttonElement) {
     }
 }
 // window.startNavigation = startNavigation;
+// Ta koda mora iti V DATOTEKO INDEX.HTML
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Preverimo, če je v URL-ju ID za odpiranje restavracije
+    const urlParams = new URLSearchParams(window.location.search);
+    const restavracijaIdZaOdpiranje = urlParams.get('openRestavracijaId');
+
+    if (restavracijaIdZaOdpiranje) {
+        
+        let restavracijaObjekt = null;
+        
+        // 2. Poskusimo pridobiti celoten objekt restavracije (Potrebujemo ga za prikaziPodrobnosti)
+        if (typeof getFullRestaurantDetails === 'function') {
+            restavracijaObjekt = await getFullRestaurantDetails(restavracijaIdZaOdpiranje);
+        } else {
+            console.warn('OPOZORILO: Funkcija getFullRestaurantDetails ni najdena. Modal se ne bo mogel odpreti z vsemi podrobnostmi.');
+        }
+
+        // 3. Preverimo, ali smo dobili objekt in ali je funkcija definirana
+        // 🔥 POPRAVEK: Uporabljamo vaše dejansko ime funkcije prikaziPodrobnosti
+        if (restavracijaObjekt && typeof prikaziPodrobnosti === 'function') {
+            
+            // 4. Odstranimo ID iz URL-ja (za čistejši URL)
+            history.replaceState(null, '', location.pathname);
+
+            // 5. Pokličemo vašo funkcijo za odpiranje modala z CELOTNIM OBJEKTOM
+            await prikaziPodrobnosti(restavracijaObjekt);
+            
+        } else if (restavracijaObjekt) {
+            console.error('Napaka: Funkcija prikaziPodrobnosti ni definirana v index.html.');
+        } else {
+            console.warn('OPOZORILO: Restavracija s tem ID-jem ni bila najdena.');
+        }
+    }
+    // ... ostala DOMContentLoaded koda v index.html
+});
 
 
 </script>
