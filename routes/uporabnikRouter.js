@@ -16,20 +16,16 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     // ⭐ 2. KLJUČNO: Ustvarimo model Uporabnik (na sekundarni povezavi)
     const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema); 
     
-    // ⭐ 3. KLJUČNO: UVOZIMO CELOTEN AUTH CONTROLLER!
+    // ⭐ 3. KLJUČNO: UVOZIMO CELOTEN AUTH CONTROLLER! (Klican kot funkcija)
     const authController = require('../controllers/authController')(
         JWT_SECRET_KEY, 
         Uporabnik, 
         Restavracija 
     );
     
-    // 🔥 NOVO: UVOZIMO TUDI RESTAVRACIJE CONTROLLER za upravljanje priljubljenih!
-    // ⭐⭐ POPRAVEK: Popravljeno ime datoteke in dodana končnica '.js'! ⭐⭐
-    const restavracijeController = require('../controllers/restavracijaController.js')( 
-        Uporabnik, // Controller potrebuje model Uporabnik (za priljubljene)
-        Restavracija, // Controller potrebuje model Restavracija
-        JWT_SECRET_KEY
-    );
+    // 🔥 UVOZIMO RESTAVRACIJA CONTROLLER!
+    // ⭐⭐ KLJUČNI POPRAVEK: Pravilno ime datoteke in brez klica funkcije '(...)'
+    const restavracijeController = require('../controllers/restavracijaController.js'); 
     
     // ==========================================================
     // 🟠 GLAVNE RUTe, KI KLIČEJO FUNKCIJE IZ CONTROLLERJA
@@ -57,17 +53,18 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
 
     
     // ==========================================================
-    // 🔥🔥 NOVE POTI ZA FCM IN PRILJUBLJENE (Za reševanje težav) 🔥🔥
+    // 🔥🔥 NOVE POTI ZA FCM IN PRILJUBLJENE (Rešitev 404) 🔥🔥
     // ==========================================================
     
-    // 1. Shranjevanje in posodabljanje FCM Tokena (Push Obvestila)
+    // 1. Shranjevanje in posodabljanje FCM Tokena
     router.post('/shrani-fcm-token', zahtevajPrijavo, authController.saveFCMToken); 
 
-    // 2. Pridobivanje/Preklapljanje Priljubljenih 
+    // 2. Pridobivanje seznama priljubljenih
     router.get('/priljubljene', zahtevajPrijavo, restavracijeController.getFavoriteRestaurants);
-    
-    // TO REŠUJE NAPAKO 404 NA INDEX.HTML! Pota je: /api/uporabnik/priljubljene/toggle
-    router.post('/priljubljene/toggle', zahtevajPrijavo, restavracijeController.toggleFavorite);
+
+    // 3. Preklapljanje priljubljenosti (rešitev za napako 404!)
+    // Pot: POST /api/uporabnik/priljubljene/toggle
+    router.post('/priljubljene/toggle', zahtevajPrijavo, restavracijeController.toggleFavorite); 
 
 
     // ==========================================================
