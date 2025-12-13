@@ -24,7 +24,8 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     );
     
     // 🔥 NOVO: UVOZIMO TUDI RESTAVRACIJE CONTROLLER za upravljanje priljubljenih!
-    const restavracijeController = require('../controllers/restavracijeController')(
+    // ⭐⭐ POPRAVEK: Popravljeno ime datoteke in dodana končnica '.js'! ⭐⭐
+    const restavracijeController = require('../controllers/restavracijaController.js')( 
         Uporabnik, // Controller potrebuje model Uporabnik (za priljubljene)
         Restavracija, // Controller potrebuje model Restavracija
         JWT_SECRET_KEY
@@ -60,14 +61,12 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     // ==========================================================
     
     // 1. Shranjevanje in posodabljanje FCM Tokena (Push Obvestila)
-    // To je KLJUČNA pot za rešitev težave z obvestili!
-    router.post('/shrani-fcm-token', zahtevajPrijavo, authController.saveFCMToken); // Uporabimo NOVO funkcijo iz authControllerja!
+    router.post('/shrani-fcm-token', zahtevajPrijavo, authController.saveFCMToken); 
 
-    // 2. Pridobivanje/Preklapljanje Priljubljenih (Čeprav je to v restavracijeController, je pot logično povezana z uporabnikom)
-    // Opomba: Ti dve poti bi lahko bili v ločenem routerju 'restavracije', vendar če uporabljate samo en router za uporabniške akcije, sta lahko tukaj.
+    // 2. Pridobivanje/Preklapljanje Priljubljenih 
     router.get('/priljubljene', zahtevajPrijavo, restavracijeController.getFavoriteRestaurants);
     
-    // TO REŠUJE NAPAKO 404 NA INDEX.HTML! Pota mora biti: /api/uporabnik/priljubljene/toggle
+    // TO REŠUJE NAPAKO 404 NA INDEX.HTML! Pota je: /api/uporabnik/priljubljene/toggle
     router.post('/priljubljene/toggle', zahtevajPrijavo, restavracijeController.toggleFavorite);
 
 
