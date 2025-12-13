@@ -3694,18 +3694,30 @@ body.is-capacitor-app #aiChatModal {
             <div id="galerijaSlike" class="galerija-slike">
                 </div>
 </div>
-        <div class="podrobnosti-tekst">
-            <h2 id="modalIme">Ime Restavracije</h2>
-            
-           <div class="info-vrstica">
-                <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
-                <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
-                <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
-            </div>
+      <div class="podrobnosti-tekst">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 id="modalIme" style="margin-bottom: 0;">Ime Restavracije</h2>
+        
+        <button 
+            id="modalFavoriteToggle" 
+            class="gumb-priljubljeno-modal" 
+            data-id="" 
+            style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;"
+        >
+            <i class="favorite-icon fa-heart far"></i> 
+            <span style="font-size: 1rem; font-weight: bold;">favorite</span>
+        </button>
+        </div>
+    
+   <div class="info-vrstica">
+        <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
+        <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
+        <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
+    </div>
 
             <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
 
-            </div> 
+            </div>
         
         <div class="rezervacija-vnosna-polja">
             <div class="vnosno-polje">
@@ -4202,6 +4214,7 @@ const initializePushNotifications = async () => {
 
 window.addEventListener('load', initializePushNotifications);
 
+
 // TUKAJ SE NADALJUJE OSTALA GLOBALNA KODA
 </script>
 <script>
@@ -4280,6 +4293,7 @@ const pikadayLangs = {
 
 // API BASE URL
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+const TOGGLE_FAVORITE_API_URL = `${API_BASE_URL}/users/favorites/toggle`;
 
 // GLOBALNE SPREMENLJIVKE ZA PODATKE IN STANJE
 let allRestavracije = [];
@@ -4289,6 +4303,7 @@ let globalSelectedTime = null;
 let currentRestaurantId = null; 
 let globalSelectedMizaId = null; 
 let globalSelectedMizaIme = null;
+let globalFavoritesList = [];
 
 // 🔥 NOVA GLOBALNA SPREMENLJIVKA ZA ZEMLJEVID (Leaflet)
 let map = null; 
@@ -4373,6 +4388,124 @@ const potrdiNovoGesloBtn = document.getElementById('potrdiNovoGeslo');   // Gumb
 </script>
 
 <script>
+ 
+ // =========================================================
+// 🔥 1. PRIDOBITEV TOKENA (POPRAVLJEN KLJUČ - DVOJNO PREVERJANJE) 🔥
+// =========================================================
+
+/**
+ * Pridobi shranjeni JWT token iz localStorage.
+ */
+function getUserToken() {
+    // 1. Poskus: Preverimo ključ, za katerega ste ugotovili, da deluje (starejša implementacija).
+    let token = localStorage.getItem('zeton'); 
+    
+    // 2. Poskus: Preverimo ključ, ki smo ga poskušali standardizirati.
+    if (!token) {
+        token = localStorage.getItem('auth-token'); 
+    }
+    
+    // Vrne token, če je prisoten in ni "fake-token"
+    if (token && token !== 'fake-token') { 
+        console.log(`[AUTH] Token uspešno pridobljen. (Dolžina: ${token.length})`);
+        return token;
+    } else {
+        console.warn("[AUTH] Opozorilo: JWT token ni najden/veljaven v localStorage.");
+        return null;
+    }
+}
+
+// Globalna spremenljivka, ki hrani pridobljeni token
+const zeton = getUserToken(); 
+
+// =========================================================
+// 🔥 2. FUNKCIJA ZA PRILJUBLJENE (Prenesena iz profil.html) 🔥
+// =========================================================
+
+/**
+ * Preklopi stanje restavracije med priljubljeno in navadno.
+ * @param {string} restavracijaId ID restavracije.
+ */
+const toggleFavorite = async (restavracijaId) => {
+    
+    if (!zeton) {
+        // Uporabljamo direktno prikaziSporocilo, saj smo ga definirali
+        prikaziSporocilo('warning', 'Prijava je potrebna za shranjevanje priljubljenih!'); 
+        return;
+    }
+
+    try {
+        const response = await fetch(TOGGLE_FAVORITE_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${zeton}` // Uporaba globalnega žetona
+            },
+            body: JSON.stringify({ restavracijaId })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Posodobitev globalnega seznama
+            if (data.action === 'added') {
+                if (!globalFavoritesList.includes(restavracijaId)) {
+                    globalFavoritesList.push(restavracijaId);
+                }
+                prikaziSporocilo('success', 'Restavracija dodana med priljubljene.'); 
+            } else if (data.action === 'removed') {
+                globalFavoritesList = globalFavoritesList.filter(id => id !== restavracijaId);
+                prikaziSporocilo('success', 'Restavracija odstranjena iz priljubljenih.'); 
+            }
+            
+            // OPOMBA: Spodnje funkcije so morda specifične za profil.html in jih lahko odstranite ali komentirate
+            // naloziAktivneRezervacije();
+            // naloziPretekleRezervacije();
+            
+        } else {
+            const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+            prikaziSporocilo('error', `Napaka pri priljubljenih: ${errorData.msg || response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Kritična napaka pri shranjevanju priljubljenih:", error);
+        prikaziSporocilo('error', 'Napaka strežnika pri shranjevanju priljubljenih.');
+    }
+};
+
+// =========================================================
+// 🔥 3. EVENT LISTENER (Zagotovite, da ga imate v svoji kodi) 🔥
+// =========================================================
+
+// Prepričajte se, da imate ta poslušalec za klika na gumb za priljubljene
+document.body.addEventListener('click', (e) => {
+    const favoriteButton = e.target.closest('#modalFavoriteToggle');
+
+    if (favoriteButton) {
+        e.stopPropagation(); 
+
+        const restavracijaId = favoriteButton.getAttribute('data-id');
+        const icon = favoriteButton.querySelector('.favorite-icon');
+
+        if (restavracijaId) {
+            // Klic funkcije, ki smo jo definirali
+            if (typeof toggleFavorite === 'function') {
+                toggleFavorite(restavracijaId);
+            }
+
+            // Posodobitev vizualnega stanja srca (se mora ujemati s togoom)
+            if (icon) {
+                if (icon.classList.contains('fas')) {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                } else {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                }
+            }
+        }
+    }
+});
+// =========================================================
 
 // =================================================================
 // ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
@@ -6835,15 +6968,48 @@ async function prikaziPodrobnosti(restavracija) {
         prikazLokacije = `<i class="fas fa-map-marker-alt"></i> ${gpsString}`;
     }
     
-    // Polnjenje Glavnih podrobnosti
-    if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
-    if(modalIme) modalIme.textContent = restavracijaIme;
-    if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+   // Polnjenje Glavnih podrobnosti
+if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
 
-    if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
+// 🔥 Vstavljanje gumba za priljubljene, ki se pozicionira absolutno 🔥
+const favoriteButtonHTML = `
+    <button 
+        id="modalFavoriteToggle" 
+        class="gumb-priljubljeno-modal" 
+        data-id="${currentRestaurantId}" 
+        style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px; z-index: 100;"
+    >
+        <i class="favorite-icon fa-heart far"></i>
+        <span style="font-size: 1rem; font-weight: bold;">favorite</span>
+    </button>
+`;
 
-    if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
-    if (modalOpis) {
+// Preveri, ali gumb že obstaja, preden ga ustvari
+if (!document.getElementById('modalFavoriteToggle')) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = favoriteButtonHTML;
+    
+    // Predvidevamo, da je '.podrobnosti-tekst' kontejner (parent element) za H2
+    const detailsContainer = document.querySelector('.podrobnosti-tekst');
+    if (detailsContainer) {
+        detailsContainer.style.position = 'relative'; // Ključno za Absolutno pozicioniranje
+        
+        // Vstavimo ga kot prvi otrok v kontejner
+        detailsContainer.insertBefore(tempDiv.firstChild, detailsContainer.firstChild);
+    }
+} else {
+    // Če gumb že obstaja (iz prejšnjih odprtih modalov), samo posodobi ID
+    document.getElementById('modalFavoriteToggle').setAttribute('data-id', currentRestaurantId);
+}
+// Konec vstavljanja gumba
+    
+if(modalIme) modalIme.textContent = restavracijaIme;
+if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+
+if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
+
+if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
+if (modalOpis) {
     modalOpis.innerHTML = opis; 
 }
 
@@ -8180,6 +8346,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // ... ostala DOMContentLoaded koda v index.html
 });
+
+
 
 
 </script>

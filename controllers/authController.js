@@ -283,6 +283,51 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         res.status(200).json({ message: 'Geslo je bilo uspešno ponastavljeno. Sedaj se lahko prijavite z novim geslom.' });
     };
     
+    
+    // ==========================================================
+    // 🔥 NOVO: FUNKCIJA ZA POSODABLJANJE FCM TOKENA 🔥
+    // ==========================================================
+
+    /**
+     * Shrani FCM token (za Push obvestila) v uporabniški zapis.
+     * Uporablja se PO prijavi ali kadarkoli se token posodobi.
+     * POST /api/uporabnik/shrani-fcm-token
+     * @access Private (zahteva avtentikacijo)
+     */
+    exports.saveFCMToken = async (req, res) => {
+        const { fcmToken } = req.body;
+        const userId = req.uporabnik ? req.uporabnik.id : null; 
+
+        if (!userId) {
+            return res.status(401).json({ msg: 'Neavtorizirano: Potrebna prijava.' });
+        }
+
+        if (!fcmToken || typeof fcmToken !== 'string') {
+            return res.status(400).json({ msg: 'Neveljaven ali manjkajoč FCM token.' });
+        }
+
+        try {
+            // Uporabimo findByIdAndUpdate za shranjevanje tokena
+            const uporabnik = await Uporabnik.findByIdAndUpdate(
+                userId,
+                { fcmToken: fcmToken }, 
+                { new: true, runValidators: true } // Vrnemo posodobljeni dokument
+            ).select('ime fcmToken'); 
+
+            if (!uporabnik) {
+                return res.status(404).json({ msg: 'Uporabnik ni najden.' });
+            }
+
+            console.log(`[FCM] Token za uporabnika ${uporabnik.ime} uspešno posodobljen.`);
+            res.status(200).json({ msg: 'FCM token uspešno shranjen.', fcmToken: uporabnik.fcmToken });
+
+        } catch (error) {
+            console.error('❌ Napaka pri shranjevanju FCM tokena:', error.message);
+            res.status(500).json({ msg: 'Napaka strežnika pri shranjevanju FCM tokena.' });
+        }
+    };
+
+    
     // ==========================================================
     // ⭐ IZVOZ VSEH FUNKCIJ 
     // ==========================================================
@@ -293,8 +338,11 @@ module.exports = (JWT_SECRET_KEY, Uporabnik, Restavracija) => {
         profil: exports.profil,
         izbrisProfila: exports.izbrisProfila,
         forgotPassword: exports.forgotPassword, 
-        // 💥 POZOR: Staro funkcijo resetPassword smo zamenjali z novo confirmResetPassword
         confirmResetPassword: exports.confirmResetPassword,
+        
+        // 🔥 DODANO: Izvoz nove funkcije za shranjevanje FCM tokena
+        saveFCMToken: exports.saveFCMToken, 
+        
         // Izvoz pomožnih funkcij, ki jih potrebuje uporabnikRoutes.js za socialno prijavo:
         generirajZeton: generirajZeton,
         nastaviAuthPiškotek: nastaviAuthPiškotek

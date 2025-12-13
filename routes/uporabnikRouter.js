@@ -1,12 +1,10 @@
 // ==========================================================
 // 🟢 POSODOBLJENA uporabnikRoutes.js — Router za Avtentikacijo
-// Logika PREMAKNJENA v authController.js! Ta datoteka sedaj samo USMERJA.
 // ==========================================================
 module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => { 
 
     const express = require('express');
     const router = express.Router();
-    // Odstranjeni uvozi: jwt, bcrypt (so v Controllerju)
     const mongoose = require('mongoose'); 
     const passport = require('passport'); 
 
@@ -19,11 +17,17 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema); 
     
     // ⭐ 3. KLJUČNO: UVOZIMO CELOTEN AUTH CONTROLLER!
-    // Controller sedaj prejme ključ in modele, ki jih potrebuje za izvajanje logike.
     const authController = require('../controllers/authController')(
         JWT_SECRET_KEY, 
         Uporabnik, 
         Restavracija 
+    );
+    
+    // 🔥 NOVO: UVOZIMO TUDI RESTAVRACIJE CONTROLLER za upravljanje priljubljenih!
+    const restavracijeController = require('../controllers/restavracijeController')(
+        Uporabnik, // Controller potrebuje model Uporabnik (za priljubljene)
+        Restavracija, // Controller potrebuje model Restavracija
+        JWT_SECRET_KEY
     );
     
     // ==========================================================
@@ -31,7 +35,6 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     // ==========================================================
 
     // Prijava / Registracija / Odjava
-    // Logika je v authController.js
     router.post('/registracija', authController.registracija);
     router.post('/prijava', authController.prijava);
     router.post('/odjava', authController.odjava);
@@ -45,16 +48,31 @@ module.exports = (JWT_SECRET_KEY, preveriGosta, zahtevajPrijavo) => {
     // ⭐ NOVE POTI ZA PONASTAVITEV GESLA (Z PIN KODO) ⭐
     // ==========================================================
     
-    // 1. Zahteva PIN kode (klic exports.forgotPassword)
+    // 1. Zahteva PIN kode
     router.post('/forgot-password', authController.forgotPassword);
     
-    // 2. Potrditev PIN kode in ponastavitev gesla (klic exports.confirmResetPassword)
-    // Opomba: Stara pot /reset-password/:token je odstranjena.
+    // 2. Potrditev PIN kode in ponastavitev gesla
     router.post('/reset-password/confirm', authController.confirmResetPassword);
+
+    
+    // ==========================================================
+    // 🔥🔥 NOVE POTI ZA FCM IN PRILJUBLJENE (Za reševanje težav) 🔥🔥
+    // ==========================================================
+    
+    // 1. Shranjevanje in posodabljanje FCM Tokena (Push Obvestila)
+    // To je KLJUČNA pot za rešitev težave z obvestili!
+    router.post('/shrani-fcm-token', zahtevajPrijavo, authController.saveFCMToken); // Uporabimo NOVO funkcijo iz authControllerja!
+
+    // 2. Pridobivanje/Preklapljanje Priljubljenih (Čeprav je to v restavracijeController, je pot logično povezana z uporabnikom)
+    // Opomba: Ti dve poti bi lahko bili v ločenem routerju 'restavracije', vendar če uporabljate samo en router za uporabniške akcije, sta lahko tukaj.
+    router.get('/priljubljene', zahtevajPrijavo, restavracijeController.getFavoriteRestaurants);
+    
+    // TO REŠUJE NAPAKO 404 NA INDEX.HTML! Pota mora biti: /api/uporabnik/priljubljene/toggle
+    router.post('/priljubljene/toggle', zahtevajPrijavo, restavracijeController.toggleFavorite);
+
 
     // ==========================================================
     // 🔴 SOCIALNA PRIJAVA Z GOOGLE & APPLE RUTE (OSTANEJO TUKAJ!)
-    // Ker potrebujejo Passport.js (req, res, next) in generiranje tokena
     // ==========================================================
 
     // --- GOOGLE PRIJAVA ---
