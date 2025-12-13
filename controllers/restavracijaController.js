@@ -1,13 +1,13 @@
 // ===============================================
 // 🟢 RESTAVRACIJA CONTROLLER
 // Vsebuje vso poslovno logiko za restavracije, rezervacije in Geo iskanje.
+// (Vključen POPRAVEK: Priljubljene restavracije)
 // ===============================================
 
-// ⚠️ OPOMBA: Če se strežnik zatakne, je najverjetnejša težava pri uvozu ali definiciji modela.
 const Restavracija = require('../models/Restavracija'); 
 const mongoose = require('mongoose');
 
-// 🟢 DODANO: Uvozimo model Uporabnik iz sekundarne povezave
+// 🟢 UVOZ MODELA UPORABNIK ZA SEKUNDARNO POVEZAVO (POTREBNO ZA FAVORITE)
 const UporabnikShema = require('../models/Uporabnik'); 
 const dbUsers = require('../dbUsers');
 const Uporabnik = dbUsers.model('Uporabnik', UporabnikShema);
@@ -91,6 +91,7 @@ exports.getPrivzetoRestavracije = async (req, res) => {
         res.status(500).json({ msg: "Napaka strežnika pri nalaganju restavracij" });
     }
 };
+
 /**
  * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (POPRAVLJEN KLON getPrivzetoRestavracije)
  * Vrača samo restavracije, ki imajo neprazno polje 'popust'.
@@ -539,7 +540,7 @@ exports.ustvariRezervacijo = async (req, res) => {
         // 4. Končna preverba: Ali smo našli mizo?
         if (!prostaMizaId) {
              return res.status(409).json({ 
-                msg: `Žal nam je, ob ${casStart} ni proste mize, ki bi ustrezala ${stOseb} osebam.`,
+                msg: `Žal nam je, ob ${casZacetka} ni proste mize, ki bi ustrezala ${stOseb} osebam.`,
                 status: "ZASEDNO"
             });
         }
@@ -569,7 +570,7 @@ exports.ustvariRezervacijo = async (req, res) => {
         }
 
         res.status(201).json({ 
-            msg: `Rezervacija uspešno ustvarjena za mizo ${prostaMizaIme} ob ${casStart}.`,
+            msg: `Rezervacija uspešno ustvarjena za mizo ${prostaMizaIme} ob ${casZacetka}.`,
             rezervacija: novaRezervacija,
             miza: prostaMizaIme // Dodamo ime mize v odgovor
         });
@@ -631,6 +632,50 @@ exports.izbrisiRezervacijo = async (req, res) => {
     } catch (error) {
         console.error('Napaka pri TRDEM brisanju rezervacije:', error);
         res.status(500).json({ msg: 'Napaka serverja pri brisanju rezervacije.' });
+    }
+};
+
+
+// =================================================================
+// 3. Admin operacije (PUT /admin/posodobi_vsebino/:restavracijaId)
+// =================================================================
+
+/**
+ * Posodobitev bogatih podatkov (slike, opis, meni)
+ */
+exports.posodobiAdminVsebino = async (req, res) => { 
+    const restavracijaId = req.params.restavracijaId;
+    const { novOpis, glavnaSlikaUrl, galerijaUrlsi, novMeni } = req.body;
+    
+    if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
+        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    }
+
+    try {
+        const updateData = {};
+        if (novOpis) updateData.description = novOpis;
+        if (glavnaSlikaUrl) updateData.mainImageUrl = glavnaSlikaUrl;
+        
+        // 🔥 POPRAVEK: Zamenjano 'galleryUrls' z 'galerija_slik'
+        if (galerijaUrlsi) updateData.galerija_slik = galerijaUrlsi;
+        
+        if (novMeni) updateData.menu = novMeni;
+        
+        const posodobljeno = await Restavracija.findByIdAndUpdate(
+            restavracijaId, 
+            { $set: updateData }, 
+            { new: true, runValidators: true } 
+        );
+
+        if (!posodobljeno) {
+            return res.status(404).json({ msg: 'Restavracija ni najdena za posodobitev.' });
+        }
+
+        res.json({ msg: 'Vsebina uspešno posodobljena.', restavracija: posodobljeno });
+
+    } catch (error) {
+        console.error('Napaka pri posodabljanju admin vsebine:', error);
+        res.status(500).json({ msg: 'Napaka serverja.' });
     }
 };
 
@@ -820,50 +865,6 @@ exports.pridobiZgodovinoRezervacijUporabnika = async (req, res) => {
     } catch (error) {
         console.error("Napaka pri pridobivanju zgodovine rezervacij uporabnika:", error);
         res.status(500).json({ msg: 'Napaka strežnika pri nalaganju zgodovine rezervacij.' });
-    }
-};
-
-
-// =================================================================
-// 3. Admin operacije (PUT /admin/posodobi_vsebino/:restavracijaId)
-// =================================================================
-
-/**
- * Posodobitev bogatih podatkov (slike, opis, meni)
- */
-exports.posodobiAdminVsebino = async (req, res) => { 
-    const restavracijaId = req.params.restavracijaId;
-    const { novOpis, glavnaSlikaUrl, galerijaUrlsi, novMeni } = req.body;
-    
-    if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
-        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
-    }
-
-    try {
-        const updateData = {};
-        if (novOpis) updateData.description = novOpis;
-        if (glavnaSlikaUrl) updateData.mainImageUrl = glavnaSlikaUrl;
-        
-        // 🔥 POPRAVEK: Zamenjano 'galleryUrls' z 'galerija_slik'
-        if (galerijaUrlsi) updateData.galerija_slik = galerijaUrlsi;
-        
-        if (novMeni) updateData.menu = novMeni;
-        
-        const posodobljeno = await Restavracija.findByIdAndUpdate(
-            restavracijaId, 
-            { $set: updateData }, 
-            { new: true, runValidators: true } 
-        );
-
-        if (!posodobljeno) {
-            return res.status(404).json({ msg: 'Restavracija ni najdena za posodobitev.' });
-        }
-
-        res.json({ msg: 'Vsebina uspešno posodobljena.', restavracija: posodobljeno });
-
-    } catch (error) {
-        console.error('Napaka pri posodabljanju admin vsebine:', error);
-        res.status(500).json({ msg: 'Napaka serverja.' });
     }
 };
 
@@ -1348,6 +1349,7 @@ exports.isciRestavracije = async (req, res) => {
     }
 };
 
+
 // =================================================================
 // 🌟 NOVO: Funkcija za pretečene rezervacije (DODAJTE JO V SERVER.JS!)
 // =================================================================
@@ -1366,7 +1368,6 @@ exports.oznaciPretekleRezervacije = async () => {
     
     // Čas za primerjavo DANAŠNJIH rezervacij: npr. 1 uro nazaj
     const pretekliCas = new Date(danes.getTime() - (60 * 60000)); 
-    const uraMinuteZdaj = `${String(pretekliCas.getHours()).padStart(2, '0')}:${String(pretekliCas.getMinutes()).padStart(2, '0')}`;
     const danesISO = danes.toISOString().split('T')[0];
 
     try {
@@ -1421,3 +1422,116 @@ exports.oznaciPretekleRezervacije = async () => {
         return 0;
     }
 }
+
+
+// =================================================================
+// 🔥 7. NOVE FUNKCIJE ZA PRILJUBLJENE RESTAVRACIJE
+// =================================================================
+
+/**
+ * 🌟 Preklapljanje statusa priljubljenosti restavracije za prijavljenega uporabnika.
+ * POST /api/restavracije/favorites/toggle/:restavracijaId
+ * @access Private
+ */
+exports.toggleFavorite = async (req, res) => {
+    const restavracijaId = req.params.restavracijaId;
+    const userId = req.uporabnik ? req.uporabnik.id : null;
+    
+    if (!userId) {
+        return res.status(401).json({ msg: 'Neavtorizirano: Prijavite se za upravljanje priljubljenih.' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
+        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    }
+
+    try {
+        const userIdObj = new mongoose.Types.ObjectId(userId);
+        const restavracijaIdObj = new mongoose.Types.ObjectId(restavracijaId);
+        
+        const uporabnik = await Uporabnik.findById(userIdObj, 'favorite_restaurants');
+        
+        if (!uporabnik) {
+            return res.status(404).json({ msg: 'Uporabnik ni najden.' });
+        }
+        
+        // Preverimo, ali je ID restavracije že v seznamu (uporabljamo toString za varno primerjavo)
+        const jePriljubljena = uporabnik.favorite_restaurants.some(id => id.toString() === restavracijaIdObj.toString());
+
+        let posodobitevRezultat;
+        let operacija;
+
+        if (jePriljubljena) {
+            // ODSTRANI (UNFAVORITE)
+            posodobitevRezultat = await Uporabnik.findByIdAndUpdate(
+                userIdObj,
+                { $pull: { favorite_restaurants: restavracijaIdObj } },
+                { new: true }
+            );
+            operacija = 'odstranjeno';
+            console.log(`[FAVORITE] Restavracija ${restavracijaId} odstranjena iz priljubljenih za uporabnika ${userId}.`);
+
+        } else {
+            // DODAJ (FAVORITE)
+            // Uporabimo $addToSet, da zagotovimo unikatnost v polju
+            posodobitevRezultat = await Uporabnik.findByIdAndUpdate(
+                userIdObj,
+                { $addToSet: { favorite_restaurants: restavracijaIdObj } },
+                { new: true }
+            );
+            operacija = 'dodano';
+            console.log(`[FAVORITE] Restavracija ${restavracijaId} dodana v priljubljene za uporabnika ${userId}.`);
+        }
+
+        // Vrnemo nov seznam, da ga frontend posodobi
+        res.status(200).json({ 
+            msg: `Restavracija uspešno ${operacija} med priljubljene.`,
+            status: operacija,
+            favorite_restaurants: posodobitevRezultat.favorite_restaurants
+        });
+
+    } catch (error) {
+        console.error('❌ Napaka pri preklapljanju priljubljenih restavracij:', error);
+        res.status(500).json({ msg: 'Napaka strežnika pri posodabljanju priljubljenih.' });
+    }
+};
+
+/**
+ * Pridobitev podrobnosti vseh priljubljenih restavracij za prijavljenega uporabnika.
+ * GET /api/restavracije/favorites/
+ * @access Private
+ */
+exports.getFavoriteRestaurants = async (req, res) => {
+    const userId = req.uporabnik ? req.uporabnik.id : null;
+
+    if (!userId) {
+        return res.status(401).json({ msg: 'Neavtorizirano: Prijavite se za ogled priljubljenih.' });
+    }
+
+    try {
+        const userIdObj = new mongoose.Types.ObjectId(userId);
+
+        // 1. Poišči uporabnika in "populiraj" (nanesi) podatke o restavracijah
+        const uporabnik = await Uporabnik.findById(userIdObj)
+            .populate({
+                path: 'favorite_restaurants', // Polje, ki ga populiramo
+                model: 'Restavracija',      // Uporabimo model Restavracija
+                select: 'ime mainImageUrl galerija_slik cuisine opis ocena_povprecje googleRating googleReviewCount lokacija' // Izberemo samo ključna polja
+            })
+            .select('favorite_restaurants')
+            .lean(); // Vrnemo kot navaden JS objekt za lažjo manipulacijo
+
+        if (!uporabnik) {
+            return res.status(404).json({ msg: 'Uporabnik ni najden.' });
+        }
+        
+        // 2. Preverimo in vrnemo samo seznam restavracij (lahko tudi v primeru, če je seznam prazen)
+        const priljubljene = uporabnik.favorite_restaurants || [];
+
+        res.status(200).json(priljubljene);
+
+    } catch (error) {
+        console.error('❌ Napaka pri pridobivanju priljubljenih restavracij:', error);
+        res.status(500).json({ msg: 'Napaka strežnika pri nalaganju priljubljenih restavracij.' });
+    }
+};
