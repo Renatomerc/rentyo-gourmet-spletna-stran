@@ -9,6 +9,13 @@
     padding: 0;
 }
 
+/* Dodatno: Nastavitev minimalne višine za HTML in BODY */
+html, body {
+    /* To je potrebno, da se telo (body) pravilno raztegne za visoke strani */
+    min-height: 100%; 
+    height: auto;
+}
+
 /* Osnovna tipografija in barva ozadja telesa */
 body {
     background-image: url('circles-and-roundabouts.png'); 
@@ -16,19 +23,26 @@ body {
     /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
     background-color: #F5F5F5; 
     
-    /* Preprečimo, da bi se vzorec premikal ob drsenju, če je to želeno */
-    /* background-attachment: fixed; */ 
+    /* Zelo pomembno: Omogoča, da se body::before pravilno pozicionira */
+    position: relative; 
 }
+
 body::before {
     content: ''; /* Obvezno za pseudo-elemente */
-    position: absolute;
+    
+    /* 🔥 POPRAVEK: Uporabite 'fixed' ali 'absolute' v kombinaciji z 100% višine. */
+    /* Uporabimo 'absolute', saj želimo, da se raztegne čez celotno vsebino. */
+    position: absolute; 
+    
     top: 0;
     left: 0;
     width: 100%;
+    
+    /* 🔥 POPRAVEK: Višino nastavite na 100% vsebine BODY elementa */
     height: 100%;
     
     /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
-    background-color: rgba(255, 255, 255, 0.511); /* Bela barva (255, 255, 255) z 50% prosojnostjo (0.5) */
+    background-color: rgba(255, 255, 255, 0.591); 
     
     /* Zagotovimo, da je ta sloj pod vso vsebino */
     z-index: -1; 
@@ -174,7 +188,7 @@ a:hover {
     padding: 15px;
     background-color: #ffffff;
     border: 1px solid #ffffff;
-    box-shadow: 0 0px 10px rgba(78, 78, 78, 0.372); 
+    box-shadow: 0 0px 4px rgba(78, 78, 78, 0.454); 
     margin: -50px 7% 20px 7%; /* Velik negativen rob zgoraj - za splet/velik zaslon */
     border-radius: 30px;
     z-index: 20;
@@ -303,7 +317,7 @@ body.is-capacitor .iskalnik-sekcija {
     font-weight: 500;
     transition: background-color 0.3s;
     margin-top: 10px; /* Majhen razmik na mobilnem */
-    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.424) !important;
+    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.424) !important;
     
     /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
     -webkit-tap-highlight-color: transparent;
@@ -346,7 +360,7 @@ body.is-capacitor .iskalnik-sekcija {
     display: inline-block;
     padding: 8px 10px; /* Zmeren padding za gumb */
     border: 1px solid #333; /* Rdeč rob kot poudarek */
-    box-shadow: 0 0px 5px rgba(78, 78, 78, 0.333); 
+    box-shadow: 0 0px 0px rgba(78, 78, 78, 0.333); 
     border-radius: 25px; /* Zaobljeni robovi */
     background-color: #fff;
     color: #333;
@@ -384,7 +398,7 @@ body.is-capacitor .iskalnik-sekcija {
 /* ========================================================================= */
 
 .kartice-restavracij {
-    padding: 30px 5%;
+    padding: 25px 5%;
     text-align: center;
     position: relative; /* Potrebno za absolutno pozicioniranje ločilne črte */
     
@@ -392,7 +406,7 @@ body.is-capacitor .iskalnik-sekcija {
 
 .kartice-restavracij h2 {
     margin-bottom: 25px;
-    font-size: 1.5em;
+    font-size: 1.2em;
     color: #333
 }
 .kartice-restavracij h3 {
@@ -701,7 +715,7 @@ body.is-capacitor .iskalnik-sekcija {
     }
     
     .kartica img {
-        height: 150px; /* Še manjša slika */
+        height: 160px; /* Še manjša slika */
     }
     
     .kartica h3 {

@@ -501,14 +501,27 @@ function prikaziModalPodrobnosti(restavracija) {
         tabMeni.innerHTML = ustvariMenijaHTML(restavracija.menu, currentLang);
     }
 
-    // 3. Napolnimo zavihek GALERIJA
-    const tabGalerija = document.getElementById('tabGalerija');
-    if(tabGalerija) {
-        const lat = restavracija.lokacija && restavracija.lokacija.coordinates ? restavracija.lokacija.coordinates[1] : null;
-        const lng = restavracija.lokacija && restavracija.lokacija.coordinates ? restavracija.lokacija.coordinates[0] : null;
+ // 3. Napolnimo zavihek GALERIJA
+const tabGalerija = document.getElementById('tabGalerija');
 
-        tabGalerija.innerHTML = ustvariGalerijeHTML(restavracija.galleryUrls, lat, lng);
-    }
+if(tabGalerija) {
+    // 🔥 POPRAVEK: Uporaba DEFAULT_LAT/DEFAULT_LON, če koordinate niso na voljo 🔥
+    
+    const hasCoordinates = restavracija.lokacija && 
+                           restavracija.lokacija.coordinates && 
+                           restavracija.lokacija.coordinates.length === 2;
+
+    const lat = hasCoordinates 
+        ? restavracija.lokacija.coordinates[1] 
+        : DEFAULT_LAT; // Uporabi DEFAULT_LAT namesto null
+        
+    const lng = hasCoordinates 
+        ? restavracija.lokacija.coordinates[0] 
+        : DEFAULT_LON; // Uporabi DEFAULT_LON namesto null
+
+    // V tem koraku ustvarjamo HTML za zavihek:
+    tabGalerija.innerHTML = ustvariGalerijeHTML(restavracija.galleryUrls, lat, lng);
+}
     
     // 4. Nastavimo zavihek Rezervacija (resetiramo proste ure)
     const tabRezervacija = document.getElementById('tabRezervacija');
@@ -580,30 +593,32 @@ function ustvariGalerijeHTML(galerijaUrl, lat, lng) {
     let zemljevidHtml = `<h4 data-i18n="modal.map_title" class="text-xl font-bold mb-3 mt-6 text-gray-700">${i18next.t('modal.map_title')}</h4>`;
     
     if (lat && lng) {
-        // Uporaba resničnih lat/lng vrednosti v embed URL-ju
-        const embedUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=sl&z=15&output=embed`;
-        const navigacijskiURL = `https://maps.google.com/?q=${lat},${lng}`; 
-        
-        zemljevidHtml += `
-            <a href="${navigacijskiURL}" target="_blank" class="block">
-                <div class="zemljevid-ovoj rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 cursor-pointer relative">
-                    <iframe
-                        src="${embedUrl}" 
-                        width="100%"
-                        height="400"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                    <div class="absolute inset-0 bg-transparent z-10" aria-label="${i18next.t('modal.click_for_navigation')}"></div>
-                </div>
-            </a>
-            
-        `;
-    } else {
-        zemljevidHtml += `<p class="p-4 text-center text-gray-500">${i18next.t('modal.no_map')}</p>`;
-    }
+    // 🔥 NOVI, ČISTEJŠI GOOGLE EMBED URL:
+    // Uporabljamo format q=lat,lng za čistejši zemljevid brez dodatnih kontrol
+    const embedUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`; 
+    
+    // URL za navigacijo ostane enak
+    const navigacijskiURL = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`; 
+    
+    zemljevidHtml += `
+        <a href="${navigacijskiURL}" target="_blank" class="block">
+            <div class="zemljevid-ovoj rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 cursor-pointer relative">
+                <iframe
+                    src="${embedUrl}" 
+                    width="100%"
+                    height="400"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+                <div class="absolute inset-0 bg-transparent z-10" aria-label="${i18next.t('modal.click_for_navigation')}"></div>
+            </div>
+        </a>
+    `;
+} else {
+    zemljevidHtml += `<p class="p-4 text-center text-gray-500">${i18next.t('modal.no_map')}</p>`;
+}
 
     return `<div class="galerija-sekcija p-4">${slikeHtml}</div><div class="zemljevid-sekcija p-4">${zemljevidHtml}</div>`;
 }

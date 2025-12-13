@@ -46,6 +46,7 @@ body::before {
     }
 
     /* ===== GLAVA IN SKRIVANJE ELEMENTOV ===== */
+    /* Če je na profil.html, je glava že prilagojena z gumbom nazaj */
     .logotip {
         display: none !important; 
     }
@@ -126,22 +127,14 @@ body::before {
 /* ================================================================= */
 
 .qr-scan-ovoj {
-    /* Odstranimo stari stil, ki je bil samo črta */
-    /* padding: 15px 0; */
-    /* margin-bottom: 15px; */
-    /* border-bottom: 1px solid #eee; */
-    
     /* 🟢 NOVI OVALNI OVOJ (KARTICA) 🟢 */
     background-color: #88d82d; /* Bela notranjost */
     border-radius: 12px; /* Zaobljeni robovi */
     padding: 15px; /* Notranji rob znotraj ovoja */
     margin: 15px; /* Zunanji rob, da se kartica loči od okolice */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Senčenje, da izgleda kot kartica */
-    
-    /* Prepričajte se, da je ta element display:block ali display:flex */
     display: block; 
 }
-
 
 /* ================================================================= */
 /* OBSTOJEČI STILI ZA NOTRANJO VSEBINO (QR gumb) */
@@ -673,8 +666,15 @@ body::before {
         <i class="fas fa-arrow-left"></i>
     </a>
 
-    <div class="akcije">
-        </div>
+    <div class="akcije" style="display: none;"> 
+         <a href="prijava.html" class="gumb-prijava" data-i18n="header.login_button" id="gumb-prijava-header">
+           <i class="fas fa-sign-in-alt"></i> Prijava 
+         </a>
+         <a href="profil.html" class="gumb-profil" data-i18n="header.profile_button" id="gumb-profil-header" style="display: none;">
+           <i class="fas fa-user-circle"></i> Profil 
+         </a>
+    </div>
+
   </header>
 
   <main>
@@ -687,7 +687,7 @@ body::before {
         <div class="profil-zavihek" data-target="osnovni-podatki" data-i18n="profile.tab_data">Osebni Podatki</div>
         <div class="profil-zavihek active" data-target="aktualne-rezervacije" data-i18n="profile.tab_current">Aktualne Rezervacije</div>
         <div class="profil-zavihek" data-target="zgodovina" data-i18n="profile.tab_history">Zgodovina Rezervacij</div>
-        <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
+        <div class="profil-zavihek" data-target="priljubljene" data-i18n="profile.tab_favorites">Priljubljeno</div> <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
       </div>
 
      <div class="vsebina-zavihek" id="osnovni-podatki">
@@ -722,7 +722,10 @@ body::before {
       <div class="vsebina-zavihek" id="zgodovina">
         <h3 data-i18n="profile.history_subtitle">Pretekle rezervacije</h3>
         </div>
-
+        
+      <div class="vsebina-zavihek" id="priljubljene">
+        <h3 data-i18n="profile.favorites_subtitle">Priljubljene restavracije</h3>
+      </div>
       <div class="vsebina-zavihek" id="tocke-kartica">
         <h3 data-i18n="profile.points_payment_subtitle">Točke in Plačilna sredstva</h3>
         <div class="kartica-podatkov">
@@ -814,14 +817,25 @@ body::before {
     </main>
   <script>
         // ===========================================
-        // API KONFIGURACIJA
+        // GLAVNE SPREMENLJIVKE STANJA IN API KONFIGURACIJA
         // ===========================================
+        
+        // KRITIČNO: Globalne spremenljivke stanja (brez ponovne deklaracije)
+        let zeton = localStorage.getItem('zeton'); // Uporabljamo let, ker se lahko spremeni (npr. odjava)
+        let profilniPodatki = null;
+        
+        // Globalna spremenljivka za shranjevanje ID-jev priljubljenih restavracij
+        let globalFavoritesList = []; 
+        
+        // Preverjanje okolja za QR skeniranje (iz prvega dela)
+        const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform();
+
+        // API KONFIGURACIJA
         const BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/';
         
         // API poti
         const PROFIL_API_URL = `${BASE_URL}auth/profil`;
-        // NOVO: API pot za izbris računa
-        const IZBRIS_RACUNA_API_URL = `${BASE_URL}auth/profil`; // Običajno uporabljamo isti endpoint z DELETE metodo za profil
+        const IZBRIS_RACUNA_API_URL = `${BASE_URL}auth/profil`; 
         
         const AKTIVNE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/aktivne`;
         const PRETEKLE_REZERVACIJE_API_URL = `${BASE_URL}restavracije/uporabnik/zgodovina`; 
@@ -829,8 +843,12 @@ body::before {
         const ODDAJ_OCENO_API_URL = `${BASE_URL}restavracije/oceni`; 
         const QR_API_URL = `${BASE_URL}restavracije/potrdi_prihod`; 
 
+        // API POTI ZA PRILJUBLJENE (Favorites)
+        const FAVORITES_API_URL = `${BASE_URL}restavracije/uporabnik/priljubljene`; 
+        const TOGGLE_FAVORITE_API_URL = `${BASE_URL}restavracije/uporabnik/priljubljene/toggle`; 
+
         // ===========================================
-        // Elementi modala in podatki
+        // DOM ELEMENTI
         // ===========================================
         const modalOcena = document.getElementById('modal-ocena');
         const modalZapriGumb = document.querySelector('#modal-ocena .zapri-gumb');
@@ -842,7 +860,7 @@ body::before {
         
         // Elementi za zvezdice
         const visualRating = document.getElementById('visual-rating');
-        const hiddenSelect = document.getElementById('ocena-skrita');
+        const hiddenSelect = document.getElementById('ocena-skrita'); // Ni uporabljen, ampak OK
         
         // Elemente za prikaz podatkov
         const podatkiImeElement = document.getElementById('profil-ime'); 
@@ -850,8 +868,9 @@ body::before {
         const aktivneRezervacijeKontejner = document.getElementById('aktualne-rezervacije');
         const zgodovinaRezervacijKontejner = document.getElementById('zgodovina');
         const tockeStatusElement = document.getElementById('tocke-status-prikaz');
+        const priljubljeneRestavracijeKontejner = document.getElementById('priljubljene');
         
-        // 🚀 Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
+        // Elementi za QR skeniranje (Referenca je globalna zaradi ponovnega renderiranja)
         let scanStatusElement = document.getElementById('scan-status');
 
 
@@ -865,6 +884,8 @@ body::before {
          * @param {string} sporocilo Besedilo sporočila
          */
         const prikaziSporocilo = (tip, sporocilo) => {
+            if (!sporociloOvoj) return console.error('Sporočilo Ovoj element ni najden.');
+            
             const sporociloDiv = document.createElement('div');
             sporociloDiv.classList.add('sporocilo', tip);
             sporociloDiv.textContent = sporocilo;
@@ -877,7 +898,11 @@ body::before {
             // Skrij in odstrani po 5 sekundah
             setTimeout(() => {
                 sporociloDiv.classList.remove('visible');
-                setTimeout(() => sporociloOvoj.removeChild(sporociloDiv), 300);
+                setTimeout(() => {
+                    if (sporociloDiv.parentElement === sporociloOvoj) {
+                        sporociloOvoj.removeChild(sporociloDiv);
+                    }
+                }, 300);
             }, 5000);
         };
 
@@ -894,234 +919,251 @@ body::before {
                 zavihek.classList.add("active");
                 const targetId = zavihek.getAttribute("data-target");
                 document.getElementById(targetId).classList.add("active");
+
+                // Če je aktivni zavihek "priljubljene", naložimo podatke
+                if (targetId === 'priljubljene') {
+                    naloziPriljubljeneRestavracije();
+                }
             });
         });
 
 
- // ===========================================
-// 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (ML KIT) 🚀
-// ===========================================
+        // ===========================================
+        // 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (ML KIT) 🚀
+        // ===========================================
 
-// Ali tečemo v Capacitor okolju?
-const isCapacitorApp = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform();
-
-// UI cleanup (ML Kit ne uporablja stopScan ali showBackground!)
-const stopHighlight = async () => { 
-    document.body.classList.remove('barcode-scanner-active');
-};
+        // UI cleanup (ML Kit ne uporablja stopScan ali showBackground!)
+        const stopHighlight = async () => { 
+            // Ta funkcija je v ML Kit skeniranju prazna, a jo pustimo za kompatibilnost
+            document.body.classList.remove('barcode-scanner-active');
+        };
 
 
-/**
- * 1. Pošlje restavracijaId na strežnik
- */
-const potrdiPrihodNaStrežniku = async (restavracijaId) => {
-    if (!zeton) {
-        prikaziSporocilo('error', i18next.t('profile.auth_required'));
-        return;
-    }
-    
-    if (scanStatusElement) {
-         scanStatusElement.textContent = i18next.t('profile.status_sending');
-         scanStatusElement.style.color = '#575757';
-    }
-
-    try {
-        const response = await fetch(QR_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${zeton}` 
-            },
-            body: JSON.stringify({ restavracijaId })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            prikaziSporocilo('success', data.msg);
-
-            if (scanStatusElement) {
-                const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
-                scanStatusElement.textContent = statusMsg;
-                scanStatusElement.style.color = 'green';
+        /**
+         * 1. Pošlje restavracijaId na strežnik
+         */
+        const potrdiPrihodNaStrežniku = async (restavracijaId) => {
+            if (!zeton) {
+                prikaziSporocilo('error', i18next.t('profile.auth_required'));
+                return;
             }
-
-            naloziPodatkeProfila();
-            naloziAktivneRezervacije();
-            naloziPretekleRezervacije();
-
-        } else {
-            const errorMsg = i18next.t('profile.status_error') + `: ${data.msg}`;
-            prikaziSporocilo('error', errorMsg);
-
-            if (scanStatusElement) {
-                scanStatusElement.textContent = errorMsg;
-                scanStatusElement.style.color = 'red';
-            }
-        }
-
-    } catch (error) {
-        prikaziSporocilo('error', i18next.t('profile.server_error'));
-
-        if (scanStatusElement) {
-            scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
-            scanStatusElement.style.color = 'red';
-        }
-    }
-
-    await stopHighlight(); 
-};
-
-
-/**
- * 2. ML Kit skeniranje (KONČNA POPRAVLJENA VERZIJA)
- */
-const zacniSkeniranje = async () => {
-    
-    if (!isCapacitorApp) {
-        prikaziSporocilo('error', i18next.t('profile.scan_unavailable'));
-        return;
-    }
-
-    const { BarcodeScanner } = Capacitor.Plugins;
-
-    try {
-        
-        // 1. Preverjanje dovoljenj
-        const permissions = await BarcodeScanner.requestPermissions();
-        
-        if (permissions.camera !== 'granted') {
-             const msg = i18next.t('profile.camera_permission_required') || 'Za skeniranje je potrebno dovoljenje za kamero.';
-             prikaziSporocilo('error', msg);
-             return; 
-        }
-        
-        if (scanStatusElement) {
-            scanStatusElement.textContent = i18next.t('profile.status_scanning');
-            scanStatusElement.style.color = '#1BC0BB';
-        }
-
-        // 2. Native ML Kit Activity
-        const result = await BarcodeScanner.scan(); 
-        
-        await stopHighlight();
-        
-        // ⭐ POPRAVEK: Preverjamo result.barcodes[0] in ne result.barcode
-        if (!result.barcodes || result.barcodes.length === 0 || !result.barcodes[0].rawValue) {
-            const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano ali neuspešno.';
-            prikaziSporocilo('error', msg);
-            if (scanStatusElement) scanStatusElement.textContent = msg;
-            return;
-        }
-
-        // ⭐ Pravilno pridobivanje rawValue iz tabelary result.barcodes
-        const rawValue = result.barcodes[0].rawValue; 
-        
-        // 3. Čiščenje in Validacija
-        let restavracijaId = rawValue
-            .trim()
-            .replace(/[^0-9a-fA-F]/g, '');
-
-        // STRIKTA VALIDACIJA (24-mestni format)
-        if (!restavracijaId || restavracijaId.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(restavracijaId)) {
             
-            const msg = i18next.t('profile.invalid_qr_format') || 'Neveljavna oblika QR kode (pričakovan 24-mestni ID).';
-            prikaziSporocilo('error', msg);
-            if (scanStatusElement) scanStatusElement.textContent = msg;
-            return;
-        }
-
-        // ⭐ KONČNI PUSH: Klic na strežnik s potrjenim in očiščenim ID-jem
-        potrdiPrihodNaStrežniku(restavracijaId);
-
-    } catch (error) {
-        prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
-        console.error("ML Kit napaka:", error);
-        await stopHighlight();
-    }
-};
-
-
-// ===========================================
-// 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
-// ===========================================
-
-const zeton = localStorage.getItem('zeton');
-
-const updateHeader = () => {
-    if (!zeton) {
-        window.location.href = 'index.html';
-    }
-};
-
-const odjava = (e) => {
-    if (e) e.preventDefault();
-    localStorage.removeItem('zeton'); 
-    localStorage.removeItem('jeLastnik'); 
-    window.location.href = 'index.html'; 
-};
-
-// ===========================================
-// NOVO: LOGIKA ZA IZBRIS RAČUNA
-// ===========================================
-
-const izbrisiRacun = async (e) => {
-    if (e) e.preventDefault();
-    
-    // Uporaba i18next za prevajanje besedila potrditve
-    if (!window.confirm(i18next.t('profile.delete_account_confirmation') || 'Ste prepričani, da želite trajno izbrisati račun? To je NEPOVRATNO!')) {
-        return;
-    }
-
-    if (!zeton) {
-         // Predpostavljamo, da funkcija prikaziSporocilo obstaja
-         prikaziSporocilo('error', i18next.t('profile.delete_no_auth') || 'Manjka avtentikacija.');
-         odjava();
-         return;
-    }
-    
-    try {
-        // Predpostavljamo, da je IZBRIS_RACUNA_API_URL definiran
-        const response = await fetch(IZBRIS_RACUNA_API_URL, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${zeton}` 
+            if (scanStatusElement) {
+                 scanStatusElement.textContent = i18next.t('profile.status_sending');
+                 scanStatusElement.style.color = '#575757';
             }
-        });
 
-        if (response.ok) {
-            prikaziSporocilo('success', i18next.t('profile.delete_success') || 'Račun uspešno izbrisan.');
-            // Po uspešnem izbrisu izbrišemo žeton in preusmerimo uporabnika
-            odjava(); 
-        } else {
-            const errorData = await response.json().catch(() => ({ msg: response.statusText }));
-            console.error("SERVER RESPONSE ERROR on account deletion:", response.status, errorData);
-            prikaziSporocilo('error', `${i18next.t('profile.delete_error') || 'Napaka pri izbrisu'}: ${errorData.msg || response.statusText}`);
-        }
-    } catch (error) {
-        console.error("Napaka pri komunikaciji z backendom:", error);
-        prikaziSporocilo('error', i18next.t('profile.server_error') || 'Napaka strežnika.');
-    }
-};
+            try {
+                const response = await fetch(QR_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}` 
+                    },
+                    body: JSON.stringify({ restavracijaId })
+                });
 
-// ===========================================
+                const data = await response.json();
 
-const posodobiPrikazPodatka = (element, labelKey, value) => {
-    if (element) {
-        const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
-        let span = element.querySelector('.placeholder-text');
-        
-        element.innerHTML = `<strong>${label}:</strong> `; 
-        
-        if(!span) {
-            span = document.createElement('span');
-            span.className = 'placeholder-text';
-        }
-        span.textContent = value;
-        element.appendChild(span);
-    }
-};
+                if (response.ok) {
+                    prikaziSporocilo('success', data.msg);
+
+                    if (scanStatusElement) {
+                        const statusMsg = i18next.t('profile.status_success', { points: data.noveTocke }) || data.msg;
+                        scanStatusElement.textContent = statusMsg;
+                        scanStatusElement.style.color = 'green';
+                    }
+
+                    naloziPodatkeProfila();
+                    naloziAktivneRezervacije();
+                    naloziPretekleRezervacije();
+
+                } else {
+                    const errorMsg = i18next.t('profile.status_error') + `: ${data.msg}`;
+                    prikaziSporocilo('error', errorMsg);
+
+                    if (scanStatusElement) {
+                        scanStatusElement.textContent = errorMsg;
+                        scanStatusElement.style.color = 'red';
+                    }
+                }
+
+            } catch (error) {
+                prikaziSporocilo('error', i18next.t('profile.server_error'));
+
+                if (scanStatusElement) {
+                    scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
+                    scanStatusElement.style.color = 'red';
+                }
+            }
+
+            await stopHighlight(); 
+        };
+
+
+        /**
+         * 2. ML Kit skeniranje
+         */
+        const zacniSkeniranje = async () => {
+            
+            if (!isCapacitorApp) {
+                prikaziSporocilo('error', i18next.t('profile.scan_unavailable'));
+                return;
+            }
+
+            // Uporabimo Capacitor objekt, ki je globalno dostopen
+            const { BarcodeScanner } = Capacitor.Plugins;
+
+            try {
+                
+                // 1. Preverjanje dovoljenj
+                const permissions = await BarcodeScanner.requestPermissions();
+                
+                if (permissions.camera !== 'granted') {
+                     const msg = i18next.t('profile.camera_permission_required') || 'Za skeniranje je potrebno dovoljenje za kamero.';
+                     prikaziSporocilo('error', msg);
+                     return; 
+                }
+                
+                if (scanStatusElement) {
+                    scanStatusElement.textContent = i18next.t('profile.status_scanning');
+                    scanStatusElement.style.color = '#1BC0BB';
+                }
+
+                // 2. Native ML Kit Activity
+                const result = await BarcodeScanner.scan(); 
+                
+                await stopHighlight();
+                
+                // Preverjanje result.barcodes[0]
+                if (!result.barcodes || result.barcodes.length === 0 || !result.barcodes[0].rawValue) {
+                    const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano ali neuspešno.';
+                    prikaziSporocilo('error', msg);
+                    if (scanStatusElement) scanStatusElement.textContent = msg;
+                    return;
+                }
+
+                // Pravilno pridobivanje rawValue iz tabelary result.barcodes
+                const rawValue = result.barcodes[0].rawValue; 
+                
+                // 3. Čiščenje in Validacija
+                let restavracijaId = rawValue
+                    .trim()
+                    .replace(/[^0-9a-fA-F]/g, '');
+
+                // STRIKTA VALIDACIJA (24-mestni format)
+                if (!restavracijaId || restavracijaId.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(restavracijaId)) {
+                    
+                    const msg = i18next.t('profile.invalid_qr_format') || 'Neveljavna oblika QR kode (pričakovan 24-mestni ID).';
+                    prikaziSporocilo('error', msg);
+                    if (scanStatusElement) scanStatusElement.textContent = msg;
+                    return;
+                }
+
+                // KONČNI PUSH: Klic na strežnik s potrjenim in očiščenim ID-jem
+                potrdiPrihodNaStrežniku(restavracijaId);
+
+            } catch (error) {
+                prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
+                console.error("ML Kit napaka:", error);
+                await stopHighlight();
+            }
+        };
+
+
+        // ===========================================
+        // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV
+        // ===========================================
+
+        const updateHeader = () => {
+            // Logika za index.html gumba (če bi bila vključena v profil.html)
+            const gumbPrijava = document.getElementById('gumb-prijava-header');
+            const gumbProfil = document.getElementById('gumb-profil-header');
+            
+            if (gumbPrijava && gumbProfil) {
+                 if (zeton) {
+                     gumbPrijava.style.display = 'none';
+                     gumbProfil.style.display = 'inline-flex';
+                 } else {
+                     gumbPrijava.style.display = 'inline-flex';
+                     gumbProfil.style.display = 'none';
+                 }
+            }
+
+
+            if (!zeton) {
+                 // Če smo na profil.html brez žetona, preusmerimo nazaj na index.html
+                 if (window.location.pathname.endsWith('profil.html')) {
+                      window.location.href = 'index.html';
+                 }
+            }
+        };
+
+        const odjava = (e) => {
+            if (e) e.preventDefault();
+            localStorage.removeItem('zeton'); 
+            localStorage.removeItem('jeLastnik'); 
+            // Posodobimo globalni žeton
+            zeton = null;
+            window.location.href = 'index.html'; 
+        };
+
+        // ===========================================
+        // LOGIKA ZA IZBRIS RAČUNA
+        // ===========================================
+
+        const izbrisiRacun = async (e) => {
+            if (e) e.preventDefault();
+            
+            if (!window.confirm(i18next.t('profile.delete_account_confirmation') || 'Ste prepričani, da želite trajno izbrisati račun? To je NEPOVRATNO!')) {
+                return;
+            }
+
+            if (!zeton) {
+                 prikaziSporocilo('error', i18next.t('profile.delete_no_auth') || 'Manjka avtentikacija.');
+                 odjava();
+                 return;
+            }
+            
+            try {
+                const response = await fetch(IZBRIS_RACUNA_API_URL, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}` 
+                    }
+                });
+
+                if (response.ok) {
+                    prikaziSporocilo('success', i18next.t('profile.delete_success') || 'Račun uspešno izbrisan.');
+                    odjava(); 
+                } else {
+                    const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+                    console.error("SERVER RESPONSE ERROR on account deletion:", response.status, errorData);
+                    prikaziSporocilo('error', `${i18next.t('profile.delete_error') || 'Napaka pri izbrisu'}: ${errorData.msg || response.statusText}`);
+                }
+            } catch (error) {
+                console.error("Napaka pri komunikaciji z backendom:", error);
+                prikaziSporocilo('error', i18next.t('profile.server_error') || 'Napaka strežnika.');
+            }
+        };
+
+
+        const posodobiPrikazPodatka = (element, labelKey, value) => {
+             if (element) {
+                 const label = typeof i18next !== 'undefined' ? i18next.t(labelKey) : labelKey; 
+                 let span = element.querySelector('.placeholder-text');
+                 
+                 element.innerHTML = `<strong>${label}:</strong> `; 
+                 
+                 if(!span) {
+                     span = document.createElement('span');
+                     span.className = 'placeholder-text';
+                 }
+                 span.textContent = value;
+                 element.appendChild(span);
+             }
+        };
 
         const naloziPodatkeProfila = async () => {
             if (!zeton) return;
@@ -1131,7 +1173,6 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 gumbOdjava.addEventListener('click', odjava);
             }
             
-            // NOVO: Povezava gumba za izbris računa
             const gumbIzbrisRacuna = document.getElementById('gumb-izbris-racuna');
             if (gumbIzbrisRacuna) {
                 gumbIzbrisRacuna.addEventListener('click', izbrisiRacun);
@@ -1149,11 +1190,18 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 if (response.ok) {
                     const data = await response.json();
                     const uporabnik = data.uporabnik || data; 
+                    profilniPodatki = uporabnik; // Shranimo podatke v globalno spremenljivko
 
                     if (uporabnik && uporabnik.ime && uporabnik.email) {
                         posodobiPrikazPodatka(podatkiImeElement, 'profile.name_label', uporabnik.ime);
                         posodobiPrikazPodatka(podatkiEmailElement, 'profile.email_label', uporabnik.email);
                         
+                        // Nalaganje seznama priljubljenih ID-jev
+                        if (uporabnik.favorite_restaurants && Array.isArray(uporabnik.favorite_restaurants)) {
+                             // Shrani samo ID-je, ne celotnih objektov, ki so morda vrnjeni (če ni populate)
+                             globalFavoritesList = uporabnik.favorite_restaurants.map(fav => typeof fav === 'string' ? fav : fav._id);
+                        }
+
                         if (tockeStatusElement && uporabnik.tockeZvestobe !== undefined) {
                             const tocke = uporabnik.tockeZvestobe;
                             const tockeZaEuro = 45; 
@@ -1222,13 +1270,16 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 prikaziSporocilo('error', i18next.t('profile.server_error'));
             }
         };
-
+        
+        /**
+         * Glavna funkcija za renderiranje rezervacij (aktivne, pretekle)
+         */
         const renderRezervacije = (rezervacije, kontejnerElement, jeAktivnaLista) => {
             const h3 = kontejnerElement.querySelector('h3');
             kontejnerElement.innerHTML = '';
             if (h3) kontejnerElement.appendChild(h3);
             
-            // 🚀 Popravek: Dodajanje QR dela nazaj v aktivne rezervacije
+            // Dodajanje QR dela nazaj v aktivne rezervacije
             if (jeAktivnaLista) {
                 const qrOvoj = document.createElement('div');
                 qrOvoj.classList.add('qr-scan-ovoj');
@@ -1291,8 +1342,9 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 kartica.style.gap = '15px';
                 kartica.style.backgroundColor = '#fff';
                 
-                const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; // Vzemi status rezervacije
+                const currentStatus = rez.status?.toUpperCase() || 'POTRJENO'; 
 
+                // LOGIKA ZA PRETEKLE REZERVACIJE (OCENJEVANJE)
                 if (!jeAktivnaLista) {
                     
                     const isCancelled = currentStatus === 'PREKLICANO'; 
@@ -1306,11 +1358,12 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                         kartica.classList.add('ocenjeno'); 
                     } 
                     
-                    // Omogoči ocenjevanje samo, če ni preklicano in še ni ocenjeno
+                    // Omogoči ocenjevanje samo, če ni preklicano in še ni ocenjeno in je potrjen prihod
                     if (!jeZeOcenjeno && !isCancelled && currentStatus === 'POTRJENO_PRIHOD') { 
                         kartica.style.cursor = 'pointer';
                         kartica.addEventListener('click', (e) => {
-                            if (e.target.tagName !== 'BUTTON') { 
+                            // Če kliknemo na kartico, odpri modal
+                            if (e.target.tagName !== 'BUTTON' && !e.target.classList.contains('favorite-icon')) { 
                                 odpriModalOcena(rez.restavracijaId, rez._id, rez.ime_restavracije);
                             }
                         });
@@ -1324,7 +1377,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                     
                 }
                 
-                // --- 1. Podatki o rezervaciji ---
+                // --- 1. Podatki o rezervaciji in ikona Srca (Favorite) ---
                 const cas = rez.cas_rezervacije;
                 const ura = Math.floor(cas); 
                 const minute = Math.round((cas - ura) * 60); 
@@ -1333,11 +1386,19 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 const podatkiDiv = document.createElement('div');
                 podatkiDiv.classList.add('rezervacija-podatki');
                 
+                // LOGIKA ZA SRCE (FAVORITE)
+                const restavracijaId = rez.restavracijaId;
+                const jePriljubljeno = globalFavoritesList.includes(restavracijaId);
+                const favoriteClass = jePriljubljeno ? 'fas' : 'far'; 
+                
              let htmlContent = `
-    <div class="rez-card">
+    <div class="rez-card" style="position: relative; padding-right: 40px;"> 
+        <div class="favorite-icon-wrapper" data-id="${restavracijaId}" style="position: absolute; top: 0; right: 0;">
+             <i class="${favoriteClass} fa-heart favorite-icon" data-restavracija-id="${restavracijaId}" style="font-size: 1.3rem; color: #e74c3c; cursor: pointer; transition: color 0.2s;"></i>
+        </div>
+        
         <p class="rez-title">${rez.ime_restavracije}</p>
 
-        <!-- Koledar -->
         <div class="rez-row">
             <div class="rez-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1350,7 +1411,6 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
             <div class="rez-text">${rez.datum_rezervacije}</div>
         </div>
 
-        <!-- Ura -->
         <div class="rez-row">
             <div class="rez-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1361,7 +1421,6 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
             <div class="rez-text">${casIzpis}</div>
         </div>
 
-        <!-- Ena oseba -->
         <div class="rez-row">
             <div class="rez-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#076b6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1375,12 +1434,10 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
 `;
 
 
-
-
-                // Logika za status v zgodovini
+                // Logika za status v zgodovini (Popravek logike, uporaba izvornih pogojev)
                 if (!jeAktivnaLista) {
                     const isCancelled = currentStatus === 'PREKLICANO'; 
-                    const jeZeOcenjeno = kartica.classList.contains('ocenjeno'); 
+                    const jeZeOcenjeno = rez.ocenjeno || false; // Uporabimo neposredni status
                     
                     let statusTextHtml = '';
 
@@ -1391,7 +1448,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                                             <i class="fas fa-check-circle" style="color: #076b6a;"></i> 
                                             ${i18next.t('profile.status_rated')}
                                         </p>`;
-                    } else if (currentStatus === 'POTRJENO_PRIHOD') { // Ko ni preklicano in še ni ocenjeno
+                    } else if (currentStatus === 'POTRJENO_PRIHOD') { 
                          statusTextHtml = `<p style="margin: 5px 0 0 0; font-weight: bold; color:#076b6a;">
                                             ${i18next.t('profile.status_rate_now')}
                                         </p>`;
@@ -1407,20 +1464,28 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 podatkiDiv.innerHTML = htmlContent;
                 kartica.appendChild(podatkiDiv);
                 
-                // --- 2. LOGIKA ZA AKTIVNE REZERVACIJE (Potrjeno ali Prekliči) ---
+                // EVENT LISTENER ZA SRCE
+                const favoriteIcon = kartica.querySelector('.favorite-icon');
+                if (favoriteIcon) {
+                    favoriteIcon.addEventListener('click', (e) => {
+                        e.stopPropagation(); 
+                        toggleFavorite(restavracijaId); 
+                    });
+                }
+                
+                // LOGIKA ZA AKTIVNE REZERVACIJE (Potrjeno ali Prekliči)
                 if (jeAktivnaLista) {
-                    // POPRAVEK: Preverjamo status 'POTRJENO_PRIHOD', saj strežnik to nastavi po QR skeniranju.
                     const jePotrjeno = currentStatus === 'POTRJENO_PRIHOD'; 
 
                     if (jePotrjeno) {
-                        // Renderiraj 'Potrjeno' status namesto gumba (gumb Prekliči se skrije)
+                        // Renderiraj 'Potrjeno' status
                         const statusDiv = document.createElement('div');
                         statusDiv.classList.add('status-potrjeno');
                         statusDiv.textContent = i18next.t('profile.status_confirmed') || 'Potrjeno'; 
                         kartica.appendChild(statusDiv);
                         
                     } else {
-                        // Renderiraj 'Prekliči' gumb (če je status 'POTRJENO' ali kateri koli drug ne-potrjen status)
+                        // Renderiraj 'Prekliči' gumb
                         const preklicGumb = document.createElement('button');
                         preklicGumb.classList.add('gumb-preklici');
                         preklicGumb.textContent = i18next.t('profile.cancel_button');
@@ -1442,6 +1507,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
         };
 
         const naloziAktivneRezervacije = async () => {
+             if (!zeton) return;
             try {
                 const response = await fetch(AKTIVNE_REZERVACIJE_API_URL, {
                     method: 'GET',
@@ -1463,6 +1529,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
         };
 
         const naloziPretekleRezervacije = async () => {
+             if (!zeton) return;
             try {
                 const response = await fetch(PRETEKLE_REZERVACIJE_API_URL, {
                     method: 'GET',
@@ -1482,25 +1549,176 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 console.error("Kritična napaka pri nalaganju preteklih rezervacij:", error);
             }
         };
+        
+        // ===========================================
+        // LOGIKA ZA PRILJUBLJENE (Toggle Favorite in Loading)
+        // ===========================================
+
+        /**
+         * Preklopi stanje restavracije med priljubljeno in navadno.
+         * To je ključna funkcija za srce (Favorite)
+         * @param {string} restavracijaId ID restavracije.
+         */
+        const toggleFavorite = async (restavracijaId) => {
+            
+            if (!zeton) {
+                prikaziSporocilo('error', i18next.t('profile.login_required') || 'Prijava je potrebna za shranjevanje priljubljenih!');
+                return;
+            }
+
+            try {
+                const response = await fetch(TOGGLE_FAVORITE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${zeton}`
+                    },
+                    body: JSON.stringify({ restavracijaId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Posodobitev globalnega seznama
+                    if (data.action === 'added') {
+                        if (!globalFavoritesList.includes(restavracijaId)) {
+                            globalFavoritesList.push(restavracijaId);
+                        }
+                        prikaziSporocilo('success', i18next.t('profile.favorite_added') || 'Restavracija dodana med priljubljene.'); 
+                    } else if (data.action === 'removed') {
+                        globalFavoritesList = globalFavoritesList.filter(id => id !== restavracijaId);
+                        prikaziSporocilo('success', i18next.t('profile.favorite_removed') || 'Restavracija odstranjena iz priljubljenih.'); 
+                    }
+                    
+                    // Ponovno naložimo prikaz (pomembno za ikone srca na karticah)
+                    naloziAktivneRezervacije();
+                    naloziPretekleRezervacije();
+                    
+                    // Če smo na zavihku 'priljubljene', ponovno naložemo ta seznam
+                    if (document.getElementById('priljubljene')?.classList.contains('active')) {
+                        naloziPriljubljeneRestavracije();
+                    }
+                    
+                } else {
+                    const errorData = await response.json().catch(() => ({ msg: response.statusText }));
+                    prikaziSporocilo('error', `${i18next.t('profile.favorite_error') || 'Napaka pri priljubljenih:'} ${errorData.msg || response.statusText}`);
+                }
+            } catch (error) {
+                console.error("Kritična napaka pri shranjevanju priljubljenih:", error);
+                prikaziSporocilo('error', i18next.t('profile.server_error'));
+            }
+        };
+
+        /**
+         * Naloži seznam priljubljenih restavracij za prikaz v zavihku.
+         */
+        const naloziPriljubljeneRestavracije = async () => {
+             if (!zeton || !priljubljeneRestavracijeKontejner) return;
+
+            // Prikaz nalaganja (z naslovom)
+            priljubljeneRestavracijeKontejner.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
+            priljubljeneRestavracijeKontejner.innerHTML += `<p style="padding: 15px 20px;">${i18next.t('profile.favorites_loading') || 'Nalaganje priljubljenih restavracij...'}</p>`;
+
+            try {
+                const response = await fetch(FAVORITES_API_URL, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${zeton}` }
+                });
+
+                if (response.ok) {
+                    const restavracije = await response.json();
+                    
+                    // Vedno ponastavimo s pravilnim naslovom
+                    priljubljeneRestavracijeKontejner.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
+
+                    if (restavracije && restavracije.length > 0) {
+                         // Uporabimo render funkcijo za priljubljene
+                         renderPriljubljene(restavracije, priljubljeneRestavracijeKontejner);
+                    } else {
+                         priljubljeneRestavracijeKontejner.innerHTML += `<p style="padding: 15px 20px;">${i18next.t('profile.no_favorites') || 'Trenutno nimate shranjenih priljubljenih restavracij.'}</p>`;
+                    }
+                    
+                } else {
+                    console.error("Napaka pri nalaganju priljubljenih:", response.status);
+                    priljubljeneRestavracijeKontejner.innerHTML += `<p style="color: red;">${i18next.t('profile.loading_error')}</p>`;
+                }
+            } catch (error) {
+                console.error("Kritična napaka pri nalaganju priljubljenih:", error);
+            }
+        };
+
+
+        /**
+         * NOVO: POENOSTAVLJENA RENDER FUNKCIJA ZA PRILJUBLJENE
+         */
+        const renderPriljubljene = (restavracije, kontejnerElement) => {
+            
+            // Začnemo z naslovom
+            kontejnerElement.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
+            
+            restavracije.forEach(rest => {
+                // Poskrbimo, da imamo ID (če je bil populate na backendu, je ID na rest._id)
+                const restavracijaId = rest._id;
+
+                const kartica = document.createElement('div');
+                kartica.classList.add('kartica-rezervacije', 'kartica-podatkov', 'priljubljena-kartica'); 
+                kartica.style.padding = '15px 20px';
+                kartica.style.marginBottom = '10px';
+                kartica.style.border = '1px solid #ccc';
+                kartica.style.borderRadius = '8px';
+                kartica.style.display = 'flex';
+                kartica.style.justifyContent = 'space-between'; 
+                kartica.style.alignItems = 'center';
+                kartica.style.backgroundColor = '#fff';
+                
+                
+                const jePriljubljeno = globalFavoritesList.includes(restavracijaId);
+                const favoriteClass = jePriljubljeno ? 'fas' : 'far';
+                
+                kartica.innerHTML = `
+                    <div>
+                        <p class="rez-title" style="margin: 0; font-size: 1.1em; font-weight: bold;">${rest.ime || rest.name}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #555;">${rest.naslov || i18next.t('profile.address_unknown')}</p>
+                        <a href="restavracija.html?id=${restavracijaId}" style="font-size: 0.9em; color: #076b6a; text-decoration: none; display: block; margin-top: 10px;">
+                            <i class="fas fa-external-link-alt"></i> ${i18next.t('profile.go_to_restaurant') || 'Prikaži restavracijo'}
+                        </a>
+                    </div>
+                    <div class="favorite-icon-wrapper" data-id="${restavracijaId}" style="flex-shrink: 0;">
+                        <i class="${favoriteClass} fa-heart favorite-icon" data-restavracija-id="${restavracijaId}" style="font-size: 1.5rem; color: #e74c3c; cursor: pointer;"></i>
+                    </div>
+                `;
+
+                const favoriteIcon = kartica.querySelector('.favorite-icon');
+                if (favoriteIcon) {
+                    favoriteIcon.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleFavorite(restavracijaId);
+                    });
+                }
+                
+                kontejnerElement.appendChild(kartica);
+            });
+        }
 
 
         // ===========================================
         // 5. LOGIKA ZA OCENJEVANJE IN ZVEZDICE 
         // ===========================================
         
-        // ... (Vsa logika za Modal in Star Rating ostane enaka) ...
-        
         /**
          * Odpre modal za ocenjevanje in napolni polja
          */
         const odpriModalOcena = (restavracijaId, rezervacijaId, imeRestavracije) => {
+             if (!modalOcena) return;
+             
             modalOcenaNaslov.textContent = `${i18next.t('profile.rate_title')} ${imeRestavracije}`;
             ocenaRestavracijaIdInput.value = restavracijaId; 
             ocenaRezervacijaIdInput.value = rezervacijaId; 
             
             // Počisti vnosna polja in inicializiraj zvezdice
             document.getElementById('ocena-skrita').value = '5'; // Nastavi privzeto na 5
-            document.getElementById('komentar').value = '';
+            const komentarInput = document.getElementById('komentar');
+            if(komentarInput) komentarInput.value = '';
             
             // KLJUČNO: Inicializacija prikaza zvezdic
             updateStarRating(5); 
@@ -1512,6 +1730,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
          * Zapre modal za ocenjevanje
          */
         const zapriModalOcena = () => {
+             if (!modalOcena) return;
             modalOcena.classList.add('skrij-modal');
             // Ponovno naloži zgodovino, da se posodobi status ocenjene rezervacije
             naloziPretekleRezervacije(); 
@@ -1526,7 +1745,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
             const restavracijaId = ocenaRestavracijaIdInput.value;
             const rezervacijaId = ocenaRezervacijaIdInput.value;
             const ocena = document.getElementById('ocena-skrita').value;
-            const komentar = document.getElementById('komentar').value;
+            const komentar = document.getElementById('komentar')?.value || '';
             
             if (!restavracijaId || !rezervacijaId || !ocena) {
                 prikaziSporocilo('error', i18next.t('profile.review_missing_data'));
@@ -1572,11 +1791,14 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
          * Posodobi vizualni prikaz zvezdic in skrito polje.
          */
         const updateStarRating = (value, isHover = false) => {
+             if (!visualRating) return;
+             
             const stars = visualRating.querySelectorAll('span');
             const numericValue = parseInt(value);
 
             if (!isHover) {
-                document.getElementById('ocena-skrita').value = value;
+                const hiddenInput = document.getElementById('ocena-skrita');
+                if (hiddenInput) hiddenInput.value = value;
                 visualRating.setAttribute('data-value', value);
             }
 
@@ -1673,7 +1895,13 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
           }
           
           if (modalOcenaNaslov) {
-             modalOcenaNaslov.textContent = i18next.t('profile.rate_title');
+             // Ohranimo obstoječi naslov, če je modal že odprt
+             if (modalOcenaNaslov.textContent.includes(':')) {
+                 const currentRestName = modalOcenaNaslov.textContent.split(':').pop().trim();
+                 modalOcenaNaslov.textContent = `${i18next.t('profile.rate_title')} ${currentRestName}`;
+             } else {
+                 modalOcenaNaslov.textContent = i18next.t('profile.rate_title');
+             }
           }
         };
 
@@ -1710,8 +1938,9 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                 const gumbPrekliciKartico = document.getElementById('gumb-preklici-kartico');
                 
                 // POČISTIMO STATIČNO VSEBINO za naknadno renderiranje z renderRezervacije
-                aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">${i18next.t('profile.current_subtitle')}</h3>`;
-                zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">${i18next.t('profile.history_subtitle')}</h3>`;
+                if (aktivneRezervacijeKontejner) aktivneRezervacijeKontejner.innerHTML = `<h3 data-i18n="profile.current_subtitle">${i18next.t('profile.current_subtitle')}</h3>`;
+                if (zgodovinaRezervacijKontejner) zgodovinaRezervacijKontejner.innerHTML = `<h3 data-i18n="profile.history_subtitle">${i18next.t('profile.history_subtitle')}</h3>`;
+                if (priljubljeneRestavracijeKontejner) priljubljeneRestavracijeKontejner.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
 
 
                 if (gumbDodajKartico && formularKartice && gumbPrekliciKartico) {
@@ -1741,6 +1970,7 @@ const posodobiPrikazPodatka = (element, labelKey, value) => {
                      if (scanButton) {
                          scanButton.style.display = 'none';
                      }
+                     // Ponovno nastavimo status, če je element že ustvarjen
                      if (scanStatusElement) {
                          scanStatusElement.textContent = i18next.t('profile.scan_unavailable') || 'Skeniranje je na voljo samo v mobilni aplikaciji.';
                          scanStatusElement.style.color = 'orange';

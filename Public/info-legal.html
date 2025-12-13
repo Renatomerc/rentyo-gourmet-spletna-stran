@@ -6,7 +6,9 @@
     <title data-i18n="legal.page_title">Informacije & Pravna obvestila</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Osnovni mobilni slog */
+        /* ========================================================================= */
+        /* SPLOŠNO IN HEADER (Nespremenjeno / Črno-Belo) */
+        /* ========================================================================= */
         body {
             background-color: #ffffff;
             color: #1f2937;
@@ -15,8 +17,6 @@
             padding: 0;
             min-height: 100vh;
         }
-
-        /* Glava (Header) - Fiksno na vrhu */
         .header-bar {
             background-color: #ffffff;
             border-bottom: 1px solid #e5e7eb;
@@ -24,87 +24,99 @@
             top: 0;
             z-index: 10;
         }
-
-        /* Stil za 'izgled' gumba za izbiro jezika */
-        .language-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        /* Stil za sam gumb jezika */
+        .language-dropdown { position: relative; display: inline-block; }
         .language-button {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            background-color: #f3f4f6;
-            color: #4b5563;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-            /* DODANO: da ne zavzame celotnega prostora elementa in je klik omejen na sam gumb */
-            height: 36px; 
-            box-sizing: border-box;
+            display: flex; align-items: center; padding: 0.5rem 0.75rem; border-radius: 0.5rem;
+            background-color: #f3f4f6; color: #4b5563; font-weight: 500; font-size: 0.875rem;
+            transition: all 0.2s ease; cursor: pointer; border: none; height: 36px; box-sizing: border-box;
         }
-
-        .language-button:hover {
-            background-color: #e5e7eb;
-            color: #1f2937;
-        }
-        
-        /* Skrita vsebina (izbira jezikov) */
+        .language-button:hover { background-color: #e5e7eb; color: #1f2937; }
         .language-options {
-            display: none;
-            position: absolute;
-            right: 0;
-            margin-top: 0.5rem;
-            min-width: 10rem;
-            background-color: #ffffff;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            z-index: 20;
-            overflow: hidden;
+            display: none; position: absolute; right: 0; margin-top: 0.5rem; min-width: 10rem;
+            background-color: #ffffff; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            z-index: 20; overflow: hidden;
+        }
+        .language-dropdown.open .language-options { display: block; }
+        .language-option { padding: 0.6rem 1rem; cursor: pointer; font-size: 0.875rem; color: #374151; }
+        .language-option:hover { background-color: #f3f4f6; color: #1f2937; }
+        .language-option.selected { background-color: #e5e7eb; color: #1f2937; font-weight: 600; } /* Črno-beli poudarek */
+
+        /* ========================================================================= */
+        /* HARMONIKA MENI (ACCORDION) - ČRNO-BELO */
+        /* ========================================================================= */
+
+        .accordion-container {
+            border-top: 1px solid #e5e7eb; /* Zgornja črta za začetek menija */
+            padding-top: 0;
         }
         
-        .language-dropdown.open .language-options {
-            display: block;
+        /* Stil za posamezni zavihek (črna črta spodaj) */
+        .accordion-item {
+            border-bottom: 1px solid #e5e7eb; 
         }
-        
-        .language-option {
-            padding: 0.6rem 1rem;
+
+        /* Glava zavihka (videti kot element menija) */
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
             cursor: pointer;
-            font-size: 0.875rem;
-            color: #374151;
-        }
-
-        .language-option:hover {
-            background-color: #f3f4f6;
+            font-size: 0.9rem; /* Malo večji font za naslov */
+            font-weight: 600; /* Poudarek na naslovu */
             color: #1f2937;
-        }
-
-        .language-option.selected {
-            background-color: #eff6ff;
-            color: #2563eb;
-            font-weight: 600;
+            background-color: #ffffff;
         }
         
-        /* Stil za vsebino - pomembno za branje na mobilniku */
-        .main-content {
+        /* Ikona za razširitev (puščica) */
+        .accordion-header i {
+            font-size: 0.9em;
+            margin-left: 10px;
+            color: #4b5563; /* Sivo, nevtralno */
+            transition: transform 0.3s;
+        }
+
+        /* Vsebina (Skrita) */
+        .accordion-content {
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.4s ease-in-out;
+        }
+
+        /* Vsebina (Prikazana) */
+        .accordion-item.active .accordion-content {
+            max-height: 5000px; /* Velika vrednost za vso vsebino */
+            padding-bottom: 20px;
+        }
+        
+        /* Rotacija puščice, ko je zavihek aktiven */
+        .accordion-item.active .accordion-header i {
+            transform: rotate(180deg);
+        }
+
+        /* Oblikovanje besedila vsebine (izboljšanje berljivosti) */
+        .accordion-content p, .accordion-content ul, .accordion-content ol {
             font-size: 0.9rem;
             line-height: 1.6;
-            padding: 1rem 0;
+            margin-bottom: 1rem;
+            color: #4b5563; /* Temno siva za vsebino */
         }
         
-        /* Stil za naslove v sekcijah */
-        .content-title {
+        /* Stil za naslove v vsebini (da niso preveliki) */
+        .accordion-content h3 {
             font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 1px solid #e5e7eb;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
         }
+        
+        /* Stil za povezave (lahko ostanejo modre za prepoznavnost, ali sivo poudarjene) */
+        .accordion-content a {
+            color: #4b5563; /* Namesto modre, uporabimo sivo */
+            text-decoration: underline;
+        }
+        
     </style>
 </head>
 <body class="antialiased">
@@ -118,14 +130,11 @@
                 </svg>
             </a>
             
-            <h1 class="text-lg font-bold"><span data-i18n="legal.page_title">Informacije & Pravna obvestila</span></h1>
+            <h1 class="text-sm font-bold"><span data-i18n="legal.page_title">Informacije & Pravna obvestila</span></h1>
             
             <div class="language-dropdown" id="language-dropdown">
                 <button class="language-button" id="language-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v5.586l-2.293-2.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L11 11.586V6z" clip-rule="evenodd" transform="rotate(270 10 10)"/>
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 5a1 1 0 112 0v2.793l.293-.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L7 7.793V5z" clip-rule="evenodd"/>
-                    </svg>
+                    
                     <span id="current-language">SL</span> 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -148,216 +157,173 @@
 
     <main class="max-w-lg mx-auto p-4">
         
-        <div class="main-content space-y-8">
+        <div class="accordion-container">
             
-            <section id="o-nas">
-                <h2 class="content-title" data-i18n="about.title">O Rentyo Gourmet</h2>
-                
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.subtitle">Rezervacija mize – hitro, enostavno in brez klica.</h3>
-                <p data-i18n="about.content_1">
-                    Rentyo Gourmet je evropska spletna platforma, ki omogoča hitro in zanesljivo rezervacijo miz v izbranih restavracijah. Na enem mestu lahko poiščete restavracije po lokaciji, kuhinji ali datumu ter v nekaj klikih rezervirate svojo mizo.
-                </p>
-                <p class="mt-2" data-i18n="about.content_2">
-                    Naša naloga je, da vam olajšamo izkušnjo rezervacije – brez čakanja na telefonske klice ali nepotrebnih zamud. Mi poskrbimo, da vaša rezervacija varno prispe do restavracije in da ste o njenem statusu obveščeni v realnem času.
-                </p>
+            <div class="accordion-item" id="o-nas">
+                <div class="accordion-header">
+                    <span data-i18n="about.title">O Rentyo Gourmet</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <h3 data-i18n="about.subtitle">Rezervacija mize – hitro, enostavno in brez klica.</h3>
+                    <p data-i18n="about.content_1">Rentyo Gourmet je evropska spletna platforma, ki omogoča hitro in zanesljivo rezervacijo miz v izbranih restavracijah. Na enem mestu lahko poiščete restavracije po lokaciji, kuhinji ali datumu ter v nekaj klikih rezervirate svojo mizo.</p>
+                    <p data-i18n="about.content_2">Naša naloga je, da vam olajšamo izkušnjo rezervacije – brez čakanja na telefonske klice ali nepotrebnih zamud. Mi poskrbimo, da vaša rezervacija varno prispe do restavracije in da ste o njenem statusu obveščeni v realnem času.</p>
+    
+                    <h3 data-i18n="about.why_title">Zakaj Rentyo Gourmet?</h3>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li data-i18n="about.why_item_1">Preprosta rezervacija 24/7</li>
+                        <li data-i18n="about.why_item_2">Brez dodatnih stroškov za uporabnike</li>
+                        <li data-i18n="about.why_item_3">Zanesljivo potrjevanje rezervacij</li>
+                        <li data-i18n="about.why_item_4">Varna uporaba in zaščita vaših podatkov</li>
+                    </ul>
+    
+                    <h3 data-i18n="about.team_title">Kdo stoji za Rentyo Gourmet?</h3>
+                    <p data-i18n="about.team_content_1">Rentyo Gourmet razvija in upravlja podjetje Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., s sedežem v Zagrebu, Hrvaška.</p>
+                    <p data-i18n="about.team_content_2">Naša ekipa verjame, da mora biti rezervacija mize tako enostavna, kot je nakup vozovnice. Delujemo po celotni Evropi in sodelujemo neposredno z restavracijami.</p>
+                </div>
+            </div>
 
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.why_title">Zakaj Rentyo Gourmet?</h3>
-                <ul class="list-disc ml-5 space-y-1">
-                    <li data-i18n="about.why_item_1">Preprosta rezervacija 24/7</li>
-                    <li data-i18n="about.why_item_2">Brez dodatnih stroškov za uporabnike</li>
-                    <li data-i18n="about.why_item_3">Zanesljivo potrjevanje rezervacij</li>
-                    <li data-i18n="about.why_item_4">Varna uporaba in zaščita vaših podatkov</li>
-                </ul>
+            <div class="accordion-item" id="zasebnost">
+                <div class="accordion-header">
+                    <span data-i18n="privacy.title">Politika Zasebnosti</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <p data-i18n="privacy.intro">Vaša zasebnost nam veliko pomeni. Rentyo Gourmet, ki ga upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obdeluje osebne podatke uporabnikov v skladu z zakonodajo EU (GDPR) in hrvaškim Zakonom o varstvu osebnih podatkov.</p>
 
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="about.team_title">Kdo stoji za Rentyo Gourmet?</h3>
-                <p data-i18n="about.team_content_1">
-                    Rentyo Gourmet razvija in upravlja podjetje Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., s sedežem v Zagrebu, Hrvaška.
-                </p>
-                <p class="mt-2" data-i18n="about.team_content_2">
-                    Naša ekipa verjame, da mora biti rezervacija mize tako enostavna, kot je nakup vozovnice. Delujemo po celotni Evropi in sodelujemo neposredno z restavracijami.
-                </p>
-            </section>
+                    <h3 data-i18n="privacy.data_collected_title">Katere podatke zbiramo</h3>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li data-i18n="privacy.data_item_1">Ime in priimek</li>
+                        <li data-i18n="privacy.data_item_2">E-poštni naslov</li>
+                        <li data-i18n="privacy.data_item_3">Datum, ura in število oseb za rezervacijo</li>
+                        <li data-i18n="privacy.data_item_4">Podatki o uporabi spletne strani (prek piškotkov)</li>
+                    </ul>
+    
+                    <h3 data-i18n="privacy.why_collected_title">Zakaj jih zbiramo</h3>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li data-i18n="privacy.why_item_1">za potrjevanje in obveščanje o rezervacijah,</li>
+                        <li data-i18n="privacy.why_item_2">za zagotavljanje podpore uporabnikom,</li>
+                        <li data-i18n="privacy.why_item_3">za izboljšanje uporabniške izkušnje,</li>
+                        <li data-i18n="privacy.why_item_4">le ob vašem soglasju: za občasna obvestila o novostih ali promocijah.</li>
+                    </ul>
+    
+                    <h3 data-i18n="privacy.sharing_title">Deljenje podatkov</h3>
+                    <p data-i18n="privacy.sharing_content_1">Vaše podatke delimo izključno z restavracijo, pri kateri ste opravili rezervacijo, in le v obsegu, ki je potreben za izvedbo storitve.</p>
+                    <p data-i18n="privacy.sharing_content_2">Podatki niso prodajani ali deljeni tretjim osebam za oglaševanje.</p>
+    
+                    <h3 data-i18n="privacy.retention_title">Hramba podatkov</h3>
+                    <p data-i18n="privacy.retention_content">Podatke hranimo toliko časa, kolikor je potrebno za namen rezervacije in skladno z zakonodajo. Uporabniki lahko kadarkoli zahtevajo izbris svojih podatkov na <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.</p>
+    
+                    <h3 data-i18n="privacy.rights_title">Vaše pravice</h3>
+                    <p data-i18n="privacy.rights_content">Imate pravico do dostopa, popravka, izbrisa in omejitve obdelave osebnih podatkov. Za vse zahteve glede zasebnosti nas kontaktirajte prek <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.</p>
+                </div>
+            </div>
+            
+            <div class="accordion-item" id="pogoji">
+                <div class="accordion-header">
+                    <span data-i18n="terms.title">Pogoji Uporabe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <p data-i18n="terms.intro">Z uporabo spletne strani Rentyo Gourmet se strinjate s spodnjimi pogoji.</p>
+    
+                    <h3 data-i18n="terms.offer_title">1. Kaj ponujamo</h3>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li data-i18n="terms.offer_item_1">Rentyo Gourmet omogoča uporabnikom brezplačno rezervacijo miz v restavracijah.</li>
+                        <li data-i18n="terms.offer_item_2" class="font-medium">Ne prodajamo hrane, pijače ali drugih gostinskih storitev.</li>
+                    </ul>
+    
+                    <h3 data-i18n="terms.how_it_works_title">2. Kako deluje</h3>
+                    <p data-i18n="terms.how_it_works_content_1">Rezervacija prek platforme pomeni, da ste izrazili interes za določen termin v restavraciji.</p>
+                    <p data-i18n="terms.how_it_works_content_2">Potrditev rezervacije prejmete po e-pošti ali znotraj spletne strani.</p>
+    
+                    <h3 data-i18n="terms.responsibility_title">3. Odgovornost</h3>
+                    <p data-i18n="terms.responsibility_content_1">Rentyo Gourmet ni odgovoren za dejanske storitve, ki jih opravi restavracija (npr. kakovost hrane ali postrežbe).</p>
+                    <p data-i18n="terms.responsibility_content_2">V primeru težav se uporabnik obrne neposredno na restavracijo.</p>
+    
+                    <h3 data-i18n="terms.cancellation_title">4. Odpoved rezervacije</h3>
+                    <p data-i18n="terms.cancellation_content_1">Če želite rezervacijo odpovedati ali spremeniti, to storite prek povezave v potrditvenem e-sporočilu ali jo enostavno prekličete znotraj vašega uporabniškga računa.</p>
+                    <p data-i18n="terms.cancellation_content_2">Restavracija ima lahko svojo politiko odpovedi, ki se prikaže ob rezervaciji.</p>
+    
+                    <h3 data-i18n="terms.fair_use_title">5. Varnost in poštena uporaba</h3>
+                    <p data-i18n="terms.fair_use_content_1">Uporabnik se zavezuje, da bo rezervacije uporabljal pošteno.</p>
+                    <p data-i18n="terms.fair_use_content_2">Zloraba sistema (npr. ponavljajoče se lažne rezervacije) lahko privede do blokade računa.</p>
+    
+                    <h3 data-i18n="terms.law_title">6. Pravo in pristojnost</h3>
+                    <p data-i18n="terms.law_content_1">Za uporabo strani in razreševanje sporov velja hrvaško pravo.</p>
+                    <p data-i18n="terms.law_content_2">Pristojno sodišče je v Zagrebu, Hrvaška.</p>
+                </div>
+            </div>
 
-            <section id="zasebnost">
-                <h2 class="content-title" data-i18n="privacy.title">Politika Zasebnosti</h2>
-                <p data-i18n="privacy.intro">
-                    Vaša zasebnost nam veliko pomeni. Rentyo Gourmet, ki ga upravlja Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., obdeluje osebne podatke uporabnikov v skladu z zakonodajo EU (GDPR) in hrvaškim Zakonom o varstvu osebnih podatkov.
-                </p>
+            <div class="accordion-item" id="legal-contact">
+                <div class="accordion-header">
+                    <span data-i18n="legal_notice.title">Pravno Obvestilo & Kontakt</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <h3 data-i18n="legal_notice.title">Pravno Obvestilo</h3>
+                    <p data-i18n="legal_notice.content_1">Vse informacije na strani Rentyo Gourmet so informativne narave in namenjene uporabnikom, ki želijo opraviti rezervacijo.</p>
+                    <p data-i18n="legal_notice.content_2">Rentyo Gourmet ne prevzema odgovornosti za napake ali netočnosti v opisu restavracij, ki jih posredujejo sami ponudniki. Uporaba strani je na lastno odgovornost.</p>
+                    <p data-i18n="legal_notice.content_3">Spletna stran se redno posodablja, vendar Rentyo Gourmet ne jamči za neprekinjeno delovanje ali popolno točnost vseh podatkov.</p>
+                    
+                    <hr class="my-6 border-gray-200">
+                    
+                    <h3 data-i18n="contact.title">Pravne Informacije in Kontakt</h3>
+                    
+                    <h4 data-i18n="contact.company_data_title" class="font-semibold mt-4 mb-2">Uradni podatki podjetja (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):</h4>
+                    <ul class="list-none space-y-1 text-sm">
+                        <li data-i18n="contact.name">Naziv podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</li>
+                        <li data-i18n="contact.address">Sedež: Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
+                        <li data-i18n="contact.vat">Davčna številka (OIB): 85972870674</li>
+                        <li data-i18n="contact.iban">IBAN: LT31 3250 0588 1111 4934 (Revolut)</li>
+                        <li data-i18n="contact.swift">BIC / SWIFT: REVOLT21</li>
+                        <li data-i18n="contact.court">Pristojno sodišče: Zagreb, Hrvaška</li>
+                    </ul>
+                    <p class="mt-2 text-sm" data-i18n="contact.compliance">Podjetje deluje v skladu z veljavno hrvaško zakonodajo in evropskimi predpisi, zlasti uredbo (EU) 2016/679 (GDPR). V primeru sporov se uporablja hrvaško pravo, razen če evropska zakonodaja določa drugače.</p>
 
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.data_collected_title">Katere podatke zbiramo</h3>
-                <ul class="list-disc ml-5 space-y-1">
-                    <li data-i18n="privacy.data_item_1">Ime in priimek</li>
-                    <li data-i18n="privacy.data_item_2">E-poštni naslov</li>
-                    <li data-i18n="privacy.data_item_3">Datum, ura in število oseb za rezervacijo</li>
-                    <li data-i18n="privacy.data_item_4">Podatki o uporabi spletne strani (prek piškotkov)</li>
-                </ul>
+                    <hr class="my-6 border-gray-200">
 
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.why_collected_title">Zakaj jih zbiramo</h3>
-                <ul class="list-disc ml-5 space-y-1">
-                    <li data-i18n="privacy.why_item_1">za potrjevanje in obveščanje o rezervacijah,</li>
-                    <li data-i18n="privacy.why_item_2">za zagotavljanje podpore uporabnikom,</li>
-                    <li data-i18n="privacy.why_item_3">za izboljšanje uporabniške izkušnje,</li>
-                    <li data-i18n="privacy.why_item_4">le ob vašem soglasju: za občasna obvestila o novostih ali promocijah.</li>
-                </ul>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.sharing_title">Deljenje podatkov</h3>
-                <p data-i18n="privacy.sharing_content_1">
-                    Vaše podatke delimo izključno z restavracijo, pri kateri ste opravili rezervacijo, in le v obsegu, ki je potreben za izvedbo storitve.
-                </p>
-                <p class="mt-2" data-i18n="privacy.sharing_content_2">
-                    Podatki niso prodajani ali deljeni tretjim osebam za oglaševanje.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.retention_title">Hramba podatkov</h3>
-                <p data-i18n="privacy.retention_content">
-                    Podatke hranimo toliko časa, kolikor je potrebno za namen rezervacije in skladno z zakonodajo. Uporabniki lahko kadarkoli zahtevajo izbris svojih podatkov na <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="privacy.rights_title">Vaše pravice</h3>
-                <p data-i18n="privacy.rights_content">
-                    Imate pravico do dostopa, popravka, izbrisa in omejitve obdelave osebnih podatkov. Za vse zahteve glede zasebnosti nas kontaktirajte prek <a href="mailto:privacy@rentyo.eu" class="text-blue-600 hover:underline">privacy@rentyo.eu</a>.
-                </p>
-            </section>
-
-            <section id="pogoji">
-                <h2 class="content-title" data-i18n="terms.title">Pogoji Uporabe</h2>
-                <p data-i18n="terms.intro">
-                    Z uporabo spletne strani Rentyo Gourmet se strinjate s spodnjimi pogoji.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.offer_title">1. Kaj ponujamo</h3>
-                <ul class="list-disc ml-5 space-y-1">
-                    <li data-i18n="terms.offer_item_1">Rentyo Gourmet omogoča uporabnikom brezplačno rezervacijo miz v restavracijah.</li>
-                    <li data-i18n="terms.offer_item_2" class="font-medium">Ne prodajamo hrane, pijače ali drugih gostinskih storitev.</li>
-                </ul>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.how_it_works_title">2. Kako deluje</h3>
-                <p data-i18n="terms.how_it_works_content_1">
-                    Rezervacija prek platforme pomeni, da ste izrazili interes za določen termin v restavraciji.
-                </p>
-                <p data-i18n="terms.how_it_works_content_2">
-                    Potrditev rezervacije prejmete po e-pošti ali znotraj spletne strani.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.responsibility_title">3. Odgovornost</h3>
-                <p data-i18n="terms.responsibility_content_1">
-                    Rentyo Gourmet ni odgovoren za dejanske storitve, ki jih opravi restavracija (npr. kakovost hrane ali postrežbe).
-                </p>
-                <p data-i18n="terms.responsibility_content_2">
-                    V primeru težav se uporabnik obrne neposredno na restavracijo.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.cancellation_title">4. Odpoved rezervacije</h3>
-                <p data-i18n="terms.cancellation_content_1">
-                    Če želite rezervacijo odpovedati ali spremeniti, to storite prek povezave v potrditvenem e-sporočilu ali jo enostavno prekličete znotraj vašega uporabniškga računa.
-                </p>
-                <p data-i18n="terms.cancellation_content_2">
-                    Restavracija ima lahko svojo politiko odpovedi, ki se prikaže ob rezervaciji.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.fair_use_title">5. Varnost in poštena uporaba</h3>
-                <p data-i18n="terms.fair_use_content_1">
-                    Uporabnik se zavezuje, da bo rezervacije uporabljal pošteno.
-                </p>
-                <p data-i18n="terms.fair_use_content_2">
-                    Zloraba sistema (npr. ponavljajoče se lažne rezervacije) lahko privede do blokade računa.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="terms.law_title">6. Pravo in pristojnost</h3>
-                <p data-i18n="terms.law_content_1">
-                    Za uporabo strani in razreševanje sporov velja hrvaško pravo.
-                </p>
-                <p data-i18n="terms.law_content_2">
-                    Pristojno sodišče je v Zagrebu, Hrvaška.
-                </p>
-            </section>
-
-            <section id="partnerji">
-                <h2 class="content-title" data-i18n="legal_notice.title">Pravno Obvestilo</h2>
-                <p data-i18n="legal_notice.content_1">
-                    Vse informacije na strani Rentyo Gourmet so informativne narave in namenjene uporabnikom, ki želijo opraviti rezervacijo.
-                </p>
-                <p class="mt-2" data-i18n="legal_notice.content_2">
-                    Rentyo Gourmet ne prevzema odgovornosti za napake ali netočnosti v opisu restavracij, ki jih posredujejo sami ponudniki. Uporaba strani je na lastno odgovornost.
-                </p>
-                <p class="mt-2" data-i18n="legal_notice.content_3">
-                    Spletna stran se redno posodablja, vendar Rentyo Gourmet ne jamči za neprekinjeno delovanje ali popolno točnost vseh podatkov.
-                </p>
-            </section>
-
-            <section id="kontakt">
-                <h2 class="content-title" data-i18n="contact.title">Pravne Informacije in Kontakt</h2>
-                
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="contact.company_data_title">Uradni podatki podjetja (Modern Enterprise for Cloud-Enabled Reservations d.o.o.):</h3>
-                <ul class="list-none space-y-1 text-sm">
-                    <li data-i18n="contact.name">Naziv podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o.</li>
-                    <li data-i18n="contact.address">Sedež: Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
-                    <li data-i18n="contact.vat">Davčna številka (OIB): 85972870674</li>
-                    <li data-i18n="contact.iban">IBAN: LT31 3250 0588 1111 4934 (Revolut)</li>
-                    <li data-i18n="contact.swift">BIC / SWIFT: REVOLT21</li>
-                    <li data-i18n="contact.court">Pristojno sodišče: Zagreb, Hrvaška</li>
-                </ul>
-                <p class="mt-2 text-sm" data-i18n="contact.compliance">
-                    Podjetje deluje v skladu z veljavno hrvaško zakonodajo in evropskimi predpisi, zlasti uredbo (EU) 2016/679 (GDPR). V primeru sporov se uporablja hrvaško pravo, razen če evropska zakonodaja določa drugače.
-                </p>
-                
-                <hr class="my-6 border-gray-200">
-                
-                <h2 class="content-title" data-i18n="partners.title">Platforma za partnerje Rentyo Gourmet</h2>
-                <p data-i18n="partners.intro">
-                    Razvijte svoje poslovanje z optimizacijo rezervacij in zmanjšanjem 'no-show' odsotnosti.
-                </p>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.join_title">1. Pridružite se skupnosti Rentyo Gourmet</h3>
-                <p data-i18n="partners.join_content">
-                    Rentyo Gourmet je premium platforma, namenjena poenostavitvi in digitalizaciji rezervacij v sektorju vrhunske gastronomije. Iščemo partnerje, ki delijo našo vizijo odličnosti.
-                </p>
-                
-                <h4 class="font-medium mt-3" data-i18n="partners.who_can_join_title">Kdo se nam lahko pridruži?</h4>
-                <ul class="list-disc ml-5 space-y-1">
-                    <li data-i18n="partners.who_item_1">Restavracije: Optimizirajte rezervacije in izboljšajte zasedenost miz.</li>
-                    <li data-i18n="partners.who_item_2">Bari in saloni: Učinkovito upravljajte svoje prostore in dogodke.</li>
-                    <li data-i18n="partners.who_item_3">Vinarne in degustacijske sobe: Poenostavite rezervacije za vodene degustacije in dogodke.</li>
-                </ul>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.advantages_title">2. Zakaj partnerstvo z Rentyo Gourmet?</h3>
-                <h4 class="font-medium mt-3" data-i18n="partners.key_advantages_title">Ključne prednosti partnerstva:</h4>
-                <ul class="list-disc ml-5 space-y-2">
-                    <li data-i18n="partners.advantage_1">Večji doseg do premium strank: Dostop do rastoče baze strank in ljubiteljev gastronomije.</li>
-                    <li data-i18n="partners.advantage_2">Orodja za optimizacijo zasedenosti: Napredna orodja za avtomatizacijo komunikacije.</li>
-                    <li data-i18n="partners.advantage_3">
-                        Varnost rezervacij (kreditna kartica): Kot partner lahko zahtevate podatke o kreditni kartici gosta kot jamstvo. *Opomba: Kartica služi izključno kot garancija v primeru 'no-show' ali odpovedi izven vaših pogojev.*
-                    </li>
-                    <li data-i18n="partners.advantage_4">
-                        Ničelna toleranca za 'No-Show': Uporabnik, ki rezervira dvakrat in rezervacije ne odpove ali se ne pojavi, je po drugem opozorilu trajno odstranjen iz aplikacije.
-                    </li>
-                </ul>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.how_to_start_title">3. Kako začeti (Postopek)</h3>
-                <h4 class="font-medium mt-3" data-i18n="partners.steps_title">Preprosti koraki do uspeha:</h4>
-                <ol class="list-decimal ml-5 space-y-2">
-                    <li data-i18n="partners.step_1">
-                        Registracija in izbira paketa: Registrirajte se na <a href="http://gourmet.rentyo.eu" class="text-blue-600 hover:underline">gourmet.rentyo.eu</a>, izberite paket in dokončajte nakup.
-                    </li>
-                    <li data-i18n="partners.step_2">
-                        Nastavitev profila: V meniju za rezervacije izberite 'Moj profil', kjer naložite podatke, slike, menije, cene in opis za aplikacijo.
-                    </li>
-                    <li data-i18n="partners.step_3">
-                        Zagon: Ko je vaš profil dokončan, začnite prejemati optimizirane in zanesljive rezervacije.
-                    </li>
-                </ol>
-
-                <h3 class="font-semibold mt-4 mb-2" data-i18n="partners.contact_title">4. Kontakt za dodatna vprašanja</h3>
-                <ul class="list-none space-y-1 text-sm">
-                    <li data-i18n="partners.contact_email">E-pošta: <a href="mailto:partners@rentyo.eu" class="text-blue-600 hover:underline">partners@rentyo.eu</a></li>
-                    <li data-i18n="partners.contact_phone">Telefon (WhatsApp): +385 98 902 3144</li>
-                    <li data-i18n="partners.contact_address">Sedež podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
-                </ul>
-                
-            </section>
+                    <h3 data-i18n="partners.title">Platforma za partnerje Rentyo Gourmet</h3>
+                    <p data-i18n="partners.intro">Razvijte svoje poslovanje z optimizacijo rezervacij in zmanjšanjem 'no-show' odsotnosti.</p>
+                    
+                    <h4 class="font-semibold mt-4 mb-2" data-i18n="partners.join_title">1. Pridružite se skupnosti Rentyo Gourmet</h4>
+                    <p data-i18n="partners.join_content">Rentyo Gourmet je premium platforma, namenjena poenostavitvi in digitalizaciji rezervacij v sektorju vrhunske gastronomije. Iščemo partnerje, ki delijo našo vizijo odličnosti.</p>
+                    
+                    <h4 class="font-medium mt-3" data-i18n="partners.who_can_join_title">Kdo se nam lahko pridruži?</h4>
+                    <ul class="list-disc ml-5 space-y-1">
+                        <li data-i18n="partners.who_item_1">Restavracije: Optimizirajte rezervacije in izboljšajte zasedenost miz.</li>
+                        <li data-i18n="partners.who_item_2">Bari in saloni: Učinkovito upravljajte svoje prostore in dogodke.</li>
+                        <li data-i18n="partners.who_item_3">Vinarne in degustacijske sobe: Poenostavite rezervacije za vodene degustacije in dogodke.</li>
+                    </ul>
+    
+                    <h4 class="font-semibold mt-4 mb-2" data-i18n="partners.advantages_title">2. Zakaj partnerstvo z Rentyo Gourmet?</h4>
+                    <h5 class="font-medium mt-3" data-i18n="partners.key_advantages_title">Ključne prednosti partnerstva:</h5>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li data-i18n="partners.advantage_1">Večji doseg do premium strank: Dostop do rastoče baze strank in ljubiteljev gastronomije.</li>
+                        <li data-i18n="partners.advantage_2">Orodja za optimizacijo zasedenosti: Napredna orodja za avtomatizacijo komunikacije.</li>
+                        <li data-i18n="partners.advantage_3">Varnost rezervacij (kreditna kartica): Kot partner lahko zahtevate podatke o kreditni kartici gosta kot jamstvo. *Opomba: Kartica služi izključno kot garancija v primeru 'no-show' ali odpovedi izven vaših pogojev.*</li>
+                        <li data-i18n="partners.advantage_4">Ničelna toleranca za 'No-Show': Uporabnik, ki rezervira dvakrat in rezervacije ne odpove ali se ne pojavi, je po drugem opozorilu trajno odstranjen iz aplikacije.</li>
+                    </ul>
+    
+                    <h4 class="font-semibold mt-4 mb-2" data-i18n="partners.how_to_start_title">3. Kako začeti (Postopek)</h4>
+                    <h5 class="font-medium mt-3" data-i18n="partners.steps_title">Preprosti koraki do uspeha:</h5>
+                    <ol class="list-decimal ml-5 space-y-2">
+                        <li data-i18n="partners.step_1">Registracija in izbira paketa: Registrirajte se na <a href="http://gourmet.rentyo.eu" class="text-blue-600 hover:underline">gourmet.rentyo.eu</a>, izberite paket in dokončajte nakup.</li>
+                        <li data-i18n="partners.step_2">Nastavitev profila: V meniju za rezervacije izberite 'Moj profil', kjer naložite podatke, slike, menije, cene in opis za aplikacijo.</li>
+                        <li data-i18n="partners.step_3">Zagon: Ko je vaš profil dokončan, začnite prejemati optimizirane in zanesljive rezervacije.</li>
+                    </ol>
+    
+                    <h3 data-i18n="partners.contact_title">4. Kontakt za dodatna vprašanja</h3>
+                    <ul class="list-none space-y-1 text-sm">
+                        <li data-i18n="partners.contact_email">E-pošta: <a href="mailto:partners@rentyo.eu" class="text-blue-600 hover:underline">partners@rentyo.eu</a></li>
+                        <li data-i18n="partners.contact_phone">Telefon (WhatsApp): +385 98 902 3144</li>
+                        <li data-i18n="partners.contact_address">Sedež podjetja: Modern Enterprise for Cloud-Enabled Reservations (Mecer) d.o.o., Ulica grada Vukovara 271, 10000 Zagreb, Hrvaška</li>
+                    </ul>
+                </div>
+            </div>
+            
         </div>
-
-    </main>
+        </main>
 
     <script>
         // Objekt, ki vsebuje vse prevode (prevzeto iz prejšnjega odgovora)
@@ -1030,7 +996,7 @@
         };
 
         // =========================================================================
-        // POPRAVLJENA IN KLJUČNA FUNKCIJA ZA REŠITEV TEŽAVE
+        // POPRAVLJENA IN KLJUČNA FUNKCIJA ZA REŠITEV TEŽAVE (I18N)
         // =========================================================================
         
         /**
@@ -1065,7 +1031,8 @@
         let currentLang = localStorage.getItem('currentLang') || 'sl';
 
         const setLanguage = (lang) => {
-            if (!i18nData[lang]) {
+            // Opomba: i18nData mora biti definirana pred tem skriptom
+            if (typeof i18nData === 'undefined' || !i18nData[lang]) {
                 console.warn(`Prevodi za jezik '${lang}' niso na voljo. Uporaba privzetega (sl).`);
                 lang = 'sl';
             }
@@ -1083,7 +1050,7 @@
 
                 if (translation) {
                     // Preverimo, ali prevod vsebuje HTML (npr. <a>)
-                    if (translation.includes('<a') || translation.includes('<span')) {
+                    if (translation.includes('<a') || translation.includes('<span') || element.tagName === 'P') {
                         element.innerHTML = translation;
                     } else {
                         element.textContent = translation;
@@ -1122,7 +1089,7 @@
         };
 
         // =========================================================================
-        // INICIALIZACIJA IN DOGODKI
+        // GLAVNA INICIALIZACIJA IN DOGODKI (vključno z Accordionom)
         // =========================================================================
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1131,7 +1098,12 @@
             const optionsContainer = document.getElementById('language-options');
             
             // 1. Inicializacija jezika
-            setLanguage(currentLang);
+            // Predvideva, da je i18nData naložena pred tem skriptom
+            if (typeof i18nData !== 'undefined') { 
+                setLanguage(currentLang);
+            } else {
+                console.error("i18nData objekt ni definiran. Prevajanje ne deluje.");
+            }
 
             // 2. Dodajanje dogodka za preklop jezika
             if (optionsContainer) {
@@ -1157,11 +1129,36 @@
                 
                 // Zapri spustni seznam, če uporabnik klikne kjerkoli zunaj njega
                 document.addEventListener('click', (event) => {
-                    if (!dropdown.contains(event.target)) {
+                    if (dropdown && !dropdown.contains(event.target)) {
                         dropdown.classList.remove('open');
                     }
                 });
             }
+            
+            // 4. 🔥 NOVA FUNKCIJA: Logika Harmonika Menija (Accordion)
+            const headers = document.querySelectorAll('.accordion-header');
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const item = header.closest('.accordion-item');
+                    
+                    // Če je že aktivno, ga zapri
+                    if (item.classList.contains('active')) {
+                        item.classList.remove('active');
+                    } else {
+                        // Zapri vse ostale, razen trenutnega
+                        document.querySelectorAll('.accordion-item.active').forEach(activeItem => {
+                            if (activeItem !== item) {
+                                activeItem.classList.remove('active');
+                            }
+                        });
+                        
+                        // Odpri kliknjeni element
+                        item.classList.add('active');
+                    }
+                });
+            });
+
         });
         
         // =========================================================================

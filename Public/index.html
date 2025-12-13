@@ -734,8 +734,8 @@
             /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
             border-top-left-radius: 10px;    /* Radius zgoraj levo */
             border-top-right-radius: 10px;   /* Radius zgoraj desno */
-            border-bottom-right-radius: 20px; /* Radius spodaj desno */
-            border-bottom-left-radius: 20px;  /* Radius spodaj levo */
+            border-bottom-right-radius: 10px; /* Radius spodaj desno */
+            border-bottom-left-radius: 10px;  /* Radius spodaj levo */
             
             /* Prejšnja enotna lastnost: border-radius: 10px; */
             
@@ -772,10 +772,11 @@
         }
 
         .kartica-vsebina h3 {
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             font-weight: bold;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            
         }
         
         /* NOVI STIL: Ovoj za oceno in oddaljenost */
@@ -792,7 +793,7 @@
         .kartica-vsebina .ocena {
             /* INTERNA OCENA: Order 1 (levo zgoraj) */
             order: 1; 
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: #333; 
             margin: 0;
             font-weight: bold;
@@ -801,7 +802,8 @@
         .kartica-vsebina .ocena span.ocena-stevilka {
             color: #333; 
             font-weight: bold;
-            margin-left: 5px;
+            margin-left: 0px;
+            font-size: 1.1rem;
         }
         
         /* Stil za navidezno oddaljenost */
@@ -814,6 +816,7 @@
             display: flex;
             align-items: center;
             gap: 2px;
+            margin-right: 5px;
         }
         .oddaljenost i {
             color: #1f1f1f; /* Ikona v modri barvi */
@@ -828,7 +831,7 @@
             font-size: 0.8rem;
             font-weight: bold; 
             color: #333; 
-            margin-top: 0px; 
+            margin-top: 10px; 
             margin-bottom: 0;
             display: flex;
             align-items: center;
@@ -907,8 +910,8 @@
     /* SPREMENJENO: Ločene lastnosti za radius vsakega vogala */
     border-top-left-radius: 10px;    /* Radius zgoraj levo */
     border-top-right-radius: 10px;   /* Radius zgoraj desno */
-    border-bottom-right-radius: 20px; /* Radius spodaj desno */
-    border-bottom-left-radius: 20px;  /* Radius spodaj levo */
+    border-bottom-right-radius: 10px; /* Radius spodaj desno */
+    border-bottom-left-radius: 10px;  /* Radius spodaj levo */
     
     /* Prejšnja enotna lastnost: border-radius: 10px; */
     
@@ -1067,7 +1070,7 @@
 
     .slika-glava {
         width: 100%;
-        height: 300px;
+        height: 400px;
         background-size: cover;
         background-position: center;
         border-top-left-radius: 12px;
@@ -1265,18 +1268,28 @@
         font-weight: 500; 
     }
 
-    /* Slike in Zemljevid */
-  .galerija-slike {
+/* Slike in Zemljevid */
+.galerija-slike {
     /* 1. Ključno: Uporabite Flexbox za eno vodoravno vrstico */
     display: flex;
     
     /* 2. Ključno: Omogoči vodoravno drsenje, ko vsebina preseže širino */
     overflow-x: scroll;
     
-    /* 3. Določite razmik med slikami (namesto gap/space-x) */
+    /* 3. Določite razmik med slikami */
     gap: 1rem; 
     
-    padding: 1rem;
+    /* Dodamo horizontalni padding le za vizualni odmik prve/zadnje slike od roba zaslona */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+    /* Navpični prostor med glavno sliko in galerijo */
+    margin-top: 1rem;
+    
+    /* POPRAVEK: Povečan negativni rob na -2rem, da preglasi padding nadrejenega elementa */
+    margin-left: -1.6rem; 
+    margin-right: -1.6rem; 
+    
     margin-bottom: 20px;
 }
 
@@ -1285,20 +1298,20 @@
     flex-shrink: 0;
     
     /* Zagotovite FIKSNO kvadratno višino: */
-    width: 140px !important; /* Dodan !important */
-    height: 140px !important; /* Dodan !important */
+    width: 200px !important; 
+    height: 200px !important; 
     
     position: relative;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
 }
 
 /* Pravila za IMG tag znotraj DIVa */
 .galerija-slike img {
-    /* Raztegnite sliko, da POPOLNOMA zapolni 120x120px okvir */
-    width: 100% !important; /* Dodan !important */
-    height: 100% !important; /* Dodan !important */
+    /* Raztegnite sliko, da POPOLNOMA zapolni okvir */
+    width: 100% !important; 
+    height: 100% !important; 
     
     object-fit: cover !important; /* Zagotovite, da se izreže in ne deformira */
     cursor: pointer;
@@ -1356,15 +1369,15 @@
         }
         
         .slika-glava {
-            height: 180px; 
+            height: 300px; 
         }
         
         .galerija-slike {
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 5px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
         }
         .galerija-slike img {
-            height: 80px;
+            height: 100px;
         }
         
         /* 🔥 POPRAVEK ZA MOBILNI ZEMLJEVID */
@@ -1569,8 +1582,8 @@
     font-size: 16px;
     cursor: pointer;
     background-color: white;
-    width: 60%;
-    box-shadow: 0 1px 8px rgba(60, 60, 60, 0.234);
+    width: 45%;
+    box-shadow: 0 0px 4px rgba(60, 60, 60, 0.333);
     
     /* 👇 DODANE LASTNOSTI ZA STANDARDIZACIJO VIDEZA SELECT ELEMENTA 👇 */
     
@@ -2183,6 +2196,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     border-radius: 20px; /* Zaobljeni robovi kartice */
     padding: 1.5rem; /* Notranji rob znotraj okvirja */
     margin-bottom: 1.5rem; /* Razmik med karticami */
+    margin-left: 0.5rem; /* Razmik med karticami */
     background-color: #ffffff; /* Belo ozadje za vsako kartico */
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.267); /* Nežna senca za 'dvignjen' videz */
 }
@@ -2221,24 +2235,24 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 
 /* --- NOVI SLOGI ZA SEKCIJO GOURMET EXPLORE --- */
 .gourmet-explore {
-    padding: 4rem 2rem 2rem;
+    padding: 0rem 2rem 2rem;
     text-align: center;
 }
 
 .gourmet-explore h2 {
     color: var(--rmlk-modra);
     margin-bottom: 1.5rem;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #333
 }
 
 /* Nastavljiv border-radius za vsak vogal */
 .country-card {
-    --card-radius-tl: 20px;
-    --card-radius-tr: 20px;
-    --card-radius-bl: 20px;
-    --card-radius-br: 20px;
+    --card-radius-tl: 10px;
+    --card-radius-tr: 10px;
+    --card-radius-bl: 10px;
+    --card-radius-br: 10px;
 
     position: relative;
     border-top-left-radius: var(--card-radius-tl);
@@ -2304,7 +2318,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
 
 .card-title {
     color: #fff;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 4;
@@ -3032,7 +3046,7 @@ body.is-capacitor-app #aiChatModal {
     border-radius: 25px; /* Bolj zaobljeni robovi */
     margin-right: 10px;
     background-color: #ffffff;
-    color: #303030;
+    color: #000000;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Rahla senca */
 }
 
@@ -3122,7 +3136,7 @@ body.is-capacitor-app #aiChatModal {
     line-height: 1.4;
 }
 
-/* --- Oblikovanje vnosnega polja in gumbov --- */
+/* --- Oblikovanje vnosnega polja in gumbov (velja za 1. fazo: Email) --- */
 
 #zahtevaResetForm {
     width: 100%;
@@ -3206,6 +3220,199 @@ body.is-capacitor-app #aiChatModal {
     color: #054f4e;
     text-decoration: underline;
 }
+
+/* ========================================================== */
+/* ⭐ DODANO: Oblikovanje KORAKA 2: Vnos kode in novega gesla ⭐ */
+/* ========================================================== */
+
+#confirmResetFields {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#confirmResetFields p.mt-20 {
+    margin-top: 0; /* Preprečimo dodaten rob, če je že rob predhodnega elementa */
+    margin-bottom: 20px;
+}
+
+/* Skupni stil za vnosna polja za kodo in novo geslo */
+#confirmResetFields input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+#confirmResetFields input:focus {
+    border-color: #076b6a;
+    outline: none;
+    box-shadow: 0 0 5px rgba(7, 107, 106, 0.3);
+}
+
+/* Specifičen stil za vnos kode (da ni predolgo) */
+#resetCode {
+    /* Če želite, da je polje kode ožje in centrirano: */
+    max-width: 150px; 
+    text-align: center;
+    letter-spacing: 5px; /* Razmik med številkami za boljšo berljivost */
+}
+
+/* Stil za gumb za potrditev */
+#potrdiNovoGeslo {
+    width: 100%;
+    padding: 12px;
+    background-color: #076b6a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#potrdiNovoGeslo:hover {
+    background-color: #054f4e;
+}
+/* ========================================================== */
+/* Oblikovanje GUMBA za Pozabljeno Geslo (Namesto Linka) */
+/* ========================================================== */
+
+.forgot-password-container {
+    width: 100%; /* Da se lahko centriramo, če želimo */
+    margin-top: 15px; /* Razmik od gumba za prijavo zgoraj */
+    text-align: center;
+}
+
+#pozabljenoGesloLink {
+    /* Spremenimo ga v inline-block, da lahko nastavljamo širino/padding */
+    display: inline-block; 
+    
+    /* Gumbni videz */
+    padding: 8px 15px;
+    background-color: transparent; /* Brez ozadja, saj je to sekundarni gumb */
+    
+    /* Stil obrobe (Outline Button) */
+    border: 1px solid #076b6a; 
+    border-radius: 8px; 
+    
+    /* Tekst stil */
+    color: #076b6a; /* Barva teksta */
+    text-decoration: none; /* Odstranimo podčrtaj linka */
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#pozabljenoGesloLink:hover {
+    background-color: #076b6a; /* Ozadje se obarva ob prehodu miške */
+    color: white; /* Tekst postane bel */
+    text-decoration: none;
+}
+/* ========================================================== */
+/* Oblikovanje GUMBA/LINKA za "Nazaj na prijavo" */
+/* ========================================================== */
+
+.back-to-login-container {
+    width: 100%;
+    margin-top: 30px; /* Večji rob na vrhu, da se loči od gumba za potrditev gesla */
+    text-align: center;
+}
+
+#nazajNaPrijavoLink {
+    display: inline-flex; /* Uporabimo flex, da lahko poravnamo puščico in tekst */
+    align-items: center;
+    gap: 5px; /* Razmik med puščico in tekstom */
+    
+    padding: 8px 15px;
+    background-color: transparent;
+    
+    /* Sekundarni/Nevtralni stil gumba */
+    border: 1px solid #ccc; /* Svetlo siv okvir */
+    border-radius: 8px;
+    
+    /* Tekst stil */
+    color: #333; /* Temnejši, nevtralen tekst */
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+#nazajNaPrijavoLink:hover {
+    background-color: #f0f0f0; /* Rahlo sivo ozadje ob hoverju */
+    border-color: #076b6a; /* Poudarek z barvo blagovne znamke ob hoverju */
+    color: #076b6a;
+}
+/* Stil za vsebnik zemljevida (omogoča relativno pozicioniranje) - OSTANE NESPREMENJENO */
+.zemljevid-ovoj {
+    position: relative;
+    width: 100%;
+    /* Dodajte fiksno višino, da bo zemljevid viden */
+    height: 350px; 
+    overflow: hidden; /* Skrije morebitne robove */
+    border-radius: 8px; /* Po želji zaokrožite robove */
+}
+
+/* Stil za iframe/zemljevid (zasede celoten vsebnik) - OSTANE NESPREMENJENO */
+#modalZemljevid {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* ----------------------------------------------------------------- */
+/* 🔥 POPRAVLJEN STIL ZA GUMB (Absolutno pozicioniran krog) 🔥 */
+/* ----------------------------------------------------------------- */
+
+.gumb-navigacija { 
+    /* Absolutno pozicioniranje znotraj .zemljevid-ovoj */
+    position: absolute;
+    bottom: 50px; /* 10px od spodnjega roba */
+    right: 50px; /* 10px od desnega roba */
+    z-index: 10; /* Zagotovi, da je nad iframe-om */
+    
+    /* Fiksne dimenzije za krog */
+    width: 60px; 
+    height: 60px; 
+    padding: 0; /* Odstranimo notranji rob */
+    
+    /* Centriranje ikone */
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    
+    /* Oblikovanje gumba */
+    background-color: #076b6a; 
+    color: white;
+    font-size: 1.2rem; /* Velikost ikone */
+    font-weight: bold;
+    border-radius: 50%; /* Naredi gumb popoln krog */
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Malo močnejša senca, da izstopa */
+    border: 3px solid #ffffff;
+}
+
+.gumb-navigacija i {
+    font-size: 1.4rem; 
+    margin: 0; /* Odstranimo vse robove okoli ikone */
+}
+
+.gumb-navigacija:active {
+    background-color: #044f4e;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+
 
 
 
@@ -3482,17 +3689,23 @@ body.is-capacitor-app #aiChatModal {
         
         <div id="modalSlika" class="slika-glava"></div>
         
+       <div style="padding: 0 25px;">
+            
+            <div id="galerijaSlike" class="galerija-slike">
+                </div>
+</div>
         <div class="podrobnosti-tekst">
             <h2 id="modalIme">Ime Restavracije</h2>
             
-            <div class="info-vrstica">
+           <div class="info-vrstica">
                 <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
                 <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
                 <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
             </div>
-            
+
             <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
-        </div>
+
+            </div> 
         
         <div class="rezervacija-vnosna-polja">
             <div class="vnosno-polje">
@@ -3517,7 +3730,7 @@ body.is-capacitor-app #aiChatModal {
             <input type="hidden" data-reserv-id="" value="">
             
         </div>
-        
+
         <div style="padding: 0 25px 25px 25px;">
             <div id="prosteUreRezultati" class="proste-ure-rezultati" style="margin-bottom: 15px; padding-top: 15px; text-align: center;">
                 <p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>
@@ -3529,7 +3742,7 @@ body.is-capacitor-app #aiChatModal {
         <div class="modal-tabs">
             <div class="modal-tab active" data-tab="meni" data-i18n="modal.tab_menu">Meni</div>
             <div class="modal-tab" data-tab="aktualnaPonudba" data-i18n="modal.tab_special_offer">Aktualna Ponudba</div> 
-            <div class="modal-tab" data-tab="galerija" data-i18n="modal.tab_gallery">Slike & Zemljevid</div>
+            <div class="modal-tab" data-tab="galerija" data-i18n="modal.tab_gallery">Zemljevid</div>
             <div class="modal-tab" data-tab="ocene" data-i18n="modal.tab_reviews">Ocene (0)</div>
         </div>
 
@@ -3550,15 +3763,23 @@ body.is-capacitor-app #aiChatModal {
                     </div>
 
                 <div id="tabGalerija" class="tab-content">
-                    <h4 data-i18n="modal.gallery_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">Galerija slik</h4>
-                    <div id="galerijaSlike" class="galerija-slike">
-                        </div>
-                    
                     <h4 data-i18n="modal.map_title" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; margin-top: 20px;">Zemljevid Lokacije</h4>
+                    
                     <div class="zemljevid-ovoj">
                         <iframe id="modalZemljevid" src="about:blank" allowfullscreen="" loading="lazy" aria-label="Zemljevid lokacije restavracije"></iframe>
+                        
                     </div>
-                </div>
+                    
+  <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
+    <button 
+        id="navigacija-gumb-modal"  
+        class="gumb-navigacija" 
+        onclick="startNavigation(this)" 
+        data-lat=""  data-lon=""  >
+        <i class="fas fa-location-arrow"></i>
+    </button>
+</div>
+                    </div>
 
                 <div id="tabOcene" class="tab-content">
                     <p data-i18n="modal.no_reviews">Trenutno ni na voljo podrobnih ocen za prikaz.</p>
@@ -3589,7 +3810,7 @@ body.is-capacitor-app #aiChatModal {
           <button type="submit" data-i18n="modal.login_button">Prijavi se</button>
           
           <div class="prijava-info-text">
-              <p data-i18n="modal.prijava_info">
+              <p data-i18n="">
                   Prosimo, uporabite vaš e-poštni naslov in geslo za dostop.
               </p>
           </div>
@@ -3649,10 +3870,10 @@ body.is-capacitor-app #aiChatModal {
         </form>
         
       </div>
-     <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
+    <div id="forgotPasswordView" style="display: none;" class="reset-password-view">
     <h3 data-i18n="auth.reset_title">Ponastavitev Gesla</h3>
     
-    <p data-i18n="auth.reset_instructions">Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
+    <p id="navodilaEmail" data-i18n="auth.reset_instructions">Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.</p>
 
     <form id="zahtevaResetForm">
         <input type="email" id="resetEmail" data-i18n="[placeholder]modal.email_placeholder" placeholder="E-pošta" required>
@@ -3662,6 +3883,28 @@ body.is-capacitor-app #aiChatModal {
         <button type="submit" id="posljiResetNavodila" data-i18n="auth.send_instructions_button">Pošlji navodila</button>
     </form>
     
+    <div id="confirmResetFields" style="display: none;">
+        
+        <p class="mt-20" data-i18n="auth.confirm_instructions">Vnesite 6-mestno kodo, ki ste jo prejeli na e-pošto, in novo geslo.</p>
+
+        <input 
+            type="text" 
+            id="resetCode" 
+            placeholder="PIN (OTP)" 
+            maxlength="6" 
+            inputmode="numeric" 
+            required>
+        
+        <input 
+            type="password" 
+            id="newPassword" 
+            placeholder="Novo Geslo" 
+            data-i18n="[placeholder]auth.new_password_placeholder" 
+            required>
+        
+        <button type="button" id="potrdiNovoGeslo" data-i18n="auth.confirm_password_button">Potrdi novo geslo</button>
+    </div>
+
     <div class="back-to-login-container">
         <a href="#" id="nazajNaPrijavoLink" data-i18n="auth.back_to_login_link">Nazaj na prijavo</a>
     </div>
@@ -3813,7 +4056,7 @@ body.is-capacitor-app #aiChatModal {
     </div>
     
     <a href="info-legal.html" class="taskbar-item">
-        <i class="fas fa-receipt"></i>
+        <i class="fas fa-bars"></i>
         <span data-i18n="">Rezervacije</span>
     </a>
     
@@ -4045,16 +4288,21 @@ let currentFilterKuhinja = '';
 let globalSelectedTime = null; 
 let currentRestaurantId = null; 
 let globalSelectedMizaId = null; 
-let globalSelectedMizaIme = null; 
+let globalSelectedMizaIme = null;
 
 // 🔥 NOVA GLOBALNA SPREMENLJIVKA ZA ZEMLJEVID (Leaflet)
 let map = null; 
+
+// 🔥 NOVE GLOBALNE SPREMENLJIVKE ZA LOKACIJO IZBRANE RESTAVRACIJE (Za Navigacijo)
+let globalRestaurantLat = null; 
+let globalRestaurantLon = null;
 
 // 🔥 NOVA GLOBALNA SPREMENLJIVKA ZA LOKACIJO UPORABNIKA
 let userLocation = null; 
 const DEFAULT_LAT = 46.0569; // Ljubljana, kot privzeto, če ni lokacije
 const DEFAULT_LON = 14.5058;
 const FALLBACK_IMAGE_URL = 'https://placehold.co/300x200?text=Slika+ni+na+voljo';
+const MAX_DISTANCE_KM = 100;
 
 
 // GLOBALNE DEFINICIJE DOM ELEMENTOV (Ohranjene, če so definirane v HTML)
@@ -4111,10 +4359,17 @@ const chatModal = document.getElementById('aiChatModal');
 const loginRegisterView = document.getElementById('loginRegisterView');
 const forgotPasswordView = document.getElementById('forgotPasswordView');
 const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink'); // Link "Pozabljeno geslo?"
-const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');     // Link "← Nazaj na prijavo"
+const nazajNaPrijavoLink = document.getElementById('nazajNaPrijavoLink');     // Link "Nazaj na prijavo"
 const zahtevaResetForm = document.getElementById('zahtevaResetForm');
 const resetEmailInput = document.getElementById('resetEmail');
 const resetStatus = document.getElementById('resetStatus');
+const prijavaEmailInput = document.getElementById('prijavaEmail'); // Predpostavka: že definirano
+const posljiResetNavodilaBtn = document.getElementById('posljiResetNavodila'); // Gumb za pošiljanje
+// 👇👇👇 TI ELEMENTI SO MANJKALI IN POVZROČALI NAPAKE 👇👇👇
+const confirmResetFields = document.getElementById('confirmResetFields'); // DIV za vnos kode in gesla
+const resetCodeInput = document.getElementById('resetCode');             // Vnosno polje za 6-mestno kodo
+const newPasswordInput = document.getElementById('newPassword');         // Vnosno polje za novo geslo
+const potrdiNovoGesloBtn = document.getElementById('potrdiNovoGeslo');   // Gumb za potrditev novega gesla
 </script>
 
 <script>
@@ -4627,6 +4882,7 @@ const checkUrlForAuthToken = () => {
 document.addEventListener('DOMContentLoaded', () => { 
     
     // ⭐ NOVO: DEFINICIJA ELEMENTOV ZA PONASTAVITEV GESLA (Pred DOMContentLoaded jih ni bilo) ⭐
+    // Opomba: Te definicije so v vašem izvirniku, čeprav so globalno že definirane, jih pustimo.
     const loginRegisterView = document.getElementById('loginRegisterView'); 
     const forgotPasswordView = document.getElementById('forgotPasswordView');
     const pozabljenoGesloLink = document.getElementById('pozabljenoGesloLink');
@@ -4636,8 +4892,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetEmailInput = document.getElementById('resetEmail');
     const resetStatus = document.getElementById('resetStatus');
     const prijavaEmailInput = document.getElementById('prijavaEmail');
-    const sendResetEmailBtn = document.getElementById('posljiResetNavodila');
+    const sendResetEmailBtn = document.getElementById('posljiResetNavodila'); // Ta ID je v HTML-ju
     
+    // Predpostavimo, da je API_BASE_URL definirana in da so:
+    // const API_BASE_URL = '/api'; 
+    // const confirmResetFields = document.getElementById('confirmResetFields');
+    // const resetCodeInput = document.getElementById('resetCode');
+    // const newPasswordInput = document.getElementById('newPassword');
+    // const potrdiNovoGesloBtn = document.getElementById('potrdiNovoGeslo');
+
     // Preveri, ali so v URL-ju parametri prijave (Za social login)
     checkUrlForAuthToken();
 
@@ -4715,12 +4978,16 @@ document.addEventListener('DOMContentLoaded', () => {
             loginRegisterView.style.display = 'none';
             forgotPasswordView.style.display = 'block'; 
 
-            // 2. Poskusi avtomatično izpolniti e-mail
+            // 2. Zagotovi, da je najprej vidna le faza E-maila (1. korak)
+            if (zahtevaResetForm) zahtevaResetForm.style.display = 'block';
+            if (confirmResetFields) confirmResetFields.style.display = 'none'; // ⭐ Dodano!
+
+            // 3. Poskusi avtomatično izpolniti e-mail
             if (prijavaEmailInput && resetEmailInput && prijavaEmailInput.value) {
                  resetEmailInput.value = prijavaEmailInput.value;
             }
             
-            // 3. Počisti statusna sporočila
+            // 4. Počisti statusna sporočila
             if (resetStatus) resetStatus.textContent = ''; 
         });
     }
@@ -4737,8 +5004,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. KLIC NA BACKEND (/forgot-password)
-    if (zahtevaResetForm) {
+    // 2. KLIC NA BACKEND (/forgot-password) - ZAHTEVA ZA KODO
+    if (zahtevaResetForm && sendResetEmailBtn && confirmResetFields) {
         zahtevaResetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -4768,10 +5035,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (res.ok) {
+                    // ⭐ USPEH KORAKA 1: Preklop pogleda na vnos kode in gesla
                     if (resetStatus) {
                         resetStatus.style.color = 'green';
-                        resetStatus.textContent = data.message || 'Navodila so bila poslana na vaš e-mail naslov (preverite tudi vsiljeno pošto).';
+                        resetStatus.textContent = data.message || 'Koda je poslana. Prosimo, vnesite jo spodaj z novim geslom.';
                     }
+
+                    // Skrij 1. korak (e-mail formular) in prikaži 2. korak (OTP/geslo)
+                    zahtevaResetForm.style.display = 'none';
+                    confirmResetFields.style.display = 'block'; // ⭐ Dodano!
+
                 } else {
                     if (resetStatus) {
                         resetStatus.style.color = 'red';
@@ -4786,10 +5059,80 @@ document.addEventListener('DOMContentLoaded', () => {
                     resetStatus.textContent = 'Napaka pri povezavi z omrežjem.';
                 }
             } finally {
-                if(sendResetEmailBtn) sendResetEmailBtn.disabled = false;
+                // Gumb omogoči nazaj, samo če klic ni bil uspešen (tj. če je formular še viden)
+                if (zahtevaResetForm.style.display !== 'none') {
+                    if(sendResetEmailBtn) sendResetEmailBtn.disabled = false;
+                }
             }
         });
     }
+
+    // 3. KLIC NA BACKEND (/reset-password/confirm) - POTRDITEV KODE IN NOVO GESLO
+    if (potrdiNovoGesloBtn) {
+        potrdiNovoGesloBtn.addEventListener('click', async () => {
+            
+            // ⭐ Zberemo vse podatke
+            const email = resetEmailInput.value;
+            const otpCode = resetCodeInput.value.trim();
+            const newPassword = newPasswordInput.value;
+
+            // Osnovna validacija
+            if (!email || otpCode.length !== 6 || newPassword.length < 6) {
+                if(resetStatus) {
+                    resetStatus.style.color = 'red';
+                    resetStatus.textContent = 'Prosimo, vnesite 6-mestno kodo in geslo (min 6 znakov).';
+                }
+                return;
+            }
+
+            // Priprava za klic
+            if (resetStatus) {
+                resetStatus.style.color = 'black';
+                resetStatus.textContent = 'Potrjevanje kode in ponastavitev gesla...';
+            }
+            potrdiNovoGesloBtn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/reset-password/confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otpCode, newPassword })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // ⭐ USPEH: Ponastavitev gesla je uspešna
+                    if (resetStatus) {
+                        resetStatus.style.color = 'green';
+                        resetStatus.textContent = data.message || 'Geslo je bilo uspešno ponastavljeno! Preusmerjam na prijavo...';
+                    }
+                    
+                    // Po uspešni ponastavitvi preusmeri nazaj na prijavo po 3 sekundah
+                    setTimeout(() => {
+                        if (nazajNaPrijavoLink) nazajNaPrijavoLink.click();
+                    }, 3000);
+
+                } else {
+                    // NAPAKA (npr. napačna ali potekla koda)
+                    if (resetStatus) {
+                        resetStatus.style.color = 'red';
+                        resetStatus.textContent = data.error || data.message || `Napaka: Koda ni pravilna ali je potekla.`;
+                    }
+                }
+
+            } catch (error) {
+                console.error('Napaka omrežja pri potrditvi gesla:', error);
+                if (resetStatus) {
+                    resetStatus.style.color = 'red';
+                    resetStatus.textContent = 'Napaka pri povezavi z omrežjem med potrjevanjem.';
+                }
+            } finally {
+                potrdiNovoGesloBtn.disabled = false;
+            }
+        });
+    }
+
     // ==========================================================
     
     // Nadaljevanje vaše obstoječe kode:
@@ -5206,7 +5549,7 @@ function renderCard(restavracija) {
         
     // Interna ocena 
     const internaOcena = restavracija.ocena_povprecje || 0;
-    const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">(${(internaOcena).toFixed(1)})</span>`;
+    const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">${(internaOcena).toFixed(1)}</span>`;
 
     // Googlova ocena
     const googleRating = restavracija.googleRating || 0;
@@ -5325,7 +5668,7 @@ function renderFeaturedCard(restavracija) {
     return card;
 }
 
-// 3. Filtriranje in Prikaz (KONČNA REŠITEV Z NOVIM POLJEM kuhinja_filtri)
+// 3. Filtriranje in Prikaz (KONČNA REŠITEV Z Radijem 20 km)
 function filterAndRenderRestavracije(optionalFilteredList) {
     if (!mrezaKarticDiv || !statusKarticeDiv) return;
 
@@ -5333,11 +5676,41 @@ function filterAndRenderRestavracije(optionalFilteredList) {
     const listToRender = optionalFilteredList || allRestavracije;
     
     const filtered = listToRender.filter(r => {
-        // 1. Če filter ni izbran (pogled 'Priljubljeno v bližini'), prikaži vse
-        if (currentFilterKuhinja === '') return true; 
         
-        // 2. Filtriranje z uporabo novega, čistega Array polja iz MongoDB
-        const filtriIzBaze = r.kuhinja_filtri; // ⭐ TO JE KLJUČNA SPREMEMBA ⭐
+        // =================================================================
+        // ⭐ 1. NOVO: Logika 'Priljubljeno v bližini' (Radij 20 km)
+        // =================================================================
+        if (currentFilterKuhinja === '') {
+            
+            // A. Preverjanje, ali imamo lokacijo uporabnika IN restavracije
+            if (userLocation && r.lokacija?.coordinates) {
+                
+                // Koordinate restavracije (lon je 0, lat je 1)
+                const restaurantLon = r.lokacija.coordinates[0];
+                const restaurantLat = r.lokacija.coordinates[1];
+                
+                // Izračunaj razdaljo (uporablja globalno funkcijo getDistance)
+                const distance = getDistance(
+                    userLocation.lat, 
+                    userLocation.lon, 
+                    restaurantLat, 
+                    restaurantLon
+                );
+                
+                // Vrni TRUE samo, če je razdalja znotraj 20 km
+                return distance <= MAX_DISTANCE_KM; // Uporablja MAX_DISTANCE_KM = 20
+
+            }
+            
+            // B. Če nimamo lokacije uporabnika, restavracije v tem pogledu ne prikažemo.
+            return false; 
+        } 
+        
+        // =================================================================
+        // 2. Filtriranje po tipu kuhinje (če je filter izbran)
+        // =================================================================
+        
+        const filtriIzBaze = r.kuhinja_filtri; 
 
         // Preverimo, ali je polje Array in ali vsebuje aktivni filter
         if (Array.isArray(filtriIzBaze)) {
@@ -5720,6 +6093,11 @@ async function prikaziPodrobnosti(restavracija) {
     const lat = popolnaRestavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
     const gpsString = `${lat.toFixed(4)},${lon.toFixed(4)}`; 
 
+    // 🔥🔥🔥 KLJUČNO: SHRANJEVANJE KOORDINAT GLOBALNO ZA NAVIGACIJO 🔥🔥🔥
+    globalRestaurantLat = lat;
+    globalRestaurantLon = lon;
+    // 🔥🔥🔥 KONEC SHRANJEVANJA 🔥🔥🔥
+
     // IZRAČUN RAZDALJE ZA MODALNO OKNO
     let prikazLokacije = '';
 
@@ -5746,7 +6124,9 @@ async function prikaziPodrobnosti(restavracija) {
     if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
 
     if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
-    if(modalOpis) modalOpis.textContent = opis;
+    if (modalOpis) {
+    modalOpis.innerHTML = opis; 
+}
 
     // Generiranje Menija (Uporaba POPOLNA_RESTAVRACIJA)
     if(modalMeni) {
@@ -5865,7 +6245,7 @@ async function prikaziPodrobnosti(restavracija) {
 
 // Generiranje Zemljevida (OPOMBA: URL popravljen, vendar morate preveriti format, ki ga zahteva vaš strežnik)
     if (modalZemljevid) {
-       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`; 
+       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
     }
     
     // ⭐ KLJUČNO: Klic funkcije za prikaz vseh ocen
@@ -6411,9 +6791,31 @@ async function prikaziPodrobnosti(restavracija) {
     
     const opis = popolnaRestavracija.opis || popolnaRestavracija.glavniOpis || ''; 
     
+    // 🔥 Pravilne koordinate, ki se uporabljajo povsod
     const lon = popolnaRestavracija.lokacija?.coordinates?.[0] || DEFAULT_LON; 
     const lat = popolnaRestavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
     const gpsString = `${lat.toFixed(4)},${lon.toFixed(4)}`; 
+    
+    
+    // *************************************************************************
+    // ⭐ DODANO: DINAMIČNA NASTAVITEV DATA-ATRIBUTOV NA GUMBU ZA NAVIGACIJO
+    // Uporabimo ID, da se izognemo težavam z document.querySelector
+    // *************************************************************************
+    const gumbNavigacija = document.getElementById('navigacija-gumb-modal'); 
+    
+    if (gumbNavigacija) {
+        // Prepisovanje data-atributov z dinamičnimi koordinatami
+        gumbNavigacija.setAttribute('data-lat', lat);
+        gumbNavigacija.setAttribute('data-lon', lon);
+        
+        console.log(`[NAVIGACIJA FIX] Gumb posodobljen z LAT=${lat}, LON=${lon}`);
+    } else {
+        console.warn("POZOR: Gumb z ID 'navigacija-gumb-modal' ni najden! Preverite HTML.");
+    }
+    // *************************************************************************
+    // ⭐ KONEC DODANEGA BLOKA
+    // *************************************************************************
+
 
     // IZRAČUN RAZDALJE ZA MODALNO OKNO
     let prikazLokacije = '';
@@ -6441,7 +6843,9 @@ async function prikaziPodrobnosti(restavracija) {
     if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
 
     if(modalOcena) modalOcena.innerHTML = `<i class="fas fa-star"></i> ${(popolnaRestavracija.ocena_povprecje || 0).toFixed(1)}`;
-    if(modalOpis) modalOpis.textContent = opis;
+    if (modalOpis) {
+    modalOpis.innerHTML = opis; 
+}
 
     // Generiranje Menija (Uporaba POPOLNA_RESTAVRACIJ A)
     if(modalMeni) {
@@ -6531,37 +6935,54 @@ async function prikaziPodrobnosti(restavracija) {
     }
     
   // Generiranje Galerije 
-    if(galerijaSlikeDiv) {
-        const galerijaSlikaURLS = popolnaRestavracija.galerija_slik || []; 
+if(galerijaSlikeDiv) {
+    const galerijaSlikaURLS = popolnaRestavracija.galerija_slik || []; 
+    
+    let galerijaHTML = ''; 
+
+    if (galerijaSlikaURLS.length > 0) {
         
-        let galerijaHTML = ''; 
+        galerijaSlikaURLS.forEach(url => {
+            galerijaHTML += `
+                <div class="relative rounded-lg overflow-hidden shadow-md">
+                    <img 
+                        src="${url}" 
+                        alt="Slika restavracije" 
+                        class="absolute top-0 left-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition duration-300"
+                        onclick="openFullSizeImage('${url}')"
+                    >
+                </div>
+            `;
+        });
 
-        if (galerijaSlikaURLS.length > 0) {
-            
-            galerijaSlikaURLS.forEach(url => {
-                galerijaHTML += `
-                    <div class="relative rounded-lg overflow-hidden shadow-md">
-                        <img 
-                            src="${url}" 
-                            alt="Slika restavracije" 
-                            class="absolute top-0 left-0 w-full h-full object-cover cursor-pointer hover:opacity-90 transition duration-300"
-                            onclick="openFullSizeImage('${url}')"
-                        >
-                    </div>
-                `;
-            });
+        galerijaSlikeDiv.innerHTML = galerijaHTML; 
 
-            galerijaSlikeDiv.innerHTML = galerijaHTML; 
-
-        } else {
-            galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni slik za prikaz.</p>';
-        }
+    } else {
+        galerijaSlikeDiv.innerHTML = '<p class="text-gray-500 p-4">Ni slik za prikaz.</p>';
     }
+}
 
-// Generiranje Zemljevida (OPOMBA: URL popravljen, vendar morate preveriti format, ki ga zahteva vaš strežnik)
-    if (modalZemljevid) {
-       modalZemljevid.src = `https://maps.google.com/maps?q=${lat},${lon}&hl=sl&z=15&output=embed`; 
-    }
+// Generiranje Zemljevida
+if (modalZemljevid) {
+
+    // prepreči težave s klikom kartice
+    modalZemljevid.style.pointerEvents = "auto";
+    modalZemljevid.style.display = "block";
+    modalZemljevid.style.position = "relative";
+    modalZemljevid.style.zIndex = "1";
+
+    // izračun bounding box za bližji pogled (zoom ~16)
+    const offset = 0.005; 
+
+    const left = lon - offset;
+    const right = lon + offset;
+    const top = lat + offset;
+    const bottom = lat - offset;
+
+    modalZemljevid.src = 
+        `https://www.openstreetmap.org/export/embed.html?bbox=${left},${bottom},${right},${top}&layer=mapnik&marker=${lat},${lon}`;
+}
+
     
     // ⭐ KLJUČNO: Klic funkcije za prikaz vseh ocen
     // ⭐ POPRAVLJENO: Uporaba ključa 'komentarji', ki ga vrne API.
@@ -7547,9 +7968,9 @@ async function fetchAiResponse(prompt, languageCode) {
     // ⭐ POPRAVEK: LOKALIZACIJA LOADING SPOROČILA ⭐
     let loadingText;
     if (languageCode.startsWith('en')) {
-        loadingText = "Leo is thinking";
+        loadingText = "Leo";
     } else {
-        loadingText = "Leo razmišlja";
+        loadingText = "Leo";
     }
     
     // 1. Prikaz "loading" sporočila od AI, dokler čaka na odgovor
@@ -7676,6 +8097,53 @@ function handleKeyboard(isOpen, keyboardHeight) {
         }
     }
 }
+// ******************************************************************
+// FUNKCIJA ZA NAVIGACIJO (Google Maps APP OPEN) - POPRAVLJENA
+// ******************************************************************
+
+function startNavigation(buttonElement) {
+    
+    // Sprememba: Koordinate beremo direktno iz data-atributov prejetega gumba (buttonElement)
+    let lat = parseFloat(buttonElement.getAttribute('data-lat'));
+    let lon = parseFloat(buttonElement.getAttribute('data-lon'));
+    
+    // Prejšnje branje globalnih spremenljivk se odstrani, saj je nezanesljivo.
+    // let lat = globalRestaurantLat; 
+    // let lon = globalRestaurantLon;
+
+    if (isNaN(lat) || isNaN(lon) || lat === 0 || lon === 0) { 
+        console.error("Koordinate restavracije niso na voljo. Preverite data-atribute gumba.");
+        alert("Koordinat restavracije ni mogoče najti.");
+        return;
+    }
+    
+    // 1. Definicija URL-jev z zagotovljenim formatom LAT, LON
+    
+    // A. Deep Link (Zagon nativne aplikacije)
+    const deepLinkUrl = `geo:${lat},${lon}?q=${lat},${lon}`;
+    
+    // B. Fallback URL za splet (Popravljen URL)
+    // Uporabite standardni Google Maps URL za smer:
+    const fallbackWebUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`;
+    // Opomba: Če želite, da je začetni položaj **vedno** lokacija uporabnika, je ta URL najboljši.
+
+    // 2. Zagon navigacije
+    try {
+        if (window.Capacitor) {
+            console.log("Poskušam zagnati navigacijo (Deep Link):", deepLinkUrl);
+            window.open(deepLinkUrl, '_system');
+        } else {
+            console.log("Poskušam zagnati navigacijo (Web Fallback):", fallbackWebUrl);
+            window.open(fallbackWebUrl, '_blank'); 
+        }
+
+    } catch (e) {
+        console.error("Napaka pri zagonu navigacije:", e);
+        alert("Prišlo je do napake pri zagonu navigacije. Poskusite znova.");
+        window.open(fallbackWebUrl, '_blank');
+    }
+}
+// window.startNavigation = startNavigation;
 
 
 </script>

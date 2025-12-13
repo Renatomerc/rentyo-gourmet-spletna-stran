@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Iskanje Restavracij - Gourmet & Experience",
+    "title": "Iskanje restavracij - Gourmet & Experience",
     "profile_title": "Moj profil - Gourmet & Experience",
     "pageTitle": "Rentyo ponudbe in doživetja"
   },
@@ -14,7 +14,7 @@
   },
   "action_banner": {
     "title": "Še vedno rezervirate restavracije preko telefona?",
-    "subtitle": "Z nami najdete svojo najljubšo restavracijo, jo rezervirate in uživate in to brez klica. Rentyo Gourmet & Experience"
+    "subtitle": "Z nami najdete svojo najljubšo restavracijo, jo rezervirate in v njej uživate – brez klica. Rentyo Gourmet & Experience"
   },
   "search": {
     "restaurant_city_label": "Restavracija ali mesto",
@@ -39,14 +39,14 @@
     "brunch": "Brunch"
   },
   "results": {
-    "popular_title": "Priljubljeno v vaši bližini",
+    "popular_title": "Kam v bližini",
     "featured_title": "Izpostavljeno",
     "reserve_button": "Rezerviraj",
     "description_1": "Tradicionalna slovenska kuhinja in prijetno vzdušje.",
     "description_2": "Sodobne jedi z lokalnimi sestavinami.",
     "description_3": "Pristna italijanska hrana in odlične pice.",
     "description_4": "Izvrstne rastlinske jedi za vsakogar.",
-    "description_5": "Izvrstni brunchi za vsakogar.",
+    "description_5": "Izvrsten brunch za vsakogar.",
     "check_tables": "Preveri mize ob {{time}}",
     "cuisine": "Kuhinja",
     "na": "Ni podatkov",
@@ -69,7 +69,7 @@
     "wine_href": "experience.html?code=wine-tasting",
     "adventure": "Pustolovščina na prostem",
     "adventure_href": "experience.html?code=outdoor-adventure",
-    "slepa-kuhinja": "Slepa kuhinja", 
+    "slepa-kuhinja": "Slepa kuhinja",
     "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
     "sea": "Morska doživetja",
     "sea_href": "experience.html?code=sea-experience",
@@ -89,7 +89,7 @@
     "search_success": "Najdeno {{count}} restavracij.",
     "search_error": "Iskanje ni uspelo.",
     "no_restaurants_found": "Ni najdenih restavracij.",
-    "reserving": "Rezerviram {{stevilo}} osebi ob {{cas}}...",
+    "reserving": "Rezerviram za št. oseb {{stevilo}} ob {{cas}}...",
     "reservation_success": "Rezervacija uspešna! Miza št. {{miza}} je rezervirana za {{trajanje}}.",
     "reservation_success_minimal": "Uspešno rezervirano ob {{cas}}!",
     "reservation_failed": "Rezervacija ni uspela.",
@@ -120,7 +120,14 @@
     "register_success": "Registracija uspešna! Zdaj se lahko prijavite.",
     "login_error": "Napaka pri prijavi.",
     "register_error": "Registracija ni uspela.",
-    "server_error": "Napaka pri povezavi s strežnikom."
+    "server_error": "Napaka pri povezavi s strežnikom.",
+    "reset_title": "Ponastavitev gesla",
+    "reset_instructions": "Vnesite vaš e-poštni naslov za pošiljanje navodil za ponastavitev.",
+    "send_instructions_button": "Pošlji navodila",
+    "confirm_instructions": "Vnesite 6-mestno kodo, ki ste jo prejeli na e-pošto, in novo geslo.",
+    "new_password_placeholder": "Novo geslo",
+    "confirm_password_button": "Potrdi novo geslo",
+    "back_to_login_link": "← Nazaj na prijavo"
   },
   "modal": {
     "login_tab": "Prijava",
@@ -130,15 +137,16 @@
     "name_placeholder": "Ime in priimek",
     "login_button": "Prijavi se",
     "register_button": "Ustvari račun",
+    "forgot_password_link": "Pozabljeno geslo?",
     "tab_menu": "Meni",
-    "tab_gallery": "Slike & Zemljevid",
+    "tab_gallery": "Zemljevid & navigacija",
     "tab_reviews": "Ocene",
     "tab_special_offer": "Aktualna ponudba",
     "special_offer_title": "Posebna ponudba restavracije",
     "special_offer_default": "Trenutno ni aktivne posebne ponudbe ali sezonskega menija.",
     "no_reviews": "Trenutno ni na voljo podrobnih ocen za prikaz.",
     "no_menu": "Meni še ni na voljo.",
-    "reserve_button": "Rezerviraj mizo",
+    "reserve_button": "Preveri",
     "gallery_title": "Galerija slik",
     "map_title": "Zemljevid lokacije",
     "reservation_persons": "Število oseb",
@@ -183,7 +191,7 @@
     "payment_info_prefix": "Varno plačilo, ki ga omogoča",
     "copyright_text": "© 2025 Rentyo Gourmet. Vse pravice pridržane."
   },
-  "profile": {
+ "profile": {
     "title": "Moj uporabniški profil",
     "tab_data": "Osebni podatki",
     "tab_current": "Aktualne rezervacije",
@@ -201,7 +209,7 @@
     "no_history_reservations": "Zgodovina rezervacij je prazna.",
     "points_payment_subtitle": "Točke in plačilna sredstva",
     "points_title": "Vaše zbrane točke",
-    "points_status": "Trenutno stanje: {{count}} točk (Dovolj za 10€ popusta)",
+    "points_status": "Trenutno stanje: {{count}} točk (dovolj za 10€ popusta)",
     "points_status_dynamic": "Trenutno stanje: {{count}} točk",
     "card_title": "Shranjena kreditna kartica",
     "card_info": "Visa končnica: **** 1234",
@@ -214,21 +222,24 @@
     "cancel_success": "Rezervacija je bila uspešno preklicana.",
     "status_rated": "Že ocenjeno",
     "status_rate_now": "Kliknite za oceno",
-    "rate_title": "Oceni Restavracijo",
-    "rating_label": "Vaša Ocena",
-    "comment_label": "Komentar (Neobvezno)",
-    "submit_review": "Oddaj Oceno",
+    "rate_title": "Oceni restavracijo",
+    "rating_label": "Vaša ocena",
+    "comment_label": "Komentar (neobvezno)",
+    "submit_review": "Oddaj oceno",
     "review_missing_data": "Napaka: Manjkajo podatki za oddajo ocene.",
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova.",
     "scan_qr_main_text": "Skeniraj QR kodo in potrdi svoj prihod",
-    "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk in kasnejše popuste.",
+    "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk ter dodatne ugodnosti in povabila.",
     "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
     "status_confirmed": "Potrjeno",
-    "scan_unavailable": "Naloži aplikacijo in pridobi točke in popuste",
-    "delete_account_confirmation": "Z izbrisom računa boste izbrisali vse svoje osebne podatke, kakor tudi vse ocene in komentarje restavracij",
+    "scan_unavailable": "Naloži aplikacijo in pridobi točke in ugodnosti",
+    "scan_cancelled": "Skeniranje preklicano ali neuspešno.",
+    "scanner_error": "Napaka skenerja.",
+    "camera_permission_required": "Za skeniranje je potrebno dovoljenje za kamero.",
+    "delete_account_confirmation": "Z izbrisom računa boste izbrisali vse svoje osebne podatke. Ocene in komentarji restavracij ostanejo vidni, vendar pod imenom \"GDPR Deleted User\".",
     "delete_account_button": "Izbriši moj račun"
-  },
+},
   "warning": {
     "title": "Opozorilo",
     "default_message": "Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.",
@@ -240,11 +251,11 @@
     "splosni_pogoji_link": "Splošnimi pogoji",
     "splosni_pogoji_href": "https://www.rentyo.com/sl/uvjeti-koristenja.html",
     "in_politiko": " in ",
-    "politika_zasebnosti_link": "Politika zasebnosti",
+    "politika_zasebnosti_link": "Politiko zasebnosti",
     "politika_zasebnosti_href": "https://www.rentyo.com/sl/politika-zasebnosti.html"
   },
   "cookieConsent": {
-    "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analize prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
+    "message": "Ta spletna stran uporablja piškotke za zagotavljanje boljše uporabniške izkušnje in analitike prometa. Za nadaljnjo uporabo prosimo za vaše soglasje.",
     "moreInfoLink": {
       "text": "Preberi več.",
       "url": "politika-zasebnosti.html"
@@ -264,7 +275,7 @@
     "back": "Nazaj",
     "loadingOffers": "Nalaganje posebnih ponudb...",
     "footerText": "© 2025 Rentyo Gourmet. Vse pravice pridržane.",
-    "location": "Lokacija", 
+    "location": "Lokacija",
     "dateTime": "Datum/Čas",
     "price": "Cena",
     "noDescription": "Podroben opis ponudbe ni na voljo.",

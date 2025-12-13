@@ -3,6 +3,7 @@
 // POPRAVLJENO: Dodan fcmToken za PUSH obvestila
 // POPRAVLJENO: Dodana podpora za AppleId in posodobljena validacija gesla
 // ⭐ NOVO: Polja za ponastavitev gesla so ostala, a je odstranjena metoda getResetPasswordToken, saj sedaj uporabljamo OTP v Controllerju
+// ⭐ NOVO: DODANO POLJE ZA PRILJUBLJENE RESTAVRACIJE
 // ========================================
 
 const mongoose = require('mongoose');
@@ -52,6 +53,12 @@ const UporabnikShema = new mongoose.Schema({
         default: 0
     },
 
+    // 🔥 NOVO: POLJE ZA PRILJUBLJENE RESTAVRACIJE (SHRANJUJEMO ID-je)
+    favorite_restaurants: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Restavracija'
+    }],
+    
     // 🔥 POPRAVKI ZA FCM TOKEN: Odstranitev default: null in unique: true
     fcmToken: { 
         type: String, 
