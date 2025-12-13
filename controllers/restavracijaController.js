@@ -1430,33 +1430,37 @@ exports.oznaciPretekleRezervacije = async () => {
 
 /**
  * 🌟 Preklapljanje statusa priljubljenosti restavracije za prijavljenega uporabnika.
- * POST /api/restavracije/favorites/toggle/:restavracijaId
+ * POST /api/restavracije/uporabnik/priljubljene/toggle
  * @access Private
  */
 exports.toggleFavorite = async (req, res) => {
-    const restavracijaId = req.params.restavracijaId;
+    // 🔥 POPRAVEK: Pridobimo restavracijaId iz telesa zahteve (req.body),
+    // saj frontend ne pošilja ID-ja v URL-ju, ampak v telesu JSON zahteve.
+    const { restavracijaId } = req.body; 
+    
     const userId = req.uporabnik ? req.uporabnik.id : null;
     
     if (!userId) {
         return res.status(401).json({ msg: 'Neavtorizirano: Prijavite se za upravljanje priljubljenih.' });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(restavracijaId)) {
-        return res.status(400).json({ msg: 'Neveljaven format ID restavracije.' });
+    // Preverjanje ID-ja: Ne preverjamo, ali je v req.params, ampak ali je v req.body in je validen
+    if (!restavracijaId || !mongoose.Types.ObjectId.isValid(restavracijaId)) {
+        return res.status(400).json({ msg: 'Neveljaven ali manjkajoč ID restavracije v telesu zahteve.' });
     }
 
     try {
-        const userIdObj = new mongoose.Types.ObjectId(userId);
-        const restavracijaIdObj = new mongoose.Types.ObjectId(restavracijaId);
+        // 🔥 POPRAVEK: Uporabimo samo userId, Mongoose bo sam pretvoril v ObjectId.
         
-        const uporabnik = await Uporabnik.findById(userIdObj, 'favorite_restaurants');
+        // 1. Najprej poiščemo, ali je ID restavracije že v seznamu
+        const uporabnik = await Uporabnik.findById(userId, 'favorite_restaurants');
         
         if (!uporabnik) {
             return res.status(404).json({ msg: 'Uporabnik ni najden.' });
         }
         
         // Preverimo, ali je ID restavracije že v seznamu (uporabljamo toString za varno primerjavo)
-        const jePriljubljena = uporabnik.favorite_restaurants.some(id => id.toString() === restavracijaIdObj.toString());
+        const jePriljubljena = uporabnik.favorite_restaurants.some(id => id.toString() === restavracijaId.toString());
 
         let posodobitevRezultat;
         let operacija;
@@ -1464,8 +1468,8 @@ exports.toggleFavorite = async (req, res) => {
         if (jePriljubljena) {
             // ODSTRANI (UNFAVORITE)
             posodobitevRezultat = await Uporabnik.findByIdAndUpdate(
-                userIdObj,
-                { $pull: { favorite_restaurants: restavracijaIdObj } },
+                userId, // Uporabimo userId
+                { $pull: { favorite_restaurants: restavracijaId } }, // Uporabimo restavracijaId
                 { new: true }
             );
             operacija = 'odstranjeno';
@@ -1475,8 +1479,8 @@ exports.toggleFavorite = async (req, res) => {
             // DODAJ (FAVORITE)
             // Uporabimo $addToSet, da zagotovimo unikatnost v polju
             posodobitevRezultat = await Uporabnik.findByIdAndUpdate(
-                userIdObj,
-                { $addToSet: { favorite_restaurants: restavracijaIdObj } },
+                userId,
+                { $addToSet: { favorite_restaurants: restavracijaId } },
                 { new: true }
             );
             operacija = 'dodano';
@@ -1491,7 +1495,7 @@ exports.toggleFavorite = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Napaka pri preklapljanju priljubljenih restavracij:', error);
+        console.error('❌ Napaka pri preklapljanju priljubljenih restavracij:', error.message);
         res.status(500).json({ msg: 'Napaka strežnika pri posodabljanju priljubljenih.' });
     }
 };
@@ -1511,8 +1515,6 @@ exports.getFavoriteRestaurants = async (req, res) => {
 
     try {
         // 1. POIŠČI UPORABNIKA IN SAMO ID-JE PRILJUBLJENIH RESTAVRACIJ
-        // Izognemo se ročni pretvorbi new mongoose.Types.ObjectId(userId) in pustimo Mongooseu, 
-        // da to stori sam (s tem se izognemo morebitnim napakam pri uvozu/inicializaciji Mongoose tipov).
         const uporabnik = await Uporabnik.findById(userId) 
             .select('favorite_restaurants')
             .lean(); 
