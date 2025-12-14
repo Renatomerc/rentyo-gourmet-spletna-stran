@@ -182,8 +182,10 @@ exports.askAssistant = async (req, res) => {
             // 5. Pridobitev povprečne ocene
             const povprecnaOcena = rest.ocena_povprecje ? rest.ocena_povprecje.toFixed(1) : "Ni dovolj ocen";
 
-            // 6. 🔥 Zamenjava 'evrov' s simbolom '€' v meniju
-            const cleanMeni = rest.meni ? rest.meni.replace(/evrov/gi, '€') : null;
+            // 6. 🔥 POPRAVEK: Zamenjava simbola '€' z besedno kodo 'EUR' IN dodano preverjanje tipa za preprečitev napake
+            const cleanMeni = (rest.meni && typeof rest.meni === 'string') 
+                ? rest.meni.replace(/€/gi, 'EUR') 
+                : null;
 
 
             return {
@@ -230,7 +232,7 @@ exports.askAssistant = async (req, res) => {
             2.  Nikoli ne zveni kot robot ali sistem, ki prebira navodila. **Odgovarjaj tekoče, kot da bi se pogovarjal v živo.**
             3.  **STRIKTNO NE UPORABLJAJ nobenih emoji znakov, RAZEN ZASMEJANEGA Z MEŽIKANJEM 😉 pri šaljivi opombi o preprogi.**
             4.  Striktno NE UPORABLJAJ oblikovanja Markdown (*, #, ** ali -).
-            5.  **CENE:** Ko omenjaš cene iz menija, **vedno uporabljaj simbol € namesto besede "evrov"**.
+            5.  **CENE:** Ko omenjaš cene iz menija, **vedno uporabljaj kodo EUR namesto simbola €**.
 
             **IZJEMNO POMEMBNO FILTRIRANJE (Vir znanja):**
             1. LOKALNO FILTRIRANJE PO MESTU: Restavracije so določene s poljem **'mesto'** (npr. 'Maribor', 'Koper'). Ker so restavracije sedaj že **filtrirane po geografski bližini (če je lokacija uporabnika znana)**, lahko predlagaš tudi restavracije iz drugih mest/držav, če so v filtru (npr. Trst blizu Kopra).
