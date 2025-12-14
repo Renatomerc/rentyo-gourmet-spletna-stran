@@ -64,8 +64,8 @@ exports.askAssistant = async (req, res) => {
                  },
                  {
                      $project: {
-                         _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1
-                         // 'razdalja_m' je sedaj vključena
+                         _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1,
+                         razdalja_m: 1 // 🔥 POPRAVEK: Ohranimo razdaljo v metrih!
                      }
                  },
                  { $limit: 10 }
@@ -171,17 +171,24 @@ exports.askAssistant = async (req, res) => {
                 ocenaZasedenostiTekst = `Visoka obremenjenost (cca ${odstotekZasedenosti}% teoretične kapacitete). Zelo zasedeno!`;
             }
 
+            // 4. 🔥 Izračun razdalje v KM (če obstaja)
+            const razdaljaMetri = rest.razdalja_m; // Pridobi razdaljo, če obstaja (samo po Geo Searchu)
+            let razdaljaKmText = razdaljaMetri !== undefined 
+                ? `${(razdaljaMetri / 1000).toFixed(1)} km od uporabnika` 
+                : null; // Če Geo Search ni bil narejen, je null
+
             return {
                 ime: rest.ime,
                 opis: rest.opis,
                 meni: rest.meni,
                 mesto: rest.mesto,
                 drzava_koda: rest.drzava_koda,
+                // ⭐ NOVO: Razdalja do uporabnika
+                razdalja_km: razdaljaKmText,
                 // ⭐ NOVO: Združeno polje za delovni čas (za lažjo uporabo v RAG)
                 delovniCas: `${delovniCasStart}h do ${delovniCasEnd}h`, 
                 // ⭐ NOVO: Tekstualna ocena obremenjenosti
                 ocenaZasedenostiDanes: ocenaZasedenostiTekst,          
-                // Odstranimo 'delovniCasStart' in 'delovniCasEnd' iz končnega JSON-a, da je bolj čist
             };
         });
         
@@ -221,7 +228,10 @@ exports.askAssistant = async (req, res) => {
             3. DEFINICIJA KOD: Upoštevaj, da kode pomenijo: **SI = Slovenija, IT = Italija, CRO/HR = Hrvaška, DE = Nemčija, AT = Avstrija, FR = Francija.**
             4. KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU. STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH. Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
-            // 🔥 NOVO: PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
+            // 🔥 NOVO PRAVILO: BLIŽINA UPORABNIKA 🔥
+            5.  **LOKACIJA IN RAZDALJA:** Če ima restavracija polje **'razdalja_km'** (npr. "2.5 km od uporabnika"), to pomeni, da so bile restavracije filtrirane po bližini do uporabnika. Če uporabnik vpraša "Kaj mi je najbližje?" ali "Priporoči mi nekaj v bližini?", uporabi to polje in omenite to razdaljo. Če to polje ne obstaja (je null), pomeni, da nimaš podatka o uporabnikovi lokaciji.
+
+            // 🔥 PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
             **PRAVILA ZA RAZPOLOŽLJIVOST (Obremenjenost):**
             1.  Delovni čas je določen z **delovniCas** (npr. "10h do 24h").
             2.  Oceno zasedenosti poišči v polju **ocenaZasedenostiDanes**. Ta ocena temelji na številu rezervacij za danes.
@@ -232,7 +242,7 @@ exports.askAssistant = async (req, res) => {
 
             
             // ⭐ NOVO: KONTEKSTUALNO ZNANJE O APLIKACIJI (FAQ) ⭐
-            // Tvoja primarna baza znanja za pravila platforme... (ostane enako)
+            // Tvoja primarna baza znanja za pravila platforme... 
             // -------------------------------------------------------------
             // ZNANJE O PLATFORMI RENTYO GOURMET & EXPERIENCE (FAQ):
             // - NO-SHOW POLITIKA: Uporabnika, ki dvakrat rezervira in se ne prikaže/ne potrdi prihoda z QR kodo, lahko platforma odstrani. Odstranitev pomeni izgubo vseh zbranih točk, ki jih ni možno povrniti. Platforma lahko zahteva tudi vpis veljavne kreditne kartice kot zavarovanje pri naslednjih rezervacijah.
