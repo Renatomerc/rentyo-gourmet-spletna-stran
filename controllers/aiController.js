@@ -65,7 +65,8 @@ exports.askAssistant = async (req, res) => {
                  {
                      $project: {
                          _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1,
-                         razdalja_m: 1 // 🔥 POPRAVEK: Ohranimo razdaljo v metrih!
+                         razdalja_m: 1, // Ohranimo razdaljo v metrih
+                         ocena_povprecje: 1 // 🔥 NOVO: Dodamo povprečno oceno
                      }
                  },
                  { $limit: 10 }
@@ -78,7 +79,8 @@ exports.askAssistant = async (req, res) => {
             
             // ⭐ KRITIČNO: Izberemo delovni čas
             restavracije = await Restavracija.find({})
-                .select('ime opis meni drzava_koda mesto delovniCasStart delovniCasEnd')
+                // 🔥 SPREMENJENO: Dodamo ocena_povprecje
+                .select('ime opis meni drzava_koda mesto delovniCasStart delovniCasEnd ocena_povprecje')
                 .limit(10) 
                 .lean();
         }
@@ -176,6 +178,9 @@ exports.askAssistant = async (req, res) => {
             let razdaljaKmText = razdaljaMetri !== undefined 
                 ? `${(razdaljaMetri / 1000).toFixed(1)} km od uporabnika` 
                 : null; // Če Geo Search ni bil narejen, je null
+                
+            // 5. Pridobitev povprečne ocene
+            const povprecnaOcena = rest.ocena_povprecje ? rest.ocena_povprecje.toFixed(1) : "Ni dovolj ocen";
 
             return {
                 ime: rest.ime,
@@ -185,10 +190,10 @@ exports.askAssistant = async (req, res) => {
                 drzava_koda: rest.drzava_koda,
                 // ⭐ NOVO: Razdalja do uporabnika
                 razdalja_km: razdaljaKmText,
-                // ⭐ NOVO: Združeno polje za delovni čas (za lažjo uporabo v RAG)
                 delovniCas: `${delovniCasStart}h do ${delovniCasEnd}h`, 
-                // ⭐ NOVO: Tekstualna ocena obremenjenosti
                 ocenaZasedenostiDanes: ocenaZasedenostiTekst,          
+                // 🔥 NOVO: Povprečna ocena restavracije
+                ocena_povprecje: povprecnaOcena, 
             };
         });
         
@@ -228,8 +233,11 @@ exports.askAssistant = async (req, res) => {
             3. DEFINICIJA KOD: Upoštevaj, da kode pomenijo: **SI = Slovenija, IT = Italija, CRO/HR = Hrvaška, DE = Nemčija, AT = Avstrija, FR = Francija.**
             4. KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU. STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH. Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
-            // 🔥 NOVO PRAVILO: BLIŽINA UPORABNIKA 🔥
-            5.  **LOKACIJA IN RAZDALJA:** Če ima restavracija polje **'razdalja_km'** (npr. "2.5 km od uporabnika"), to pomeni, da so bile restavracije filtrirane po bližini do uporabnika. Če uporabnik vpraša "Kaj mi je najbližje?" ali "Priporoči mi nekaj v bližini?", uporabi to polje in omenite to razdaljo. Če to polje ne obstaja (je null), pomeni, da nimaš podatka o uporabnikovi lokaciji.
+            // 🔥 PRAVILA ZA OCENE RESTAVRACIJ
+            5.  **OCENA:** Uporabi polje **'ocena_povprecje'** (npr. 4.7) za poudarjanje kakovosti. Omenite oceno, če je visoka (4.5 in več), ali če uporabnik vpraša za oceno/kvaliteto. Če je polje "Ni dovolj ocen", to tudi omenite.
+
+            // 🔥 PRAVILA ZA BLIŽINO UPORABNIKA
+            6.  **LOKACIJA IN RAZDALJA (ZRAČNA ČRTA):** Če ima restavracija polje **'razdalja_km'** (npr. "2.5 km od uporabnika"), to pomeni zračno razdaljo do uporabnika. Omenite to razdaljo in **vključite šaljivo opombo**, da gre za razdaljo po zračni črti in da bo po cesti pot nekoliko daljša, razen če ima uporabnik letečo preprogo (ali drone).
 
             // 🔥 PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
             **PRAVILA ZA RAZPOLOŽLJIVOST (Obremenjenost):**
