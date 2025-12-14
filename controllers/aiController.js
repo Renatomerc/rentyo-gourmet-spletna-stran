@@ -84,7 +84,7 @@ exports.askAssistant = async (req, res) => {
         }
             
         // --------------------------------------------------------------------------------
-        // 🔥🔥🔥 NOV KORAK: AGREGACIJA ZA ŠTETJE AKTIVNIH REZERVACIJ DANES 🔥🔥🔥
+        // 🔥🔥🔥 KORAK 3: AGREGACIJA ZA ŠTETJE AKTIVNIH REZERVACIJ DANES 🔥🔥🔥
         // --------------------------------------------------------------------------------
         const restavracijeIds = restavracije.map(r => r._id);
         let obremenjenostPodatki = [];
@@ -135,27 +135,60 @@ exports.askAssistant = async (req, res) => {
 
              console.log(`✅ MongoDB Agregacija obremenjenosti uspešno izvedena.`);
         }
+
+        // 🔥 LOGIKA ZA IZRAČUN IN OCENO ZASEDENOSTI 🔥
+        const povprecnoTrajanjeRezervacije = 1.5; // Predpostavka: 1.5 ure na rezervacijo
+        const steviloSkupnihMiz = 5; // Privzeta predpostavka o številu miz v restavraciji
         
-        // Združitev podatkov iz GeoSearch (ime, opis, meni, mesto, delovni čas) 
-        // s podatki o obremenjenosti
+        // Združitev in obdelava podatkov za RAG
         const restavracijeZaRAG = restavracije.map(rest => {
             const obremenitev = obremenjenostPodatki.find(o => o._id.toString() === rest._id.toString());
+            
+            // 1. Pridobitev podatkov
+            const delovniCasStart = rest.delovniCasStart || 10;
+            const delovniCasEnd = rest.delovniCasEnd || 24;
+            const stAktivnihRezervacij = obremenitev ? obremenitev.st_aktivnih_rezervacij_danes : 0;
+            
+            // 2. Izračun potencialne kapacitete (maks. rezervacij)
+            const delovneUre = delovniCasEnd - delovniCasStart;
+            
+            // Maksimalno število rezervacij na VSE mize za cel dan (teoretično)
+            const maxRezervacijNaVseMize = Math.floor((delovneUre / povprecnoTrajanjeRezervacije) * steviloSkupnihMiz); 
+            
+            // 3. Izračun obremenjenosti (%)
+            const odstotekZasedenosti = maxRezervacijNaVseMize > 0 
+                ? Math.round((stAktivnihRezervacij / maxRezervacijNaVseMize) * 100) 
+                : 0;
+
+            let ocenaZasedenostiTekst;
+            if (stAktivnihRezervacij === 0) {
+                ocenaZasedenostiTekst = "Popolnoma prosto (0 rezervacij).";
+            } else if (odstotekZasedenosti < 30) {
+                ocenaZasedenostiTekst = `Nizka obremenjenost (cca ${odstotekZasedenosti}% teoretične kapacitete).`;
+            } else if (odstotekZasedenosti < 70) {
+                ocenaZasedenostiTekst = `Zmerna obremenjenost (cca ${odstotekZasedenosti}% teoretične kapacitete).`;
+            } else {
+                ocenaZasedenostiTekst = `Visoka obremenjenost (cca ${odstotekZasedenosti}% teoretične kapacitete). Zelo zasedeno!`;
+            }
+
             return {
                 ime: rest.ime,
                 opis: rest.opis,
                 meni: rest.meni,
                 mesto: rest.mesto,
                 drzava_koda: rest.drzava_koda,
-                delovniCasStart: rest.delovniCasStart, // Vzeto iz prvega searcha
-                delovniCasEnd: rest.delovniCasEnd,    // Vzeto iz prvega searcha
-                st_aktivnih_rezervacij_danes: obremenitev ? obremenitev.st_aktivnih_rezervacij_danes : 0,
+                // ⭐ NOVO: Združeno polje za delovni čas (za lažjo uporabo v RAG)
+                delovniCas: `${delovniCasStart}h do ${delovniCasEnd}h`, 
+                // ⭐ NOVO: Tekstualna ocena obremenjenosti
+                ocenaZasedenostiDanes: ocenaZasedenostiTekst,          
+                // Odstranimo 'delovniCasStart' in 'delovniCasEnd' iz končnega JSON-a, da je bolj čist
             };
         });
         
         const finalRestavracijeJson = JSON.stringify(restavracijeZaRAG, null, 2);
         
         // --------------------------------------------------------------------------------
-        // 🔥🔥🔥 KONEC KORAKA ZA OBREMENJENOST 🔥🔥🔥
+        // 🔥🔥🔥 KONEC KORAKA ZA OBREMENJENOST IN OCENO 🔥🔥🔥
         // --------------------------------------------------------------------------------
 
         // ⭐ Določitev vsebine opozorila glede na prejeto kodo jezika (lang) ⭐
@@ -190,10 +223,12 @@ exports.askAssistant = async (req, res) => {
             
             // 🔥 NOVO: PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
             **PRAVILA ZA RAZPOLOŽLJIVOST (Obremenjenost):**
-            1.  Delovni čas je določen z **delovniCasStart** in **delovniCasEnd** (npr. 10 do 24).
-            2.  **st_aktivnih_rezervacij_danes** ti pove, koliko rezervacij je že potrjenih za to restavracijo na danes (${defaultDatum}).
-            3.  Če uporabnik sprašuje o tem, kako je kje zasedeno, lahko na podlagi tega števila sklepaš, ali je restavracija priljubljena/zasedena. **Ne moreš pa na podlagi teh podatkov povedati TOČNE proste ure, saj nimaš vpogleda v prekrivanje rezervacij.**
-            4.  Vedno omenite delovni čas (od-do).
+            1.  Delovni čas je določen z **delovniCas** (npr. "10h do 24h").
+            2.  Oceno zasedenosti poišči v polju **ocenaZasedenostiDanes**. Ta ocena temelji na številu rezervacij za danes.
+            3.  Če uporabnik sprašuje o razpoložljivosti:
+                a) Uporabi **ocenaZasedenostiDanes** za opis, kako je v restavraciji zasedeno.
+                b) **STRIKTNO OPOZORI UPORABNIKA**, da je ta ocena zgolj informativna in da mora **vedno in izključno** preveriti *točno* prosto mizo in čas v sekciji 'Rezervacije' v aplikaciji pod izbrano restavracijo, saj samo tam lahko vidi realno prekrivanje ur.
+            4.  Vedno omenite delovni čas.
 
             
             // ⭐ NOVO: KONTEKSTUALNO ZNANJE O APLIKACIJI (FAQ) ⭐
@@ -222,7 +257,7 @@ exports.askAssistant = async (req, res) => {
             // Model mora izbrati ustrezen nagovor (Prijatelj/Prijateljica/Friend) in slovnično usklajenost glede na uporabnika. Uporabi TOČNO to vsebino, ki je že prevedena:
             **VSEBINA OPOZORILA:** ${finalWarningText}
             
-            --- ZNANJE IZ BAZE (RESTAVRACIJ/MENIJEV Z OBREMENJENOSTJO) ---
+            --- ZNANJE IZ BAZE (RESTAVRACIJ/MENIJEV Z OCENO ZASEDENOSTI) ---
             ${finalRestavracijeJson}
             --- KONEC ZNANJA IZ BAZE ---
         `;
