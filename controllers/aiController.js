@@ -3,6 +3,8 @@
 const { GoogleGenAI } = require('@google/genai');
 // ⭐ Uvoz Mongoose modela za dostop do kolekcije 'restavracijas'
 const Restavracija = require('../models/Restavracija'); 
+// 🔥 Potrebujemo Mongoose za delo z ID-ji in agregacijo
+const mongoose = require('mongoose'); 
 
 // 🛑 Odstranjena inicializacija 'ai' in 'AI_API_KEY' na najvišji ravni modula, 
 // da se prepreči napaka 'undefined' ob zagonu strežnika.
@@ -29,6 +31,8 @@ exports.askAssistant = async (req, res) => {
     
     // Privzeti jezik, če koda manjka (čeprav bi jo moral poslati frontend)
     const lang = languageCode || 'sl';
+    // 🔥 Določitev današnjega datuma za preverjanje obremenjenosti
+    const defaultDatum = new Date().toISOString().substring(0, 10); 
 
     if (!prompt) {
         return res.status(400).json({ 
@@ -60,7 +64,7 @@ exports.askAssistant = async (req, res) => {
                  },
                  {
                      $project: {
-                         _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1
+                         _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1
                          // 'razdalja_m' je sedaj vključena
                      }
                  },
@@ -72,15 +76,87 @@ exports.askAssistant = async (req, res) => {
         } else {
             // ⚪ KORAK 2: Standardni search (če lokacija ni poslana ali je nedovoljena)
             
-            // ⭐ KRITIČNO: Izberemo 'mesto' in 'drzava_koda', izpustimo 'lokacija' (koordinate)
+            // ⭐ KRITIČNO: Izberemo delovni čas
             restavracije = await Restavracija.find({})
-                .select('ime opis meni drzava_koda mesto')
+                .select('ime opis meni drzava_koda mesto delovniCasStart delovniCasEnd')
                 .limit(10) 
                 .lean();
         }
             
-        // Podatke konvertiramo v čitljiv JSON string
-        const restavracijeJson = JSON.stringify(restavracije, null, 2);
+        // --------------------------------------------------------------------------------
+        // 🔥🔥🔥 NOV KORAK: AGREGACIJA ZA ŠTETJE AKTIVNIH REZERVACIJ DANES 🔥🔥🔥
+        // --------------------------------------------------------------------------------
+        const restavracijeIds = restavracije.map(r => r._id);
+        let obremenjenostPodatki = [];
+        
+        if (restavracijeIds.length > 0) {
+            
+             obremenjenostPodatki = await Restavracija.aggregate([
+                 { 
+                     // Filtriramo restavracije, ki so bile že najdene z zgornjim iskanjem
+                     $match: { _id: { $in: restavracijeIds } } 
+                 },
+                 {
+                     // Odvijemo mize in rezervacije, da lahko filtriramo in štejemo
+                     $unwind: { path: "$mize", preserveNullAndEmptyArrays: true }
+                 },
+                 {
+                     $unwind: { path: "$mize.rezervacije", preserveNullAndEmptyArrays: true }
+                 },
+                 {
+                     // Filtriramo samo AKTIVNE rezervacije za današnji datum
+                     $match: { 
+                         $or: [
+                             // Vključi dokument, če rezervacije.casStart sploh ni (torej ni rezervacij)
+                             { "mize.rezervacije.casStart": { $exists: false } }, 
+                             // ALI, če je rezervacija DANES in ni PREKLICANA/ZAKLJUČENA
+                             { 
+                                 "mize.rezervacije.datum": defaultDatum,
+                                 "mize.rezervacije.status": { $nin: ['PREKLICANO', 'ZAKLJUČENO'] } 
+                             }
+                         ]
+                     }
+                 },
+                 {
+                     // Združevanje po _id restavracije in štetje AKTIVNIH rezervacij danes
+                     $group: {
+                         _id: "$_id",
+                         // Shranimo le ključne informacije, ki jih potrebujemo (ID, število)
+                         st_aktivnih_rezervacij_danes: { 
+                             $sum: { $cond: [ 
+                                 { $eq: ["$mize.rezervacije.datum", defaultDatum] }, 
+                                 1, // Povečaj števec, če se datum ujema (aktivna rezervacija)
+                                 0 
+                             ]} 
+                         }
+                     }
+                 }
+             ]);
+
+             console.log(`✅ MongoDB Agregacija obremenjenosti uspešno izvedena.`);
+        }
+        
+        // Združitev podatkov iz GeoSearch (ime, opis, meni, mesto, delovni čas) 
+        // s podatki o obremenjenosti
+        const restavracijeZaRAG = restavracije.map(rest => {
+            const obremenitev = obremenjenostPodatki.find(o => o._id.toString() === rest._id.toString());
+            return {
+                ime: rest.ime,
+                opis: rest.opis,
+                meni: rest.meni,
+                mesto: rest.mesto,
+                drzava_koda: rest.drzava_koda,
+                delovniCasStart: rest.delovniCasStart, // Vzeto iz prvega searcha
+                delovniCasEnd: rest.delovniCasEnd,    // Vzeto iz prvega searcha
+                st_aktivnih_rezervacij_danes: obremenitev ? obremenitev.st_aktivnih_rezervacij_danes : 0,
+            };
+        });
+        
+        const finalRestavracijeJson = JSON.stringify(restavracijeZaRAG, null, 2);
+        
+        // --------------------------------------------------------------------------------
+        // 🔥🔥🔥 KONEC KORAKA ZA OBREMENJENOST 🔥🔥🔥
+        // --------------------------------------------------------------------------------
 
         // ⭐ Določitev vsebine opozorila glede na prejeto kodo jezika (lang) ⭐
         let finalWarningText;
@@ -112,6 +188,24 @@ exports.askAssistant = async (req, res) => {
             3. DEFINICIJA KOD: Upoštevaj, da kode pomenijo: **SI = Slovenija, IT = Italija, CRO/HR = Hrvaška, DE = Nemčija, AT = Avstrija, FR = Francija.**
             4. KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU. STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH. Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
+            // 🔥 NOVO: PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
+            **PRAVILA ZA RAZPOLOŽLJIVOST (Obremenjenost):**
+            1.  Delovni čas je določen z **delovniCasStart** in **delovniCasEnd** (npr. 10 do 24).
+            2.  **st_aktivnih_rezervacij_danes** ti pove, koliko rezervacij je že potrjenih za to restavracijo na danes (${defaultDatum}).
+            3.  Če uporabnik sprašuje o tem, kako je kje zasedeno, lahko na podlagi tega števila sklepaš, ali je restavracija priljubljena/zasedena. **Ne moreš pa na podlagi teh podatkov povedati TOČNE proste ure, saj nimaš vpogleda v prekrivanje rezervacij.**
+            4.  Vedno omenite delovni čas (od-do).
+
+            
+            // ⭐ NOVO: KONTEKSTUALNO ZNANJE O APLIKACIJI (FAQ) ⭐
+            // Tvoja primarna baza znanja za pravila platforme... (ostane enako)
+            // -------------------------------------------------------------
+            // ZNANJE O PLATFORMI RENTYO GOURMET & EXPERIENCE (FAQ):
+            // - NO-SHOW POLITIKA: Uporabnika, ki dvakrat rezervira in se ne prikaže/ne potrdi prihoda z QR kodo, lahko platforma odstrani. Odstranitev pomeni izgubo vseh zbranih točk, ki jih ni možno povrniti. Platforma lahko zahteva tudi vpis veljavne kreditne kartice kot zavarovanje pri naslednjih rezervacijah.
+            // - TOČKE: Točke služijo kot nagrada za rezervacijo in dejanski prihod. Omogočajo sodelovanja v nagradnih igrah, posebnih povabilih v izbrane restavracije in dogodke. Točke niso zamenljive za denar.
+            // - PREKLIC REZERVACIJE: Preklic je možen preko linka v potrditvenem mailu ali v sekciji 'Moje rezervacije'.
+            // - KONTAKT ZA POMOČ: Za tehnično podporo in vprašanja se lahko uporabniki obrnejo na podporo preko e-pošte support@rentyo.eu.
+            // -------------------------------------------------------------
+            
             
             // ⭐ ZAKLJUČEK POGOVORA (naraven tok) ⭐
             
@@ -128,8 +222,8 @@ exports.askAssistant = async (req, res) => {
             // Model mora izbrati ustrezen nagovor (Prijatelj/Prijateljica/Friend) in slovnično usklajenost glede na uporabnika. Uporabi TOČNO to vsebino, ki je že prevedena:
             **VSEBINA OPOZORILA:** ${finalWarningText}
             
-            --- ZNANJE IZ BAZE (RESTAVRACIJ/MENIJEV) ---
-            ${restavracijeJson}
+            --- ZNANJE IZ BAZE (RESTAVRACIJ/MENIJEV Z OBREMENJENOSTJO) ---
+            ${finalRestavracijeJson}
             --- KONEC ZNANJA IZ BAZE ---
         `;
 

@@ -3411,6 +3411,11 @@ body.is-capacitor-app #aiChatModal {
     background-color: #044f4e;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
+/* Ta selektor je izjemno specifičen: cilja na vso Font Awesome ikono */
+.gumb-priljubljeno-modal .favorite-icon {
+    /* To bi moralo biti dovolj, če ni drugega močnejšega pravila */
+    color: #e74c3c; 
+}
 
 
 
@@ -3698,15 +3703,15 @@ body.is-capacitor-app #aiChatModal {
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h2 id="modalIme" style="margin-bottom: 0;">Ime Restavracije</h2>
         
-        <button 
-            id="modalFavoriteToggle" 
-            class="gumb-priljubljeno-modal" 
-            data-id="" 
-            style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;"
-        >
-            <i class="favorite-icon fa-heart far"></i> 
-            <span style="font-size: 1rem; font-weight: bold;">favorite</span>
-        </button>
+       <button 
+    id="modalFavoriteToggle" 
+    class="gumb-priljubljeno-modal" 
+    data-id="" 
+    style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;"
+>
+    <i class="favorite-icon fa-heart far"></i> 
+    <span style="font-size: 1rem; font-weight: bold;"></span>
+</button>
         </div>
     
    <div class="info-vrstica">
@@ -4065,14 +4070,19 @@ body.is-capacitor-app #aiChatModal {
         <a href="profil.html#aktualne-rezervacije" class="scan-btn" title="Aktualne rezervacije (Scan & Earn)">
             <i class="fas fa-qrcode"></i> 
         </a>
+
     </div>
+        <a href="profil.html#priljubljene" class="taskbar-item">
+        <i class="fas fa-heart"></i>
+        <span data-i18n="">Priljubljene</span>
+    </a>
     
     <a href="info-legal.html" class="taskbar-item">
         <i class="fas fa-bars"></i>
         <span data-i18n="">Rezervacije</span>
     </a>
     
-    </div>
+</div>
 
 <div id="cookie-consent-banner" class="cookie-banner hidden" style="display: none !important;" data-capacitor-remove-on-native="true">
     <div class="banner-content">
@@ -4293,7 +4303,8 @@ const pikadayLangs = {
 
 // API BASE URL
 const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
-const TOGGLE_FAVORITE_API_URL = `${API_BASE_URL}/users/favorites/toggle`;
+const TOGGLE_FAVORITE_API_URL = `${API_BASE_URL}/restavracije/uporabnik/priljubljene/toggle`;
+const FAVORITES_API_URL = `${API_BASE_URL}/restavracije/uporabnik/priljubljene`;
 
 // GLOBALNE SPREMENLJIVKE ZA PODATKE IN STANJE
 let allRestavracije = [];
@@ -4366,6 +4377,7 @@ const tabOcene = document.getElementById('tabOcene');
 const googleLoginBtn = document.getElementById('google-sign-in-btn'); 
 const appleLoginBtn = document.getElementById('apple-sign-in-btn');
 const chatModal = document.getElementById('aiChatModal');
+const FAVORITE_RED_COLOR = '#e74c3c';
 
 // ==========================================================
 // ⭐ NOVE DEFINICIJE ZA PONASTAVITEV GESLA (IZ HTML-ja) ⭐
@@ -4389,24 +4401,20 @@ const potrdiNovoGesloBtn = document.getElementById('potrdiNovoGeslo');   // Gumb
 
 <script>
  
- // =========================================================
-// 🔥 1. PRIDOBITEV TOKENA (POPRAVLJEN KLJUČ - DVOJNO PREVERJANJE) 🔥
+// =========================================================
+// 🔥 1. PRIDOBITEV TOKENA 🔥
 // =========================================================
 
 /**
  * Pridobi shranjeni JWT token iz localStorage.
  */
 function getUserToken() {
-    // 1. Poskus: Preverimo ključ, za katerega ste ugotovili, da deluje (starejša implementacija).
-    let token = localStorage.getItem('zeton'); 
-    
-    // 2. Poskus: Preverimo ključ, ki smo ga poskušali standardizirati.
+    let token = localStorage.getItem('zeton');
     if (!token) {
-        token = localStorage.getItem('auth-token'); 
+        token = localStorage.getItem('auth-token');
     }
     
-    // Vrne token, če je prisoten in ni "fake-token"
-    if (token && token !== 'fake-token') { 
+    if (token && token !== 'fake-token') {
         console.log(`[AUTH] Token uspešno pridobljen. (Dolžina: ${token.length})`);
         return token;
     } else {
@@ -4416,10 +4424,89 @@ function getUserToken() {
 }
 
 // Globalna spremenljivka, ki hrani pridobljeni token
-const zeton = getUserToken(); 
+const zeton = getUserToken();
+
 
 // =========================================================
-// 🔥 2. FUNKCIJA ZA PRILJUBLJENE (Prenesena iz profil.html) 🔥
+// 🔥 2. FUNKCIJE ZA POSODOBITEV VIZUALNEGA STANJA IN NALAGANJE (POPRAVLJENO) 🔥
+// =========================================================
+
+/**
+ * Posodobi ikone priljubljenih na VSEH karticah na strani glede na globalFavoritesList.
+ * To obarva srčke v rdeč okvir (ne-priljubljeno) ali polno rdečo (priljubljeno).
+ */
+const posodobiVizualnoStanjePriljubljenih = () => {
+    // Poišče elemente, ki vsebujejo 'data-id' (restavracija ID)
+    document.querySelectorAll('[data-id]').forEach(element => {
+        const restavracijaId = element.getAttribute('data-id');
+        // Predvidevamo, da je ikona znotraj elementa z razredom '.favorite-icon'
+        const icon = element.querySelector('.favorite-icon'); 
+        
+        if (restavracijaId && icon) {
+             const isFavorite = globalFavoritesList.includes(restavracijaId);
+
+            // 1. Nastavi barvo vedno na rdečo
+            icon.style.color = FAVORITE_RED_COLOR;
+
+            // ⭐ DODATNO ZAGOTOVILO ZA FONT AWESOME DELOVANJE ⭐
+            // Prepričamo se, da je osnovni razred 'fa-heart' vedno prisoten
+            icon.classList.add('fa-heart');
+
+            // 2. Nastavi razred za polno/prazno srce
+            if (isFavorite) {
+                // Priljubljena -> Polno rdeče srce (fas / fa-solid)
+                icon.classList.remove('far', 'fa-regular'); // Odstrani obrobo
+                icon.classList.add('fas', 'fa-solid'); // Dodaj polno obliko
+            } else {
+                // Ni priljubljena -> Rdeča obroba (far / fa-regular)
+                icon.classList.remove('fas', 'fa-solid'); // Odstrani polno obliko
+                icon.classList.add('far', 'fa-regular'); // Dodaj obrobo
+            }
+        }
+    });
+};
+
+
+/**
+ * Pridobi seznam ID-jev priljubljenih restavracij trenutnega uporabnika in ga shrani.
+ */
+const naloziPriljubljeneRestavracije = async () => {
+    if (!zeton) {
+        console.warn("[FAVORITES] Uporabnik ni prijavljen, preskakujem nalaganje priljubljenih.");
+        return;
+    }
+
+    try {
+        const response = await fetch(FAVORITES_API_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${zeton}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // Predpostavljamo, da API vrne { favorites: ['id1', 'id2', ...] }
+            globalFavoritesList = Array.isArray(data.favorites) ? data.favorites : [];
+
+            console.log(`[FAVORITES] Uspešno naloženih ${globalFavoritesList.length} priljubljenih restavracij.`);
+
+            // KLJUČNO: Po nalaganju seznama posodobimo vmesnik
+            posodobiVizualnoStanjePriljubljenih();
+
+        } else {
+            globalFavoritesList = [];
+            console.error(`[FAVORITES] Napaka pri nalaganju priljubljenih: ${response.status}`);
+        }
+    } catch (error) {
+        console.error("[FAVORITES] Kritična napaka pri nalaganju priljubljenih:", error);
+    }
+};
+
+
+// =========================================================
+// 🔥 3. FUNKCIJA ZA PREKLOP PRILJUBLJENIH (POSODOBLJENA) 🔥
 // =========================================================
 
 /**
@@ -4427,10 +4514,9 @@ const zeton = getUserToken();
  * @param {string} restavracijaId ID restavracije.
  */
 const toggleFavorite = async (restavracijaId) => {
-    
+
     if (!zeton) {
-        // Uporabljamo direktno prikaziSporocilo, saj smo ga definirali
-        prikaziSporocilo('warning', 'Prijava je potrebna za shranjevanje priljubljenih!'); 
+        prikaziSporocilo('warning', 'Prijava je potrebna za shranjevanje priljubljenih!');
         return;
     }
 
@@ -4439,29 +4525,29 @@ const toggleFavorite = async (restavracijaId) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${zeton}` // Uporaba globalnega žetona
+                'Authorization': `Bearer ${zeton}`
             },
             body: JSON.stringify({ restavracijaId })
         });
 
         if (response.ok) {
             const data = await response.json();
-            
+
             // Posodobitev globalnega seznama
             if (data.action === 'added') {
                 if (!globalFavoritesList.includes(restavracijaId)) {
                     globalFavoritesList.push(restavracijaId);
                 }
-                prikaziSporocilo('success', 'Restavracija dodana med priljubljene.'); 
+                prikaziSporocilo('success', 'Restavracija dodana med priljubljene.');
             } else if (data.action === 'removed') {
                 globalFavoritesList = globalFavoritesList.filter(id => id !== restavracijaId);
-                prikaziSporocilo('success', 'Restavracija odstranjena iz priljubljenih.'); 
+                prikaziSporocilo('success', 'Restavracija odstranjena iz priljubljenih.');
             }
-            
-            // OPOMBA: Spodnje funkcije so morda specifične za profil.html in jih lahko odstranite ali komentirate
-            // naloziAktivneRezervacije();
-            // naloziPretekleRezervacije();
-            
+
+            // 🔥 KLJUČNO: Po uspešni API operaciji posodobi vmesnik
+            // To popravi vizualno stanje (fas/far) na VSEH elementih
+            posodobiVizualnoStanjePriljubljenih();
+
         } else {
             const errorData = await response.json().catch(() => ({ msg: response.statusText }));
             prikaziSporocilo('error', `Napaka pri priljubljenih: ${errorData.msg || response.statusText}`);
@@ -4473,34 +4559,39 @@ const toggleFavorite = async (restavracijaId) => {
 };
 
 // =========================================================
-// 🔥 3. EVENT LISTENER (Zagotovite, da ga imate v svoji kodi) 🔥
+// 🔥 4. EVENT LISTENER (DODANA LOKALNA VIZUALNA POTRDITEV) 🔥
 // =========================================================
 
-// Prepričajte se, da imate ta poslušalec za klika na gumb za priljubljene
 document.body.addEventListener('click', (e) => {
-    const favoriteButton = e.target.closest('#modalFavoriteToggle');
+    const favoriteButton = e.target.closest('#modalFavoriteToggle'); 
 
     if (favoriteButton) {
-        e.stopPropagation(); 
+        e.stopPropagation();
 
         const restavracijaId = favoriteButton.getAttribute('data-id');
-        const icon = favoriteButton.querySelector('.favorite-icon');
+        const icon = favoriteButton.querySelector('.favorite-icon'); // 🔥 Pridobimo referenco na ikono
 
-        if (restavracijaId) {
-            // Klic funkcije, ki smo jo definirali
+        if (restavracijaId && icon) {
+            // ⭐ LOKALNI VIZUALNI POUDAREK (Takojšnja sprememba na polno rdeče)
+            // To služi kot takojšnja vizualna potrditev uporabniku
+            
+            // Če trenutno ni polno, ga naredimo polno in rdeče (fas/fa-solid)
+            if (icon.classList.contains('far') || icon.classList.contains('fa-regular')) {
+                icon.classList.remove('far', 'fa-regular');
+                icon.classList.add('fas', 'fa-solid');
+            } else {
+                // Če je že polno, ga naredimo obrobo (kar simulira odstranitev)
+                icon.classList.remove('fas', 'fa-solid');
+                icon.classList.add('far', 'fa-regular');
+            }
+            
+            // Barvo ponovno nastavimo (za vsak primer)
+            icon.style.color = FAVORITE_RED_COLOR;
+            
+            // Sproži API klic, ki bo po potrditvi s strežnika poklical posodobiVizualnoStanjePriljubljenih()
+            // To bo vizualno stanje POPRAVILO NA PRAVEGA (tudi če pride do napake na strežniku)
             if (typeof toggleFavorite === 'function') {
                 toggleFavorite(restavracijaId);
-            }
-
-            // Posodobitev vizualnega stanja srca (se mora ujemati s togoom)
-            if (icon) {
-                if (icon.classList.contains('fas')) {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                } else {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                }
             }
         }
     }
@@ -6043,7 +6134,7 @@ function prikaziRezultate(restavracije) {
 }
 
 
-// 7. Glavna funkcija za nalaganje (POPRAVLJENO)
+// 7. Glavna funkcija za nalaganje (POPRAVLJENO, SINHRONIZIRANO)
 async function loadRestavracije() {
     if (!mrezaKarticDiv) return; 
 
@@ -6052,6 +6143,13 @@ async function loadRestavracije() {
     if(statusKarticeDiv) statusKarticeDiv.textContent = i18next.t('messages.searching', { criteria: '...' }) || 'Iščem restavracije...'; 
     
     try {
+        // ⭐ KORAK A: POČAKAJ NA NALOGANJE PRILJUBLJENIH
+        // To zagotavlja, da je globalFavoritesList poln PREDEN se rišejo kartice.
+        if (typeof naloziPriljubljeneRestavracije === 'function') {
+             await naloziPriljubljeneRestavracije();
+        }
+        // **********************************************
+        
         const response = await fetch(API_CALL_URL);
         
         if (!response.ok) {
@@ -6062,10 +6160,7 @@ async function loadRestavracije() {
         
         allRestavracije = data; 
         
-        // ❌ ODSTRANJENA VRSTICA: MOCK_IZPOSTAVLJENO_RAW = allRestavracije.slice(0, 3);
-        // Ta vrstica je odstranjena, da bi preprečila prisilno omejitev na 3,
-        // kar omogoča funkciji renderFeaturedRestavracije, da prikaže vse označene restavracije.
-        
+        // Kartice se začnejo risati ŠELE ZDAJ, ko je globalFavoritesList že pripravljen.
         setupKuhinjaFiltersListeners();
         filterAndRenderRestavracije();
         renderFeaturedRestavracije(); 
@@ -6971,35 +7066,53 @@ async function prikaziPodrobnosti(restavracija) {
    // Polnjenje Glavnih podrobnosti
 if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
 
-// 🔥 Vstavljanje gumba za priljubljene, ki se pozicionira absolutno 🔥
-const favoriteButtonHTML = `
-    <button 
-        id="modalFavoriteToggle" 
-        class="gumb-priljubljeno-modal" 
-        data-id="${currentRestaurantId}" 
-        style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px; z-index: 100;"
-    >
-        <i class="favorite-icon fa-heart far"></i>
-        <span style="font-size: 1rem; font-weight: bold;">favorite</span>
-    </button>
-`;
+// =========================================================
+// 🔥 VSTAVITE TA BLOK KODE TUKAJ (Znotraj prikaziPodrobnosti()) 🔥
+// =========================================================
+// Predpostavljamo, da je 'currentRestaurantId' ID restavracije, ki jo prikazujemo
+// in da je 'globalFavoritesList' globalno naložen seznam priljubljenih ID-jev.
+
+// 1. Preverimo, ali je ta restavracija že na seznamu priljubljenih
+const isFavorite = globalFavoritesList.includes(currentRestaurantId);
+
+// 2. Določimo CSS razred in barvo glede na stanje:
+const iconClass = isFavorite ? 'fas' : 'far'; // fas = polno srce, far = prazno srce
+const iconColor = '#e74c3c'; // Rdeča za oba primera
+
+// =========================================================
+// 🔥 Nadaljevanje s sestavljanjem HTML niza (uporaba spremenljivk) 🔥
+// =========================================================
+
+
 
 // Preveri, ali gumb že obstaja, preden ga ustvari
-if (!document.getElementById('modalFavoriteToggle')) {
+const existingButton = document.getElementById('modalFavoriteToggle');
+
+if (!existingButton) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = favoriteButtonHTML;
     
     // Predvidevamo, da je '.podrobnosti-tekst' kontejner (parent element) za H2
     const detailsContainer = document.querySelector('.podrobnosti-tekst');
     if (detailsContainer) {
-        detailsContainer.style.position = 'relative'; // Ključno za Absolutno pozicioniranje
-        
-        // Vstavimo ga kot prvi otrok v kontejner
+        detailsContainer.style.position = 'relative'; 
         detailsContainer.insertBefore(tempDiv.firstChild, detailsContainer.firstChild);
     }
 } else {
-    // Če gumb že obstaja (iz prejšnjih odprtih modalov), samo posodobi ID
-    document.getElementById('modalFavoriteToggle').setAttribute('data-id', currentRestaurantId);
+    // Če gumb že obstaja (modal se ponovno odpre), posodobi ID IN stanje
+    existingButton.setAttribute('data-id', currentRestaurantId);
+    
+    // ⭐ KLJUČNO POPRAVILO: Ročna posodobitev stanja ikone za obstoječi gumb
+    const icon = existingButton.querySelector('.favorite-icon');
+    if (icon) {
+        if (isFavorite) {
+            icon.classList.remove('far'); 
+            icon.classList.add('fas'); 
+        } else {
+            icon.classList.remove('fas'); 
+            icon.classList.add('far');
+        }
+    }
 }
 // Konec vstavljanja gumba
     
@@ -7643,30 +7756,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ------------------------------------------------------------------
-    // Logika za preklop zavihka na profil.html s pomočjo URL-ja
-    // ------------------------------------------------------------------
+   // ------------------------------------------------------------------
+// Logika za preklop zavihka na profil.html s pomočjo URL-ja
+// ------------------------------------------------------------------
 
-    function preklopiZavihekPoHashu() {
-        if (!window.location.pathname.includes('profil.html')) {
-            return;
+function preklopiZavihekPoHashu() {
+    if (!window.location.pathname.includes('profil.html')) {
+        return;
+    }
+
+    const ciljniHash = window.location.hash.substring(1);
+
+    // LOGIKA ZA AKTUALNE REZERVACIJE
+    if (ciljniHash === 'aktualne-rezervacije') {
+        // Išče gumb za zavihek z data-target="aktualne-rezervacije"
+        const ciljniGumb = document.querySelector(`.profil-zavihek[data-target="${ciljniHash}"]`); 
+        
+        if (ciljniGumb) {
+            ciljniGumb.click(); 
+            history.replaceState(null, null, 'profil.html'); 
+        } else {
+            console.warn(`Zavihek Aktualne Rezervacije ni bil najden.`);
         }
+    }
 
-        const ciljniHash = window.location.hash.substring(1);
-
-        if (ciljniHash === 'aktualne-rezervacije') {
-            const ciljniGumb = document.querySelector(`.profil-zavihek[data-target="${ciljniHash}"]`); 
+    // LOGIKA ZA PRILJUBLJENE
+        // Hash: #priljubljene
+        if (ciljniHash === 'priljubljene') { 
+            // Išče gumb za zavihek z data-target="priljubljene"
+            const ciljniGumb = document.querySelector(`.profil-zavihek[data-target="priljubljene"]`); 
             
             if (ciljniGumb) {
                 ciljniGumb.click(); 
                 history.replaceState(null, null, 'profil.html'); 
             } else {
-                console.warn(`Zavihek Aktualne Rezervacije ni bil najden.`);
-            }
+                console.warn(`Zavihek Priljubljene ni bil najden.`);
         }
     }
-    
-    preklopiZavihekPoHashu();
+}
+
+preklopiZavihekPoHashu();
 });
 
 

@@ -15,28 +15,31 @@
   <script src="capacitor.js"></script> 
 
 <style>
-    body {
+   body {
     background-image: url('circles-and-roundabouts.png'); 
     background-repeat: repeat; 
-    /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
-    background-color: #F5F5F5; 
-    
-    /* Preprečimo, da bi se vzorec premikal ob drsenju, če je to želeno */
-    /* background-attachment: fixed; */ 
+    background-color: #F5F5F5;
+    position: relative; /* za pseudo-element */
+    min-height: 100vh; /* zagotovi vsaj višino zaslona */
 }
+
+/* 3. Pseudo-element za blur/posvetlitev */
 body::before {
-    content: ''; /* Obvezno za pseudo-elemente */
-    position: absolute;
+    content: '';
+    position: fixed; /* fiksno po viewportu */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     
-    /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
-    background-color: rgba(255, 255, 255, 0.511); /* Bela barva (255, 255, 255) z 50% prosojnostjo (0.5) */
-    
-    /* Zagotovimo, da je ta sloj pod vso vsebino */
-    z-index: -1; 
+    /* Sloj za posvetlitev / blur effect */
+    background-color: rgba(255, 255, 255, 0.5);
+
+    /* Če želiš blur: */
+    /* backdrop-filter: blur(5px); */
+    /* -webkit-backdrop-filter: blur(5px); */
+
+    z-index: -1;
 }
     /* SPECIFIČEN CSS ZA PROFIL */
     .profil-sekcija {
@@ -677,7 +680,7 @@ body::before {
 
   </header>
 
-  <main>
+ <main>
     <div id="sporocilo-ovoj"></div>
     
     <section class="profil-sekcija">
@@ -687,8 +690,9 @@ body::before {
         <div class="profil-zavihek" data-target="osnovni-podatki" data-i18n="profile.tab_data">Osebni Podatki</div>
         <div class="profil-zavihek active" data-target="aktualne-rezervacije" data-i18n="profile.tab_current">Aktualne Rezervacije</div>
         <div class="profil-zavihek" data-target="zgodovina" data-i18n="profile.tab_history">Zgodovina Rezervacij</div>
-        <div class="profil-zavihek" data-target="priljubljene" data-i18n="profile.tab_favorites">Priljubljeno</div> <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
-      </div>
+        <div class="profil-zavihek" data-target="priljubljene">Priljubljeno</div>
+        <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
+        <div class="profil-zavihek" data-target="pomoc" data-i18n="profile.tab_help">Pomoč</div> </div>
 
      <div class="vsebina-zavihek" id="osnovni-podatki">
     <h3 data-i18n="profile.data_subtitle">Vaši podatki</h3>
@@ -766,6 +770,31 @@ body::before {
                         <button type="submit" data-i18n="profile.save_card_button">Shrani kartico</button>
                         <button type="button" class="gumb-odjava gumb-preklici" id="gumb-preklici-kartico" data-i18n="profile.cancel_button">Prekliči</button>
                     </div>
+                </form>
+            </div>
+            </div>
+      </div>
+      
+      <div class="vsebina-zavihek" id="pomoc">
+        <h3 data-i18n="profile.help_subtitle">Pomoč in podpora</h3> <div class="menu-section mt-6 border-t border-gray-200 pt-4">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2" data-i18n="profile.support_title">Podpora in pomoč</h2>
+            
+            <a href="mailto:support@rentyo.eu?subject=Pomo%C4%8D%20za%20Rentyo%20Gourmet%20aplikacijo" class="flex items-center justify-between p-4 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition duration-150 ease-in-out border border-gray-100 mb-2">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9.247a1.25 1.25 0 011.085-1.922 1.25 1.25 0 011.085 1.922 1.25 1.25 0 001.085 1.922 1.25 1.25 0 001.085-1.922 1.25 1.25 0 011.085-1.922 1.25 1.25 0 011.085 1.922M15 13a6 6 0 11-12 0 6 6 0 0112 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7L4 7" />
+                    </svg>
+                    
+                    <span class="text-sm font-medium text-gray-800" data-i18n="profile.help_link">Potrebujete pomoč? Pišite nam!</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+            
+            <p class="text-xs text-gray-400 mt-2 p-2" data-i18n="profile.help_note">Na vprašanja odgovarjamo v najkrajšem možnem času.</p>
+        </div>
                 </form>
             </div>
             </div>
@@ -912,25 +941,44 @@ body::before {
         };
 
         // ===========================================
-        // 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov
-        // ===========================================
-        const zavihki = document.querySelectorAll(".profil-zavihek");
-        const vsebine = document.querySelectorAll(".vsebina-zavihek");
+// 1. CENTRALNA FUNKCIJA ZA AKTIVACIJO ZAVIHKA
+// ===========================================
+function aktivirajZavihek(targetId) {
+    const zavihki = document.querySelectorAll(".profil-zavihek");
+    const vsebine = document.querySelectorAll(".vsebina-zavihek");
 
-        zavihki.forEach(zavihek => {
-            zavihek.addEventListener("click", () => {
-                zavihki.forEach(t => t.classList.remove("active"));
-                vsebine.forEach(c => c.classList.remove("active"));
-                zavihek.classList.add("active");
-                const targetId = zavihek.getAttribute("data-target");
-                document.getElementById(targetId).classList.add("active");
+    if (!targetId) return;
 
-                // Če je aktivni zavihek "priljubljene", naložimo podatke
-                if (targetId === 'priljubljene') {
-                    naloziPriljubljeneRestavracije();
-                }
-            });
-        });
+    zavihki.forEach(z => z.classList.remove("active"));
+    vsebine.forEach(v => v.classList.remove("active"));
+
+    const ciljniZavihek = document.querySelector(`.profil-zavihek[data-target="${targetId}"]`);
+    const ciljnaVsebina = document.getElementById(targetId);
+
+    if (ciljniZavihek && ciljnaVsebina) {
+        ciljniZavihek.classList.add("active");
+        ciljnaVsebina.classList.add("active");
+
+        // Posebna logika za Priljubljene
+        if (targetId === 'priljubljene') {
+            naloziPriljubljeneRestavracije();
+        }
+    }
+}
+
+// ===========================================
+// 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov
+// ===========================================
+const zavihki = document.querySelectorAll(".profil-zavihek");
+const vsebine = document.querySelectorAll(".vsebina-zavihek");
+
+zavihki.forEach(zavihek => {
+    zavihek.addEventListener("click", () => {
+        const targetId = zavihek.getAttribute("data-target");
+        aktivirajZavihek(targetId);
+    });
+});
+
 
 
         // ===========================================
@@ -1653,41 +1701,99 @@ body::before {
         };
 
 
-   /**
- * NOVO: POENOSTAVLJENA RENDER FUNKCIJA ZA PRILJUBLJENE
+ /**
+ * RENDER FUNKCIJA ZA PRILJUBLJENE
+ * Slika: galerija_slik[0]
+ * Ocena: ocena_povprecje
  */
 const renderPriljubljene = (restavracije, kontejnerElement) => {
-    
-    // Začnemo z naslovom
-    kontejnerElement.innerHTML = `<h3 data-i18n="profile.favorites_subtitle">${i18next.t('profile.favorites_subtitle')}</h3>`;
-    
+
+    kontejnerElement.innerHTML = `
+        <h3 data-i18n="profile.favorites_subtitle">
+            ${i18next.t('profile.favorites_subtitle')}
+        </h3>
+    `;
+
     restavracije.forEach(rest => {
         const restavracijaId = rest._id;
 
         const kartica = document.createElement('div');
-        kartica.classList.add('kartica-rezervacije', 'kartica-podatkov', 'priljubljena-kartica'); 
-        kartica.style.padding = '15px 20px';
-        kartica.style.marginBottom = '10px';
-        kartica.style.border = '1px solid solid #ccc';
-        kartica.style.borderRadius = '8px';
+        kartica.classList.add(
+            'kartica-rezervacije',
+            'kartica-podatkov',
+            'priljubljena-kartica'
+        );
+
         kartica.style.display = 'flex';
-        kartica.style.justifyContent = 'space-between'; 
         kartica.style.alignItems = 'center';
+        kartica.style.gap = '15px';
+        kartica.style.padding = '15px';
+        kartica.style.marginBottom = '10px';
+        kartica.style.border = '1px solid #ccc';
+        kartica.style.borderRadius = '10px';
         kartica.style.backgroundColor = '#fff';
-        kartica.style.cursor = 'pointer'; 
-        
-        
+
+        // -------------------------
+        // SLIKA IZ BAZE
+        // -------------------------
+        let slika = 'assets/img/restaurant-placeholder.jpg';
+
+        if (Array.isArray(rest.galerija_slik) && rest.galerija_slik.length > 0) {
+            slika = rest.galerija_slik[0];
+        }
+
+        // Če slike prihajajo kot relativna pot
+        if (slika && !slika.startsWith('http')) {
+            slika = `${API_BASE_URL}/${slika}`;
+        }
+
+        // -------------------------
+        // OCENA IZ BAZE
+        // -------------------------
+        const ocena = rest.ocena_povprecje;
+
         const jePriljubljeno = globalFavoritesList.includes(restavracijaId);
-        
-        // Srce je pravilno nastavljeno: 'fas' (polno) ali 'far' (obris)
-        const favoriteClass = jePriljubljeno ? 'fas' : 'far'; 
-        
+        const favoriteClass = jePriljubljeno ? 'fas' : 'far';
+
         kartica.innerHTML = `
-            <div style="flex-grow: 1;">
-                <p class="rez-title" style="margin: 0; font-size: 1.1em; font-weight: bold;">${rest.ime || rest.name}</p>
+            <!-- SLIKA -->
+            <div style="flex-shrink:0;">
+                <img 
+                    src="${slika}" 
+                    alt="${rest.ime || rest.name}"
+                    style="
+                        width:90px;
+                        height:90px;
+                        object-fit:cover;
+                        border-radius:8px;
+                    "
+                />
             </div>
-            <div class="favorite-icon-wrapper" data-id="${restavracijaId}" style="flex-shrink: 0;">
-                <i class="${favoriteClass} fa-heart favorite-icon" data-restavracija-id="${restavracijaId}" style="font-size: 1.5rem; color: #e74c3c; cursor: pointer;"></i>
+
+            <!-- PODATKI -->
+            <div style="flex-grow:1;">
+                <p class="rez-title" style="margin:0;font-size:1.1em;font-weight:bold;">
+                    ${rest.ime || rest.name}
+                </p>
+
+                ${
+             typeof ocena === 'number'
+        ? `<p style="margin:4px 0 0;color:#333;">
+               &#9733; ${ocena.toFixed(1)}
+           </p>`
+        : `<p style="margin:4px 0 0;color:#999;font-size:0.9em;">
+               Brez ocen
+           </p>`
+}
+            </div>
+
+            <!-- SRCE -->
+            <div class="favorite-icon-wrapper">
+                <i 
+                    class="${favoriteClass} fa-heart favorite-icon"
+                    data-restavracija-id="${restavracijaId}"
+                    style="font-size:1.6rem;color:#e74c3c;cursor:pointer;"
+                ></i>
             </div>
         `;
 
@@ -2002,6 +2108,18 @@ const renderPriljubljene = (restavracije, kontejnerElement) => {
                 
             }
         );
+        // ===========================================
+// 3. AKTIVACIJA ZAVIHKA PREK URL HASH-a
+// ===========================================
+document.addEventListener("DOMContentLoaded", () => {
+    const hash = window.location.hash.substring(1);
+
+    if (hash) {
+        aktivirajZavihek(hash);
+        history.replaceState(null, null, 'profil.html');
+    }
+});
+
     </script>
 </body>
 </html>
