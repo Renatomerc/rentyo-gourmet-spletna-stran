@@ -11,7 +11,6 @@ const mongoose = require('mongoose');
 
 /**
  * Obdeluje POST zahtevo, ki vsebuje vprašanje (prompt), jezik (languageCode) in (opcijsko) lokacijo.
- * Če je poslana zgodovina pogovora (chatHistory), jo vključi v zahtevo.
  */
 exports.askAssistant = async (req, res) => {
     
@@ -28,8 +27,7 @@ exports.askAssistant = async (req, res) => {
     const ai = new GoogleGenAI(AI_API_KEY); 
 
     // 1. Pridobitev vprašanja, Latitude, Longitude IN JEZIKA iz telesa zahteve (JSON body)
-    // ⭐ OPOMBA: Če bi želeli pravi "spomin", bi morali tukaj sprejeti in vključiti zgodovino pogovora (npr. 'history').
-    const { prompt, userLat, userLon, languageCode } = req.body; 
+    const { prompt, userLat, userLon, languageCode } = req.body; // ⭐ DODANO: languageCode
     
     // Privzeti jezik, če koda manjka (čeprav bi jo moral poslati frontend)
     const lang = languageCode || 'sl';
@@ -68,7 +66,7 @@ exports.askAssistant = async (req, res) => {
                      $project: {
                          _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1,
                          razdalja_m: 1, // Ohranimo razdaljo v metrih
-                         ocena_povprecje: 1 // Dodamo povprečno oceno
+                         ocena_povprecje: 1 // 🔥 NOVO: Dodamo povprečno oceno
                      }
                  },
                  { $limit: 10 }
