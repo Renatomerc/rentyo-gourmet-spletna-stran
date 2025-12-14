@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 
 /**
  * Obdeluje POST zahtevo, ki vsebuje vprašanje (prompt), jezik (languageCode) in (opcijsko) lokacijo.
+ * Če je poslana zgodovina pogovora (chatHistory), jo vključi v zahtevo.
  */
 exports.askAssistant = async (req, res) => {
     
@@ -27,7 +28,8 @@ exports.askAssistant = async (req, res) => {
     const ai = new GoogleGenAI(AI_API_KEY); 
 
     // 1. Pridobitev vprašanja, Latitude, Longitude IN JEZIKA iz telesa zahteve (JSON body)
-    const { prompt, userLat, userLon, languageCode } = req.body; // ⭐ DODANO: languageCode
+    // ⭐ OPOMBA: Če bi želeli pravi "spomin", bi morali tukaj sprejeti in vključiti zgodovino pogovora (npr. 'history').
+    const { prompt, userLat, userLon, languageCode } = req.body; 
     
     // Privzeti jezik, če koda manjka (čeprav bi jo moral poslati frontend)
     const lang = languageCode || 'sl';
@@ -66,7 +68,7 @@ exports.askAssistant = async (req, res) => {
                      $project: {
                          _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1,
                          razdalja_m: 1, // Ohranimo razdaljo v metrih
-                         ocena_povprecje: 1 // 🔥 NOVO: Dodamo povprečno oceno
+                         ocena_povprecje: 1 // Dodamo povprečno oceno
                      }
                  },
                  { $limit: 10 }
@@ -182,10 +184,14 @@ exports.askAssistant = async (req, res) => {
             // 5. Pridobitev povprečne ocene
             const povprecnaOcena = rest.ocena_povprecje ? rest.ocena_povprecje.toFixed(1) : "Ni dovolj ocen";
 
+            // 6. 🔥 Zamenjava 'evrov' s simbolom '€' v meniju
+            const cleanMeni = rest.meni ? rest.meni.replace(/evrov/gi, '€') : null;
+
+
             return {
                 ime: rest.ime,
                 opis: rest.opis,
-                meni: rest.meni,
+                meni: cleanMeni, // Uporabi očiščen meni
                 mesto: rest.mesto,
                 drzava_koda: rest.drzava_koda,
                 // ⭐ NOVO: Razdalja do uporabnika
@@ -224,8 +230,9 @@ exports.askAssistant = async (req, res) => {
             **Pravila za ton in dolžino:**
             1.  Bodi kratk, jedrnat in neposreden. Izogibaj se nepotrebni vljudnosti.
             2.  Nikoli ne zveni kot robot ali sistem, ki prebira navodila. **Odgovarjaj tekoče, kot da bi se pogovarjal v živo.**
-            3.  **NE UPORABLJAJ nobenih emoji znakov.**
+            3.  **STRIKTNO NE UPORABLJAJ nobenih emoji znakov, RAZEN ZASMEJANEGA Z MEŽIKANJEM 😉 pri šaljivi opombi o preprogi.**
             4.  Striktno NE UPORABLJAJ oblikovanja Markdown (*, #, ** ali -).
+            5.  **CENE:** Ko omenjaš cene iz menija, **vedno uporabljaj simbol € namesto besede "evrov"**.
 
             **IZJEMNO POMEMBNO FILTRIRANJE (Vir znanja):**
             1. LOKALNO FILTRIRANJE PO MESTU: Restavracije so določene s poljem **'mesto'** (npr. 'Maribor', 'Koper'). Ker so restavracije sedaj že **filtrirane po geografski bližini (če je lokacija uporabnika znana)**, lahko predlagaš tudi restavracije iz drugih mest/držav, če so v filtru (npr. Trst blizu Kopra).
@@ -234,10 +241,10 @@ exports.askAssistant = async (req, res) => {
             4. KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU. STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH. Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
             // 🔥 PRAVILA ZA OCENE RESTAVRACIJ
-            5.  **OCENA:** Uporabi polje **'ocena_povprecje'** (npr. 4.7) za poudarjanje kakovosti. Omenite oceno, če je visoka (4.5 in več), ali če uporabnik vpraša za oceno/kvaliteto. Če je polje "Ni dovolj ocen", to tudi omenite.
+            6.  **OCENA:** Uporabi polje **'ocena_povprecje'** (npr. 4.7) za poudarjanje kakovosti. Omenite oceno, če je visoka (4.5 in več), ali če uporabnik vpraša za oceno/kvaliteto. Če je polje "Ni dovolj ocen", to tudi omenite.
 
-            // 🔥 PRAVILA ZA BLIŽINO UPORABNIKA
-            6.  **LOKACIJA IN RAZDALJA (ZRAČNA ČRTA):** Če ima restavracija polje **'razdalja_km'** (npr. "2.5 km od uporabnika"), to pomeni zračno razdaljo do uporabnika. Omenite to razdaljo in **vključite šaljivo opombo**, da gre za razdaljo po zračni črti in da bo po cesti pot nekoliko daljša, razen če ima uporabnik letečo preprogo (ali drone).
+            // 🔥 PRAVILA ZA BLIŽINO UPORABNIKA (IZBOLJŠANO ZA PONAVLJANJE)
+            7.  **LOKACIJA IN RAZDALJA (ZRAČNA ČRTA):** Če ima restavracija polje **'razdalja_km'** (npr. "2.5 km od uporabnika"), to pomeni zračno razdaljo do uporabnika. Omenite to razdaljo in **vključite šaljivo opombo** o daljši cestni poti in leteči preprogi (z emoji **😉**), **SAMO PRVIČ** pri predlogu v pogovoru. Pri nadaljnjih predlogih v istem pogovoru je dovolj, da se omenja samo razdalja.
 
             // 🔥 PRAVILA ZA RAZPOLOŽLJIVOST (OBREMENJENOST)
             **PRAVILA ZA RAZPOLOŽLJIVOST (Obremenjenost):**
@@ -294,6 +301,7 @@ exports.askAssistant = async (req, res) => {
         // ⭐ KORAK 3: ČIŠČENJE ODGOVORA PRED VRNITVIJO
         const answer = response.text;
         // Odstranimo * ali ** (za odebelitev) ter # iz odgovora
+        // OPOMBA: ZASMEJANI Z MEŽIKANJEM 😉 (Umazani Emoji) MORA OSTATI!
         const cleanAnswer = answer.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '');
 
 
