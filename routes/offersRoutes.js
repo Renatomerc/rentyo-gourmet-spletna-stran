@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose'); 
 
+// 🔥 KLJUČEN POPRAVEK: Uvoz modela 'Offer'
+// PRILAGODITE POT DO MODELA PO POTREBI (npr. '../models/Offer' ali './models/Offer')
+const Offer = require('../models/Offer'); 
+
 // GET /api/offers -> Pridobi vse aktivne ponudbe
 // Omogoča filtriranje po kategoriji: /api/offers?category=event
 router.get('/', async (req, res) => {
@@ -12,8 +16,6 @@ router.get('/', async (req, res) => {
     }
     
     try {
-        // Pridobimo Mongoose Native Connection Object
-        const db = mongoose.connection.db; 
         
         // 2. Definiramo osnovno poizvedbo
         const query = { 
@@ -24,19 +26,15 @@ router.get('/', async (req, res) => {
         const requestedCategory = req.query.category;
         
         if (requestedCategory) {
-            // Preverimo, ali je kategorija prisotna v URL-ju (npr. ?category=event)
-            // Dodamo filter za polje 'category' (ki ste ga dodali v dokumente)
+            // Dodamo filter za polje 'category' v Mongoose poizvedbo
             query.category = requestedCategory;
             
             console.log(`Filtriranje ponudb po kategoriji: ${requestedCategory}`);
         }
         
-        // 4. Dostop do zbirke 'offers'
-        const offersCollection = db.collection('offers'); 
-        
-        // 5. Izvedemo poizvedbo s spremenljivko 'query'
-        // Poizvedba bo: { is_active: true } ALI { is_active: true, category: 'event' }
-        const offers = await offersCollection.find(query).toArray(); 
+        // 🔥 KLJUČEN POPRAVEK (4. in 5. korak združena): Uporabimo Mongoose Model Offer
+        // Mongoose poizvedba s filtrom 'query'
+        const offers = await Offer.find(query); 
 
         // 6. Pošljemo rezultate
         res.json(offers); 

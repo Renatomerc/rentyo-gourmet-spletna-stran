@@ -474,7 +474,7 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-   <script>
+    <script>
         // API BASE URL (Definiramo, ker se uporablja za prijavo)
         const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
 
@@ -566,8 +566,11 @@
                 });
                 
                 // 3. Shranimo prevode za dinamično ustvarjene elemente (modal)
-                modalTranslations = langData.global || {}; 
-                modalTranslations = {...modalTranslations, ...langData.experience}; 
+                // 🔥 POPRAVEK: Shranimo celotna global in experience polja za dinamične prikaze
+                modalTranslations = {
+                    ...(langData.global || {}),
+                    ...(langData.experience || {})
+                };
             }
         };
         
@@ -579,13 +582,35 @@
             return offer[field] || offer[fallbackField] || '';
         };
 
+        // 🔥 NOVA FUNKCIJA: Pridobitev ID-ja kategorije iz URL-ja
+        const getCategoryFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            // Prebere parameter 'category' iz URL-ja (npr. ?category=wine)
+            return params.get('category'); 
+        };
+
         // ===========================================
-        // GLAVNA LOGIKA NALAGANJA (PO PREVODU)
+        // GLAVNA LOGIKA NALAGANJA (S FILTRIRANJEM)
         // ===========================================
         
         const loadOffers = () => {
-              const offersContainer = document.getElementById('offersContainer');
-              fetch(`${API_BASE_URL}/offers`) 
+            const offersContainer = document.getElementById('offersContainer');
+            const category = getCategoryFromUrl(); // Pridobi ID kategorije (npr. 'wine')
+            
+            let apiUrl = `${API_BASE_URL}/offers`;
+            
+            if (category) {
+                // 🔥 Ključen popravek: Dodajanje filtra v API klic
+                apiUrl += `?category=${category}`; 
+            }
+
+            // Pokaži sporočilo o nalaganju
+            if (offersContainer) {
+                // Uporabimo shranjeni prevod iz modalTranslations
+                offersContainer.innerHTML = `<p id="loadingStatus">${modalTranslations.loadingOffers || 'Nalaganje posebnih ponudb...'}</p>`;
+            }
+            
+            fetch(apiUrl) 
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Napaka pri nalaganju ponudb iz API-ja: ' + response.statusText);
@@ -605,29 +630,29 @@
                     const offersEntries = Object.entries(globalOffersData); 
 
                     if (offersEntries.length > 0) {
-                             if (window.innerWidth >= 768) {
-                                 if(offersContainer) {
-                                     offersContainer.style.display = 'grid';
-                                 }
-                             } else {
-                                 if(offersContainer) {
-                                     offersContainer.style.display = 'flex';
-                                 }
-                             }
+                            // Logika za prikaz 'grid' ali 'flex' je OK
+                            if (window.innerWidth >= 768) {
+                                if(offersContainer) offersContainer.style.display = 'grid';
+                            } else {
+                                if(offersContainer) offersContainer.style.display = 'flex';
+                            }
                         
                         offersEntries.forEach(([key, offer]) => {
                             const card = createOfferCard(offer, key);
                             if(offersContainer) offersContainer.appendChild(card);
                         });
                     } else {
-                        if(offersContainer) offersContainer.innerHTML = '<p id="loadingStatus" data-i18n="experience.noActiveOffers">Trenutno ni aktivnih posebnih ponudb.</p>';
-                        translatePage(); 
+                        // Če ni ponudb, prikažemo sporočilo "Ni aktivnih ponudb"
+                        // Uporabimo shranjeni prevod, ali fallback
+                        if(offersContainer) offersContainer.innerHTML = `<p data-i18n="experience.noActiveOffers">${modalTranslations.noActiveOffers || 'Trenutno ni aktivnih posebnih ponudb.'}</p>`;
+                        // Odstranjen klic translatePage()
                     }
                 })
                 .catch(error => {
                     console.error('Napaka pri nalaganju ponudb:', error);
-                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;" data-i18n="global.dataLoadError">❌ NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint '/api/offers'.</p>`;
-                    translatePage(); 
+                    // Prikaz napake s shranjenim prevodom
+                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;">❌ ${modalTranslations.dataLoadError || 'NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint \'/api/offers\'.'}</p>`;
+                    // Odstranjen klic translatePage()
                 });
         };
 
@@ -755,7 +780,7 @@
             // 2. Prevedi stran (POČAKAJ na naložitev prevodov)
             await translatePage(); 
             
-            // 3. Naloži ponudbe iz API-ja (Zdaj so prevodi na voljo za dinamične elemente, če so uspešno naloženi)
+            // 3. Naloži ponudbe iz API-ja (Zdaj s filtrom iz URL-ja)
             loadOffers();
 
             const offerDetailModal = document.getElementById('offerDetailModal');
