@@ -875,15 +875,26 @@ body.is-capacitor .iskalnik-sekcija {
 .close-btn {
     color: #333;
     float: right;
-    font-size: 28px;
-    font-weight: bold;
-    background: none;
+    font-size: 35px;
+    font-weight: 300;
+    
+    /* 🔥 SPREMEMBA ZA BELO OKROGLO OZADJE (50px) 🔥 */
+    background-color: rgba(255, 255, 255, 0.775); /* Belo ozadje */
+    width: 50px; /* Fiksna širina */
+    height: 50px; /* Fiksna višina */
+    border-radius: 50%; /* Naredi popoln krog */
+    
     border: none;
     cursor: pointer;
     position: absolute; /* Postavitev v kot modalnega okna */
-    top: 25px;
-    right: 25px;
-    z-index: 9999; /* Popravljeno: Zelo visoka vrednost, da je gumb nad zemljevidi */
+    top: 10px;
+    right: 10px;
+    z-index: 9999; 
+    
+ /* 🔥🔥🔥 POPRAVEK: VIZUALNO CENTRIRANJE ZNAKA 'X' 🔥🔥🔥 */
+    line-height: 1; /* Zagotovi, da osnovna višina vrstice ne vpliva */
+    padding-bottom: 6px; /* Doda 2px navpičnega premika, odvisno od pisave */
+    /* Opcijsko: lahko uporabite tudi: transform: translateY(-1px); */
 }
 
 .close-btn:hover,
@@ -891,6 +902,8 @@ body.is-capacitor .iskalnik-sekcija {
     color: #000;
     text-decoration: none;
     cursor: pointer;
+    /* Opcijsko: dodajte rahlo senco za poudarek ob hoverju, če želite */
+    /* box-shadow: 0 0 5px rgba(0,0,0,0.3); */
 }
 
 #large-map-container {
@@ -929,6 +942,26 @@ body.is-capacitor .iskalnik-sekcija {
 /* ========================================================= */
 /* 🔥 CSS ZA KONTROLO PRIKAZA NA ZEMLJEVIDU (VAŠA POSODOBITEV) */
 /* ========================================================= */
+
+/* 🔥 NOV DODATEK: STIL ZA LEAFLET LOGO KONTROLNIK V ZGORNJEM LEVEM KOTU */
+.leaflet-control-logo {
+    /* ODSTRANJENO: Belo ozadje, senca, robovi in zaobljenost */
+    background-color: transparent !important; /* Odstrani belo ozadje */
+    padding: 0 !important; /* Odstrani notranji rob */
+    box-shadow: none !important; /* Odstrani senco */
+    border-radius: 0 !important; /* Odstrani zaobljene robove */
+    
+    margin: 15px; /* Povečan zunanji rob (margin), da je logotip malo odmaknjen od roba */
+    cursor: default;
+}
+
+/* Stil za samo sliko znotraj kontrolnika, da jo povečamo. */
+/* Če ste v JavaScriptu nastavili stil (style="width: 40px;..."), 
+   lahko tukaj preglasite velikost, ali pa spremenite neposredno v JS. */
+.leaflet-control-logo img {
+    width: 50px !important; /* Logotip povečan na 60px širine (prej 40px) */
+    height: auto;
+}
 
 .map-restaurant-tooltip {
     /* ODSTRANIMO Leaflet ozadje, vendar OHRANIMO border/box-shadow za okvir */
@@ -989,6 +1022,39 @@ body.is-capacitor .iskalnik-sekcija {
     margin-top: 5px !important;
     /* Poudarek naj se prikazuje znotraj belega okvirja */
 }
+/* 🔥 CUSTOM STILI ZA MARKER LOKACIJE UPORABNIKA (KROG Z IKONO) 🔥 */
+
+.leaflet-user-icon {
+    /* 1. Barva ozadja in oblika */
+    background-color: white; /* 🔥🔥 SPREMENJENO: Ozadje je belo */
+    border: 3px solid #066A69; /* 🔥🔥 DODANO: Okvir/rob v vaši barvi */
+    border-radius: 30%; /* Naredi krog */
+    
+    /* 2. Senca (opcijsko, da izstopa) */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
+    
+    /* 3. Poravnava ikone (Font Awesome) v sredino */
+    display: flex; /* Uporabi Flexbox */
+    justify-content: center; /* Centriraj horizontalno */
+    align-items: center; /* Centriraj vertikalno */
+}
+
+/* OPOMBA: Ikona Font Awesome znotraj tega kroga je že nastavljena 
+   na belo barvo (color: white) v JavaScript delu (L.divIcon definicija).
+*/
+
+/* POMEMBNO: Ohranite odstranjene/zakomentirane stare stile za Pop-up,
+   saj ti zagotavljajo, da Leaflet ne bo poskušal prikazati privzetega Popupa.
+*/
+/* Stari, zdaj neuporabljeni Pop-up stili: */
+/*
+.leaflet-popup-content-wrapper,
+.leaflet-popup-content,
+.leaflet-popup-tip,
+.leaflet-popup {
+    ...
+}
+*/
 /* POPRAVEK: Fiksna, Obarvana Glava za Native Android (Največja višina) */
 .platform-android header {
     /* Fiksna pozicija in barva ostanejo enake */

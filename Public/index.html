@@ -3666,7 +3666,7 @@ body.is-capacitor-app #aiChatModal {
 
     <a href="sea.html" class="country-card-link">
         <div class="country-card" data-experience-code="sea">
-            <img src="images/experiences/sea.jpg" alt="Morska doživetja" class="card-image">
+            <img src="Wine-tasting.png" alt="Morska doživetja" class="card-image">
             <div class="card-overlay">
                 <span class="card-title" data-i18n="experience.sea">Morska doživetja</span>
             </div>
@@ -4119,35 +4119,42 @@ body.is-capacitor-app #aiChatModal {
 
 
   
-<script src="capacitor.js"></script>
-<script type="module" src="script.js"></script>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script> 
 
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivrne.net/npm/pikaday/css/pikaday.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday@1.8.0/css/pikaday.css">
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
 <script>
 // =================================================================
-// 🚨 KRITIČNO: GLOBALNA DEFINICIJA SOCIAL LOGIN IN PUSH NOTIFICATIONS
+// ⭐ GLOBALNA DEFINICIJA PLUGIN-a ZA POTISNA OBVESTILA ⭐
+//    (Odstranjena Social Login logika in nevarna destrukturiranja)
 // =================================================================
 
-// ⭐ POPRAVEK: Uporaba varnostne kopije za SocialLogin
-const { Capacitor, Plugins } = window; // Zagotovimo, da imamo dostop do globalnega Capacitor objekta
+// ⭐ VAREN DOSTOP: Če je Capacitor prisoten, pridobimo PushNotifications plugin.
+//    Če Plugins ali PushNotifications še nista naložena, bo spremenljivka undefined, 
+//    kar prepreči zrušitev programa (TypeError).
+const PushNotifications = 
+    window.Capacitor && 
+    window.Capacitor.Plugins 
+    ? window.Capacitor.Plugins.PushNotifications
+    : undefined;
 
-// ⭐ NOVO: Uvoz App plugina za Deep Linking ⭐
-const { App } = Plugins; 
-
-const SocialLogin = 
-    Plugins.SocialLogin || 
-    Plugins.CapgoCapacitorSocialLogin; // Poskus s polnim imenom razreda
-
-const PushNotifications = Plugins.PushNotifications;
+// App in SocialLogin plugini so popolnoma odstranjeni.
 
 
 // ==========================================================
-// ⭐ NOVO: LOGIKA ZA DEEP LINKS (Obravnava URL-jev) ⭐
+// ⭐ NOVO: LOGIKA ZA DEEP LINKS (Obravnava URL-jev) - VAREN DOSTOP ⭐
 // ==========================================================
+
+// ⭐ 1. VAREN DOSTOP DO PLUGIN-a ⭐
+const App = 
+    window.Capacitor && 
+    window.Capacitor.Plugins 
+    ? window.Capacitor.Plugins.App
+    : undefined;
+
 if (App) {
     App.addListener('appUrlOpen', (data) => {
         const url = data.url;
@@ -4164,7 +4171,6 @@ if (App) {
                 console.log("Deep link uspešno prestrežen! Token:", token);
                 
                 // ⭐ KLJUČNO: Preusmerite uporabnika na HTML stran z žetonom kot parametrom ⭐
-                // Ta stran mora obstajati!
                 window.location.href = `reset-password.html?token=${token}`; 
 
             } else {
@@ -4600,104 +4606,36 @@ document.body.addEventListener('click', (e) => {
 
 // =================================================================
 // ⭐ NOV BLOK ZA OPTIMIZACIJO CAPACITOR APLIKACIJE ⭐
+//    (Odstranjena vsa logika za Web Splash Screen)
 // =================================================================
 
-// ⭐ DEFINICIJA ZASTAVICE ZA PRVI ZAGON ⭐
-const ZASTAVICA_PRVI_ZAGON = 'aplikacijaPrviZagonKončan';
-
-// Opomba: Ker potrebujemo hitrost, bomo del kode izvajali TAKOJ, ne da bi čakali na 'DOMContentLoaded'.
+// Opomba: Ta blok je sedaj namenjen samo prilagoditvi DOM elementov za Capacitor okolje.
 
 if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     
-    // Pridobitev elementa za spletni pozdravni zaslon
-    const webSplash = document.getElementById('splashScreenWeb');
+    // ---------------------------------------------------------------------
+    // VSA LOGIKA, KI SE IZVAJA TAKOJ (Odstranjena: ni več potrebna)
+    // ---------------------------------------------------------------------
+
     
     // ---------------------------------------------------------------------
-    // 1. PREVERJANJE LOCALSTORAGE PRED PRIKAZOM (Izvede se TAKOJ ob nalaganju skripte)
-    // ---------------------------------------------------------------------
-
-    if (localStorage.getItem(ZASTAVICA_PRVI_ZAGON) === 'true') {
-        
-        console.log("Pozdravni zaslon preskočen, ker je bil že viden.");
-        if (webSplash) {
-            webSplash.remove(); // Takoj odstrani element, če je bil že viden
-        }
-        // Skrij native splash, če je aktiven (za gotovost)
-        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
-            window.Capacitor.Plugins.SplashScreen.hide(); 
-        }
-        // TUKAJ SE BLOK KONČA, saj ne potrebujemo DOMContentLoaded logike za splash screen.
-        // Vendar moramo še vedno poslušati DOMContentLoaded za druge stvari (odstranitev bannerja).
-        
-    } else {
-        // Če še ni bil viden, ga prikažemo in pustimo, da se izvede logika časovnika
-        
-        // ⭐ KLJUČNA SPREMEMBA ZA ODPRAVO BLISKANJA: 
-        // Element prikažemo TAKOJ, ko se skripta izvede.
-        if (webSplash) {
-            webSplash.classList.add('show-on-mobile');
-        }
-    }
-
-
-    // ---------------------------------------------------------------------
-    // 2. DOMContentLoaded LOGIKA (Za ostale aspekte in dokončanje animacije)
+    // DOMContentLoaded LOGIKA (Za ostale aspekte in čiščenje)
     // ---------------------------------------------------------------------
 
     document.addEventListener('DOMContentLoaded', () => {
 
         // 1. Logika za skritje oglasne sekcije 'akcijeBanner' (Ta se izvede vedno)
+        // Ta del je ohranjen, saj ni povezan s Splash Screenom.
         const akcijeBanner = document.getElementById('akcijeBanner');
         if (akcijeBanner) {
             akcijeBanner.remove(); 
             console.log("Capacitor App: Oglasna sekcija 'akcijeBanner' je uspešno odstranjena.");
         }
 
-        // Če je bil pozdravni zaslon že viden, se logika časovnika NE sme zagnati.
-        if (localStorage.getItem(ZASTAVICA_PRVI_ZAGON) === 'true') {
-            return; 
-        }
-
-        // --- Logika časovnika za PRVI ZAGON ---
-
-        // ⭐ POPRAVEK ČASOV ZA HITREJŠI START ⭐
-        // Animacija se sedaj konča pri 2.0s (PREDPOSTAVLJA SE HITREJŠI CSS!)
-        const totalAnimationFinishTime = 2000; 
-        const stabilizationTime = 200;   // Standarden čas pred izbleditvijo
-        const safetyMargin = 5000;       // ⭐ POPRAVEK: Ohranjamo varnostno rezervo 5.0 sekund (5000ms) za stabilnost! ⭐
+        // Vsa ostala logika (preverjanje zastavice, časovniki, klici SplashScreen.hide()) 
+        // je odstranjena, ker se sedaj zanašamo na Native Splash Screen in 
+        // avtomatsko skrivanje.
         
-        // Skupni čas, ko se začne skrivati Native Splash: 2.0s + 5.0s = 7000ms
-        const hideNativeDelay = totalAnimationFinishTime + safetyMargin; // 7000ms
-
-        // 1. KORAK: SPROŽITEV PREHODA BARV JE ODSTRANJENA (saj ni več prehoda)
-
-        // 2. KORAK: SKRIJEMO NATIVE SPLASH SCREEN (po koncu animacije in zamiku)
-        // Pri 7.0s
-        setTimeout(async () => {
-            
-            // ⭐ SKRIJEMO NATIVNI SPLASH ⭐
-            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
-                await window.Capacitor.Plugins.SplashScreen.hide(); 
-            }
-            
-            // 3. KORAK: SKRIJEMO WEB SPLASH SCREEN (izbleditev HTML elementa)
-            // Pri 7.2s (7.0s + 0.2s)
-            setTimeout(() => {
-                 if (webSplash) {
-                    webSplash.style.opacity = '0';
-                    
-                    // Odstranimo ga iz DOM-a po zaključku izbleditve (500ms)
-                    setTimeout(() => {
-                        webSplash.remove(); 
-                        
-                        // 🚨 KRITIČNA VRSTICA: NASTAVITEV ZASTAVICE PO KONCU ANIMACIJE
-                        localStorage.setItem(ZASTAVICA_PRVI_ZAGON, 'true');
-                        
-                    }, 500); 
-                }
-            }, stabilizationTime); 
-            
-        }, hideNativeDelay); // 7000ms zamude
     }); // Zapira document.addEventListener('DOMContentLoaded', ...)
 
 } // Zapira if (window.Capacitor && window.Capacitor.isNativePlatform())
@@ -6905,6 +6843,94 @@ const mapModal = document.getElementById('map-modal');
 // Uporabimo closeBtnMap, da ne pride do konflikta z morebitno globalno spremenljivko 'closeBtn'
 const closeBtnMap = document.getElementById('close-map-btn'); 
 
+// =========================================================
+// 🔥🔥 KODA ZA DODAJANJE LOGOTIPA (CUSTOM LEAFLET CONTROL) - GLOBALNA DEFINICIJA 🔥🔥
+// =========================================================
+
+// Pot do vaše slike logotipa (TODO: TO SPREMENITE V PRAVILNO POT!)
+const logoUrl = 'Rentyo-gourmer-logo-zemljevid.png'; 
+const logoAltText = 'Logotip podjetja';
+
+// Definiramo nov Leaflet Control
+const LogoControl = L.Control.extend({
+    options: {
+        position: 'topleft' // Privzeto nastavimo pozicijo
+    },
+    onAdd: function(map) {
+        // Ustvarimo div za logotip
+        const container = L.DomUtil.create('div', 'leaflet-control-logo');
+        
+        // Ustvarimo sliko (po želji lahko dodate tudi povezavo <a>)
+        // POMEMBNO: 'leaflet-control-logo' MORATE STILIZIRATI Z CSS-om (ozadje, padding, senca)!
+        container.innerHTML = `<img src="${logoUrl}" alt="${logoAltText}" style="width: 40px; height: auto;">`;
+        
+        // Prepreči, da bi kliki na logotipu sprožili dejanja na zemljevidu (npr. pan/zoom)
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(container, 'contextmenu', L.DomEvent.stopPropagation);
+
+        return container;
+    },
+    onRemove: function(map) {
+        // Opcijsko čiščenje
+    }
+});
+
+// Funkcija za enostavno dodajanje kontrolnika
+const addLogoControl = (map) => {
+    new LogoControl({ position: 'topleft' }).addTo(map);
+    console.log("Logotip kontrolnik dodan na zemljevid.");
+};
+
+// =========================================================
+// 🔥 FUNKCIJE ZA LOKALIZACIJO UPORABNIKA 🔥
+// =========================================================
+
+let userLocationMarker = null;
+let userAccuracyCircle = null;
+
+function onLocationFound(e) {
+    const radius = e.accuracy / 2; 
+    const latlng = e.latlng;
+
+    // Odstranimo prejšnje oznake, če obstajajo
+    if (userLocationMarker) {
+        map.removeLayer(userLocationMarker);
+    }
+    if (userAccuracyCircle) {
+        map.removeLayer(userAccuracyCircle);
+    }
+
+    // Centriranje zemljevida na uporabnikovo lokacijo (ostane nespremenjeno)
+    map.setView(latlng, 13);
+    
+    // Dodajanje kroga, ki prikazuje natančnost lokacije (ostane nespremenjeno)
+    userAccuracyCircle = L.circle(latlng, radius, {
+        color: '#066A69', 
+        fillColor: '#066A69', 
+        fillOpacity: 0.5,
+        weight: 1
+    }).addTo(map).bindPopup("Trenutno se nahajate znotraj tega območja.");
+
+    // 🔥🔥🔥 SPREMEMBA: NAMENITEV BESEDILA "You are here" Z IKONO OSEBE V POPUPU 🔥🔥🔥
+    const userIconHtml = '<i class="fa fa-user" style="color: #066A69; font-size: 24px;"></i>';
+    
+    userLocationMarker = L.marker(latlng)
+        .addTo(map)
+        // Namesto besedila vstavimo HTML kodo za ikono
+        .bindPopup(userIconHtml)
+        .openPopup(); 
+    // Opomba: Ker ikona stoji sama, sem dodal barvo neposredno v stil.
+
+    console.log(`Lokacija uporabnika uspešno določena: Lat: ${latlng.lat}, Lng: ${latlng.lng}`);
+}
+
+function onLocationError(e) {
+    console.warn(`Napaka pri določanju lokacije: ${e.message}`);
+}
+
+// =========================================================
+
+
 // 1. Odpiranje modalnega okna ob kliku na ikono
 if (mapIcon && mapModal) {
     mapIcon.addEventListener('click', function(e) {
@@ -6927,6 +6953,22 @@ if (mapIcon && mapModal) {
                 maxZoom: 19,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
+            
+            // 🔥 Klic funkcije za dodajanje LOGOTIPA v zgornji levi kot
+            addLogoControl(map);
+            
+            // Dodamo poslušalce dogodkov za lokacijo
+            map.on('locationfound', onLocationFound);
+            map.on('locationerror', onLocationError);
+            
+            // 🔥🔥🔥 POZIV ZA DOLOČITEV LOKACIJE UPORABNIKA 🔥🔥🔥
+            map.locate({
+                setView: false, // Dovolimo, da funkcija onLocationFound ročno centrira pogled
+                maxZoom: 16, 
+                watch: false, 
+                enableHighAccuracy: true 
+            });
+
 
             // Če so restavracije ŽE naložene, jih dodaj ob inicializaciji mape
             if (typeof allRestavracije !== 'undefined' && allRestavracije.length > 0) {
