@@ -111,17 +111,24 @@ const RestavracijaSchema = new mongoose.Schema({
     drzava: String,
     
     // ⭐ NOVO: POLJE ZA POPUST ZA IZPOSTAVLJENO SEKCIJO
-    popust: {
-        type: String, 
-        default: '', // Privzeta vrednost je prazen niz (NI izpostavljeno)
-        trim: true
-    },
-    
-    // 🔥 NOVO: POLJE ZA OZNAČEVANJE IZPOSTAVLJENE RESTAVRACIJE (FEATURED)
-    featured: {
-        type: Boolean,
-        default: false // Privzeto ni izpostavljeno
-    },
+popust: {
+    type: String, 
+    default: '', // Privzeta vrednost je prazen niz (NI izpostavljeno)
+    trim: true
+},
+
+// ➡️ DODANO: POLJE ZA BESEDILO O VELJAVNOSTI PROMOCIJE (STRING)
+veljavnost_besedilo: {
+    type: String, 
+    default: '', // Npr.: "od 19h do 21h" ali "vsak četrtek"
+    trim: true
+},
+
+// 🔥 NOVO: POLJE ZA OZNAČEVANJE IZPOSTAVLJENE RESTAVRACIJE (FEATURED)
+featured: {
+    type: Boolean,
+    default: false // Privzeto ni izpostavljeno
+},
     // ----------------------------------------------------
     
     cuisine: [String], 

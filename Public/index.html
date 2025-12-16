@@ -898,7 +898,7 @@
             background-color: #1a9e9a;
         }
         
-   /* ======================================================= */
+  /* ======================================================= */
 /* NOVO: KARTICA IZPOSTAVLJENO (MANJŠA KARTICA) */
 /* ======================================================= */
 .kartica-izpostavljeno {
@@ -949,17 +949,17 @@
     top: 10px;          
     right: 10px;        
     
-    /* Oblikovanje za okroglo obliko */
+    /* Oblikovanje za ovalno obliko */
     background-color: #88d82d; /* Rdeča/izstopajoča barva za popust */
     color: #131313;               /* Belo besedilo */
     
-    /* 🔥 KLJUČNA SPREMEMBA: Enak padding za krog (višina == širina) */
-    padding: 8px; 
+    /* 🔥 SPREMENJENO: Asimetričen padding za podolgovato obliko */
+    padding: 6px 10px; 
     
-    /* 🔥 KLJUČNA SPREMEMBA: Nastavitev za popolnoma okroglo obliko */
-    border-radius: 50%;
+    /* 🔥 SPREMENJENO: Nastavitev za zaobljeno obliko (ni več 50%) */
+    border-radius: 12px;
     
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Malenkost zmanjšana pisava, da se besedilo prilega */
     font-weight: 700;
     
     /* Odstranimo text-transform, ker se morda ne prilega */
@@ -974,8 +974,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 45px; /* Fiksna širina in višina za popoln krog */
-    height: 45px;
+    
+    /* 🔥 ODSTRANJENO: Fiksna širina in višina za krog. Sedaj se dimenzija prilagodi vsebini. */
+    width: auto; 
+    height: auto;
+    
+    white-space: nowrap; /* Zagotavlja, da se besedilo ne prelomi in oznaka raztegne */
 }
 /* ---------------------------------------------------- */
 
