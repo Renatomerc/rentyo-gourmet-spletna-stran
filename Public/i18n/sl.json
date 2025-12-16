@@ -200,8 +200,8 @@
     "tab_points_payment": "Točke in plačilo",
     "tab_notifications": "Obvestila",
     "data_subtitle": "Vaši podatki",
-    "name_label": "Ime in priimek:",
-    "email_label": "E-pošta:",
+    "name_label": "Ime in priimek",
+    "email_label": "E-pošta",
     "edit_button": "Uredi podatke",
     "current_subtitle": "Aktivne rezervacije",
     "no_current_reservations": "Trenutno nimate aktivnih rezervacij.",
@@ -243,7 +243,8 @@
     "help_link": "Potrebujete pomoč? Pišite nam!",
     "help_note": "Na vprašanja odgovarjamo v najkrajšem možnem času.",
     "support_title": "Pomoč in podpora",
-    "tab_help": "Pomoč"
+    "tab_help": "Pomoč",
+    "tab_favorites": "Priljubljeno"
 
 },
   "warning": {

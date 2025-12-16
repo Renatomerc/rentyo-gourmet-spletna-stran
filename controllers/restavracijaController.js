@@ -1308,7 +1308,7 @@ exports.isciRestavracije = async (req, res) => {
     const iskalniPogoji = {};
     const mestoTrim = mesto ? mesto.trim() : '';
 
-    // 1. Iskanje po mestu/imenu restavracije
+    // 1. Iskanje po mestu/imenu restavracije/DRŽAVI
     if (mestoTrim !== '') {
         // Uporabimo STRING za regex in $options:'i' (case-insensitive)
         iskalniPogoji.$or = [
@@ -1317,7 +1317,9 @@ exports.isciRestavracije = async (req, res) => {
             // Mesto/Kraj
             { 'lokacija.mesto': { $regex: mestoTrim, $options: 'i' } },
             // Naslov
-            { 'lokacija.naslov': { $regex: mestoTrim, $options: 'i' } }
+            { 'lokacija.naslov': { $regex: mestoTrim, $options: 'i' } },
+            // ** DRŽAVA **
+            { 'lokacija.drzava': { $regex: mestoTrim, $options: 'i' } } // <--- TO JE PRAVILNO DODANO
         ];
     }
     

@@ -700,13 +700,14 @@ body::before {
     <section class="profil-sekcija">
       <h2 data-i18n="profile.title">Moj Uporabniški Profil</h2>
       
-      <div class="profil-menu">
-        <div class="profil-zavihek" data-target="osnovni-podatki" data-i18n="profile.tab_data">Osebni Podatki</div>
-        <div class="profil-zavihek active" data-target="aktualne-rezervacije" data-i18n="profile.tab_current">Aktualne Rezervacije</div>
-        <div class="profil-zavihek" data-target="zgodovina" data-i18n="profile.tab_history">Zgodovina Rezervacij</div>
-        <div class="profil-zavihek" data-target="priljubljene">Priljubljeno</div>
-        <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
-        <div class="profil-zavihek" data-target="pomoc" data-i18n="profile.tab_help">Pomoč</div> </div>
+    <div class="profil-menu">
+    <div class="profil-zavihek" data-target="osnovni-podatki" data-i18n="profile.tab_data">Osebni Podatki</div>
+    <div class="profil-zavihek active" data-target="aktualne-rezervacije" data-i18n="profile.tab_current">Aktualne Rezervacije</div>
+    <div class="profil-zavihek" data-target="zgodovina" data-i18n="profile.tab_history">Zgodovina Rezervacij</div>
+    <div class="profil-zavihek" data-target="priljubljene" data-i18n="profile.tab_favorites">Priljubljeno</div>
+    <div class="profil-zavihek" data-target="tocke-kartica" data-i18n="profile.tab_points_payment">Točke in Plačilo</div>
+    <div class="profil-zavihek" data-target="pomoc" data-i18n="profile.tab_help">Pomoč</div>
+</div>
 
      <div class="vsebina-zavihek" id="osnovni-podatki">
     <h3 data-i18n="profile.data_subtitle">Vaši podatki</h3>
@@ -781,7 +782,7 @@ body::before {
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <button type="submit" data-i18n="profile.save_card_button">Shrani kartico</button>
+                        <button type="button" disabled class="opacity-50 cursor-not-allowed" aria-disabled="true" data-i18n="profile.save_card_button">Shrani kartico</button>
                         <button type="button" class="gumb-odjava gumb-preklici" id="gumb-preklici-kartico" data-i18n="profile.cancel_button">Prekliči</button>
                     </div>
                 </form>
@@ -1748,7 +1749,7 @@ const renderPriljubljene = (restavracije, kontejnerElement) => {
         // -------------------------
         // SLIKA IZ BAZE
         // -------------------------
-        let slika = 'assets/img/restaurant-placeholder.jpg';
+        let slika = '';
 
         if (Array.isArray(rest.galerija_slik) && rest.galerija_slik.length > 0) {
             slika = rest.galerija_slik[0];
