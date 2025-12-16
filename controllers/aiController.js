@@ -27,7 +27,7 @@ exports.askAssistant = async (req, res) => {
     const ai = new GoogleGenAI(AI_API_KEY); 
 
     // 1. Pridobitev vprašanja, Latitude, Longitude IN JEZIKA iz telesa zahteve (JSON body)
-    const { prompt, userLat, userLon, languageCode } = req.body; // ⭐ DODANO: languageCode
+    const { prompt, userLat, userLon, languageCode } = req.body; 
     
     // Privzeti jezik, če koda manjka (čeprav bi jo moral poslati frontend)
     const lang = languageCode || 'sl';
@@ -44,6 +44,10 @@ exports.askAssistant = async (req, res) => {
         
         let restavracije;
         const searchRadiusKm = 50; // Iskanje restavracij v radiju 50 km
+        
+        // ⭐ NOVO: Kontekst za AI (približno mesto uporabnika)
+        let userCityContext = null; 
+        let userCountryCodeContext = null;
 
         // ⭐ KORAK GEOLOKACIJA: Preverimo, ali sta lokacija in koordinate prisotne
         if (userLat !== undefined && userLon !== undefined) {
@@ -66,7 +70,10 @@ exports.askAssistant = async (req, res) => {
                      $project: {
                          _id: 1, ime: 1, opis: 1, meni: 1, drzava_koda: 1, mesto: 1, delovniCasStart: 1, delovniCasEnd: 1,
                          razdalja_m: 1, // Ohranimo razdaljo v metrih
-                         ocena_povprecje: 1 // 🔥 NOVO: Dodamo povprečno oceno
+                         ocena_povprecje: 1, // Dodamo povprečno oceno
+                         // ⭐ DODANO: Projektiramo polja 'drzava' in 'mesto' za kasnejšo uporabo v RAG kontekstu (Array->String)
+                         drzava: 1,
+                         mesto: 1, 
                      }
                  },
                  { $limit: 10 }
@@ -74,13 +81,19 @@ exports.askAssistant = async (req, res) => {
              
              console.log(`✅ MongoDB Geo Search uspešno izveden okoli uporabnikove lokacije.`);
              
+             // ⭐ DOLOČITEV UPORABNIKOVE LOKACIJE (PRIBILŽEK)
+             if (restavracije.length > 0) {
+                 // Uporabimo PRVI ELEMENT Array-a najbljižje restavracije kot priblizek
+                 userCityContext = Array.isArray(restavracije[0].mesto) ? restavracije[0].mesto[0] : restavracije[0].mesto;
+                 userCountryCodeContext = Array.isArray(restavracije[0].drzava) ? restavracije[0].drzava[0] : restavracije[0].drzava;
+             }
+             
         } else {
             // ⚪ KORAK 2: Standardni search (če lokacija ni poslana ali je nedovoljena)
             
-            // ⭐ KRITIČNO: Izberemo delovni čas
+            // ⭐ KRITIČNO: Izberemo polja, VKLJUČNO Z 'drzava' in 'mesto' (za Array->String pretvorbo)
             restavracije = await Restavracija.find({})
-                // 🔥 SPREMENJENO: Dodamo ocena_povprecje
-                .select('ime opis meni drzava_koda mesto delovniCasStart delovniCasEnd ocena_povprecje')
+                .select('ime opis meni drzava_koda mesto delovniCasStart delovniCasEnd ocena_povprecje drzava mesto')
                 .limit(10) 
                 .lean();
         }
@@ -88,6 +101,7 @@ exports.askAssistant = async (req, res) => {
         // --------------------------------------------------------------------------------
         // 🔥🔥🔥 KORAK 3: AGREGACIJA ZA ŠTETJE AKTIVNIH REZERVACIJ DANES 🔥🔥🔥
         // --------------------------------------------------------------------------------
+        // ... (Agregacija rezervacij ostane nespremenjena) ...
         const restavracijeIds = restavracije.map(r => r._id);
         let obremenjenostPodatki = [];
         
@@ -186,14 +200,18 @@ exports.askAssistant = async (req, res) => {
             const cleanMeni = (rest.meni && typeof rest.meni === 'string') 
                 ? rest.meni.replace(/€/gi, 'EUR') 
                 : null;
+                
+            // ⭐ NOVO: Pretvorba Array-a (mesto, drzava) v string za AI kontekst
+            const displayMesto = Array.isArray(rest.mesto) ? rest.mesto.join(', ') : rest.mesto;
+            const displayDrzava = Array.isArray(rest.drzava) ? rest.drzava.join(', ') : rest.drzava;
 
 
             return {
                 ime: rest.ime,
                 opis: rest.opis,
                 meni: cleanMeni, // Uporabi očiščen meni
-                mesto: rest.mesto,
-                drzava_koda: rest.drzava_koda,
+                mesto: displayMesto,        // Npr. "Maribor, Marburg"
+                drzava_koda: displayDrzava, // Npr. "Slovenija, Slovenia"
                 // ⭐ NOVO: Razdalja do uporabnika
                 razdalja_km: razdaljaKmText,
                 delovniCas: `${delovniCasStart}h do ${delovniCasEnd}h`, 
@@ -218,11 +236,19 @@ exports.askAssistant = async (req, res) => {
             // vendar za slovensko damo eksplicitno navodilo)
             finalWarningText = `Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!`;
         }
+        
+        // ⭐ NOVO: KONTEKST UPORABNIKOVE LOKACIJE (DODANO V SYSTEM INSTRUCTION)
+        const userLocationContext = (userCityContext && userCountryCodeContext) 
+            ? `Tvoje trenutno mesto je ${userCityContext} v državi ${userCountryCodeContext}. Upoštevaj to lokacijo kot izhodišče pri dajanju priporočil.` 
+            : '';
 
 
         // ⭐ KORAK RAG 2: KONČNI, IZBOLJŠANI PROMPT S FOKUSOM NA NARAVEN POGOVOR ⭐
         const systemInstruction = `
             Ti si Leo virtualni pomočnik. Tvoja glavna naloga je pomagati uporabniku pri izbiri restavracij kot **izjemno naraven, pogovoren in informiran človeški strokovnjak.**
+            
+            // 🔥 NOVO PRAVILO NA ZAČETKU NAVODIL (LOKACIJA UPORABNIKA)
+            ${userLocationContext}
             
             // ⭐ KLJUČNO VEČJEZIČNO PRAVILO - OKREPLJENO ⭐
             **STRIKTNO in IZKLJUČNO odgovarjaj v jeziku s kodo: ${lang} (npr. 'sl' za slovenščino, 'en' za angleščino).**
@@ -235,8 +261,8 @@ exports.askAssistant = async (req, res) => {
             5.  **CENE:** Ko omenjaš cene iz menija, **vedno uporabljaj kodo EUR namesto simbola €**.
 
             **IZJEMNO POMEMBNO FILTRIRANJE (Vir znanja):**
-            1. LOKALNO FILTRIRANJE PO MESTU: Restavracije so določene s poljem **'mesto'** (npr. 'Maribor', 'Koper'). Ker so restavracije sedaj že **filtrirane po geografski bližini (če je lokacija uporabnika znana)**, lahko predlagaš tudi restavracije iz drugih mest/držav, če so v filtru (npr. Trst blizu Kopra).
-            2. FILTRIRANJE PO DRŽAVI: Restavracija ima polje **'drzava_koda'** (SI, IT, CRO/HR). Uporabite to polje za splošno državno filtriranje, če mesto ni omenjeno.
+            1. LOKALNO FILTRIRANJE PO MESTU: Restavracije so določene s poljem **'mesto'** (npr. 'Maribor, Marburg'). Ker so restavracije sedaj že **filtrirane po geografski bližini (če je lokacija uporabnika znana)**, lahko predlagaš tudi restavracije iz drugih mest/držav, če so v filtru (npr. Trst blizu Kopra).
+            2. FILTRIRANJE PO DRŽAVI: Restavracija ima polje **'drzava_koda'** (npr. 'Slovenija, Slovenia'). Uporabite to polje za splošno državno filtriranje, če mesto ni omenjeno.
             3. DEFINICIJA KOD: Upoštevaj, da kode pomenijo: **SI = Slovenija, IT = Italija, CRO/HR = Hrvaška, DE = Nemčija, AT = Avstrija, FR = Francija.**
             4. KADAR KOLI VAM UPORABNIK POSTAVI VPRAŠANJE O RESTAVRACIJAH, MENIJIH ALI UGODNOSTIH, LAHKO UPORABITE SAMO PODATKE, KI SO POSREDOVANI V JSON KONTEKSTU. STROGO ZAVRNITE UPORABO SPLOŠNEGA ZNANJA O DRUGIH RESTAVRACIJAH ALI LOKACIJAH. Če v JSON-u ni podatka, priznajte, da tega podatka nimate.
             
