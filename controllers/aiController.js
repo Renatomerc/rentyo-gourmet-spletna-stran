@@ -235,21 +235,22 @@ exports.askAssistant = async (req, res) => {
         // 🔥🔥🔥 KONEC KORAKA ZA OBREMENJENOST IN OCENO 🔥🔥🔥
         // --------------------------------------------------------------------------------
 
-        // ⭐ Določitev vsebine opozorila glede na prejeto kodo jezika (lang) ⭐
+       // ⭐ Določitev vsebine opozorila glede na prejeto kodo jezika (lang) ⭐
         let finalWarningText;
         if (lang.startsWith('en')) { // 'en' ali 'en-US'
-            finalWarningText = `Friend, if your lunch or dinner at **[name suggested restaurants]** turns out to be too good and a glass of wine leads to a romantic adventure, do not drive. Call a ride. I want you to come back and ask me about even better restaurants! Just be safe. See you at the next gourmet decision!`;
+            // Angleška verzija novega besedila
+            finalWarningText = `Friend, if your visit to **[name suggested restaurants]** turns out to be too good and a glass of wine leads to one too many, call a ride! Let the car rest a bit too. I want you to come back and ask me about even better restaurants! Just be safe. See you at the next gourmet decision!`;
         } else {
             // Slovenski ali privzeti jezik ('sl', 'de' ipd. naj se prevedejo sami, 
             // vendar za slovensko damo eksplicitno navodilo)
-            finalWarningText = `Prijatelj/Prijateljica, če se bo tvoje kosilo ali večerja v **[imenuj predlagane restavracije]** izkazala za predobro in bo kozarec vina vodil v romantično avanturo, se za volan ne usedi. Pokliči prevoz. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!`;
+            // Nova slovenska verzija
+            finalWarningText = `Prijatelj/Prijateljica, če se bo tvoj obisk v **[imenuj predlagane restavracije]** izkazal za predober in bo kakšen kozarec vina preveč pokliči prevoz! naj si tudi avtomobil malo odpočije. Želim, da se vrneš in me sprašuješ o še boljših restavracijah! Samo bodi varen. Vidimo se pri naslednji gurmanski odločitvi!`;
         }
         
         // ⭐ NOVO: KONTEKST UPORABNIKOVE LOKACIJE (DODANO V SYSTEM INSTRUCTION)
         const userLocationContext = (userCityContext && userCountryCodeContext) 
             ? `Tvoje trenutno mesto je ${userCityContext} v državi ${userCountryCodeContext}. Upoštevaj to lokacijo kot izhodišče pri dajanju priporočil.` 
             : '';
-
 
         // ⭐ KORAK RAG 2: KONČNI, IZBOLJŠANI PROMPT S FOKUSOM NA NARAVEN POGOVOR ⭐
         const systemInstruction = `
