@@ -62,6 +62,12 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
                 meni: 1, 
                 
+                // ➡️ DODANO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
+                popust: 1,
+                
+                // ➡️ DODANO: VKLJUČITEV POLJA VELJAVNOST BESEDILO V PROJEKCIJO
+                veljavnost_besedilo: 1,
+                
                 // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE KOMENTARJI
                 komentarji: 1, // <--- DODANO ZA REŠITEV PROBLEMA Z OCENAMI
                 
