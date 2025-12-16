@@ -106,7 +106,8 @@
     "select_reservation_date": "Prosimo, izberite datum rezervacije.",
     "pogoji_required": "Za registracijo morate sprejeti Splošne pogoje in Politiko zasebnosti.",
     "login_required": "Za rezervacijo je potrebna prijava. Prosimo, prijavite se.",
-    "google_reviews": "Google"
+    "google_reviews": "Google",
+    "loading_availability": "Preverjam razpoložljivost..."
   },
   "duration": {
     "one_hour": "1 ura",
@@ -238,7 +239,12 @@
     "scanner_error": "Napaka skenerja.",
     "camera_permission_required": "Za skeniranje je potrebno dovoljenje za kamero.",
     "delete_account_confirmation": "Z izbrisom računa boste izbrisali vse svoje osebne podatke. Ocene in komentarji restavracij ostanejo vidni, vendar pod imenom \"GDPR Deleted User\".",
-    "delete_account_button": "Izbriši moj račun"
+    "delete_account_button": "Izbriši moj račun",
+    "help_link": "Potrebujete pomoč? Pišite nam!",
+    "help_note": "Na vprašanja odgovarjamo v najkrajšem možnem času.",
+    "support_title": "Pomoč in podpora",
+    "tab_help": "Pomoč"
+
 },
   "warning": {
     "title": "Opozorilo",

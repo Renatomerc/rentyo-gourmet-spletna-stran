@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -999,7 +999,6 @@
 }
     
 
-    
     /* ======================================================= */
     /* MODAL PODROBNOSTI RESTAVRACIJE (OSTANE NESPREMENJENO) */
     /* ======================================================= */
@@ -3647,7 +3646,7 @@ body.is-capacitor-app #aiChatModal {
             <h2 data-i18n="gourmet_explore.title">Razišči nepozabna doživetja</h2>
             <div class="country-cards-container">
                 
-               <a href="experience.html?code=fine-dining" class="country-card" data-experience-code="fine-dining">
+               <a href="experience.html" class="country-card" data-experience-code="fine-dining">
     <img src="Fine-dining.png" alt="Vrhunska kulinarika" class="card-image">
     <div class="card-overlay">
         <span class="card-title" data-i18n="experience.fine_dining">Vrhunska kulinarika</span>
@@ -5439,7 +5438,7 @@ function createModalPicker() {
         field: modalDatumInput,
         format: 'DD.MM.YYYY',
         minDate: new Date(),
-        i18n: pikadayLangs[i18next.language] || pikadayLangs['sl'],
+        i18n: pikadayLangs[i18next.language] || pikadayLangs['en'],
         onSelect: function(date) {
             const dateStr = moment(date).format('DD.MM.YYYY'); 
             modalDatumInput.value = dateStr; 
@@ -5814,13 +5813,28 @@ function renderFeaturedCard(restavracija) {
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; 
     
-    // ⭐ NOVO: Pridobitev besedila popusta (polje 'popust' je vklučeno v Controller Aggregate)
+    // ⭐ 1. Pridobitev besedila popusta
     const besediloPopusta = restavracija.popust || '-10%'; 
+    
+    // --------------------------------------------------------------------------
+    // ⭐ 2. PRIDOBITEV BESEDILA VELJAVNOSTI
+    const veljavnostBesedilo = restavracija.veljavnost_besedilo; 
+    
+    let celotnaOznakaVsebina = besediloPopusta;
+
+    if (veljavnostBesedilo) {
+        // Združimo popust in čas veljavnosti z ločilom (npr. presledek in navpična črta | )
+        celotnaOznakaVsebina = `${besediloPopusta} | ${veljavnostBesedilo}`;
+        
+        // OPOMBA: Če želite ločilo samo s presledkom, uporabite:
+        // celotnaOznakaVsebina = `${besediloPopusta} ${veljavnostBesedilo}`;
+    }
+    // --------------------------------------------------------------------------
 
     card.innerHTML = `
         <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
             
-            <span class="oznaka-ponudbe">${besediloPopusta}</span>
+            <span class="oznaka-ponudbe">${celotnaOznakaVsebina}</span>
             
         </div>
         <div class="vsebina-kartice-izpostavljeno">
@@ -6788,8 +6802,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof i18next !== 'undefined' && typeof i18nextHttpBackend !== 'undefined') {
         i18next.use(i18nextHttpBackend).init(
           {
-            lng: localStorage.getItem('i18nextLng') || "sl",
-            fallbackLng: "sl",
+            lng: localStorage.getItem('i18nextLng') || "en",
+            fallbackLng: "en",
             backend: { loadPath: "./i18n/{{lng}}.json" },
           },
           (err) => {
@@ -6826,7 +6840,7 @@ datumInput.addEventListener('focus', (e) => {
             // ✅ POPRAVLJENO: Format brez presledkov
             format: 'DD.MM.YYYY', // Moment.js format (ustreza "d.m.Y")
             minDate: new Date(),
-            i18n: pikadayLangs[currentLang] || pikadayLangs['sl'], // Uporaba lokalizacije
+            i18n: pikadayLangs[currentLang] || pikadayLangs['en'], // Uporaba lokalizacije
             onSelect: function(date) {
                 // Poskrbimo za pravilen zapis v input polje
                 // ✅ POPRAVLJENO: Format brez presledkov
@@ -8004,7 +8018,7 @@ async function startVoiceInput() {
     const isCapacitorSR = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
     const inputField = document.querySelector('#aiChatModal #user-input');
     const micButton = document.querySelector('#mic-button');
-    const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
+    const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'en';
     const originalPlaceholder = selectedLang.startsWith('en') ? "Enter message..." : "Vnesite sporočilo...";
 
     // --- Pomožni funkciji za vizualno stanje ---
@@ -8140,8 +8154,8 @@ function toggleChat() {
         // ⭐ POPRAVEK: LOKALIZACIJA UVODNEGA SPOROČILA ⭐
         if (chatBody.children.length === 0) {
             
-            // Pridobitev trenutnega jezika (privzeto na 'sl')
-            const currentLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
+            // Pridobitev trenutnega jezika (privzeto na 'en')
+            const currentLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'en';
             
             let welcomeMessage;
             if (currentLang.startsWith('en')) {
@@ -8298,7 +8312,7 @@ async function getUserLocation(forceRefresh = false) {
  * ⭐ POSODOBLJENA ASINHRONA FUNKCIJA: Pošlje sporočilo na backend in prikaže odgovor,
  * vključno z geolokacijo, če je na voljo. ⭐
  * * @param {string} prompt Sporočilo uporabnika.
- * @param {string} languageCode Koda izbranega jezika ('sl', 'en', itd.). <--- NOVI PARAMETER
+ * @param {string} languageCode Koda izbranega jezika ('en', 'sl', itd.). <--- NOVI PARAMETER
  */
 async function fetchAiResponse(prompt, languageCode) {
     
@@ -8392,8 +8406,8 @@ function handleSend() {
         inputField.value = '';
 
         // ⭐ NOVO: Pridobitev trenutnega jezika preko i18next ⭐
-        // Če i18next.language ni na voljo (ali i18next še ni inicializiran), privzeto uporabimo 'sl'.
-        const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'sl';
+        // Če i18next.language ni na voljo (ali i18next še ni inicializiran), privzeto uporabimo 'en'.
+        const selectedLang = (typeof i18next !== 'undefined' && i18next.language) ? i18next.language : 'en';
         
         console.log('Sporočilo poslano AI-ju v jeziku:', selectedLang);
         

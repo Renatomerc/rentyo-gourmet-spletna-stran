@@ -66,7 +66,7 @@ const updateContent = () => {
     // -------------------------------------------------------------
     // 7. LOGIKA ZA DINAMIČNO PREPISOVANJE LINKOV (HREF)
     // -------------------------------------------------------------
-    const currentLang = i18next.language || 'sl'; 
+    const currentLang = i18next.language || 'en'; 
     
     document.querySelectorAll('[data-i18n-href]').forEach(el => {
         const key = el.getAttribute('data-i18n-href');
@@ -139,7 +139,7 @@ const initI18n = (fallbackLang) => {
 };
 
 // Zagon prevajanja
-const fallbackLang = 'sl'; 
+const fallbackLang = 'en'; 
 if (typeof i18next !== 'undefined' && typeof i18nextBrowserLanguageDetector !== 'undefined') {
     initI18n(fallbackLang);
 } else {

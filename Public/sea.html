@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle" data-i18n="experience.pageTitle">Rentyo Gourmet - Posebne Ponudbe</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -16,6 +16,29 @@
             /* 🔥 DODANO GLOBALNO OZADJE ZA CELOTNO STRAN */
             background-color: #f9f9f9; 
         }
+        body {
+    background-image: url('circles-and-roundabouts.png'); 
+    background-repeat: repeat; 
+    /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
+    background-color: #F5F5F5; 
+    
+    /* Preprečimo, da bi se vzorec premikal ob drsenju, če je to želeno */
+    /* background-attachment: fixed; */ 
+}
+body::before {
+    content: ''; /* Obvezno za pseudo-elemente */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
+    background-color: rgba(255, 255, 255, 0.511); /* Bela barva (255, 255, 255) z 50% prosojnostjo (0.5) */
+    
+    /* Zagotovimo, da je ta sloj pod vso vsebino */
+    z-index: -1; 
+}
         
         /* * ======================================
          * 1. ODSTRANITEV SVETLO MODREGA KVADRATA (FOCUS & TAP HIGHLIGHT)
@@ -130,14 +153,13 @@
 
         .exp-text-info h1 {
             color: var(--rmlk-modra);
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             margin-bottom: 10px;
         }
         
         .exp-text-info {
             margin-top: -30px; 
             position: relative;
-            background-color: white; /* Ozadje, ki ustvari beli layer na mobilnih */
             padding-top: 20px;
             border-radius: 15px 15px 0 0; 
             box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
@@ -160,7 +182,12 @@
              .hero-image-exp {
                  /* border-radius se OHRANI ASIMETRIČEN, odstranjena je le senca in zmanjšana višina */
                  box-shadow: none;
-                 height: 300px; 
+                 height: 300px;
+                  border-top-left-radius: 0px; 
+            border-top-right-radius: 0px; 
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
              }
              .header-back-only {
                  top: 20px;
@@ -208,8 +235,8 @@
 
 
         .offer-card {
-            min-width: 85vw; 
-            max-width: 350px; 
+            min-width: 70vw; 
+            max-width: 250px; 
             
             margin-right: 20px; 
             scroll-snap-align: start; 
@@ -262,7 +289,7 @@
 
         .offer-content h3 {
             color: var(--rmlk-modra);
-            font-size: 1.2rem;
+            font-size: 1rem;
             margin: 0 0 5px 0;
             line-height: 1.3;
         }
@@ -301,7 +328,7 @@
         }
         
         .offer-reserve-button {
-            background-color: #169b99; 
+            background-color: #076b6a; 
             color: white;
             padding: 8px 15px;
             border-radius: 25px;
@@ -311,7 +338,7 @@
         }
         
         .offer-reserve-button:hover {
-            background-color: #138b89; 
+            background-color: #076b6a; 
         }
 
         /*
@@ -500,7 +527,7 @@
         const LANGUAGE_KEY = 'i18nextLng'; 
         
         const getLanguage = () => {
-            return localStorage.getItem(LANGUAGE_KEY) || 'sl';
+            return localStorage.getItem(LANGUAGE_KEY) || 'en';
         };
 
         const getTranslation = (key, data) => {
@@ -566,8 +593,11 @@
                 });
                 
                 // 3. Shranimo prevode za dinamično ustvarjene elemente (modal)
-                modalTranslations = langData.global || {}; 
-                modalTranslations = {...modalTranslations, ...langData.experience}; 
+                // Uporabljamo operator širjenja za konsistentnost (kot v prejšnji kodi)
+                modalTranslations = {
+                    ...(langData.global || {}),
+                    ...(langData.experience || {})
+                }; 
             }
         };
         
@@ -579,13 +609,35 @@
             return offer[field] || offer[fallbackField] || '';
         };
 
+        // 🔥 POPRAVEK: Fiksno določimo kategorijo kot 'sea' za sea.html
+        const getCategoryFromUrl = () => {
+            // Ta stran je namenjena samo za morske ponudbe
+            return 'sea'; 
+        };
+
         // ===========================================
-        // GLAVNA LOGIKA NALAGANJA (PO PREVODU)
+        // GLAVNA LOGIKA NALAGANJA (S FILTRIRANJEM)
         // ===========================================
         
         const loadOffers = () => {
               const offersContainer = document.getElementById('offersContainer');
-              fetch(`${API_BASE_URL}/offers`) 
+              
+              // Pridobimo fiksno kategorijo 'sea'
+              const category = getCategoryFromUrl(); 
+            
+              let apiUrl = `${API_BASE_URL}/offers`;
+            
+              if (category) {
+                  // API klic bo vedno: /api/offers?category=sea
+                  apiUrl += `?category=${category}`; 
+              }
+              
+              // Pokaži sporočilo o nalaganju
+              if (offersContainer) {
+                  offersContainer.innerHTML = `<p id="loadingStatus">${modalTranslations.loadingOffers || 'Nalaganje posebnih ponudb...'}</p>`;
+              }
+              
+              fetch(apiUrl) 
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Napaka pri nalaganju ponudb iz API-ja: ' + response.statusText);
@@ -620,14 +672,16 @@
                             if(offersContainer) offersContainer.appendChild(card);
                         });
                     } else {
-                        if(offersContainer) offersContainer.innerHTML = '<p id="loadingStatus" data-i18n="experience.noActiveOffers">Trenutno ni aktivnih posebnih ponudb.</p>';
-                        translatePage(); 
+                        // Uporabimo shranjeni prevod, ali fallback
+                        if(offersContainer) offersContainer.innerHTML = `<p data-i18n="experience.noActiveOffers">${modalTranslations.noActiveOffers || 'Trenutno ni aktivnih posebnih ponudb.'}</p>`;
+                        // Klic translatePage() tukaj ni potreben, saj je bil že izveden ob zagonu
                     }
                 })
                 .catch(error => {
                     console.error('Napaka pri nalaganju ponudb:', error);
-                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;" data-i18n="global.dataLoadError">❌ NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint '/api/offers'.</p>`;
-                    translatePage(); 
+                    // Prikaz napake s shranjenim prevodom
+                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;">❌ ${modalTranslations.dataLoadError || 'NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint \'/api/offers\'.'}</p>`;
+                    // Klic translatePage() tukaj ni potreben
                 });
         };
 
@@ -755,7 +809,7 @@
             // 2. Prevedi stran (POČAKAJ na naložitev prevodov)
             await translatePage(); 
             
-            // 3. Naloži ponudbe iz API-ja (Zdaj so prevodi na voljo za dinamične elemente, če so uspešno naloženi)
+            // 3. Naloži ponudbe iz API-ja (Zdaj Fiksno za 'sea')
             loadOffers();
 
             const offerDetailModal = document.getElementById('offerDetailModal');
@@ -787,5 +841,3 @@
             });
         });
     </script>
-</body>
-</html>

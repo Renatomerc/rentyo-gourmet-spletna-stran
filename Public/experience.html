@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle" data-i18n="experience.pageTitle">Rentyo Gourmet - Posebne Ponudbe</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -182,7 +182,12 @@ body::before {
              .hero-image-exp {
                  /* border-radius se OHRANI ASIMETRIČEN, odstranjena je le senca in zmanjšana višina */
                  box-shadow: none;
-                 height: 300px; 
+                 height: 300px;
+                  border-top-left-radius: 0px; 
+            border-top-right-radius: 0px; 
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
              }
              .header-back-only {
                  top: 20px;
@@ -495,7 +500,7 @@ body::before {
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
    <script>
         // API BASE URL (Definiramo, ker se uporablja za prijavo)
         const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
@@ -522,7 +527,7 @@ body::before {
         const LANGUAGE_KEY = 'i18nextLng'; 
         
         const getLanguage = () => {
-            return localStorage.getItem(LANGUAGE_KEY) || 'sl';
+            return localStorage.getItem(LANGUAGE_KEY) || 'en';
         };
 
         const getTranslation = (key, data) => {
@@ -601,13 +606,35 @@ body::before {
             return offer[field] || offer[fallbackField] || '';
         };
 
+        // 🔥 DODANO/POPRAVLJENO: Fiksno določimo kategorijo kot 'experience' za experience.html
+        const getCategoryFromUrl = () => {
+            // Ta stran je namenjena samo za ponudbe tipa 'experience'
+            return 'experience'; 
+        };
+
         // ===========================================
-        // GLAVNA LOGIKA NALAGANJA (PO PREVODU)
+        // GLAVNA LOGIKA NALAGANJA (S FILTRIRANJEM)
         // ===========================================
         
         const loadOffers = () => {
               const offersContainer = document.getElementById('offersContainer');
-              fetch(`${API_BASE_URL}/offers`) 
+              
+              // Pridobimo fiksno kategorijo 'experience'
+              const category = getCategoryFromUrl(); 
+            
+              let apiUrl = `${API_BASE_URL}/offers`;
+            
+              if (category) {
+                  // API klic bo vedno: /api/offers?category=experience
+                  apiUrl += `?category=${category}`; 
+              }
+              
+              // Pokaži sporočilo o nalaganju
+              if (offersContainer) {
+                  offersContainer.innerHTML = `<p id="loadingStatus">${modalTranslations.loadingOffers || 'Nalaganje posebnih ponudb...'}</p>`;
+              }
+              
+              fetch(apiUrl) 
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Napaka pri nalaganju ponudb iz API-ja: ' + response.statusText);
@@ -642,14 +669,16 @@ body::before {
                             if(offersContainer) offersContainer.appendChild(card);
                         });
                     } else {
-                        if(offersContainer) offersContainer.innerHTML = '<p id="loadingStatus" data-i18n="experience.noActiveOffers">Trenutno ni aktivnih posebnih ponudb.</p>';
-                        translatePage(); 
+                        // Uporabimo shranjeni prevod, ali fallback
+                        if(offersContainer) offersContainer.innerHTML = `<p data-i18n="experience.noActiveOffers">${modalTranslations.noActiveOffers || 'Trenutno ni aktivnih posebnih ponudb.'}</p>`;
+                        // Klic translatePage() tukaj ni potreben
                     }
                 })
                 .catch(error => {
                     console.error('Napaka pri nalaganju ponudb:', error);
-                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;" data-i18n="global.dataLoadError">❌ NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint '/api/offers'.</p>`;
-                    translatePage(); 
+                    // Prikaz napake s shranjenim prevodom
+                    if(offersContainer) offersContainer.innerHTML = `<p style="color: red; font-weight: bold;">❌ ${modalTranslations.dataLoadError || 'NAPAKA PRI BRANJU PODATKOV. Preverite API endpoint \'/api/offers\'.'}</p>`;
+                    // Klic translatePage() tukaj ni potreben
                 });
         };
 
@@ -777,7 +806,7 @@ body::before {
             // 2. Prevedi stran (POČAKAJ na naložitev prevodov)
             await translatePage(); 
             
-            // 3. Naloži ponudbe iz API-ja (Zdaj so prevodi na voljo za dinamične elemente, če so uspešno naloženi)
+            // 3. Naloži ponudbe iz API-ja (Zdaj fiksno za 'experience')
             loadOffers();
 
             const offerDetailModal = document.getElementById('offerDetailModal');
@@ -809,5 +838,3 @@ body::before {
             });
         });
     </script>
-</body>
-</html>

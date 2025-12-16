@@ -125,6 +125,9 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                 // ⭐ NOVO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
                 popust: 1,
                 
+                // ➡️ DODANO: VKLJUČITEV POLJA VELJAVNOST BESEDILO (STRING) V PROJEKCIJO
+                veljavnost_besedilo: 1,
+                
                 // 🔥 DODANO: VKLJUČITEV POLJA FEATURED V PROJEKCIJO
                 featured: 1,
                 // ---------------------------------------------
@@ -149,7 +152,6 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
         res.status(500).json({ msg: "Napaka strežnika pri nalaganju izpostavljenih restavracij" });
     }
 };
-
 
 /**
  * Pridobitev vseh restavracij (GET /) - Originalni kontroler

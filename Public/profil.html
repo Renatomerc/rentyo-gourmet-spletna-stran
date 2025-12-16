@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -658,6 +658,20 @@ body::before {
 }
 
     }
+    .ikona-posta {
+    /* Nastavite fiksno velikost za ikono */
+    width: 70px; /* Približno 60% zmanjšanje, če je original 50px */
+    height: 70px; /* Ikona naj bo kvadratna */
+    
+    /* Če imate barvno ikono, te lastnosti niso potrebne: */
+    /*
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%); 
+    */
+    
+    /* Pomembno: Odstranite kateri koli privzeti obrobni (border) slog, če se pojavi */
+    border: none;
+}
+
     
   </style>
 </head>
@@ -779,19 +793,17 @@ body::before {
         <h3 data-i18n="profile.help_subtitle">Pomoč in podpora</h3> <div class="menu-section mt-6 border-t border-gray-200 pt-4">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2" data-i18n="profile.support_title">Podpora in pomoč</h2>
             
-            <a href="mailto:support@rentyo.eu?subject=Pomo%C4%8D%20za%20Rentyo%20Gourmet%20aplikacijo" class="flex items-center justify-between p-4 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition duration-150 ease-in-out border border-gray-100 mb-2">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9.247a1.25 1.25 0 011.085-1.922 1.25 1.25 0 011.085 1.922 1.25 1.25 0 001.085 1.922 1.25 1.25 0 001.085-1.922 1.25 1.25 0 011.085-1.922 1.25 1.25 0 011.085 1.922M15 13a6 6 0 11-12 0 6 6 0 0112 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7L4 7" />
-                    </svg>
-                    
-                    <span class="text-sm font-medium text-gray-800" data-i18n="profile.help_link">Potrebujete pomoč? Pišite nam!</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-            </a>
+<a href="mailto:support@rentyo.eu?subject=Pomo%C4%8D%20za%20Rentyo%20Gourmet%20aplikacijo" 
+   class="flex items-center p-4 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition duration-150 ease-in-out border border-gray-100 mb-2">
+    
+    <div class="flex items-center">
+        <img src="Send-ikona.png" 
+             alt="E-pošta ikona" 
+             class="ikona-posta mr-3" />
+        
+        <span class="text-sm font-medium text-gray-800" data-i18n="profile.help_link">Potrebujete pomoč? Pišite nam!</span>
+    </div>
+</a>
             
             <p class="text-xs text-gray-400 mt-2 p-2" data-i18n="profile.help_note">Na vprašanja odgovarjamo v najkrajšem možnem času.</p>
         </div>
@@ -2035,7 +2047,7 @@ const renderPriljubljene = (restavracije, kontejnerElement) => {
         };
 
         const loadLanguage = () => {
-            return localStorage.getItem('i18nextLng') || 'sl'; 
+            return localStorage.getItem('i18nextLng') || 'en'; 
         };
         
         i18next.use(i18nextHttpBackend).init(
