@@ -56,7 +56,18 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                         { $arrayElemAt: ["$galerija_slik", 0] } 
                     ]
                 },
-                deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
+                deviznaKuhinja: {
+    $cond: {
+        // Preveri, ali je array cuisine prazen
+        if: { $gt: [ { $size: "$cuisine" }, 0 ] }, 
+        
+        // Če je zapolnjen, vzemi prvi element
+        then: { $arrayElemAt: ["$cuisine", 0] },
+        
+        // Če je prazen, nastavi na 'any'
+        else: 'any' 
+    }
+},
                 
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
@@ -123,7 +134,18 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                         { $arrayElemAt: ["$galerija_slik", 0] } 
                     ]
                 },
-                deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
+                deviznaKuhinja: {
+    $cond: {
+        // Preveri, ali je array cuisine prazen
+        if: { $gt: [ { $size: "$cuisine" }, 0 ] }, 
+        
+        // Če je zapolnjen, vzemi prvi element
+        then: { $arrayElemAt: ["$cuisine", 0] },
+        
+        // Če je prazen, nastavi na 'any'
+        else: 'any' 
+    }
+},
                 
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
                 meni: 1, 
