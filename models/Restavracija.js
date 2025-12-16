@@ -201,6 +201,16 @@ featured: {
         coordinates: {
             type: [Number], // [longitude, latitude]
             required: false
+        },
+        
+        // ⭐ KRITIČEN POPRAVEK: DODAJANJE UGNEZDENIH POLJ KOT ARRAY STRINGOV
+        mesto: { 
+            type: [String], // Array of Strings za alternativna imena mest
+            required: false
+        },
+        drzava: { 
+            type: [String], // Array of Strings za alternativna imena držav
+            required: false
         }
     },
     
