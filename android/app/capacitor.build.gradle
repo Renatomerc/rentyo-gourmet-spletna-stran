@@ -15,7 +15,6 @@ dependencies {
     implementation project(':capacitor-geolocation')
     implementation project(':capacitor-keyboard')
     implementation project(':capacitor-push-notifications')
-    implementation project(':capgo-capacitor-social-login')
 
 }
 

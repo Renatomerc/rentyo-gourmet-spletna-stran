@@ -552,6 +552,9 @@ exports.ustvariRezervacijo = async (req, res) => {
                 status: "ZASEDNO"
             });
         }
+
+        // --- TUKAJ SE NADALJUJE TVOJA OBSTOJEČA LOGIKA ZA SHRANJEVANJE ---
+        // (Uporabi 'prostaMizaId' za vstavljanje rezervacije v bazo)
         
         // 5. Ustvarjanje rezervacije (za najdeno prosto mizo)
         const novaRezervacija = {

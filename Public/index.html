@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  
   <title data-i18n="app.title">Iskanje Restavracij - Gourmet & Experience</title>
 
   <link rel="stylesheet" href="style.css" />
@@ -2327,17 +2328,26 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     z-index: 4;
 }
 
-/* --- RESPONSIVE: Na telefonih višina kartice manjša --- */
+/* --- RESPONSIVE: Prilagoditev za mobilne naprave --- */
 @media (max-width: 768px) {
     .country-card {
         aspect-ratio: 1 / 1; /* kvadrat na mobilnih */
     }
 
     .country-cards-container {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        /* Zmanjšamo minimalno širino na 140px in zmanjšamo razmik (gap) */
+        grid-template-columns: repeat(2, 1fr); /* TUKAJ PRISILIMO 2 STOLPCA */
+        gap: 10px; /* Manjši razmik, da ne zmanjka prostora */
+        padding: 10px; /* Dodamo malo paddinga na straneh */
     }
 
-    /* Silhueta manjša na telefonih */
+    /* Naslov kartice na mobilnih malo zmanjšamo, da ne skače v 3 vrstice */
+    .card-title {
+        font-size: 1rem;
+        padding: 5px;
+        text-align: center;
+    }
+
     .country-card[data-experience-code="wine"] .wine-silhouette {
         width: 50px;
     }
@@ -2590,13 +2600,13 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
    ★ 6. DANES (rob)
    ======================================================= */
 .is-today .pika-button {
-    color: #000 !important;
+    color: #076b6a !important;
     font-weight: 700;
     border-radius: 50% !important;
     width: 28px !important;
     height: 28px !important;
     line-height: 28px !important;
-    border: 2px solid #333 !important;
+    border: 2px solid #076b6a !important;
     background: none !important;
 }
 
@@ -3419,6 +3429,117 @@ body.is-capacitor-app #aiChatModal {
     /* To bi moralo biti dovolj, če ni drugega močnejšega pravila */
     color: #e74c3c; 
 }
+/* Celoten vsebnik */
+.cloudinary-banner-sekcija {
+    padding: 20px 0; 
+    width: 100%;
+    display: flex;
+    justify-content: center; 
+    box-sizing: border-box;
+}
+
+/* NOVO: Wrapper, ki drži skupaj slider in pikice */
+.banner-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Usklajeno z max-width sliderja */
+}
+
+/* Okvir pasu */
+.cloudinary-slider-container.viden-okvir {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 10px;
+    /* Prilagojeno tvoji višini 200px + nekaj rezerve */
+    min-height: 220px; 
+    width: 95%; 
+    max-width: 1200px; 
+    border: 0px solid #e0e0e0;
+    border-radius: 20px;
+    align-items: center;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+/* Vsebnik za posamezno akcijo (slika + tekst) */
+.banner-item {
+    flex: 0 0 auto;
+    width: 100%; 
+    max-width: 1200px; 
+    height: 200px; /* Tvoja želena višina */
+    position: relative; 
+    border-radius: 14px;
+    overflow: hidden; 
+    scroll-snap-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    background: #000;
+}
+
+/* Slika se prilagaja vsebniku */
+.banner-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    display: block;
+}
+
+/* Napis čez sliko */
+.banner-tekst {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85)); 
+    color: white;
+    pointer-events: none; 
+}
+
+.banner-tekst b {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.banner-tekst small {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* NOVO: Stili za pikice (indikatorje) */
+.banner-dots-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ccc;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Aktivna pikica - postane temnejša in širša */
+.dot.active {
+    background-color: #333;
+    width: 20px;
+    border-radius: 4px;
+}
+
+/* Skrijemo scrollbar */
+.cloudinary-slider-container::-webkit-scrollbar {
+    display: none;
+}
+
 
 
 
@@ -3629,22 +3750,29 @@ body.is-capacitor-app #aiChatModal {
             </div>
         </section>
 
-        <section class="kartice-restavracij kartice-izpostavljeno">
-            <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
-            
-            <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
-                <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
-            </div>
-        </section>
-        
-        <section class="velika-akcija-slika" id="akcijeBanner">
-            
-            <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
+     <section class="kartice-restavracij kartice-izpostavljeno">
+    <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
+    
+    <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
+        <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
+    </div>
+</section>
 
-            <div class="akcija-vsebina">
-                <h2 data-i18n="action_banner.title">Aktualne Akcije in Posebna Ponudba</h2>
-            </div>
-        </section>
+<section class="cloudinary-banner-sekcija">
+    <div class="banner-wrapper"> <div class="cloudinary-slider-container viden-okvir" id="cloudinarySlider">
+            <div class="loading-placeholder">Nalaganje ponudbe...</div>
+        </div>
+        
+        <div id="banner-dots" class="banner-dots-container"></div>
+    </div>
+</section>
+
+<section class="velika-akcija-slika" id="akcijeBanner">
+    <img src="Simbol-app.png" alt="Slika aplikacije/ikona" class="ikona-ospredje">
+    <div class="akcija-vsebina">
+        <h2 data-i18n="action_banner.title">Aktualne Akcije in Posebna Ponudba</h2>
+    </div>
+</section>
 
         <section class="gourmet-explore" id="gourmetExploreSection">
             <h2 data-i18n="gourmet_explore.title">Razišči nepozabna doživetja</h2>
@@ -5754,24 +5882,33 @@ function renderCard(restavracija) {
          oddaljenostHTML = `<span class="oddaljenost" data-i18n="results.distance_unknown" style="opacity: 0.7;"><i class="fas fa-location-arrow"></i> ${oddaljenostKm}</span>`;
     }
     
-    const status = restavracija.razpolozljivost_status || (Math.random() > 0.8 ? 'tomorrow' : 'available');
+    // 1. Uporabimo dejanske podatke iz backenda (brez Math.random)
+    const status = restavracija.razpolozljivost_status; 
     const cas = restavracija.razpolozljivost_cas || '19:00';
-    let razpolozljivostTextKey;
-    let isAvailable = true;
     
+    let razpolozljivostTextKey;
+    let isAvailable = false;
+    
+    // 2. Logika za določanje besedila in vizualnega stanja
     if (status === 'available') {
         razpolozljivostTextKey = i18next.t('results.available_today', { time: cas });
+        isAvailable = true;
     } else if (status === 'tomorrow') {
         razpolozljivostTextKey = i18next.t('results.available_tomorrow', { time: cas });
         isAvailable = false; 
     } else {
+        // Če je vse zasedeno ali status ni definiran
         razpolozljivostTextKey = i18next.t('results.unavailable');
         isAvailable = false;
     }
 
+    // 3. Generiranje HTML-ja z ustreznimi razredi in i18n atributi
     const razpolozljivostHTML = `
         <div class="razpolozljivost-ovoj ${!isAvailable ? 'zasedeno' : ''}">
-            <p data-i18n="${status === 'available' ? 'results.available_today' : status === 'tomorrow' ? 'results.available_tomorrow' : 'results.unavailable'}" data-i18n-options='{"time": "${cas}"}'>${razpolozljivostTextKey}</p>
+            <p data-i18n="${status === 'available' ? 'results.available_today' : (status === 'tomorrow' ? 'results.available_tomorrow' : 'results.unavailable')}" 
+               data-i18n-options='{"time": "${cas}"}'>
+               ${razpolozljivostTextKey}
+            </p>
         </div>
     `;
     
@@ -5816,7 +5953,7 @@ function renderFeaturedCard(restavracija) {
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; 
     
     // ⭐ 1. Pridobitev besedila popusta
-    const besediloPopusta = restavracija.popust || '-10%'; 
+    const besediloPopusta = restavracija.popust || '150 Gumy -10%'; 
     
     // --------------------------------------------------------------------------
     // ⭐ 2. PRIDOBITEV BESEDILA VELJAVNOSTI
@@ -8533,9 +8670,107 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // ... ostala DOMContentLoaded koda v index.html
 });
+async function naloziBannerjeIzJson() {
+    const slider = document.getElementById('cloudinarySlider');
+    const dotsContainer = document.getElementById('banner-dots');
+    let jezik = localStorage.getItem('language') || 'sl';
+    if (jezik.includes('-')) jezik = jezik.split('-')[0];
 
+    if (!slider) return;
 
+    // Pomožna funkcija za počasno drsenje
+    function pocasiDrsajDo(element, cilj, trajanje) {
+        const zacetek = element.scrollLeft;
+        const razlika = cilj - zacetek;
+        let casZacetka = null;
 
+        function animacija(trenutniCas) {
+            if (!casZacetka) casZacetka = trenutniCas;
+            const napredek = trenutniCas - casZacetka;
+            const odstotek = Math.min(napredek / trajanje, 1);
+            
+            // "Ease-in-out" funkcija za mehkejši začetek in konec
+            const stopnja = odstotek < 0.5 ? 2 * odstotek * odstotek : -1 + (4 - 2 * odstotek) * odstotek;
+            
+            element.scrollLeft = zacetek + razlika * stopnja;
+
+            if (napredek < trajanje) {
+                requestAnimationFrame(animacija);
+            }
+        }
+        requestAnimationFrame(animacija);
+    }
+
+    try {
+        const response = await fetch('i18n/akcije.json');
+        if (!response.ok) throw new Error("Ni mogoče prebrati akcije.json");
+        
+        const akcije = await response.json();
+
+        if (akcije && akcije.length > 0) {
+            slider.innerHTML = ''; 
+            if (dotsContainer) dotsContainer.innerHTML = ''; 
+
+            akcije.forEach((akcija, index) => {
+                const prevod = akcija[jezik] || akcija['sl'];
+                const bannerItem = document.createElement('div');
+                bannerItem.className = 'banner-item';
+                bannerItem.innerHTML = `
+                    <img src="${akcija.slika_ime}" alt="${prevod.naslov}">
+                    <div class="banner-tekst">
+                        <b>${prevod.naslov}</b>
+                        <small>${prevod.opis}</small>
+                    </div>
+                `;
+                slider.appendChild(bannerItem);
+
+                if (dotsContainer) {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot' + (index === 0 ? ' active' : '');
+                    
+                    dot.addEventListener('click', () => {
+                        const ciljnaPozicija = bannerItem.offsetLeft - slider.offsetLeft;
+                        // Nastavi hitrost tukaj (1200ms = 1.2 sekunde)
+                        pocasiDrsajDo(slider, ciljnaPozicija, 2400);
+                    });
+                    dotsContainer.appendChild(dot);
+                }
+            });
+
+            if (dotsContainer) {
+                slider.addEventListener('scroll', () => {
+                    const scrollLeft = slider.scrollLeft;
+                    const itemWidth = slider.querySelector('.banner-item').offsetWidth;
+                    const gap = 12; 
+                    const activeIndex = Math.round(scrollLeft / (itemWidth + gap));
+                    
+                    const dots = dotsContainer.querySelectorAll('.dot');
+                    dots.forEach((dot, idx) => {
+                        dot.classList.toggle('active', idx === activeIndex);
+                    });
+                });
+
+                let autoScrollInterval = setInterval(() => {
+                    const dots = dotsContainer.querySelectorAll('.dot');
+                    const activeDot = dotsContainer.querySelector('.dot.active');
+                    if (!dots.length || !activeDot) return;
+
+                    let nextIndex = Array.from(dots).indexOf(activeDot) + 1;
+                    if (nextIndex >= dots.length) nextIndex = 0;
+
+                    dots[nextIndex].click();
+                }, 6000); // Malo podaljšan interval, ker je drsenje zdaj daljše
+
+                slider.addEventListener('touchstart', () => clearInterval(autoScrollInterval), {passive: true});
+                slider.addEventListener('mousedown', () => clearInterval(autoScrollInterval));
+            }
+        }
+    } catch (error) {
+        console.error("Napaka:", error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', naloziBannerjeIzJson);
 
 </script>
     <div id="toaster-container">

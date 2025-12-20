@@ -211,7 +211,7 @@
     "points_payment_subtitle": "Punktid ja maksevahendid",
     "points_title": "Teie kogutud punktid",
     "points_status": "Praegune seis: {{count}} punkti (piisav 10€ allahindluseks)",
-    "points_status_dynamic": "Praegune seis: {{count}} punkti",
+    "points_status_dynamic": "Praegune seis: {{count}} Gumy",
     "card_title": "Salvestatud krediitkaart",
     "card_info": "Visa lõpp: **** 1234",
     "add_card_button": "Lisa/Uuenda kaarti",

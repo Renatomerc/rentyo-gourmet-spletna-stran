@@ -211,7 +211,7 @@
     "points_payment_subtitle": "Puntos y Métodos de Pago",
     "points_title": "Sus Puntos Acumulados",
     "points_status": "Estado actual: {{count}} puntos (suficiente para 10€ de descuento)",
-    "points_status_dynamic": "Estado actual: {{count}} puntos",
+    "points_status_dynamic": "Estado actual: {{count}} Gumy",
     "card_title": "Tarjeta de Crédito Guardada",
     "card_info": "Visa terminada en: **** 1234",
     "add_card_button": "Añadir/Actualizar Tarjeta",

@@ -1,7 +1,7 @@
 ext {
     minSdkVersion = 23
-    compileSdkVersion = 36 // POPRAVEK: MORA biti 36 ali višje
-    targetSdkVersion = 36 // POPRAVEK: Uskladite s compileSdkVersion
+    compileSdkVersion = 35 // POPRAVEK: MORA biti 36 ali višje
+    targetSdkVersion = 35 // POPRAVEK: Uskladite s compileSdkVersion
     androidxActivityVersion = '1.9.2'
     androidxAppCompatVersion = '1.7.0'
     androidxCoordinatorLayoutVersion = '1.2.0'

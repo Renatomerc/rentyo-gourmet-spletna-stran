@@ -211,7 +211,7 @@
     "points_payment_subtitle": "Body a platobné prostriedky",
     "points_title": "Vaše nazbierané body",
     "points_status": "Aktuálny stav: {{count}} bodov (stačí na zľavu 10€)",
-    "points_status_dynamic": "Aktuálny stav: {{count}} bodov",
+    "points_status_dynamic": "Aktuálny stav: {{count}} Gumy",
     "card_title": "Uložená kreditná karta",
     "card_info": "Visa koncovka: **** 1234",
     "add_card_button": "Pridať/Aktualizovať kartu",

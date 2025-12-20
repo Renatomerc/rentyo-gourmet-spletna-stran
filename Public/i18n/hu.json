@@ -211,7 +211,7 @@
     "points_payment_subtitle": "Pontok és fizetési eszközök",
     "points_title": "Az Ön összegyűjtött pontjai",
     "points_status": "Jelenlegi állapot: {{count}} pont (elég 10€ kedvezményhez)",
-    "points_status_dynamic": "Jelenlegi állapot: {{count}} pont",
+    "points_status_dynamic": "Jelenlegi állapot: {{count}} Gumy",
     "card_title": "Mentett hitelkártya",
     "card_info": "Visa utolsó 4 számjegye: **** 1234",
     "add_card_button": "Kártya hozzáadása/frissítése",

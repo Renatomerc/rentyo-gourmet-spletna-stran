@@ -1,0 +1,23 @@
+{
+  "appId": "eu.rentyo.rentyo",
+  "appName": "Rentyo",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#066A69",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "fade": false,
+      "fadeInDuration": 0,
+      "fadeOutDuration": 0
+    },
+    "BarcodeScanner": {}
+  },
+  "ios": {
+    "backgroundColor": "#ffffff"
+  },
+  "cordova": {}
+}

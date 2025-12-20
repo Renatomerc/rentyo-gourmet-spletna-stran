@@ -211,7 +211,7 @@
     "points_payment_subtitle": "Points and Payment Methods",
     "points_title": "Your Earned Points",
     "points_status": "Current status: {{count}} points (enough for a €10 discount)",
-    "points_status_dynamic": "Current status: {{count}} points",
+    "points_status_dynamic": "Current status: {{count}} Gumy",
     "card_title": "Saved Credit Card",
     "card_info": "Visa ending in: **** 1234",
     "add_card_button": "Add/Update Card",
