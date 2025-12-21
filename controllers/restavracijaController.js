@@ -535,28 +535,28 @@ exports.ustvariRezervacijo = async (req, res) => {
                     if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojeca.casStart, obstojeceTrajanje)) {
                         const jeIstaRestavracija = rest._id.toString() === restavracijaId;
                         
-                        return res.status(400).json({ 
-                            // Za nazaj združljivo s tvojim trenutnim frontendom
-                            msg: `Ob ${obstojeca.casStart} že imate aktivno rezervacijo ${jeIstaRestavracija ? 'v tej restavraciji' : 'v drugi restavraciji'}. Ne morete rezervirati več miz hkrati!`,
-                            // i18n podatki
-                            key: 'error_double_booking',
-                            params: {
-                                cas: obstojeca.casStart,
-                                lokacija: jeIstaRestavracija ? 'ta' : 'druga'
-                            }
-                        });
-                    }
+                    return res.status(400).json({ 
+                        // Za nazaj združljivo s tvojim trenutnim frontendom
+                        msg: "",
+                        // i18n podatki
+                        key: 'messages.error_double_booking',
+                        params: {
+                            cas: obstojeca.casStart,
+                            lokacija: jeIstaRestavracija ? 'ta' : 'druga'
+                        }
+                    });
                 }
             }
         }
+    }
 
-        if (uporabnikoveRezervacijeSkupaj >= 3) {
-            return res.status(400).json({ 
-                msg: `Dosegli ste dnevno omejitev (3) aktivnih rezervacij v sistemu.`,
-                key: 'error_daily_limit',
-                params: { limit: 3 }
-            });
-        }
+    if (uporabnikoveRezervacijeSkupaj >= 3) {
+        return res.status(400).json({ 
+            msg: "",
+            key: 'messages.error_daily_limit',
+            params: { limit: 3 }
+        });
+    }
         // =========================================================================
 
         const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
