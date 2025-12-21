@@ -471,8 +471,8 @@ exports.pridobiProsteUre = async (req, res) => {
 
 /**
  * Ustvarjanje nove rezervacije (POST /ustvari_rezervacijo)
- * 💥 POPRAVEK: Dinamično iskanje prve proste mize, ki ustreza kriterijem.
- * 🛡️ DODANO: Preprečevanje dvojnih rezervacij ob istem času IN omejitev na max 3/dan.
+ * 🛡️ STRIKTNA VERZIJA: Preprečuje prekrivanje v VSEH restavracijah hkrati.
+ * 🛡️ DNEVNA OMEJITEV: Max 3 aktivne rezervacije na dan (skupno v sistemu).
  * ⚠️ OPOZORILO: Funkcija 'seRezervacijiPrekrivata' mora biti dostopna v tem obsegu!
  */
 exports.ustvariRezervacijo = async (req, res) => {
@@ -487,8 +487,6 @@ exports.ustvariRezervacijo = async (req, res) => {
     }
     
     const uporabnikIdObject = new mongoose.Types.ObjectId(userId.toString());
-    
-    // 🔥 SPREMENJENO: ODSTRANILI SMO ZAHTEVO PO 'mizaId' IZ TELESA ZAHTEVE!
     const { restavracijaId, imeGosta, telefon, stevilo_oseb, datum, casStart, trajanjeUr } = req.body; 
     
     if (!restavracijaId || !imeGosta || !datum || !casStart) {
@@ -503,69 +501,76 @@ exports.ustvariRezervacijo = async (req, res) => {
         const trajanje = parseFloat(trajanjeUr) || 1.5;
         const casZacetka = parseFloat(casStart);
         const stOseb = parseInt(stevilo_oseb) || 2;
-        let prostaMizaId = null; 
-        let prostaMizaIme = null;
+
+        // =========================================================================
+        // 🛡️ GLOBALNI VARNOSTNI PREGLED: Preveri vse restavracije v bazi
+        // =========================================================================
         
-        // 1. Pridobi restavracijo in VSE njene mize
-        const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
+        // Poiščemo vse restavracije, kjer se pojavi uporabnikov ID na ta datum
+        const vseRestavracijeZRezervacijami = await Restavracija.find({
+            "mize.rezervacije": {
+                $elemMatch: {
+                    "uporabnikId": uporabnikIdObject,
+                    "datum": datum,
+                    "status": { $in: ['AKTIVNO', 'POTRJENO'] }
+                }
+            }
+        }).lean();
 
-        if (!restavracija) {
-            return res.status(404).json({ msg: 'Restavracija ni najdena.' });
-        }
+        let uporabnikoveRezervacijeSkupaj = 0;
 
-        // =========================================================================
-        // 🛡️ VARNOSTNI PREGLED: Dvojne rezervacije IN dnevna omejitev (max 3)
-        // =========================================================================
-        const vseMizeZaPreverjanje = restavracija.mize || [];
-        let uporabnikoveRezervacijeDanes = 0;
-
-        for (const miza of vseMizeZaPreverjanje) {
-            const obstojeceRezervacijeUporabnika = (miza.rezervacije || [])
-                .filter(rez => 
+        for (const rest of vseRestavracijeZRezervacijami) {
+            for (const miza of rest.mize) {
+                const rezUporabnika = (miza.rezervacije || []).filter(rez => 
                     rez.uporabnikId && 
                     rez.uporabnikId.toString() === userId.toString() && 
                     rez.datum === datum && 
                     !['ZAKLJUČENO', 'PREKLICANO'].includes(rez.status)
                 );
 
-            // Štejemo vse aktivne rezervacije uporabnika za ta dan
-            uporabnikoveRezervacijeDanes += obstojeceRezervacijeUporabnika.length;
+                uporabnikoveRezervacijeSkupaj += rezUporabnika.length;
 
-            for (const rez of obstojeceRezervacijeUporabnika) {
-                const rezTrajanje = rez.trajanjeUr || 1.5;
-                // Preverjanje časovnega prekrivanja z obstoječo funkcijo
-                if (seRezervacijiPrekrivata(casZacetka, trajanje, rez.casStart, rezTrajanje)) {
-                    return res.status(400).json({ 
-                        msg: `V tej restavraciji že imate aktivno rezervacijo ob ${rez.casStart}. Ne morete rezervirati več miz hkrati v istem terminu.` 
-                    });
+                for (const obstojeca of rezUporabnika) {
+                    const obstojeceTrajanje = obstojeca.trajanjeUr || 1.5;
+                    
+                    // Preverimo prekrivanje časa v katerikoli restavraciji
+                    if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojeca.casStart, obstojeceTrajanje)) {
+                        return res.status(400).json({ 
+                            msg: `Ob ${obstojeca.casStart} že imate rezervacijo v restavraciji "${rest.Ime || 'drugi restavraciji'}". Ne morete biti v dveh restavracijah hkrati!` 
+                        });
+                    }
                 }
             }
         }
 
-        // Preverjanje dnevne omejitve števila rezervacij
-        if (uporabnikoveRezervacijeDanes >= 3) {
+        // Preverjanje skupne dnevne omejitve (max 3 rezervacije v celem sistemu na dan)
+        if (uporabnikoveRezervacijeSkupaj >= 3) {
             return res.status(400).json({ 
-                msg: `Dosegli ste dnevno omejitev (največ 3) rezervacij v tej restavraciji za izbrani datum.` 
+                msg: `Dosegli ste dnevno omejitev (3) aktivnih rezervacij v sistemu.` 
             });
         }
         // =========================================================================
+
+        // 1. Pridobi ciljno restavracijo za iskanje mize
+        const restavracija = await Restavracija.findById(restavracijaId, 'mize').lean();
+        if (!restavracija) {
+            return res.status(404).json({ msg: 'Restavracija ni najdena.' });
+        }
         
-        // 2. ISKANJE PRVE PROSTE MIZE, KI USTREZA KRITERIJEM
+        // 2. ISKANJE PRVE PROSTE MIZE V CILJNI RESTAVRACIJI
+        let prostaMizaId = null; 
+        let prostaMizaIme = null;
         const vseMize = restavracija.mize || [];
         
         for (const miza of vseMize) {
-            if (miza.kapaciteta < stOseb) {
-                continue; 
-            }
+            if (miza.kapaciteta < stOseb) continue;
             
             let jeProsta = true;
-            const obstojeceRezervacije = (miza.rezervacije || [])
+            const zasedenostMize = (miza.rezervacije || [])
                 .filter(rez => rez.datum === datum && !['ZAKLJUČENO', 'PREKLICANO'].includes(rez.status)); 
             
-            for (const obstojecaRezervacija of obstojeceRezervacije) {
-                const obstojeceTrajanje = obstojecaRezervacija.trajanjeUr || 1.5;
-                
-                if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojecaRezervacija.casStart, obstojeceTrajanje)) {
+            for (const obstojecaRezervacija of zasedenostMize) {
+                if (seRezervacijiPrekrivata(casZacetka, trajanje, obstojecaRezervacija.casStart, obstojecaRezervacija.trajanjeUr || 1.5)) {
                     jeProsta = false; 
                     break;
                 }
@@ -573,19 +578,19 @@ exports.ustvariRezervacijo = async (req, res) => {
             
             if (jeProsta) {
                 prostaMizaId = miza._id.toString();
-                prostaMizaIme = miza.Miza || miza.ime || miza.naziv || `ID: ${miza._id.toString().substring(0, 4)}...`;
+                prostaMizaIme = miza.Miza || miza.ime || miza.naziv || `Miza ${miza._id.toString().substring(0, 4)}`;
                 break; 
             }
         }
         
         if (!prostaMizaId) {
              return res.status(409).json({ 
-                msg: `Žal nam je, ob ${casZacetka} ni proste mize, ki bi ustrezala ${stOseb} osebam.`,
+                msg: `Žal nam je, ob ${casZacetka} ni proste mize za ${stOseb} oseb.`,
                 status: "ZASEDNO"
             });
         }
         
-        // 5. Ustvarjanje rezervacije (za najdeno prosto mizo)
+        // 5. Ustvarjanje nove rezervacije
         const novaRezervacija = {
             uporabnikId: uporabnikIdObject,
             imeGosta,
@@ -603,13 +608,13 @@ exports.ustvariRezervacijo = async (req, res) => {
         );
 
         if (rezultat.modifiedCount === 0) {
-             return res.status(500).json({ msg: 'Napaka pri shranjevanju. Restavracija ali miza ni bila posodobljena.' });
+             return res.status(500).json({ msg: 'Napaka pri shranjevanju na strežnik.' });
         }
 
         res.status(201).json({ 
             msg: `Rezervacija uspešno ustvarjena za mizo ${prostaMizaIme} ob ${casZacetka}.`,
             rezervacija: novaRezervacija,
-            miza: prostaMizaIme 
+            miza: prostaMizaIme
         });
 
     } catch (error) {
