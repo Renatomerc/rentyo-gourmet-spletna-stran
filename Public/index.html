@@ -776,7 +776,7 @@
             font-size: 1rem; 
             font-weight: bold;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             
         }
         
@@ -807,21 +807,30 @@
             font-size: 1.1rem;
         }
         
-        /* Stil za navidezno oddaljenost */
-        .oddaljenost {
-            /* RAZDALJA: Order 2 (desno zgoraj, ob interni oceni) */
-            order: 2; 
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            margin-right: 5px;
-        }
-        .oddaljenost i {
-            color: #1f1f1f; /* Ikona v modri barvi */
-        }
+       /* Stil za navidezno oddaljenost - desno spodaj */
+.oddaljenost {
+    /* Odstranimo order, ker bomo uporabili margin-left: auto v footerju */
+    font-size: 0.9rem;
+    font-weight: 600; /* Malo manj krepko kot prej za boljši izgled */
+    color: #575757;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* Margin-top tukaj ni več potreben, ker ga ureja footer */
+}
+
+.oddaljenost i {
+    color: #076B6A; /* Uporabimo tvojo temno zeleno za ikono lokacije */
+    font-size: 1rem;
+}
+
+/* Dodaj še tole za footer, če ga še nimaš */
+.kartica-footer {
+    display: flex;
+    justify-content: flex-end; /* Poravna vsebino na desno */
+    margin-top: auto; /* Potisne celoten footer na dno kartice */
+    padding-top: 8px;
+}
 
         /* Stil za Google oceno na kartici */
         .kartica .google-ocena {
@@ -845,39 +854,7 @@
         }
 
 
-        /* Stil za polje razpoložljivosti (Ostane na dnu) */
-        .razpolozljivost-ovoj {
-            margin-top: auto; /* Pritisne ga na dno */
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0px;
-            border-radius: 6px;
-            background-color: white; /* Svetlo zeleno/turkizno ozadje */
-            border: 1px solid white;
-        }
-
-        .razpolozljivost-ovoj strong {
-            font-size: 0.85rem;
-            color: #555;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .razpolozljivost-ovoj span {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #1a9e9a; /* Temnejša zelena/turkizna */
-        }
-
-        .razpolozljivost-ovoj.zasedeno {
-             background-color: white; /* Svetlo rdeče ozadje */
-             border: 1px solid white;
-        }
-
-        .razpolozljivost-ovoj.zasedeno span {
-            color: #dc3545; 
-        }
+     
         
         /* Gumb rezervacija (če bi bil) */
         .gumb-rezervacija {
@@ -1654,24 +1631,34 @@
         transition: background-color 0.2s, border-color 0.2s;
         font-size: 14px;
         flex-shrink: 0;
-        /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+        /* 👇 ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
     }
 
     .gumb-ura:hover {
         background-color: #169B99;
-        border: 1px solid #169B99; /* Rdeč rob kot poudarek */
-    
+        border: 1px solid #169B99; 
+        color: white; /* Dodano, da je tekst ob hoverju bolj berljiv */
     }
 
     /* Stil za izbran gumb ure */
     .gumb-ura.selected {
-        background-color: #169B99; /* Barva poudarka */
-        color: #333;
+        background-color: #169B99; 
+        color: white;
         border-color: #169B99;
         font-weight: bold;
+    }
+
+    /* 🔥 NOVO: Stil za pretekle termine (posiveni in onemogočeni) 🔥 */
+    .gumb-ura.termin-pretekel {
+        background-color: #f2f2f2 !important; /* Svetlo siva podlaga */
+        color: #b0b0b0 !important;            /* Siva barva besedila */
+        border: 1px solid #ddd !important;     /* Nežen rob */
+        cursor: not-allowed !important;        /* Pokaže ikono za prepoved */
+        opacity: 0.6;                          /* Rahlo prosojno */
+        pointer-events: none;                  /* Popolnoma onemogoči klike */
+        box-shadow: none !important;
     }
  /* =================================================== */
 /* GLOBALNI STILI ZA NOGO (veliki zasloni) */
@@ -2644,85 +2631,96 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
     color: #ccc !important;
     opacity: 0.7;
 }
-/* Vaša obstoječa (pravilna) koda za PRIVZETO SKRIVANJE */
+/* 📱 POSODOBLJENO ZA FIKSNO VRSTICO BREZ TRZANJA 📱 */
 #capacitorTaskbar {
-    display: none !important; 
+    /* Namesto display: none uporabimo flex, da je element vedno pripravljen */
+    display: flex !important; 
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    /* Povečamo višino, da se prilega poudarjen gumb */
     height: 65px; 
     background-color: #076b6a;
-    /* Uporabimo bolj subtilno/čisto senco za modern videz */
     border-top: none; 
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1); 
     z-index: 1000;
+    
+    /* Centriranje elementov */
+    justify-content: space-around; 
+    align-items: center;
+
+    /* 🚀 STROJNO POSPEŠEVANJE: Prepreči trzanje med menjavo strani */
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    will-change: transform;
 }
 
-/* 🌟 KLJUČNA NOV KOS KODE: Prikaz in oblikovanje za mobilno aplikacijo! 🌟 */
+/* Skrijemo vrstico na velikih zaslonih (računalnikih), da ne kvari spletne strani */
+@media (min-width: 992px) {
+    #capacitorTaskbar {
+        display: none !important;
+    }
+}
+
+/* Ohranimo tvoj is-mobile razred za vsak slučaj, če ga JS še vedno dodaja */
 #capacitorTaskbar.is-mobile {
     display: flex !important; 
-    justify-content: space-around; 
-    align-items: center; 
 }
 
-/* Stil za posamezen element znotraj vrstice */
+/* --- Stil za posamezen element znotraj vrstice --- */
 .taskbar-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    color: #ededed; /* Barva neaktivne ikone */
+    color: #ededed;
     font-size: 0.7rem;
     font-weight: 500;
-    padding: 5px 0; /* POPRAVEK: Odstranimo horizontalni padding, da ima besedilo več prostora */
-    /* Povečamo manjšo fleksibilnost in ciljno območje */
+    padding: 5px 0;
     flex-grow: 1; 
     max-width: 25%;
     transition: color 0.3s;
 }
 
-/* 🌟 POPRAVEK: Stil za IKONO znotraj taskbar-item 🌟 */
-/* To zagotovi, da so ikone večje in bolj izrazite */
+/* Stil za IKONO znotraj taskbar-item */
 .taskbar-item i {
-    font-size: 1.4rem; /* Poveča velikost same ikone */
-    margin-bottom: 2px; /* Doda malo prostora med ikono in besedilom */
+    font-size: 1.4rem;
+    margin-bottom: 2px;
     line-height: 1; 
 }
 
-/* Aktivni element ali poudarek (za Domov/Aktivno) */
+/* Aktivni element */
 .taskbar-item.active,
 .taskbar-item:hover {
-    color: #ededed; /* Modra akcentna barva (prilagodite!) */
+    color: #ededed;
 }
 
 /* ---------------------------------------------------- */
-/* 🚀 NOVI STILI ZA SREDINSKI GUMB "SCAN & EARN" 🚀 */
+/* 🚀 STILI ZA SREDINSKI GUMB "SCAN & EARN" 🚀 */
 /* ---------------------------------------------------- */
 
 .scan-btn-ovoj {
-    /* To ustvari prostor nad navigacijo, kot na sliki */
     margin-top: -30px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80px; /* Širina za polkrog */
-    height: 80px; /* Višina za polkrog */
+    width: 80px;
+    height: 80px;
+    /* Tudi tukaj dodamo stabilnost */
+    transform: translateZ(0);
 }
 
 .scan-btn {
-    /* Stil za sam gumb/krog */
     display: flex;
     justify-content: center;
     align-items: center;
     width: 60px; 
     height: 60px;
-    border-radius: 50%; /* Naredi krog */
-    background-color: #88d82d; /* Modra barva ozadja (prilagodite!) */
+    border-radius: 50%;
+    background-color: #88d82d;
     color: #2e2e2e;
-    box-shadow: 0 4px 10px rgba(39, 39, 39, 0.339); /* Poudarjena senca */
-    font-size: 1.6rem; /* POPRAVEK: Povečana velikost ikone */
+    box-shadow: 0 4px 10px rgba(39, 39, 39, 0.339);
+    font-size: 1.6rem;
     text-decoration: none;
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -4197,12 +4195,12 @@ body.is-capacitor-app #aiChatModal {
     </a>
     
     <div class="scan-btn-ovoj">
-        <a href="profil.html#aktualne-rezervacije" class="scan-btn" title="Aktualne rezervacije (Scan & Earn)">
+        <a href="profil.html#aktualne-rezervacije" class="scan-btn" title="Aktualne rezervacije (Scan & Earn)" onclick="if(!(localStorage.getItem('zeton')||localStorage.getItem('authToken'))){return false;}">
             <i class="fas fa-qrcode"></i> 
         </a>
     </div>
 
-    <a href="profil.html#priljubljene" class="taskbar-item">
+    <a href="profil.html#priljubljene" class="taskbar-item" onclick="if(!(localStorage.getItem('zeton')||localStorage.getItem('authToken'))){return false;}">
         <i class="fas fa-heart"></i>
     </a>
     
@@ -5608,116 +5606,134 @@ i18next.on('languageChanged', () => {
     createModalPicker();
 });
 
+if (gumbRezervirajModal) {
+    gumbRezervirajModal.onclick = null; 
+    gumbRezervirajModal.addEventListener('click', () => {
+        
+        const izbranDatum = modalDatumInput ? modalDatumInput.value : null; 
+        const steviloOseb = modalOsebeInput ? modalOsebeInput.value : null;
 
-    if (gumbRezervirajModal) {
-        gumbRezervirajModal.onclick = null; 
-        gumbRezervirajModal.addEventListener('click', () => {
+        if (globalSelectedTime && globalSelectedMizaId) { // Če je čas in miza že izbrana
+            odpriDurationModal();
+            return;
+        }
+
+        if (!currentRestaurantId) {
+            const errorMsg = i18next.t('messages.no_restaurant_selected') || 'Restavracija ni izbrana.';
+            if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p style="color: red;">${errorMsg}</p>`;
+            return;
+        }
+
+        if (!izbranDatum) {
+            const warningMsg = i18next.t('messages.select_reservation_date') || 'Prosimo, izberite datum.';
+            if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p style="color: red;">${warningMsg}</p>`;
+            return;
+        }
+        
+        if(prosteUreRezultati) {
+            prosteUreRezultati.innerHTML = '';
+            prosteUreRezultati.innerHTML = `<p data-i18n="messages.loading_availability">....</p>`;
+        }
+        
+        const datumZaBackend = formatirajDatumZaBackend(izbranDatum); 
+
+        const dataToSend = {
+            restavracijaId: currentRestaurantId,
+            datum: datumZaBackend, 
+            stevilo_oseb: parseInt(steviloOseb),
+        };
+        
+        if (!datumZaBackend) {
+             console.error("Neveljaven datum za backend:", izbranDatum);
+             if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p class="alert alert-danger">Napaka: Neveljaven datum format. Izberite ponovno.</p>`;
+             return;
+        }
+
+        fetch(`${API_BASE_URL}/restavracije/proste_ure`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Klic neuspešen - Status:', response.status, 'Odgovor strežnika:', errorText);
+                throw new Error(i18next.t('messages.server_error_detailed', { status: response.status }) || `Napaka strežnika: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
             
-            const izbranDatum = modalDatumInput ? modalDatumInput.value : null; 
-            const steviloOseb = modalOsebeInput ? modalOsebeInput.value : null;
-
-            if (globalSelectedTime && globalSelectedMizaId) { // Če je čas in miza že izbrana
-                odpriDurationModal();
-                return;
-            }
-
-            if (!currentRestaurantId) {
-                const errorMsg = i18next.t('messages.no_restaurant_selected') || 'Restavracija ni izbrana.';
-                if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p style="color: red;">${errorMsg}</p>`;
-                return;
-            }
-
-            if (!izbranDatum) {
-                const warningMsg = i18next.t('messages.select_reservation_date') || 'Prosimo, izberite datum.';
-                if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p style="color: red;">${warningMsg}</p>`;
-                return;
-            }
+            let ureHTML = '';
             
-            if(prosteUreRezultati) {
-                prosteUreRezultati.innerHTML = '';
-                prosteUreRezultati.innerHTML = `<p data-i18n="messages.loading_availability">Preverjam razpoložljivost...</p>`;
-            }
+            // --- LOGIKA ZA PREVERJANJE TRENUTNEGA ČASA ---
+            const zdaj = new Date();
+            const trenutnaUraDecimal = zdaj.getHours() + (zdaj.getMinutes() / 60);
             
-            const datumZaBackend = formatirajDatumZaBackend(izbranDatum); 
+            // Za primerjavo datuma uporabimo format YYYY-MM-DD
+            // Predvidevamo, da 'datumZaBackend' vrača ta format
+            const danesString = zdaj.toISOString().split('T')[0]; 
+            // --------------------------------------------
 
-            const dataToSend = {
-                restavracijaId: currentRestaurantId,
-                datum: datumZaBackend, 
-                stevilo_oseb: parseInt(steviloOseb),
-            };
-            
-            if (!datumZaBackend) {
-                 console.error("Neveljaven datum za backend:", izbranDatum);
-                 if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p class="alert alert-danger">Napaka: Neveljaven datum format. Izberite ponovno.</p>`;
-                 return;
-            }
-
-            fetch(`${API_BASE_URL}/restavracije/proste_ure`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSend)
-            })
-            .then(async response => {
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('API Klic neuspešen - Status:', response.status, 'Odgovor strežnika:', errorText);
-                    throw new Error(i18next.t('messages.server_error_detailed', { status: response.status }) || `Napaka strežnika: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
+            if (data.mize && data.mize.length > 0) {
+                const prikazaneUre = new Set();
+                ureHTML += `<p style="margin-bottom: 10px;" data-i18n="messages.available_times_found">Na voljo proste ure za ${izbranDatum}:</p>`;
+                ureHTML += '<div class="gumbi-proste-ure">';
                 
-                let ureHTML = '';
-                
-                if (data.mize && data.mize.length > 0) {
-                    const prikazaneUre = new Set();
-                    ureHTML += `<p style="margin-bottom: 10px;" data-i18n="messages.available_times_found">Na voljo proste ure za ${izbranDatum}:</p>`;
-                    ureHTML += '<div class="gumbi-proste-ure">';
-                    
-                    data.mize.forEach(miza => {
-                        if (miza.prosteUre) { 
-                             miza.prosteUre.forEach(ura => {
-                                const uraFloat = parseFloat(ura);
-                                const ure = Math.floor(uraFloat);
-                                const minute = Math.round((uraFloat - ure) * 60);
-                                const uraFormat = `${ure.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+                data.mize.forEach(miza => {
+                    if (miza.prosteUre) { 
+                         miza.prosteUre.forEach(ura => {
+                            const uraFloat = parseFloat(ura);
+                            const ure = Math.floor(uraFloat);
+                            const minute = Math.round((uraFloat - ure) * 60);
+                            const uraFormat = `${ure.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+                            
+                            const mizaIdValue = miza.mizaId || miza._id || null; 
+                            
+                            // Prikažemo vse edinstvene ure, ne glede na mizo.
+                            if (!prikazaneUre.has(uraFormat) && mizaIdValue) {
+                                const mizaIme = miza.ime || 'Miza'; 
                                 
-                                const mizaIdValue = miza.mizaId || miza._id || null; 
+                                // 🔥 PREVERJANJE: Ali je termin že pretekel?
+                                let dodatniRazred = "";
+                                let onemogocenAtribut = "";
                                 
-                                // Prikažemo vse edinstvene ure, ne glede na mizo.
-                                if (!prikazaneUre.has(uraFormat) && mizaIdValue) {
-                                    const mizaIme = miza.ime || 'Miza'; 
-                                    
-                                    // Gumbu dodamo ID mize, da vemo, katero mizo rezerviramo
-                                    ureHTML += `<button type="button" class="gumb-ura" data-time="${uraFormat}" data-miza-id="${mizaIdValue}" data-miza-ime="${mizaIme}">${uraFormat}</button>`;
-                                    
-                                    prikazaneUre.add(uraFormat);
+                                // Če je izbran danes in je ura termina manjša od trenutne ure (+15 min rezerve)
+                                if (datumZaBackend === danesString && uraFloat < (trenutnaUraDecimal + 0.25)) {
+                                    dodatniRazred = " termin-pretekel";
+                                    onemogocenAtribut = " disabled";
                                 }
-                            });
-                        }
-                    });
 
-                    ureHTML += '</div>';
-                    
-                } else {
-                    ureHTML = `<p class="alert alert-warning">${data.msg || i18next.t('messages.no_times_available') || 'Na žalost ni prostih ur.'}</p>`;
-                }
-                
-                if(prosteUreRezultati) prosteUreRezultati.innerHTML = ureHTML;
-                updateContent(); 
-                setupTimeSlotListeners(); 
+                                // Gumbu dodamo ID mize in morebitne atribute za onemogočanje
+                                ureHTML += `<button type="button" class="gumb-ura${dodatniRazred}"${onemogocenAtribut} data-time="${uraFormat}" data-miza-id="${mizaIdValue}" data-miza-ime="${mizaIme}">${uraFormat}</button>`;
+                                
+                                prikazaneUre.add(uraFormat);
+                            }
+                        });
+                    }
+                });
 
-            })
-            .catch(error => {
+                ureHTML += '</div>';
                 
-                console.error('Končna napaka pri pridobivanju prostih ur:', error.message);
-                
-                const errorMsg = error.message.includes('messages.server_error') 
-                    ? error.message 
-                    : (i18next.t('messages.server_error') || 'Napaka strežnika pri preverjanju ur.'); 
-                
-                if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p class="alert alert-danger">${errorMsg}</p>`;
-            });
+            } else {
+                ureHTML = `<p class="alert alert-warning">${data.msg || i18next.t('messages.no_times_available') || 'Na žalost ni prostih ur.'}</p>`;
+            }
+            
+            if(prosteUreRezultati) prosteUreRezultati.innerHTML = ureHTML;
+            updateContent(); 
+            setupTimeSlotListeners(); 
+
+        })
+        .catch(error => {
+            
+            console.error('Končna napaka pri pridobivanju prostih ur:', error.message);
+            
+            const errorMsg = error.message.includes('messages.server_error') 
+                ? error.message 
+                : (i18next.t('messages.server_error') || 'Napaka strežnika pri preverjanju ur.'); 
+            
+            if(prosteUreRezultati) prosteUreRezultati.innerHTML = `<p class="alert alert-danger">${errorMsg}</p>`;
+        });
             
         });
     }
@@ -5882,53 +5898,41 @@ function renderCard(restavracija) {
          oddaljenostHTML = `<span class="oddaljenost" data-i18n="results.distance_unknown" style="opacity: 0.7;"><i class="fas fa-location-arrow"></i> ${oddaljenostKm}</span>`;
     }
     
-    // 1. Uporabimo dejanske podatke iz backenda (brez Math.random)
-    const status = restavracija.razpolozljivost_status; 
+    // --- LOGIKA RAZPOLOŽLJIVOSTI (Ohranjena v ozadju za kasnejšo uporabo) ---
+    const status = restavracija.razpolozljivost_status || 'available';
     const cas = restavracija.razpolozljivost_cas || '19:00';
-    
     let razpolozljivostTextKey;
-    let isAvailable = false;
+    let isAvailable = true;
     
-    // 2. Logika za določanje besedila in vizualnega stanja
     if (status === 'available') {
         razpolozljivostTextKey = i18next.t('results.available_today', { time: cas });
-        isAvailable = true;
     } else if (status === 'tomorrow') {
         razpolozljivostTextKey = i18next.t('results.available_tomorrow', { time: cas });
         isAvailable = false; 
     } else {
-        // Če je vse zasedeno ali status ni definiran
         razpolozljivostTextKey = i18next.t('results.unavailable');
         isAvailable = false;
     }
+    // ----------------------------------------------------------------------
 
-    // 3. Generiranje HTML-ja z ustreznimi razredi in i18n atributi
-    const razpolozljivostHTML = `
-        <div class="razpolozljivost-ovoj ${!isAvailable ? 'zasedeno' : ''}">
-            <p data-i18n="${status === 'available' ? 'results.available_today' : (status === 'tomorrow' ? 'results.available_tomorrow' : 'results.unavailable')}" 
-               data-i18n-options='{"time": "${cas}"}'>
-               ${razpolozljivostTextKey}
-            </p>
-        </div>
-    `;
-    
-    // Kartica HTML
+    // Kartica HTML (Brez razpolozljivostHTML)
     card.innerHTML = `
-        <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_URL}';">
-        <div class="kartica-vsebina">
-            <h3>${restavracijaIme}</h3>
-            
-            <div class="info-ocena-oddaljenost">
-                <p class="ocena">${ratingDisplay}</p>
-                
-                ${googleRatingHTML} 
-                
+    <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_URL}';">
+    <div class="kartica-vsebina">
+        <h3>${restavracijaIme}</h3>
+        
+        <div class="info-ocene-vrstica">
+            <p class="ocena">${ratingDisplay}</p>
+            ${googleRatingHTML} 
+        </div>
+
+        <div class="kartica-footer">
+            <div class="razdalja-container">
                 ${oddaljenostHTML}
             </div>
-            
-            ${razpolozljivostHTML} 
         </div>
-    `;
+    </div>
+`;
     
     card.addEventListener('click', (e) => {
         if (e.target.classList.contains('gumb-rezervacija')) {

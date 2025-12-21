@@ -6,6 +6,18 @@ apply plugin: 'com.google.gms.google-services'
 android {
     namespace "eu.rentyo.rentyo"
     compileSdk rootProject.ext.compileSdkVersion
+
+    // 🔑 NOVO: Konfiguracija tvojega ključa za podpisovanje
+    signingConfigs {
+        release {
+            // Datoteko s ključem (.jks) skopiraj v mapo android/app/
+            storeFile file('/Users/renato/Desktop/Rentyo-gourmet-spletna-stran/android/app/moj-podpis.jks') 
+            storePassword 'Pioneer18'     // <--- Vpiši geslo, ki si ga določil
+            keyAlias 'key0'                 // <--- Vpiši alias (običajno key0)
+            keyPassword 'Pioneer18'       // <--- Vpiši geslo za ključ
+        }
+    }
+
     defaultConfig {
         applicationId "eu.rentyo.rentyo"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -15,12 +27,15 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+
     buildTypes {
         release {
+            // 👈 TO POVEŽE ZGORNJI KLJUČ Z RELEASE VERZIJO
+            signingConfig signingConfigs.release 
+            
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -45,14 +60,12 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
 
     // 🔥 KLJUČNI POPRAVEK: Uporaba BUNDLED ML Kit knjižnice. 
-    // Ta vključi modul neposredno v APK, brez zanašanja na Google Play Services.
     implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 }
 
-// ⚠️ DODANA STRATEGIJA ZA RAZREŠEVANJE KONFLIKTOV GMS (Google Mobile Services)
+// ⚠️ DODANA STRATEGIJA ZA RAZREŠEVANJE KONFLIKTOV GMS
 configurations.all {
     resolutionStrategy {
-        // Forsiranje najnovejše različice storitev Google Play Base za rešitev morebitnih konfliktov med Firebase in ML Kit
         force 'com.google.android.gms:play-services-base:18.2.0' 
     }
 }

@@ -2,43 +2,52 @@ package eu.rentyo.rentyo;
 
 import android.os.Bundle;
 import android.os.Build;
-import android.view.View;
+import android.os.Handler;
 import android.view.WindowInsetsController;
-// ⭐ Potrebna uvoza
-import android.graphics.Color; // Dodajte, če ga še nimate
+import android.graphics.Color;
 
 import androidx.core.view.WindowCompat;
+import androidx.core.splashscreen.SplashScreen; // ⭐ Potrebno za nadzor logotipa
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
+    // Spremenljivka, ki pove Androidu, ali naj še kaže logotip
+    private boolean keepSplashOn = true;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // 1. Inicializacija novega Android 12+ Splash Screen API-ja
+        // Ta vrstica MORA biti pred super.onCreate
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         
-        // ⭐ 1. Nastavitev barve DECOR VIEW (to že imate in je pravilno) ⭐
+        // Nastavimo pogoj: dokler je keepSplashOn true, logotip NE izgine
+        splashScreen.setKeepOnScreenCondition(() -> keepSplashOn);
+
+        // Po 3 sekundah (3000ms) spremenimo v false, da se logotip umakne
+        new Handler().postDelayed(() -> {
+            keepSplashOn = false;
+        }, 3000);
+
+        // Nastavitev ozadja
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
              getWindow().getDecorView().setBackgroundColor(0xFF076B6A);
         }
         
-        super.onCreate(savedInstanceState); // Inicializacija Capacitorjevega 'bridge'
+        super.onCreate(savedInstanceState);
 
-        // ⭐ 2. KLJUČNA NOVITETA: NASTAVITEV BARVE OZADJA SAMEMU WebViewu ⭐
-        // Ta koda se izvede po inicializaciji mostu (bridge).
-        // 0xFF076B6A je ARGB koda za vašo turkizno barvo.
+        // Barva za WebView pod aplikacijo
         if (this.bridge != null && this.bridge.getWebView() != null) {
             this.bridge.getWebView().setBackgroundColor(0xFF076B6A);
         }
 
-        // 1. Izklopi edge-to-edge, da app NE gre pod status bar
+        // Status bar nastavitve
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
-
-        // 2. Nastavi barvo status bara na #076B6A
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(0xFF076B6A);
         }
-        // ... ostala koda ...
         
-        // 3. Nastavi BELE ikone v status baru
+        // Bele ikone v status baru
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
@@ -48,7 +57,6 @@ public class MainActivity extends BridgeActivity {
                 );
             }
         } else {
-            // Na starejših Android verzijah odstrani LIGHT_STATUS_BAR flag (bele ikone)
             getWindow().getDecorView().setSystemUiVisibility(0);
         }
     }

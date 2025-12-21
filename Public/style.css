@@ -447,7 +447,7 @@ body.is-capacitor .iskalnik-sekcija {
     display: flex;
     flex-direction: column;
     /* Prilagojena višina za bolj pravokoten videz na namizju */
-    height: 350px; 
+    height: 310px; 
 }
 
 .kartica:hover {
@@ -463,7 +463,7 @@ body.is-capacitor .iskalnik-sekcija {
 
 .kartica h3 {
     /* Zmanjšana velikost in padding */
-    padding: 10px 10px 3px; 
+    padding: 10px 5px 3px; 
     font-size: 1.15em; /* Zmanjšan naslov */
     color: #0c3c36;
 }
@@ -720,7 +720,7 @@ body.is-capacitor .iskalnik-sekcija {
     
     .kartica h3 {
         font-size: 0.9em; /* Še manjši naslov */
-        padding: 8px 10px 3px; 
+        padding: 8px 5px 3px; 
     }
     
     .kartica p {
@@ -874,36 +874,39 @@ body.is-capacitor .iskalnik-sekcija {
 /* Gumb za zapiranje */
 .close-btn {
     color: #333;
-    float: right;
-    font-size: 35px;
+    font-size: 30px; /* Rahlo zmanjšano za boljšo optično sredino v 50px krogu */
     font-weight: 300;
     
     /* 🔥 SPREMEMBA ZA BELO OKROGLO OZADJE (50px) 🔥 */
-    background-color: rgba(255, 255, 255, 0.775); /* Belo ozadje */
-    width: 50px; /* Fiksna širina */
-    height: 50px; /* Fiksna višina */
-    border-radius: 50%; /* Naredi popoln krog */
+    background-color: rgba(255, 255, 255, 0.85); /* Malo bolj polna bela za boljšo vidnost */
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%; 
     
     border: none;
     cursor: pointer;
-    position: absolute; /* Postavitev v kot modalnega okna */
-    top: 10px;
+    position: absolute; 
+    top: 10px; /* Malo več odmika od roba za moderen izgled */
     right: 10px;
     z-index: 9999; 
     
- /* 🔥🔥🔥 POPRAVEK: VIZUALNO CENTRIRANJE ZNAKA 'X' 🔥🔥🔥 */
-    line-height: 1; /* Zagotovi, da osnovna višina vrstice ne vpliva */
-    padding-bottom: 6px; /* Doda 2px navpičnega premika, odvisno od pisave */
-    /* Opcijsko: lahko uporabite tudi: transform: translateY(-1px); */
+    /* 🔥🔥🔥 POPRAVEK: AVTOMATSKO CENTRIRANJE (Flexbox) 🔥🔥🔥 */
+    display: flex;
+    align-items: center;    /* Vertikalno centriranje */
+    justify-content: center; /* Horizontalno centriranje */
+    line-height: 0;         /* Prepreči brskalniku dodajanje višine vrstice */
+    padding: 0;             /* Odstranjeni vsi ročni zamiki */
+    
+    /* Opcijsko: doda senco, da gumb "skoči" ven iz zemljevida */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .close-btn:hover,
 .close-btn:focus {
     color: #000;
+    background-color: rgba(255, 255, 255, 1);
     text-decoration: none;
     cursor: pointer;
-    /* Opcijsko: dodajte rahlo senco za poudarek ob hoverju, če želite */
-    /* box-shadow: 0 0 5px rgba(0,0,0,0.3); */
 }
 
 #large-map-container {

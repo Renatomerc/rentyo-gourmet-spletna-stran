@@ -921,15 +921,10 @@ body::before {
         let scanStatusElement = document.getElementById('scan-status');
 
 
-        // ===========================================
+       // ===========================================
         // 1. FUNKCIJA ZA PRIKAZ SPOROČIL
         // ===========================================
         
-        /**
-         * Prikazuje sporočilo o uspehu ali napaki na vrhu strani.
-         * @param {string} tip 'success' ali 'error'
-         * @param {string} sporocilo Besedilo sporočila
-         */
         const prikaziSporocilo = (tip, sporocilo) => {
             if (!sporociloOvoj) return console.error('Sporočilo Ovoj element ni najden.');
             
@@ -939,10 +934,8 @@ body::before {
 
             sporociloOvoj.appendChild(sporociloDiv);
             
-            // Pokaži sporočilo
             setTimeout(() => sporociloDiv.classList.add('visible'), 10);
 
-            // Skrij in odstrani po 5 sekundah
             setTimeout(() => {
                 sporociloDiv.classList.remove('visible');
                 setTimeout(() => {
@@ -954,61 +947,11 @@ body::before {
         };
 
         // ===========================================
-// 1. CENTRALNA FUNKCIJA ZA AKTIVACIJO ZAVIHKA
-// ===========================================
-function aktivirajZavihek(targetId) {
-    const zavihki = document.querySelectorAll(".profil-zavihek");
-    const vsebine = document.querySelectorAll(".vsebina-zavihek");
-
-    if (!targetId) return;
-
-    zavihki.forEach(z => z.classList.remove("active"));
-    vsebine.forEach(v => v.classList.remove("active"));
-
-    const ciljniZavihek = document.querySelector(`.profil-zavihek[data-target="${targetId}"]`);
-    const ciljnaVsebina = document.getElementById(targetId);
-
-    if (ciljniZavihek && ciljnaVsebina) {
-        ciljniZavihek.classList.add("active");
-        ciljnaVsebina.classList.add("active");
-
-        // Posebna logika za Priljubljene
-        if (targetId === 'priljubljene') {
-            naloziPriljubljeneRestavracije();
-        }
-    }
-}
-
-// ===========================================
-// 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov
-// ===========================================
-const zavihki = document.querySelectorAll(".profil-zavihek");
-const vsebine = document.querySelectorAll(".vsebina-zavihek");
-
-zavihki.forEach(zavihek => {
-    zavihek.addEventListener("click", () => {
-        const targetId = zavihek.getAttribute("data-target");
-        aktivirajZavihek(targetId);
-    });
-});
-
-
-
+        // 🚀 NOVO: GLOBALNA FUNKCIJA ZA STREŽNIK (Mora biti pred skenerjem!)
         // ===========================================
-        // 🚀 2.5. LOGIKA ZA SKENIRANJE QR KODE (ML KIT) 🚀
-        // ===========================================
-
-        // UI cleanup (ML Kit ne uporablja stopScan ali showBackground!)
-        const stopHighlight = async () => { 
-            // Ta funkcija je v ML Kit skeniranju prazna, a jo pustimo za kompatibilnost
-            document.body.classList.remove('barcode-scanner-active');
-        };
-
-
-        /**
-         * 1. Pošlje restavracijaId na strežnik
-         */
-        const potrdiPrihodNaStrežniku = async (restavracijaId) => {
+        
+        window.potrdiPrihodNaStrežniku = async (restavracijaId) => {
+            // Uporabimo zeton, ki ga tvoj krmilnik zahteva za req.uporabnik.id
             if (!zeton) {
                 prikaziSporocilo('error', i18next.t('profile.auth_required'));
                 return;
@@ -1040,54 +983,83 @@ zavihki.forEach(zavihek => {
                         scanStatusElement.style.color = 'green';
                     }
 
-                    naloziPodatkeProfila();
-                    naloziAktivneRezervacije();
-                    naloziPretekleRezervacije();
+                    // Osvežimo podatke na profilu (tvoj krmilnik bo dodal 50 točk)
+                    if (typeof naloziPodatkeProfila === 'function') naloziPodatkeProfila();
+                    if (typeof naloziAktivneRezervacije === 'function') naloziAktivneRezervacije();
 
                 } else {
                     const errorMsg = i18next.t('profile.status_error') + `: ${data.msg}`;
                     prikaziSporocilo('error', errorMsg);
-
-                    if (scanStatusElement) {
-                        scanStatusElement.textContent = errorMsg;
-                        scanStatusElement.style.color = 'red';
-                    }
+                    if (scanStatusElement) scanStatusElement.textContent = errorMsg;
                 }
 
             } catch (error) {
+                console.error("Napaka pri komunikaciji:", error);
                 prikaziSporocilo('error', i18next.t('profile.server_error'));
-
-                if (scanStatusElement) {
-                    scanStatusElement.textContent = i18next.t('profile.server_error_short') || 'Napaka strežnika.';
-                    scanStatusElement.style.color = 'red';
-                }
             }
-
-            await stopHighlight(); 
         };
 
+        // ===========================================
+        // 1. CENTRALNA FUNKCIJA ZA AKTIVACIJO ZAVIHKA
+        // ===========================================
+        function aktivirajZavihek(targetId) {
+            const zavihki = document.querySelectorAll(".profil-zavihek");
+            const vsebine = document.querySelectorAll(".vsebina-zavihek");
 
-        /**
-         * 2. ML Kit skeniranje
-         */
+            if (!targetId) return;
+
+            zavihki.forEach(z => z.classList.remove("active"));
+            vsebine.forEach(v => v.classList.remove("active"));
+
+            const ciljniZavihek = document.querySelector(`.profil-zavihek[data-target="${targetId}"]`);
+            const ciljnaVsebina = document.getElementById(targetId);
+
+            if (ciljniZavihek && ciljnaVsebina) {
+                ciljniZavihek.classList.add("active");
+                ciljnaVsebina.classList.add("active");
+
+                if (targetId === 'priljubljene') {
+                    naloziPriljubljeneRestavracije();
+                }
+            }
+        }
+
+        // ===========================================
+        // 2. OSNOVNA LOGIKA ZA MENJAVO ZAVIHkov
+        // ===========================================
+        const zavihkiGumbi = document.querySelectorAll(".profil-zavihek");
+        zavihkiGumbi.forEach(zavihek => {
+            zavihek.addEventListener("click", () => {
+                const targetId = zavihek.getAttribute("data-target");
+                aktivirajZavihek(targetId);
+            });
+        });
+
+        // ===========================================
+        // 3. ML Kit skeniranje - KONČNA POSODOBLJENA VERZIJA
+        // ===========================================
         const zacniSkeniranje = async () => {
-            
             if (!isCapacitorApp) {
                 prikaziSporocilo('error', i18next.t('profile.scan_unavailable'));
                 return;
             }
 
-            // Uporabimo Capacitor objekt, ki je globalno dostopen
             const { BarcodeScanner } = Capacitor.Plugins;
 
             try {
+                if (scanStatusElement) {
+                    scanStatusElement.textContent = "Priprava skenerja..."; 
+                }
                 
-                // 1. Preverjanje dovoljenj
+                try {
+                    await BarcodeScanner.installGoogleBarcodeScannerModule();
+                } catch (installError) {
+                    console.log("Modul je že nameščen.");
+                }
+
                 const permissions = await BarcodeScanner.requestPermissions();
-                
                 if (permissions.camera !== 'granted') {
-                     const msg = i18next.t('profile.camera_permission_required') || 'Za skeniranje je potrebno dovoljenje za kamero.';
-                     prikaziSporocilo('error', msg);
+                     prikaziSporocilo('error', i18next.t('profile.camera_permission_required'));
                      return; 
                 }
                 
@@ -1096,46 +1068,28 @@ zavihki.forEach(zavihek => {
                     scanStatusElement.style.color = '#1BC0BB';
                 }
 
-                // 2. Native ML Kit Activity
                 const result = await BarcodeScanner.scan(); 
                 
-                await stopHighlight();
-                
-                // Preverjanje result.barcodes[0]
                 if (!result.barcodes || result.barcodes.length === 0 || !result.barcodes[0].rawValue) {
-                    const msg = i18next.t('profile.scan_cancelled') || 'Skeniranje preklicano ali neuspešno.';
-                    prikaziSporocilo('error', msg);
-                    if (scanStatusElement) scanStatusElement.textContent = msg;
+                    if (scanStatusElement) scanStatusElement.textContent = ""; 
                     return;
                 }
 
-                // Pravilno pridobivanje rawValue iz tabelary result.barcodes
                 const rawValue = result.barcodes[0].rawValue; 
-                
-                // 3. Čiščenje in Validacija
-                let restavracijaId = rawValue
-                    .trim()
-                    .replace(/[^0-9a-fA-F]/g, '');
+                let restavracijaId = rawValue.trim().replace(/[^0-9a-fA-F]/g, '');
 
-                // STRIKTA VALIDACIJA (24-mestni format)
-                if (!restavracijaId || restavracijaId.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(restavracijaId)) {
-                    
-                    const msg = i18next.t('profile.invalid_qr_format') || 'Neveljavna oblika QR kode (pričakovan 24-mestni ID).';
-                    prikaziSporocilo('error', msg);
-                    if (scanStatusElement) scanStatusElement.textContent = msg;
-                    return;
+                if (restavracijaId.length === 24) {
+                    // Zdaj kličemo window verzijo, ki je definirana zgoraj
+                    await window.potrdiPrihodNaStrežniku(restavracijaId);
+                } else {
+                    prikaziSporocilo('error', i18next.t('profile.invalid_qr_format'));
                 }
-
-                // KONČNI PUSH: Klic na strežnik s potrjenim in očiščenim ID-jem
-                potrdiPrihodNaStrežniku(restavracijaId);
 
             } catch (error) {
-                prikaziSporocilo('error', `${i18next.t('profile.scanner_error') || 'Napaka skenerja'}: ${error.message}`);
+                prikaziSporocilo('error', `Napaka skenerja: ${error.message}`);
                 console.error("ML Kit napaka:", error);
-                await stopHighlight();
             }
         };
-
 
         // ===========================================
         // 3. AVTENTIKACIJA IN NALAGANJE PODATKOV

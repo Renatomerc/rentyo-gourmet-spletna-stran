@@ -1,0 +1,4 @@
+io.capawesome.capacitorjs.plugins.mlkit.barcodescanning
+id preview_view
+id webview
+layout bridge_layout_main

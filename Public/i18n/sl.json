@@ -231,6 +231,7 @@
     "review_success": "Ocena uspešno oddana! Hvala.",
     "review_error": "Napaka pri oddaji ocene. Prosimo, poskusite znova.",
     "scan_qr_main_text": "Skeniraj QR kodo in potrdi svoj prihod",
+    "status_scanning": "Prebiram QR kodo",
     "scan_qr_sub_text": "S potrditvijo prihoda prejmete 50 točk ter dodatne ugodnosti in povabila.",
     "status_error": "Trenutno niste v časovnem okviru za potrditev prihoda. Prihod lahko potrdite 10 min pred rezerviranim terminom.",
     "status_confirmed": "Potrjeno",

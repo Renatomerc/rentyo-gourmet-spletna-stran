@@ -5,7 +5,7 @@
   "bundledWebRuntime": false,
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0,
+      "launchShowDuration": 3000,
       "launchAutoHide": false,
       "backgroundColor": "#076B6A",
       "androidScaleType": "CENTER_CROP",
@@ -13,16 +13,14 @@
       "splashFullScreen": false,
       "splashImmersive": false
     },
-    "BarcodeScanner": {},
-    
-    
+    "BarcodeScanner": {
+      "installForce": true
+    },
     "StatusBar": {
-      "style": "DARK",
+      "style": "LIGHT",
       "overlay": false,
       "backgroundColor": "#076B6A"
     },
-    
-    
     "SocialLogin": { 
       "google": {
         "clientId": "656400083949-nuj4kg2rvofjjecmtcoo29191erlkula.apps.googleusercontent.com",
@@ -33,7 +31,6 @@
         ]
       }
     }
-    
   },
   "cordova": {}
 }

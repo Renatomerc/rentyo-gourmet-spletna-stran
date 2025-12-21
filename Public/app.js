@@ -1,4 +1,30 @@
 // ===============================================
+// 🛠️ CAPACITOR SPLASH SCREEN LOGIKA
+// ===============================================
+const handleSplashScreen = async () => {
+    // Preverimo, če aplikacija teče na Androidu/iOS (Capacitor)
+    if (window.Capacitor && window.Capacitor.Plugins.SplashScreen) {
+        const { SplashScreen } = window.Capacitor.Plugins;
+
+        // Prisili logotip, da ostane viden (da preprečimo tisti polsekundni zeleni blisk)
+        await SplashScreen.show({
+            autoHide: false,
+        });
+
+        // Počakamo 3 sekunde, da se v ozadju v miru naloži API (naloziInPrikaziRestavracije)
+        setTimeout(async () => {
+            await SplashScreen.hide({
+                fadeOutDuration: 500 // Logotip bo nežno zbledel
+            });
+            console.log("Splash screen uspešno skrit.");
+        }, 3000);
+    }
+};
+
+// Takoj pokličemo funkcijo za Splash Screen
+handleSplashScreen();
+
+// ===============================================
 // 🚀 Public/app.js - Združitev nalaganja API podatkov, prikaza, filtrov in modalne logike
 // ===============================================
 

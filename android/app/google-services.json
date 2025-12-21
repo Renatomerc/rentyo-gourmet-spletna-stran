@@ -12,16 +12,7 @@
           "package_name": "eu.rentyo.rentyo"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "656400083949-nuj4kg2rvofjjecmtcoo29191erlkula.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "656400083949-g4rl8vrqgvoefsk3bg95r1kkn11llof8.apps.googleusercontent.com",
-          "client_type": 1
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyAbapQAdllWCpo_wD34uXAw5Rd3DFxGd6E"
