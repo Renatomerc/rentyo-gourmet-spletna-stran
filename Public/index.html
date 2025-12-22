@@ -852,6 +852,18 @@
             margin-right: 4px; 
             color: #4285F4; /* Googlova modra */
         }
+        /* Ciljamo ikone znotraj vsebnika na kartici */
+.ikone-container i {
+    color: #333333 !important; /* Temno siva/črna */
+    font-size: 1.2rem;         /* Malo večja ikona */
+    transition: transform 0.2s ease;
+}
+
+/* Opcijsko: ko se z miško zapelješ čez kartico, se ikona malo poveča */
+.kartica:hover .ikone-container i {
+    transform: scale(1.1);
+    color: #000000;
+}
 
 
      
@@ -3592,7 +3604,7 @@ body.is-capacitor-app #aiChatModal {
                     <option value="it">IT</option>
                     <option value="fr">FR</option>
                     <option value="hu">HU</option>
-                    <option value="cz">CZ</option>
+                    <option value="cs">CS</option>
                     <option value="es">ES</option>
                     <option value="et">ET</option>
                     <option value="nl">NL</option>
@@ -3674,57 +3686,74 @@ body.is-capacitor-app #aiChatModal {
           <h1 data-i18n="hero.title">Gourmet & Experience</h1>
         </section>
 
-        <section class="iskalnik-sekcija">
-          <form class="iskalnik">
-            <div class="iskalnik-polje">
-              <label for="restavracija_mesto" data-i18n="search.restaurant_city_label">Restavracija ali mesto</label>
-              <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
-            </div>
+  <section class="iskalnik-sekcija">
+  <form class="iskalnik">
+    <div class="iskalnik-polje">
+      <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
+    </div>
 
-            <div class="iskalnik-polje skrij-polje">
-              <label for="datum" data-i18n="search.date_label">Datum</label>
-              <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
-            </div>
+    <div class="iskalnik-polje skrij-polje">
+      <label for="datum" data-i18n="search.date_label">Datum</label>
+      <input type="text" id="datum" data-i18n="[placeholder]search.date_placeholder" placeholder="Izberite datum">
+    </div>
 
-            <div class="iskalnik-polje skrij-polje">
-              <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
-              <select id="stevilo_oseb">
-                <option value="1">1</option>
-                <option value="2" selected>2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-              </select>
-            </div>
+    <div class="iskalnik-polje skrij-polje">
+      <label for="stevilo_oseb" data-i18n="search.persons_label">Število oseb</label>
+      <select id="stevilo_oseb">
+        <option value="2" selected>2</option>
+      </select>
+    </div>
 
-            <div class="iskalnik-polje">
-              <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
-              <select id="cas">
-                <option value="" disabled selected data-i18n="search.select_time">Izberi čas</option>
-                <option value="18.0">18:00</option>
-                <option value="19.0">19:00</option>
-                <option value="20.0">20:00</option>
-              </select>
-            </div>
+    <div class="iskalnik-polje skrij-polje">
+      <label for="cas" data-i18n="search.time_label">Čas rezervacije</label>
+      <select id="cas">
+        <option value="19.0" selected>19:00</option>
+      </select>
+    </div>
 
-            <button type="submit" class="gumb-isci" data-i18n="search.search_button">Išči</button>
-          </form>
-        </section>
+    <button type="submit" class="gumb-isci" data-i18n="search.search_button">Išči</button>
+  </form>
+</section>
 
-       <section class="hitra-iskanja">
+<section class="hitra-iskanja">
     <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
     <div class="gumbi-kategorij">
-        <a href="#" class="gumb-kategorija" data-kuhinja="Mesna" data-i18n="cuisine.meat">Mesne jedi</a>
         
-        <a href="#" class="gumb-kategorija" data-kuhinja="Vegi" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</a>
+        <div class="kategorija-item">
+            <a href="#" class="gumb-kategorija" data-kuhinja="Mesna">
+                <i class="fa-solid fa-cow"></i>
+            </a>
+            <span class="napis-kategorije" data-i18n="cuisine.meat">Mesne jedi</span>
+        </div>
         
-        <a href="#" class="gumb-kategorija" data-kuhinja="Ribja" data-i18n="cuisine.fish">Ribje jedi</a>
+        <div class="kategorija-item">
+            <a href="#" class="gumb-kategorija" data-kuhinja="Vegi">
+                <i class="fa-solid fa-leaf"></i>
+            </a>
+            <span class="napis-kategorije" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</span>
+        </div>
         
-        <a href="#" class="gumb-kategorija" data-kuhinja="Pijača" data-i18n="cuisine.drinks">Pijača</a>
-        <a href="#" class="gumb-kategorija" data-kuhinja="Brunch" data-i18n="cuisine.brunch">Brunch</a>
+        <div class="kategorija-item">
+            <a href="#" class="gumb-kategorija" data-kuhinja="Ribja">
+                <i class="fa-solid fa-fish"></i>
+            </a>
+            <span class="napis-kategorije" data-i18n="cuisine.fish">Ribje jedi</span>
+        </div>
+        
+        <div class="kategorija-item">
+            <a href="#" class="gumb-kategorija" data-kuhinja="Pijača">
+                <i class="fa-solid fa-wine-glass"></i>
+            </a>
+            <span class="napis-kategorije" data-i18n="cuisine.drinks">Pijača</span>
+        </div>
+
+        <div class="kategorija-item">
+            <a href="#" class="gumb-kategorija" data-kuhinja="Brunch">
+                <i class="fa-solid fa-mug-saucer"></i>
+            </a>
+            <span class="napis-kategorije" data-i18n="cuisine.brunch">Brunch</span>
+        </div>
+
     </div>
 </section>
 
@@ -4254,6 +4283,7 @@ body.is-capacitor-app #aiChatModal {
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
 <script>
+    
 // =================================================================
 // ⭐ GLOBALNA DEFINICIJA PLUGIN-a ZA POTISNA OBVESTILA ⭐
 //    (Odstranjena Social Login logika in nevarna destrukturiranja)
@@ -4402,7 +4432,7 @@ const pikadayLangs = {
         weekdays      : ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'],
         weekdaysShort : ['V','H','K','Sze','Cs','P','Szo']
     },
-    cz: { // Češčina
+    cs: { // Češčina
         months        : ['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
         weekdays      : ['Neděle','Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota'],
         weekdaysShort : ['Ne','Po','Út','St','Čt','Pá','So']
@@ -4435,7 +4465,7 @@ const pikadayLangs = {
 };
 
 // API BASE URL
-const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+const API_BASE_URL = '/api';
 const TOGGLE_FAVORITE_API_URL = `${API_BASE_URL}/restavracije/uporabnik/priljubljene/toggle`;
 const FAVORITES_API_URL = `${API_BASE_URL}/restavracije/uporabnik/priljubljene`;
 
@@ -5837,22 +5867,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// =================================================================
-// IV. LOGIKA KARTIC RESTAVRACIJ 
-// =================================================================
-
 // 1. Renderiranje Ene Kartice (ZA PRILJUBLJENO)
 function renderCard(restavracija) {
     const card = document.createElement('div');
     card.className = 'kartica';
     card.setAttribute('data-id', restavracija._id || restavracija.id);
     
-    const restavracijaIme = restavracija.ime || restavracija.name || restavracija.title || restavracija.imeRestavracije || 'Neznano Ime';
+    // Usklajevanje imen (backend uporablja imeRestavracije v aggregationu)
+    const restavracijaIme = restavracija.imeRestavracije || restavracija.ime || restavracija.name || 'Neznano Ime';
     
-    // Implementacija dinamične slike
-    const urlGlavneSlike = (restavracija.galerija_slik && restavracija.galerija_slik.length > 0)
-        ? restavracija.galerija_slik[0] // Uporabi prvo sliko za sličico
-        : FALLBACK_IMAGE_URL; 
+    // Implementacija dinamične slike (backend uporablja urlSlike)
+    const urlGlavneSlike = restavracija.urlSlike || (restavracija.galerija_slik && restavracija.galerija_slik.length > 0 ? restavracija.galerija_slik[0] : FALLBACK_IMAGE_URL); 
         
     // Interna ocena 
     const internaOcena = restavracija.ocena_povprecje || 0;
@@ -5865,7 +5890,6 @@ function renderCard(restavracija) {
     let googleRatingHTML = '';
     if (googleRating > 0) {
         const translatedReviewsText = i18next.t('messages.google_reviews') || 'Google mnenj';
-        
         googleRatingHTML = `
             <p class="google-ocena">
                 <i class="fab fa-google" style="color: #4285F4;"></i> 
@@ -5880,42 +5904,24 @@ function renderCard(restavracija) {
     const restavracijaLon = restavracija.lokacija?.coordinates?.[0] || DEFAULT_LON;
     
     if (userLocation) {
-        const distance = getDistance(
-            userLocation.lat, 
-            userLocation.lon, 
-            restavracijaLat, 
-            restavracijaLon
-        );
-        
+        const distance = getDistance(userLocation.lat, userLocation.lon, restavracijaLat, restavracijaLon);
         oddaljenostKm = Math.round(distance).toString(); 
-
     } else {
         oddaljenostKm = i18next.t('results.distance_unknown') || '...';
     }
     
     let oddaljenostHTML = `<span class="oddaljenost"><i class="fas fa-location-arrow"></i> ${oddaljenostKm} km</span>`;
-    if (oddaljenostKm === '...') {
-         oddaljenostHTML = `<span class="oddaljenost" data-i18n="results.distance_unknown" style="opacity: 0.7;"><i class="fas fa-location-arrow"></i> ${oddaljenostKm}</span>`;
-    }
     
-    // --- LOGIKA RAZPOLOŽLJIVOSTI (Ohranjena v ozadju za kasnejšo uporabo) ---
-    const status = restavracija.razpolozljivost_status || 'available';
-    const cas = restavracija.razpolozljivost_cas || '19:00';
-    let razpolozljivostTextKey;
-    let isAvailable = true;
-    
-    if (status === 'available') {
-        razpolozljivostTextKey = i18next.t('results.available_today', { time: cas });
-    } else if (status === 'tomorrow') {
-        razpolozljivostTextKey = i18next.t('results.available_tomorrow', { time: cas });
-        isAvailable = false; 
-    } else {
-        razpolozljivostTextKey = i18next.t('results.unavailable');
-        isAvailable = false;
-    }
-    // ----------------------------------------------------------------------
+    // --- NOVO: LOGIKA ZA PRIKAZ IKONE IZ BACKENDA ---
+    // Ker backend pošlje deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] }
+    let ikonaHTML = '';
+    const ikonaIzBaze = restavracija.deviznaKuhinja; 
 
-    // Kartica HTML (Brez razpolozljivostHTML)
+    if (ikonaIzBaze && ikonaIzBaze.includes('fa-')) {
+        ikonaHTML = `<i class="${ikonaIzBaze.trim()}" style="color: #88d82d; font-size: 1.1em; margin-left: auto;"></i>`;
+    }
+
+    // Kartica HTML (Vključen posodobljen footer z ikono)
     card.innerHTML = `
     <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_URL}';">
     <div class="kartica-vsebina">
@@ -5926,18 +5932,19 @@ function renderCard(restavracija) {
             ${googleRatingHTML} 
         </div>
 
-        <div class="kartica-footer">
+        <div class="kartica-footer" style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
             <div class="razdalja-container">
                 ${oddaljenostHTML}
+            </div>
+            <div class="ikone-container">
+                ${ikonaHTML}
             </div>
         </div>
     </div>
 `;
     
     card.addEventListener('click', (e) => {
-        if (e.target.classList.contains('gumb-rezervacija')) {
-             return;
-        }
+        if (e.target.classList.contains('gumb-rezervacija')) return;
         prikaziPodrobnosti(restavracija);
     });
     
@@ -6026,18 +6033,15 @@ function filterAndRenderRestavracije(optionalFilteredList) {
         } 
         
         // =================================================================
-        // 2. Filtriranje po tipu kuhinje (če je filter izbran)
-        // =================================================================
+// 2. Filtriranje po tipu kuhinje (Ohranjen tvoj originalni način)
+// =================================================================
         
         const filtriIzBaze = r.kuhinja_filtri; 
 
-        // Preverimo, ali je polje Array in ali vsebuje aktivni filter
         if (Array.isArray(filtriIzBaze)) {
-            // .includes() preveri ujemanje
             return filtriIzBaze.includes(currentFilterKuhinja);
         }
         
-        // Če polje manjka ali ni Array (dokument ni bil posodobljen), ga izloči
         return false; 
     });
 
@@ -6045,7 +6049,6 @@ function filterAndRenderRestavracije(optionalFilteredList) {
     mrezaKarticDiv.innerHTML = '';
     statusKarticeDiv.textContent = '';
     
-    // Če ni najdenih rezultatov
     if (filtered.length === 0) {
         statusKarticeDiv.textContent = i18next.t('messages.no_restaurants_found') || 'Ni najdenih restavracij.';
         console.log("Filtriranje uspešno, najdenih 0 restavracij za filter:", currentFilterKuhinja);
@@ -6056,79 +6059,76 @@ function filterAndRenderRestavracije(optionalFilteredList) {
         mrezaKarticDiv.appendChild(renderCard(restavracija));
     });
     
-    // Potrdimo število najdenih restavracij
     console.log(`Filtriranje uspešno: Prikazujem ${filtered.length} restavracij za filter: ${currentFilterKuhinja}`);
     
     updateContent(); 
 }
 
-// 4. Prikaz Izpostavljenih Restavracij (POPRAVLJENO, uporablja featured: true)
+// 4. Prikaz Izpostavljenih Restavracij (Brez sprememb v logiki)
 function renderFeaturedRestavracije() {
     if (!mrezaIzpostavljenoKarticDiv) return;
     
-    // 🔥 NOVO: Filtrirajte neposredno iz allRestavracije
-    // Uporaba "!!" zagotavlja, da zajamemo 'true' ne glede na tip podatka, ki pride iz API-ja.
     const featuredList = allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
     
     mrezaIzpostavljenoKarticDiv.innerHTML = '';
     
-    // Uporabi novo, filtrirano featuredList
     if (featuredList.length === 0) {
         mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (i18next.t('messages.no_restaurants_found') || 'Ni izpostavljenih restavracij.') + '</div>'; 
         return;
     }
     
-    // Iteriraj čez novo, filtrirano featuredList
     featuredList.forEach(restavracija => {
         mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
     });
     
-    // Če je updateContent definirana
     if (typeof updateContent === 'function') updateContent();
 }
 
-// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji (POPRAVLJENO ZA KLIC API)
+// 5. Nastavitev Gumbov za Hitro Iskanje Listenerji (POPRAVLJENO ZA BOLJŠO ODZIVNOST)
 function setupKuhinjaFiltersListeners() {
-    
-    // Uporabimo robusten selektor za vse gumbe, ki imajo data-kuhinja atribut
     const vsiGumbi = document.querySelectorAll('[data-kuhinja]');
     
-    // LOGIRANJE ZDAJ MORA DELOVATI (če se funkcija izvede)
-    console.log("🔥 Število gumbov za kuhinjo najdenih za pripenjanje listenerjev:", vsiGumbi.length); 
+    console.log("🔥 Število aktivnih krogov:", vsiGumbi.length); 
 
     vsiGumbi.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        // Pomembno: kloniramo gumb, da odstranimo stare listenerje in preprečimo "neposlušnost"
+        const novGumb = btn.cloneNode(true);
+        btn.parentNode.replaceChild(novGumb, btn);
+
+        novGumb.addEventListener('click', (e) => {
             e.preventDefault();
+            // StopPropagation prepreči, da bi se klik "izgubil" ali sprožil kaj v ozadju
+            e.stopPropagation(); 
             
-            // DIAGNOSTIKA: Preverjanje, ali koda sploh pride sem.
-            console.log("✅ KLIK GUMBA: Filter:", btn.getAttribute('data-kuhinja')); 
+            // Rešitev za ikone: closest zagotovi, da klik vedno najde data-kuhinja
+            const dejanskiGumb = e.target.closest('[data-kuhinja]');
+            if (!dejanskiGumb) return;
+
+            const novaKuhinja = dejanskiGumb.getAttribute('data-kuhinja');
             
-            // Odstrani 'active' razred z vseh gumbov
+            // Vizualni odziv
             document.querySelectorAll('[data-kuhinja]').forEach(b => b.classList.remove('active'));
             
-            const novaKuhinja = btn.getAttribute('data-kuhinja');
-            let filterAktiven = false; // Status iskanja
+            let filterAktiven = false;
 
-            // Logika za vklop/izklop filtra (Toggle)
             if (currentFilterKuhinja === novaKuhinja) {
-                // Če je filter že enak, ga izklopimo
                 currentFilterKuhinja = ''; 
                 filterAktiven = false;
             } else {
-                // Če je nov filter, ga vklopimo
-                btn.classList.add('active'); 
+                // Razred active bo zdaj deloval s tvojim novim CSS (črne ikone)
+                dejanskiGumb.classList.add('active'); 
                 currentFilterKuhinja = novaKuhinja;
                 filterAktiven = true;
             }
             
-            // ⭐ KLJUČNA SPREMEMBA: Kličemo API za iskanje
             if (filterAktiven) {
-                // Če je filter vklopljen, iščemo preko API-ja. 
-                // Posredujemo samo kuhinjo, ostali iskalni parametri so prazni/privzeti.
-                // Uporabimo e za reference v handleIskanjeRestavracij.
+                const inputMesto = document.getElementById('restavracija_mesto');
+                if (inputMesto) inputMesto.value = '';
+                
+                // Kličemo iskanje z novaKuhinja parametrom
                 handleIskanjeRestavracij(e, '', '', '', 1, currentFilterKuhinja); 
             } else {
-                // Če je filter izklopljen, ponovno naložimo privzete restavracije (poln seznam)
+                // Če se filter izklopi, naložimo vse
                 loadRestavracije();
             }
         });
@@ -8057,7 +8057,7 @@ function showAppDownloadModal() {
 
 // ⭐ PREDVIDENI URL ZA KLIC NA VAŠ NODE.JS BACKEND ⭐
 // Uporabljamo vaš potrjeni API Base URL za Render in dodamo pot /assistant/ask
-const RENDER_API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+const API_BASE_URL = '/api';
 const API_ENDPOINT = `${RENDER_API_BASE_URL}/assistant/ask`;
 
 // ⭐ GLOBALNA SPREMENLJIVKA ZA SHRANJEVANJE PRIVZETE POZICIJE MODALA ⭐
@@ -8776,9 +8776,13 @@ async function naloziBannerjeIzJson() {
 
 document.addEventListener('DOMContentLoaded', naloziBannerjeIzJson);
 
+
+
 </script>
     <div id="toaster-container">
     </div>
+    
+    
 
 </body>
 </html>

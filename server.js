@@ -96,7 +96,7 @@ function startApp() {
     const allowedOrigins = [
         'https://www.rentyo.eu', 
         'http://www.rentyo.eu',  
-        'https://rentyo-gourmet-spletna-stran.onrender.com', 
+        'https://philosophical-piranha-rentyo-gourmet-spletna-stran-f9f5e315.koyeb.app/api',
         'http://localhost:5000' 
     ];
 

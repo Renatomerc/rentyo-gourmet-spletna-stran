@@ -185,12 +185,12 @@ a:hover {
 /* OSNOVNA PRAVILA (Veljajo povsod, vključno s Spletom) */
 /* ==================================================== */
 .iskalnik-sekcija {
-    padding: 15px;
+    padding: 0px;
     background-color: #ffffff;
     border: 1px solid #ffffff;
     box-shadow: 0 0px 4px rgba(78, 78, 78, 0.454); 
-    margin: -50px 7% 20px 7%; /* Velik negativen rob zgoraj - za splet/velik zaslon */
-    border-radius: 30px;
+    margin: -60px 7% 20px 7%; /* Velik negativen rob zgoraj - za splet/velik zaslon */
+    border-radius: 40px;
     z-index: 20;
     position: relative;
 }
@@ -331,64 +331,108 @@ body.is-capacitor .iskalnik-sekcija {
 }
 
 /* ========================================================================= */
-/* HITRE KATEGORIJE (GUMBI) (NESPREMENJENO)      */
+/* HITRE KATEGORIJE (GUMBI) - ZBITA POSTAVITEV                              */
 /* ========================================================================= */
 
 .hitra-iskanja {
-    padding: 0px 0%;
+    padding: 15px 0; /* Malo manj paddinga zgoraj/spodaj */
     text-align: center;
 }
 
 .hitra-iskanja h2 {
-    margin-bottom: 20px;
-    font-size: 1.2em;
+    margin-bottom: 15px; /* Manjši razmik pod naslovom */
+    font-size: 1.1em;
     color: #333;
 }
 
-/* Postavitev mreže gumbov */
+/* Postavitev vsebnikov (krog + napis) */
 .gumbi-kategorij {
-    display: flex; /* Flexbox za postavitev v vrsto */
-    flex-wrap: wrap; /* Omogoči prelom vrstice na manjših zaslonih */
-    justify-content: center; /* Centriraj gumbe */
-    gap: 10px; /* Razmik med gumbi */
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 5px; /* <--- ZELO ZMANJŠAN RAZMIK (prej 15px) */
     max-width: 1000px; 
     margin: 0 auto;
 }
 
-/* Stil za posamezni GUMB KATEGORIJE */
+/* Vsebnik za posamezno kategorijo (Krog + Napis spodaj) */
+.kategorija-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+    gap: 4px;               /* <--- Manjši razmik med krogom in napisom */
+    width: 60px;            /* <--- ZMANJŠANA ŠIRINA (prej 75px) */
+}
+
+/* Stil za posamezni GUMB KATEGORIJE - OKROGLI KROGCI */
 .gumb-kategorija {
-    display: inline-block;
-    padding: 8px 10px; /* Zmeren padding za gumb */
-    border: 1px solid #333; /* Rdeč rob kot poudarek */
-    box-shadow: 0 0px 0px rgba(78, 78, 78, 0.333); 
-    border-radius: 25px; /* Zaobljeni robovi */
+    display: flex;          
+    align-items: center;    
+    justify-content: center; 
+    
+    width: 48px;            
+    height: 48px;           
+    
+    border: 1px solid #333; 
+    border-radius: 50%;     
     background-color: #fff;
+    color: #333; /* Osnovna barva (vpliva na ikono) */
+    
+    font-size: 1.3em;       
+    text-decoration: none;
+    
+    /* DODANO ZA BOLJŠO ODZIVNOST */
+    touch-action: manipulation;
+    transition: background-color 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* KLJUČNI POPRAVEK: Preprečimo, da bi ikona blokirala klik na krog + IKONA VEDNO ČRNA */
+.gumb-kategorija i {
+    pointer-events: none;
+    color: #000 !important; /* Prisilimo črno barvo ikone v vseh stanjih */
+}
+
+/* Takojšen vizualni odziv na dotik - ZELENA KOT INDIKATOR PREHODA */
+.gumb-kategorija:active {
+    transform: scale(0.85);
+    background-color: #88d82d !important;
+    border-color: #88d82d !important;
+}
+
+/* Napis pod gumbom */
+.napis-kategorije {
+    font-size: 8px;        
     color: #333;
     font-weight: bold;
-    font-size: 0.9em;
-    text-decoration: none;
-    white-space: nowrap; /* Prepreči prelom besedila v gumbu */
-    
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    /* 👇 DODAJTE TA DVA PRAVILA ZA ODSTRANITEV MODREGA POUDARKA NA MOBILNIH NAPRAVAH 👇 */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    /* 👆 ZAKLJUČEK DODATKOV 👆 */
+    text-transform: uppercase; 
+    text-align: center;
+    line-height: 1.1;
+    word-wrap: break-word; 
+    width: 100%;           
 }
 
-/* Efekt ob premiku miške */
-.gumb-kategorija:hover {
-    background-color: #88d82d;
-     border: 1px solid #88d82d; /* Rdeč rob kot poudarek */
-    color: white;
-    transform: translateY(0px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* Odstranjena zelena barva za .active in .hover, da gumb ne ostane obarvan */
+.gumb-kategorija.active {
+    background-color: #fff;
+    border: 1px solid #333;
 }
 
-/* Odzivnost - na večjih zaslonih povečaj razmik */
+/* Nežen hover učinek samo za namizne računalnike */
+@media (hover: hover) {
+    .gumb-kategorija:hover {
+        background-color: #f9f9f9;
+        border-color: #88d82d;
+    }
+}
+
+/* Odzivnost - na spletni strani (namizje) */
 @media (min-width: 768px) {
     .gumbi-kategorij {
-        gap: 15px;
+        gap: 12px;
+    }
+    .kategorija-item {
+        width: 75px; 
     }
 }
 
@@ -589,77 +633,59 @@ body.is-capacitor .iskalnik-sekcija {
         margin-bottom: 25px;
     }
     
-    /* Vsa polja v iskalniku prisilimo na 100% širine, da se pravilno zložijo */
-     .iskalnik input, 
-     .iskalnik select,
-     .gumb-isci {
-         width: 100%;
-     }
-
-    /* KLJUČNA POPRAVKA ZA DATUM/ČAS (iOS) - Lahko ostane, a ni nujno */
-    .iskalnik input#datum, 
-    .iskalnik input#cas {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 100% !important; 
-        min-width: 100%;
-    }
-    
-    .iskalnik input[type="date"]::-webkit-inner-spin-button,
-    .iskalnik input[type="date"]::-webkit-calendar-picker-indicator {
-        display: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    /* ---------------------------------------------------- */
-    /* GLAVNI POPRAVEK: SKRIVANJE DATUMA IN ČASA            */
-    /* ---------------------------------------------------- */
-    
-    /* Skrijemo 2. in 3. polje v iskalniku (Datum in Čas) */
+    /* 1. Skrijemo nepotrebna polja (to že imate, dodamo še število oseb) */
     .iskalnik-polje:nth-child(2), 
-    .iskalnik-polje:nth-child(3) { 
+    .iskalnik-polje:nth-child(3),
+    .iskalnik-polje:nth-child(4) { 
          display: none !important;
-         /* ODSTRANIMO VSAK MARGIN, KI BI LAHKO VZTRAJAL NA SKRITIH POLJIH */
          margin: 0 !important; 
          padding: 0 !important;
     }
-    
-    /* ---------------------------------------------------- */
-    /* PONOVNO POZICIONIRANJE VIDNIH POLJ (Mesto, Osebe, Išči) */
-    /* ---------------------------------------------------- */
 
+    /* 2. Iskalnik nastavimo na relativno pozicioniranje */
     .iskalnik {
-         flex-direction: row; 
-         flex-wrap: wrap; 
-         /* Uporaba obstoječega gap-a 15px */
+        display: block !important; /* Preklopimo iz flex, da lažje pozicioniramo gumb */
+        position: relative;
+        width: 100%;
     }
-    
-    /* Polje Mesto/Restavracija (1. vidno polje) naj bo 100% */
+
+    /* 3. Prvo polje (Restavracija/Mesto) raztegnemo */
     .iskalnik-polje:nth-child(1) {
         width: 100% !important;
-        /* Ta rob je edini, ki je potreben med zgornjim in spodnjim blokom. */
-        margin-bottom: 15px !important; 
-        margin-top: 0 !important; /* Odstranimo morebiten rob zgoraj */
+        margin-bottom: 0 !important; /* Odstranimo spodnji rob, ker bo gumb znotraj */
+        position: relative;
     }
 
-    /* Polje za število ljudi (predzadnji iskalnik-polje) in gumb Išči (zadnji) naj bosta 50% */
-    .iskalnik-polje:nth-last-child(2),
-    .gumb-isci {
-        /* Uporabimo calc, da od 50% odštejemo polovico razmika (15px / 2) */
-        width: calc(50% - 7.5px) !important; 
-        
-        /* 👇 KLJUČNI POPRAVEK 👇 */
-        /* Odstranimo VSAK ZGORNJI ROB, da se polji pomakneta navzgor */
-        margin-top: 0 !important; 
-        /* Ne potrebujemo margin-bottom, ker ga določa flex-gap. */
+    /* 4. Stil za input polje, da naredi prostor za gumb na desni */
+    #restavracija_mesto {
+        width: 100% !important;
+        padding-right: 85px !important; /* Prostor za gumb na desni strani znotraj polja */
+        height: 50px; /* Fiksna višina za boljšo kontrolo */
+        border-radius: 25px !important;
+        box-sizing: border-box;
     }
-    
+
+    /* 5. GUMB IŠČI - Pozicioniramo ga znotraj polja na desno */
     .gumb-isci {
-        align-self: flex-end; /* Ključno: Gumb poravnamo na dno, da se ujema z višino select polja */
-        /* Zagotovimo, da se margin-top ne podvoji in ostane 0 */
-        margin-top: 0 !important; 
+        position: absolute !important;
+        right: 5px !important;   /* Razmik od desnega roba polja */
+        bottom: 5px !important;  /* Razmik od spodnjega roba polja */
+        width: 95px !important;  /* Fiksna širina gumba */
+        height: 40px !important; /* Malo nižji od input polja */
+        margin: 0 !important;
+        border-radius: 20px !important;
+        z-index: 10;
+        /* Ohranimo vašo zeleno barvo in pisavo preko obstoječega class-a */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px !important;
+    }
+
+    /* Odstranimo labelo ali jo zamaknemo, da ne moti dizajna, če želite */
+    .iskalnik-polje:nth-child(1) label {
+        margin-bottom: 8px;
+        display: block;
     }
 
 
@@ -709,7 +735,7 @@ body.is-capacitor .iskalnik-sekcija {
         flex: 0 0 80%; 
         min-width: 55%;
         max-width: 60%;
-        height: 320px; /* Še bolj kompaktna višina na mobilnem */
+        height: 350px; /* Še bolj kompaktna višina na mobilnem */
         
         scroll-snap-align: start; 
     }
@@ -804,7 +830,7 @@ body.is-capacitor .iskalnik-sekcija {
 /* Veliki zasloni (namizni računalniki) - 5 kartic v sirino */
 @media (min-width: 1200px) {
     .naslovna-slika {
-        height: 400px;
+        height: 350px;
     }
     
     .iskalnik-sekcija {

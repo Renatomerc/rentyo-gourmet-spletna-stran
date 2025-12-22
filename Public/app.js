@@ -30,7 +30,7 @@ handleSplashScreen();
 
 // Definirajte bazni URL za vaš API
 // API_BASE_URL: https://rentyo-gourmet-spletna-stran.onrender.com/api/restavracije
-const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api/restavracije';
+const API_BASE_URL = '/api/restavracije';
 
 // ===============================================
 // I. GLOBALNE SPREMENLJIVKE IN DOM ELEMENTI

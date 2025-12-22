@@ -3,7 +3,14 @@
   "appName": "Rentyo",
   "webDir": "public",
   "bundledWebRuntime": false,
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "http"
+  },
   "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
     "SplashScreen": {
       "launchShowDuration": 3000,
       "launchAutoHide": false,

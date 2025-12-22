@@ -150,7 +150,7 @@ if (typeof i18next !== 'undefined' && typeof i18nextBrowserLanguageDetector !== 
 // -------------------------------------------------------------
 // 1. GLOBALNA NASTAVITEV IN TOKEN
 // -------------------------------------------------------------
-const API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api'; 
+const API_BASE_URL = '/api';
 const authTokenKey = 'jwtToken'; 
 
 let currentRestaurantId = null;
@@ -1163,46 +1163,6 @@ function setupTimeSlotListeners() {
     });
 }
 
-// =================================================================
-// 7. ZAGON IN ISKALNA LOGIKA (DOM Content Loaded) - OČIŠČENA VERZIJA
-// =================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // A. PRIDOBITEV OSNOVNIH ELEMENTOV
-    const isciForm = document.querySelector('.iskalnik');
-    const hitraIskanjaGumbi = document.querySelectorAll('.gumb-kategorija');
-    
-    // B. Nastavitev poslušalcev za ISKANJE
-    if (isciForm) {
-        isciForm.addEventListener('submit', (e) => {
-            e.preventDefault(); 
-            
-            handleIskanjeRestavracij(e,
-                document.getElementById('restavracija_mesto').value,
-                document.getElementById('datum').value,
-                document.getElementById('cas').value,
-                document.getElementById('stevilo_oseb').value
-            );
-        });
-    }
-
-    // C. Nastavitev poslušalcev za HITRA ISKANJA
-    hitraIskanjaGumbi.forEach(gumb => {
-        gumb.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const kuhinjaKljuc = e.target.getAttribute('data-kuhinja') || e.target.textContent.trim();
-
-            handleIskanjeRestavracij(e,
-                document.getElementById('restavracija_mesto').value,
-                document.getElementById('datum').value,
-                document.getElementById('cas').value,
-                document.getElementById('stevilo_oseb').value,
-                kuhinjaKljuc 
-            );
-        });
-    });
 
     // KLIC NA ZAGONU STRANI: Nalaganje privzetih restavracij takoj ob zagonu
     naloziPrivzeteRestavracije();
@@ -1218,6 +1178,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (potrdiTrajanjeGumb) {
         potrdiTrajanjeGumb.addEventListener('click', potrdiRezervacijo);
     }
-});
+
 
 
