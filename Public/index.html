@@ -923,7 +923,7 @@
             font-size: 0.8rem;
             font-weight: bold; 
             color: #333; 
-            margin-top: 10px; 
+            margin-top: 5px; 
             margin-bottom: 0;
             display: flex;
             align-items: center;
@@ -1207,7 +1207,7 @@
         margin-top: 25px;
         text-align: center;
         border-radius: 20px;
-        background-color: #169B99; 
+        background-color: #076b6a; 
         color: #f5f5f5;
         font-size: 1rem;
         font-weight: 600;
@@ -1272,7 +1272,7 @@
     .modal-tab.active {
         color: #ffffff;
         border-bottom-color: none;
-        background-color: #169B99;
+        background-color: #076b6a;
         border-radius: 25px;
         margin-bottom: 0px; 
         box-shadow: 0 2px 10px rgba(49, 49, 49, 0.276);
@@ -3635,7 +3635,7 @@ body.is-capacitor-app #aiChatModal {
 /* Rezultati se razporedijo v mrežo po celotnem zaslonu */
 #rezultatiIskanja {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px 0;
 }
@@ -3947,37 +3947,30 @@ body.is-capacitor-app #aiChatModal {
     
 </main>
     
-   <div id="restavracijaModal" class="restavracija-modal">
+<div id="restavracijaModal" class="restavracija-modal">
     <div class="restavracija-vsebina">
         <span class="gumb-zapri-restavracija" id="zapriRestavracijaModal">×</span>
         
         <div id="modalSlika" class="slika-glava"></div>
         
-       <div style="padding: 0 25px;">
-            
-            <div id="galerijaSlike" class="galerija-slike">
-                </div>
-</div>
-      <div class="podrobnosti-tekst">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h2 id="modalIme" style="margin-bottom: 0;">Ime Restavracije</h2>
-        
-       <button 
-    id="modalFavoriteToggle" 
-    class="gumb-priljubljeno-modal" 
-    data-id="" 
-    style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;"
->
-    <i class="favorite-icon fa-heart far"></i> 
-    <span style="font-size: 1rem; font-weight: bold;"></span>
-</button>
+        <div style="padding: 0 25px;">
+            <div id="galerijaSlike" class="galerija-slike"></div>
         </div>
-    
-   <div class="info-vrstica">
-        <span id="modalKuhinja"><i class="fas fa-utensils"></i> Kuhinja</span>
-        <span id="modalLokacija"><i class="fas fa-map-marker-alt"></i> Mesto</span>
-        <span id="modalOcena"><i class="fas fa-star"></i> Ocena</span>
-    </div>
+
+        <div class="podrobnosti-tekst">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 id="modalIme" style="margin-bottom: 0;">Ime Restavracije</h2>
+                
+                <button 
+                    id="modalFavoriteToggle" 
+                    class="gumb-priljubljeno-modal" 
+                    data-id="" 
+                    style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;"
+                >
+                    <i class="favorite-icon fa-heart far"></i> 
+                    <span style="font-size: 1rem; font-weight: bold;"></span>
+                </button>
+            </div>
 
             <p id="modalOpis" class="opis-restavracije">Opis restavracije...</p>
 
@@ -5968,61 +5961,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// 1. Renderiranje Ene Kartice (ZA PRILJUBLJENO)
+// 1. Renderiranje Ene Kartice (ZA PRILJUBLJENO IN ISKANJE)
 function renderCard(restavracija) {
     const card = document.createElement('div');
     card.className = 'kartica';
     card.setAttribute('data-id', restavracija._id || restavracija.id);
     
-    // Usklajevanje imen (backend uporablja imeRestavracije v aggregationu)
     const restavracijaIme = restavracija.imeRestavracije || restavracija.ime || restavracija.name || 'Neznano Ime';
-    
-    // Implementacija dinamične slike (backend uporablja urlSlike)
     const urlGlavneSlike = restavracija.urlSlike || (restavracija.galerija_slik && restavracija.galerija_slik.length > 0 ? restavracija.galerija_slik[0] : FALLBACK_IMAGE_URL); 
         
-    // Interna ocena 
-    const internaOcena = restavracija.ocena_povprecje || 0;
-    const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">${(internaOcena).toFixed(1)}</span>`;
+    const internaOcena = restavracija.ocena_povprecje || restavracija.rating || 0;
+    const ratingDisplay = `${generateStarsHTML(internaOcena)} <span class="ocena-stevilka">${Number(internaOcena).toFixed(1)}</span>`;
 
-    // Googlova ocena
     const googleRating = restavracija.googleRating || 0;
     const googleReviewCount = restavracija.googleReviewCount || 0;
     
     let googleRatingHTML = '';
     if (googleRating > 0) {
-        const translatedReviewsText = i18next.t('messages.google_reviews') || 'Google mnenj';
         googleRatingHTML = `
             <p class="google-ocena">
                 <i class="fab fa-google" style="color: #4285F4;"></i> 
-                <span>${googleRating.toFixed(1)}/5 (${googleReviewCount} ${translatedReviewsText})</span>
+                <span>${googleRating.toFixed(1)}/5 (${googleReviewCount})</span>
             </p>
         `;
     }
     
-    // LOGIKA ZA IZRAČUN RAZDALJE
-    let oddaljenostKm = '';
-    const restavracijaLat = restavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
-    const restavracijaLon = restavracija.lokacija?.coordinates?.[0] || DEFAULT_LON;
+    // 🔥 POPRAVEK KOORDINAT: Preverimo vse možne strukture (lokacija.coordinates ali location.lat/lng)
+    const restavracijaLat = restavracija.lokacija?.coordinates?.[1] || restavracija.location?.lat || DEFAULT_LAT; 
+    const restavracijaLon = restavracija.lokacija?.coordinates?.[0] || restavracija.location?.lng || DEFAULT_LON;
     
+    let oddaljenostKm = '...';
     if (userLocation) {
         const distance = getDistance(userLocation.lat, userLocation.lon, restavracijaLat, restavracijaLon);
         oddaljenostKm = Math.round(distance).toString(); 
-    } else {
-        oddaljenostKm = i18next.t('results.distance_unknown') || '...';
     }
     
     let oddaljenostHTML = `<span class="oddaljenost"><i class="fas fa-location-arrow"></i> ${oddaljenostKm} km</span>`;
     
-    // --- NOVO: LOGIKA ZA PRIKAZ IKONE IZ BACKENDA ---
-    // Ker backend pošlje deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] }
-    let ikonaHTML = '';
-    const ikonaIzBaze = restavracija.deviznaKuhinja; 
+    // --- POPRAVEK IKON: Gledamo 'deviznaKuhinja' ALI 'cuisine' ---
+    const mapaIkon = {
+        'MEAT': 'fa-solid fa-cow',
+        'VEGAN': 'fa-solid fa-leaf',
+        'FISH': 'fa-solid fa-fish',
+        'WINE': 'fa-solid fa-wine-glass',
+        'COFFEE': 'fa-solid fa-mug-saucer',
+        'DRINKS': 'fa-solid fa-wine-glass'
+    };
 
-    if (ikonaIzBaze && ikonaIzBaze.includes('fa-')) {
-        ikonaHTML = `<i class="${ikonaIzBaze.trim()}" style="color: #88d82d; font-size: 1.1em; margin-left: auto;"></i>`;
+    let vseIkoneHTML = '';
+    // Tu preverimo obe polji, da ikone delajo tudi pri iskanju
+    const podatkiKuhinje = restavracija.deviznaKuhinja || restavracija.cuisine; 
+
+    if (Array.isArray(podatkiKuhinje)) {
+        podatkiKuhinje.forEach(item => {
+            if (typeof item === 'string') {
+                const kljuc = item.toUpperCase().trim();
+                const klasaIkone = kljuc.includes('FA-') ? item : mapaIkon[kljuc];
+                
+                if (klasaIkone) {
+                    // Barva nastavljena na BLACK (črna)
+                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: black; font-size: 1.1em; margin-left: 8px;" title="${item}"></i>`;
+                }
+            }
+        });
     }
 
-    // Kartica HTML (Vključen posodobljen footer z ikono)
     card.innerHTML = `
     <img src="${urlGlavneSlike}" alt="${restavracijaIme}" class="kartica-slika" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_URL}';">
     <div class="kartica-vsebina">
@@ -6037,8 +6040,8 @@ function renderCard(restavracija) {
             <div class="razdalja-container">
                 ${oddaljenostHTML}
             </div>
-            <div class="ikone-container">
-                ${ikonaHTML}
+            <div class="ikone-container" style="display: flex; align-items: center;">
+                ${vseIkoneHTML}
             </div>
         </div>
     </div>
@@ -7310,7 +7313,7 @@ async function prikaziPodrobnosti(restavracija) {
     const isMissingDetails = !restavracija.meni || !restavracija.galerija_slik || !restavracija.komentarji; 
 
     if (currentRestaurantId && isMissingDetails) {
-        if(modalIme) modalIme.textContent = restavracija.ime || restavracija.imeRestavracije || 'Nalaganje podrobnosti...'; 
+        if(modalIme) modalIme.textContent = restavracija.slice || restavracija.imeRestavracije || 'Nalaganje podrobnosti...'; 
 
         const fullData = await getFullRestaurantDetails(currentRestaurantId);
         
@@ -7334,6 +7337,34 @@ async function prikaziPodrobnosti(restavracija) {
     
     const opis = popolnaRestavracija.opis || popolnaRestavracija.glavniOpis || ''; 
     
+    // --- LOGIKA ZA PRETVORBO BESED V IKONE KUHINJE ---
+    const mapaIkon = {
+        'MEAT': 'fa-solid fa-cow',
+        'VEGAN': 'fa-solid fa-leaf',
+        'FISH': 'fa-solid fa-fish',
+        'WINE': 'fa-solid fa-wine-glass',
+        'COFFEE': 'fa-solid fa-mug-saucer',
+        'DRINKS': 'fa-solid fa-wine-glass'
+    };
+
+    let vseIkoneHTML = '';
+    const podatkiKuhinje = popolnaRestavracija.deviznaKuhinja; 
+
+    if (Array.isArray(podatkiKuhinje)) {
+        podatkiKuhinje.forEach(item => {
+            if (typeof item === 'string') {
+                const kljuc = item.toUpperCase().trim();
+                const klasaIkone = kljuc.includes('FA-') ? item : mapaIkon[kljuc];
+                if (klasaIkone) {
+                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: #333; font-size: 1.3em; margin-right: 8px;" title="${item}"></i>`;
+                }
+            }
+        });
+    } else if (kuhinja) {
+        vseIkoneHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+    }
+    // ------------------------------------------------
+
     // 🔥 Pravilne koordinate, ki se uporabljajo povsod
     const lon = popolnaRestavracija.lokacija?.coordinates?.[0] || DEFAULT_LON; 
     const lat = popolnaRestavracija.lokacija?.coordinates?.[1] || DEFAULT_LAT; 
@@ -7342,21 +7373,16 @@ async function prikaziPodrobnosti(restavracija) {
     
     // *************************************************************************
     // ⭐ DODANO: DINAMIČNA NASTAVITEV DATA-ATRIBUTOV NA GUMBU ZA NAVIGACIJO
-    // Uporabimo ID, da se izognemo težavam z document.querySelector
     // *************************************************************************
     const gumbNavigacija = document.getElementById('navigacija-gumb-modal'); 
     
     if (gumbNavigacija) {
-        // Prepisovanje data-atributov z dinamičnimi koordinatami
         gumbNavigacija.setAttribute('data-lat', lat);
         gumbNavigacija.setAttribute('data-lon', lon);
-        
         console.log(`[NAVIGACIJA FIX] Gumb posodobljen z LAT=${lat}, LON=${lon}`);
     } else {
         console.warn("POZOR: Gumb z ID 'navigacija-gumb-modal' ni najden! Preverite HTML.");
     }
-    // *************************************************************************
-    // ⭐ KONEC DODANEGA BLOKA
     // *************************************************************************
 
 
@@ -7384,21 +7410,16 @@ if(modalSlika) modalSlika.style.backgroundImage = `url(${slikaUrl})`;
 // =========================================================
 // 🔥 VSTAVITE TA BLOK KODE TUKAJ (Znotraj prikaziPodrobnosti()) 🔥
 // =========================================================
-// Predpostavljamo, da je 'currentRestaurantId' ID restavracije, ki jo prikazujemo
-// in da je 'globalFavoritesList' globalno naložen seznam priljubljenih ID-jev.
-
-// 1. Preverimo, ali je ta restavracija že na seznamu priljubljenih
 const isFavorite = globalFavoritesList.includes(currentRestaurantId);
+const iconClass = isFavorite ? 'fas' : 'far'; 
+const iconColor = '#e74c3c'; 
 
-// 2. Določimo CSS razred in barvo glede na stanje:
-const iconClass = isFavorite ? 'fas' : 'far'; // fas = polno srce, far = prazno srce
-const iconColor = '#e74c3c'; // Rdeča za oba primera
-
-// =========================================================
-// 🔥 Nadaljevanje s sestavljanjem HTML niza (uporaba spremenljivk) 🔥
-// =========================================================
-
-
+const favoriteButtonHTML = `
+    <button id="modalFavoriteToggle" class="favorite-btn-modal" data-id="${currentRestaurantId}" 
+            style="position: absolute; top: 10px; right: 10px; background: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10; cursor: pointer;">
+        <i class="${iconClass} fa-heart favorite-icon" style="color: ${iconColor}; font-size: 1.5rem;"></i>
+    </button>
+`;
 
 // Preveri, ali gumb že obstaja, preden ga ustvari
 const existingButton = document.getElementById('modalFavoriteToggle');
@@ -7407,17 +7428,13 @@ if (!existingButton) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = favoriteButtonHTML;
     
-    // Predvidevamo, da je '.podrobnosti-tekst' kontejner (parent element) za H2
     const detailsContainer = document.querySelector('.podrobnosti-tekst');
     if (detailsContainer) {
         detailsContainer.style.position = 'relative'; 
         detailsContainer.insertBefore(tempDiv.firstChild, detailsContainer.firstChild);
     }
 } else {
-    // Če gumb že obstaja (modal se ponovno odpre), posodobi ID IN stanje
     existingButton.setAttribute('data-id', currentRestaurantId);
-    
-    // ⭐ KLJUČNO POPRAVILO: Ročna posodobitev stanja ikone za obstoječi gumb
     const icon = existingButton.querySelector('.favorite-icon');
     if (icon) {
         if (isFavorite) {
@@ -7432,7 +7449,9 @@ if (!existingButton) {
 // Konec vstavljanja gumba
     
 if(modalIme) modalIme.textContent = restavracijaIme;
-if(modalKuhinja) modalKuhinja.innerHTML = `<i class="fas fa-utensils"></i> ${kuhinja}`;
+
+// POSODOBLJENO: Tukaj vstavimo zgenerirane ikone kuhinje
+if(modalKuhinja) modalKuhinja.innerHTML = vseIkoneHTML;
 
 if(modalLokacija) modalLokacija.innerHTML = prikazLokacije; 
 
@@ -7558,16 +7577,12 @@ if(galerijaSlikeDiv) {
 
 // Generiranje Zemljevida
 if (modalZemljevid) {
-
-    // prepreči težave s klikom kartice
     modalZemljevid.style.pointerEvents = "auto";
     modalZemljevid.style.display = "block";
     modalZemljevid.style.position = "relative";
     modalZemljevid.style.zIndex = "1";
 
-    // izračun bounding box za bližji pogled (zoom ~16)
     const offset = 0.005; 
-
     const left = lon - offset;
     const right = lon + offset;
     const top = lat + offset;
@@ -7577,12 +7592,9 @@ if (modalZemljevid) {
         `https://www.openstreetmap.org/export/embed.html?bbox=${left},${bottom},${right},${top}&layer=mapnik&marker=${lat},${lon}`;
 }
 
-    
     // ⭐ KLJUČNO: Klic funkcije za prikaz vseh ocen
-    // ⭐ POPRAVLJENO: Uporaba ključa 'komentarji', ki ga vrne API.
     renderReviews(popolnaRestavracija.komentarji); 
     
-
     // Resetiraj prikaz prostih ur
     if(prosteUreRezultati) prosteUreRezultati.innerHTML = 
         '<p data-i18n="messages.check_availability_prompt">Proste ure se bodo prikazale, ko kliknete Rezerviraj mizo.</p>';
@@ -7590,7 +7602,6 @@ if (modalZemljevid) {
     globalSelectedTime = null; 
     globalSelectedMizaId = null; 
     
-    // Resetiraj na prvi zavihek (Opis je bolj logičen)
     const defaultTab = document.querySelector('.modal-tab[data-tab="opis"]');
     if(defaultTab) defaultTab.click();
 
@@ -7598,37 +7609,6 @@ if (modalZemljevid) {
     if(restavracijaModal) restavracijaModal.classList.add('active');
     updateContent(); 
 }
-
-
-// Zapiranje modala (Ostane enako)
-if(zapriRestavracijaModal) zapriRestavracijaModal.addEventListener('click', () => {
-    if(restavracijaModal) restavracijaModal.classList.remove('active');
-    if(modalZemljevid) modalZemljevid.src = 'about:blank';
-    currentRestaurantId = null; 
-    globalSelectedMizaId = null; 
-});
-
-if(restavracijaModal) window.addEventListener('click', (e) => {
-    if (e.target === restavracijaModal) {
-        restavracijaModal.classList.remove('active');
-        if(modalZemljevid) modalZemljevid.src = 'about:blank';
-        currentRestaurantId = null; 
-        globalSelectedMizaId = null; 
-    }
-});
-
-// LOGIKA ZAVIHKOV (Ostane enako)
-modalTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const targetTab = tab.getAttribute('data-tab');
-        modalTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        const targetElementId = `tab${targetTab.charAt(0).toUpperCase() + targetTab.slice(1)}`;
-        const targetElement = document.getElementById(targetElementId);
-        if (targetElement) targetElement.classList.add('active');
-    });
-});
 
 
 // =================================================================
@@ -8173,7 +8153,7 @@ function showAppDownloadModal() {
 
 // ⭐ PREDVIDENI URL ZA KLIC NA VAŠ NODE.JS BACKEND ⭐
 // Uporabljamo vaš potrjeni API Base URL za Render in dodamo pot /assistant/ask
-const RENDER_API_BASE_URL = 'https://rentyo-gourmet-spletna-stran.onrender.com/api';
+const API_BASE_URL = 'https://philosophical-piranha-rentyo-gourmet-spletna-stran-f9f5e315.koyeb.app/api';
 const API_ENDPOINT = `${RENDER_API_BASE_URL}/assistant/ask`;
 
 // ⭐ GLOBALNA SPREMENLJIVKA ZA SHRANJEVANJE PRIVZETE POZICIJE MODALA ⭐
