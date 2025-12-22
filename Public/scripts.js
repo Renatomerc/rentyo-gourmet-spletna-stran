@@ -150,7 +150,7 @@ if (typeof i18next !== 'undefined' && typeof i18nextBrowserLanguageDetector !== 
 // -------------------------------------------------------------
 // 1. GLOBALNA NASTAVITEV IN TOKEN
 // -------------------------------------------------------------
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'https://philosophical-piranha-rentyo-gourmet-spletna-stran-f9f5e315.koyeb.app/api';
 const authTokenKey = 'jwtToken'; 
 
 let currentRestaurantId = null;
