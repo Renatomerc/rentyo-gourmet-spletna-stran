@@ -4585,7 +4585,7 @@ let userLocation = null;
 const DEFAULT_LAT = 46.0569; // Ljubljana, kot privzeto, če ni lokacije
 const DEFAULT_LON = 14.5058;
 const FALLBACK_IMAGE_URL = 'https://placehold.co/300x200?text=Slika+ni+na+voljo';
-const MAX_DISTANCE_KM = 100;
+const MAX_DISTANCE_KM = 0;
 
 
 // GLOBALNE DEFINICIJE DOM ELEMENTOV (Ohranjene, če so definirane v HTML)
@@ -6061,35 +6061,29 @@ function renderFeaturedCard(restavracija) {
     card.className = 'kartica kartica-izpostavljeno';
     card.setAttribute('data-id', restavracija._id || restavracija.id);
     
-    // Predpostavimo, da je prikaziPodrobnosti funkcija za obravnavo klika
     card.addEventListener('click', () => prikaziPodrobnosti(restavracija)); 
 
     const restavracijaIme = restavracija.imeRestavracije || 'Neznano Ime';
     const slikaUrl = restavracija.urlSlike || restavracija.mainImageUrl || FALLBACK_IMAGE_URL; 
     
-    // ⭐ 1. Pridobitev besedila popusta
-    const besediloPopusta = restavracija.popust || '150 Gumy -10%'; 
+    // ⭐ 1. Pridobitev osnovnega popusta (npr. "150 Gumy -10%")
+    const besediloPopusta = restavracija.popust || ''; 
     
     // --------------------------------------------------------------------------
-    // ⭐ 2. PRIDOBITEV BESEDILA VELJAVNOSTI
+    // ⭐ 2. PRIDOBITEV BESEDILA VELJAVNOSTI IN ZAMENJAVA VRSTNEGA REDA
     const veljavnostBesedilo = restavracija.veljavnost_besedilo; 
     
     let celotnaOznakaVsebina = besediloPopusta;
 
     if (veljavnostBesedilo) {
-        // Združimo popust in čas veljavnosti z ločilom (npr. presledek in navpična črta | )
-        celotnaOznakaVsebina = `${besediloPopusta} | ${veljavnostBesedilo}`;
-        
-        // OPOMBA: Če želite ločilo samo s presledkom, uporabite:
-        // celotnaOznakaVsebina = `${besediloPopusta} ${veljavnostBesedilo}`;
+        // Pika je odstranjena, ostal je le presledek
+        celotnaOznakaVsebina = `${veljavnostBesedilo} ${besediloPopusta}`;
     }
     // --------------------------------------------------------------------------
 
     card.innerHTML = `
         <div class="slika-kartice" style="background-image: url('${slikaUrl}')">
-            
             <span class="oznaka-ponudbe">${celotnaOznakaVsebina}</span>
-            
         </div>
         <div class="vsebina-kartice-izpostavljeno">
             <h3>${restavracijaIme}</h3>

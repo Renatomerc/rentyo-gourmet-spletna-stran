@@ -269,18 +269,23 @@ exports.izbrisiRestavracijo = async (req, res) => {
 
 
 // =================================================================
-// 2. Geospatial in rezervacijska logika
+// 2. Geospatial in rezervacijska logika (BACKEND JE ŠEF)
 // =================================================================
 
 /**
  * Geospatial iskanje (GET /blizina)
  */
 exports.pridobiRestavracijePoBlizini = async (req, res) => {
-    const { lat, lon, radius } = req.query; 
+    // 1. Preberemo samo lokacijo, radius iz frontenda ignoriramo
+    const { lat, lon } = req.query; 
     
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lon);
-    const maxDistance = parseInt(radius) || 10000; 
+
+    // 2. FIKSNA NASTAVITEV (100 km = 100.000 metrov)
+    // Zdaj bo razdalja vedno 100 km, ne glede na to, kaj pošlje aplikacija.
+    // Če želiš v prihodnje spremeniti na npr. 50km, samo tukaj popraviš na 50000.
+    const maxDistance = 100000; 
 
     if (isNaN(latitude) || isNaN(longitude)) {
         return res.status(400).json({ msg: "Prosimo, zagotovite veljavne koordinate (lat in lon)." });
@@ -292,10 +297,10 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
                 $geoNear: {
                     near: { 
                         type: "Point", 
-                        coordinates: [longitude, latitude] // MongoDB pričakuje [lon, lat]
+                        coordinates: [longitude, latitude] 
                     },
                     distanceField: "razdalja_metri",
-                    maxDistance: maxDistance,
+                    maxDistance: maxDistance, // Uporabi našo fiksno vrednost
                     spherical: true,
                 }
             }
@@ -308,7 +313,7 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
 
         if (restavracijeZRazdaljo.length === 0) {
              return res.status(200).json({
-                msg: "V polmeru " + (maxDistance / 1000) + " km nismo našli restavracij.",
+                msg: `V polmeru ${maxDistance / 1000} km nismo našli restavracij.`,
                 restavracije: []
             });
         }
@@ -320,7 +325,7 @@ exports.pridobiRestavracijePoBlizini = async (req, res) => {
         
         if (error.code === 16602) {
              return res.status(500).json({ 
-                msg: "Geoprostorska poizvedba ne deluje. Preverite, ali imate 2dsphere indeks na polju 'lokacija'!",
+                msg: "Preverite 2dsphere indeks na polju 'lokacija'!",
                 error_details: error.message
              });
         }
