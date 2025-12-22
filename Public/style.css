@@ -735,7 +735,7 @@ body.is-capacitor .iskalnik-sekcija {
         flex: 0 0 80%; 
         min-width: 55%;
         max-width: 60%;
-        height: 350px; /* Še bolj kompaktna višina na mobilnem */
+        height: 320px; /* Še bolj kompaktna višina na mobilnem */
         
         scroll-snap-align: start; 
     }

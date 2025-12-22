@@ -629,19 +629,27 @@ async function naloziInPrikaziRestavracije() {
 }
 
 // ===============================================
-// V. FUNKCIJA ZA ISKANJE (POPRAVLJENO RAVNANJE Z REZULTATI)
+// V. FUNKCIJA ZA ISKANJE (POPRAVLJENO RAVNANJE Z REZULTATI - BREZ BRISANJA)
 // ===============================================
 
 async function obdelajIskanje(searchData) {
     console.log("Začenjam iskanje restavracij z API-jem (/isci)...");
 
-    if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: searchData.mesto || '' }) : `Iščem ${searchData.mesto}...`;
-    if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '<p class="text-center w-full col-span-full">Iščem restavracije...</p>';
-    // Skrijemo featured sekcijo med iskanjem
-    if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.innerHTML = ''; 
+    // Pridobimo nove elemente za prikaz rezultatov iskanja
+    const rezultatiSekcija = document.getElementById('rezultatiIskanjaSekcija');
+    const rezultatiMreza = document.getElementById('rezultatiIskanja');
+
+    // 1. Prikažemo sekcijo za iskanje, ne da bi skrivali karkoli drugega
+    if (rezultatiSekcija) {
+        rezultatiSekcija.classList.remove('hidden'); 
+    }
+    
+    // 2. Samo v vsebniku za iskanje pokažemo status nalaganja
+    if (rezultatiMreza) {
+        rezultatiMreza.innerHTML = '<p class="text-center w-full">Iščem restavracije...</p>';
+    }
 
     try {
-        // 🔥 KRITIČNA TOČKA: Uporabljamo API_BASE_URL (ki vsebuje '/restavracije') + '/isci'
         const response = await fetch(`${API_BASE_URL}/isci`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -656,45 +664,52 @@ async function obdelajIskanje(searchData) {
             } catch {
                 errorText = response.statusText;
             }
-            console.error(`Napaka API klice /isci: Status ${response.status}`, errorText);
             throw new Error(`API Napaka ${response.status}: ${errorText}`);
         }
 
-        // 🔥 POPRAVEK: Preverimo, ali je odgovor Array ali posamezen objekt
         const rawResult = await response.json();
         
-        let rezultati;
+        // 3. Rezultate shranimo v lokalno spremenljivko (NE v globalno allRestavracije)
+        let najdeniRezultati;
         if (Array.isArray(rawResult)) {
-            rezultati = rawResult; // Če je že Array, ga uporabimo
+            najdeniRezultati = rawResult;
         } else if (rawResult && typeof rawResult === 'object') {
-            // Če je en sam objekt (kar se je zgodilo pri iskanju 'Lipa'), ga ovijemo v Array
-            rezultati = [rawResult];
+            najdeniRezultati = [rawResult];
         } else {
-            // Če ni niti Array niti objekt, je to prazen rezultat
-            rezultati = [];
+            najdeniRezultati = [];
         }
 
-        // 🔥 KLJUČNO: Posodobimo globalno spremenljivko z rezultati iskanja
-        allRestavracije = rezultati;
-        currentFilterKuhinja = ''; // Resetiramo filter, da se prikažejo vsi rezultati iskanja
+        console.log("Uspešno iskanje. Najdeno restavracij:", najdeniRezultati.length);
 
-        console.log("Uspešno iskanje. Najdeno restavracij:", allRestavracije.length);
+        // 4. IZRIS REZULTATOV IZKLJUČNO V NAVPIČNO MREŽO
+        if (rezultatiMreza) {
+            rezultatiMreza.innerHTML = ''; 
 
-        // Prikaz rezultatov
-        filterAndRenderRestavracije(); // Uporabimo isto funkciju za render
-        
-        // Prikaz statusa iskanja
-        if (allRestavracije.length === 0) {
-             if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.';
-        } else {
-            if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.search_results_found', { count: allRestavracije.length }) : `Najdeno ${allRestavracije.length} restavracij.`;
+            if (najdeniRezultati.length === 0) {
+                rezultatiMreza.innerHTML = '<p class="text-center w-full">Žal nismo našli restavracij za te kriterije.</p>';
+            } else {
+                najdeniRezultati.forEach(rest => {
+                    const kartica = ustvariKartico(rest);
+                    
+                    if (typeof kartica === 'string') {
+                        rezultatiMreza.insertAdjacentHTML('beforeend', kartica);
+                    } else {
+                        rezultatiMreza.appendChild(kartica);
+                    }
+                });
+            }
         }
 
+        // 5. Pomaknemo zaslon na vrh rezultatov iskanja
+        if (rezultatiSekcija) {
+            rezultatiSekcija.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
     } catch (error) {
         console.error("Kritična napaka pri Fetch klicu /isci:", error);
-        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center; width: 100%; padding: 20px;">NAPAKA PRI ISKANJU: ${error.message}</p>`;
-        if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri iskanju restavracij.';
+        if (rezultatiMreza) {
+            rezultatiMreza.innerHTML = `<p style="color: red; text-align: center; width: 100%;">NAPAKA PRI ISKANJU: ${error.message}</p>`;
+        }
     }
 }
 

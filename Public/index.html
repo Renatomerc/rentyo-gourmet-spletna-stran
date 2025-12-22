@@ -33,6 +33,88 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
+    .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff; /* Barva ozadja aplikacije */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+/* Animirana črta (Progress Bar) */
+.progress-bar {
+    width: 200px;
+    height: 4px;
+    background-color: #f0f0f0;
+    border-radius: 2px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #076b6a; /* Tvoja glavna barva */
+    animation: loadingFill 1.5s ease-in-out forwards;
+}
+
+@keyframes loadingFill {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Skrij loader */
+.loader-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.inline-loader {
+    width: 100%;
+    /* Centriranje na sredino zaslona/sekcije */
+    min-height: 200px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+}
+
+.inline-progress-bar {
+    width: 200px; /* Lahko pustiš 150px ali povečaš na 200px za boljšo vidnost */
+    height: 4px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.inline-progress-fill {
+    width: 0%; /* Začne pri ničli */
+    height: 100%;
+    background-color: #076b6a;
+    /* Animacija traja 1s, se ustavi na koncu (forwards) in uporabi isti stil kot glavni loader */
+    animation: inlineLoadingFill 1s ease-in-out forwards;
+}
+
+@keyframes inlineLoadingFill {
+    0% { 
+        width: 0%; 
+    }
+    100% { 
+        width: 100%; 
+    }
+}
+
+
 /* =================================================================
 // ⭐ PISAVA 'CREAMCAKE' - OTF format (Brez presledka)
 // ================================================================= */
@@ -1936,8 +2018,8 @@
     cursor: pointer;
     
     /* Velikost in oblika kroga */
-    width: 35px; /* Malce manjši krog */
-    height: 35px;
+    width: 40px; /* Malce manjši krog */
+    height: 40px;
     border-radius: 50%; /* Naredi krog */
     
     /* Barve in obroba */
@@ -3549,6 +3631,66 @@ body.is-capacitor-app #aiChatModal {
 .cloudinary-slider-container::-webkit-scrollbar {
     display: none;
 }
+/* --- PRIVZETO ZA SPLET (Desktop) --- */
+/* Rezultati se razporedijo v mrežo po celotnem zaslonu */
+#rezultatiIskanja {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+/* --- PRILAGODITEV ZA APPLIKACIJO / MOBILNE NAPRAVE --- */
+/* Velja za zaslone, ožje od 768px (večina telefonov) */
+@media only screen and (max-width: 768px) {
+    #rezultatiIskanja {
+        display: flex;
+        flex-direction: column; /* Kartice gredo ena pod drugo */
+        align-items: center;    /* Centrira kartice na sredino zaslona */
+        gap: 25px;              /* Večji razmik med karticami za boljši pregled */
+        padding: 20px 10px;     /* Nekaj odmika zgoraj in spodaj */
+    }
+    
+
+    /* Kartica v aplikaciji (rezultati iskanja) */
+    #rezultatiIskanja .kartica, 
+    #rezultatiIskanja .restaurant-card { 
+        /* Kartica ne bo čisto od roba do roba (90% širine zaslona) */
+        width: 90% !important;
+        
+        /* Ožja max širina, da kartice na telefonu izgledajo elegantno */
+        max-width: 300px; 
+        
+        min-width: unset !important;
+        margin: 0 auto;
+        
+        /* Dodatno oblikovanje za moderen izgled */
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        background-color: #fff;
+    }
+
+    /* Prilagoditev slik v ožjih karticah */
+    #rezultatiIskanja .kartica img, 
+    #rezultatiIskanja .restaurant-card img {
+        width: 100%;
+        height: 180px;         /* Enotna višina slik */
+        object-fit: cover;     /* Prepreči popačenje slik */
+        display: block;
+    }
+
+    /* Prilagoditev besedila v ožjih karticah */
+    #rezultatiIskanja .kartica-vsebina,
+    #rezultatiIskanja .restaurant-card-content {
+        padding: 12px;
+        text-align: left;
+    }
+}
+#rezultatiIskanja {
+    transition: opacity 0.3s ease-in-out;
+}
+
 
 
 
@@ -3562,13 +3704,15 @@ body.is-capacitor-app #aiChatModal {
 
 <body>
     
-<div id="splashScreenWeb">
-    <span class="logo-part-1">R</span>
-    <span class="logo-part-2">e</span>
-    <span class="logo-part-3">n</span> 
-    <span class="logo-part-4">t</span> 
-    <span class="logo-part-5">y</span> 
-    <span class="logo-part-6">o</span> 
+<div id="loading-screen" class="loading-overlay">
+    <div class="loader-content">
+        <div class="spinner"></div> 
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        </div>
 </div>
     
     <header class="glava">
@@ -3686,7 +3830,7 @@ body.is-capacitor-app #aiChatModal {
           <h1 data-i18n="hero.title">Gourmet & Experience</h1>
         </section>
 
-  <section class="iskalnik-sekcija">
+ <section class="iskalnik-sekcija">
   <form class="iskalnik">
     <div class="iskalnik-polje">
       <input type="text" id="restavracija_mesto" data-i18n="[placeholder]search.restaurant_city_placeholder" placeholder="Vnesite ime ali mesto">
@@ -3715,81 +3859,38 @@ body.is-capacitor-app #aiChatModal {
   </form>
 </section>
 
-<section class="hitra-iskanja">
-    <h2 data-i18n="quick_search.title">Hitra izbira kuhinje</h2>
-    <div class="gumbi-kategorij">
-        
-        <div class="kategorija-item">
-            <a href="#" class="gumb-kategorija" data-kuhinja="Mesna">
-                <i class="fa-solid fa-cow"></i>
-            </a>
-            <span class="napis-kategorije" data-i18n="cuisine.meat">Mesne jedi</span>
-        </div>
-        
-        <div class="kategorija-item">
-            <a href="#" class="gumb-kategorija" data-kuhinja="Vegi">
-                <i class="fa-solid fa-leaf"></i>
-            </a>
-            <span class="napis-kategorije" data-i18n="cuisine.vegetarian">Vegetarijanske jedi</span>
-        </div>
-        
-        <div class="kategorija-item">
-            <a href="#" class="gumb-kategorija" data-kuhinja="Ribja">
-                <i class="fa-solid fa-fish"></i>
-            </a>
-            <span class="napis-kategorije" data-i18n="cuisine.fish">Ribje jedi</span>
-        </div>
-        
-        <div class="kategorija-item">
-            <a href="#" class="gumb-kategorija" data-kuhinja="Pijača">
-                <i class="fa-solid fa-wine-glass"></i>
-            </a>
-            <span class="napis-kategorije" data-i18n="cuisine.drinks">Pijača</span>
-        </div>
 
-        <div class="kategorija-item">
-            <a href="#" class="gumb-kategorija" data-kuhinja="Brunch">
-                <i class="fa-solid fa-mug-saucer"></i>
-            </a>
-            <span class="napis-kategorije" data-i18n="cuisine.brunch">Brunch</span>
-        </div>
 
+<section class="kartice-restavracij hidden" id="rezultatiIskanjaSekcija" style="margin-bottom: 30px;">
+    <div class="gumb-nazaj-vsebnik">
+        <button id="gumbNazaj" class="gumb-nazaj ikona-nazaj" onclick="handlePrikaziPrivzete()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+    </div>
+    <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
+    <div class="navpicna-mreza" id="rezultatiIskanja">
+        </div>
+    </section>
+
+<section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
+    <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
+    <div class="mreza-kartic" id="restavracije-container">
+        <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
     </div>
 </section>
 
-        <section class="kartice-restavracij hidden" id="rezultatiIskanjaSekcija">
-            
-            <div class="gumb-nazaj-vsebnik">
-                <button id="gumbNazaj" class="gumb-nazaj ikona-nazaj" onclick="handlePrikaziPrivzete()">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-            </div>
-            
-            <h2 id="naslovRezultatov" data-i18n="results.search_title">Rezultati iskanja</h2>
-            <div class="mreza-kartic" id="rezultatiIskanja">
-            </div>
-        </section>
-
-        <section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
-            <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
-            <div class="mreza-kartic" id="restavracije-container">
-                <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
-            </div>
-        </section>
-
-     <section class="kartice-restavracij kartice-izpostavljeno">
+<section class="kartice-restavracij kartice-izpostavljeno">
     <h3 data-i18n="results.featured_title">Izpostavljeno</h3>
-    
     <div class="mreza-kartic" id="mrezaIzpostavljenoKartic">
         <div id="statusIzpostavljenoKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
     </div>
 </section>
 
 <section class="cloudinary-banner-sekcija">
-    <div class="banner-wrapper"> <div class="cloudinary-slider-container viden-okvir" id="cloudinarySlider">
+    <div class="banner-wrapper"> 
+        <div class="cloudinary-slider-container viden-okvir" id="cloudinarySlider">
             <div class="loading-placeholder">Nalaganje ponudbe...</div>
         </div>
-        
         <div id="banner-dots" class="banner-dots-container"></div>
     </div>
 </section>
@@ -6150,29 +6251,36 @@ if (iskalnik) iskalnik.addEventListener('submit', (e) => {
 });
 
 
-// 6. GLAVNA LOGIKA ISKANJA (KLIC API /isci)
+// 6. GLAVNA LOGIKA ISKANJA (KLIC API /isci) - POSODOBLJENO: Z VIZUALNIM LOADERJEM
 async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhinjaKljuc = '') {
+    if (e) e.preventDefault(); // Preprečimo osveževanje strani
+
+    // Shranimo čas začetka za smooth prehod
+    const startTime = Date.now();
     
     const rezultatiContainer = document.getElementById('rezultatiIskanja');
     const searchSection = document.getElementById('rezultatiIskanjaSekcija');
     const defaultSection = document.getElementById('privzeteRestavracijeSekcija');
 
-    // 👇 LOGIKA PREKLAPLJANJA SEKCIJ
-    if (defaultSection) defaultSection.classList.add('hidden');    // Skrijemo privzeto
-    
-    // ⭐ KLJUČNA SPREMEMBA: Sekcijo rezultatov skrijemo, dokler niso potrjeni rezultati.
-    if (searchSection) searchSection.classList.add('hidden'); 
+    // ⭐ Rezultate iskanja pripravimo za prikaz (pokažemo sekcijo)
+    if (searchSection) searchSection.classList.remove('hidden'); 
     
     if (rezultatiContainer) {
-        // Prikaz sporočila, da potrdimo, da se klic izvaja
-        rezultatiContainer.innerHTML = `<div class="p-4 text-center text-blue-500">${i18next.t('messages.searching', { criteria: mesto || kuhinjaKljuc || '...' })}</div>`;
+        // 👇 TUKAJ JE POPRAVEK: Namesto napisa vstavimo loader
+        rezultatiContainer.innerHTML = `
+            <div class="inline-loader">
+                <div class="inline-progress-bar">
+                    <div class="inline-progress-fill"></div>
+                </div>
+            </div>
+        `;
     }
 
     const datumZaBackend = formatirajDatumZaBackend(datum); 
 
     const searchParams = {
         mesto: mesto, 
-        datum: datumZaBackend, // Formatiran datum za backend
+        datum: datumZaBackend,
         cas: cas,
         stevilo_oseb: parseInt(stevilo_oseb),
         kuhinja: kuhinjaKljuc 
@@ -6189,6 +6297,12 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
 
         const data = await response.json();
 
+        // Umetna pavza za smooth prehod (1 sekunda)
+        const duration = Date.now() - startTime;
+        if (duration < 1000) {
+            await new Promise(resolve => setTimeout(resolve, 1000 - duration));
+        }
+
         // =======================================================
         // ⭐ POPRAVEK LOGIKE FRONT-ENDA ⭐
         // =======================================================
@@ -6197,8 +6311,10 @@ async function handleIskanjeRestavracij(e, mesto, datum, cas, stevilo_oseb, kuhi
             if (Array.isArray(data) && data.length > 0) {
                 prikaziRezultate(data); // Pošljemo celoten 'data' array funkciji prikaziRezultate
                 
-                // ⭐ KLJUČNO: Pokažemo celotno sekcijo z rezultati šele TUKAJ!
-                if (searchSection) searchSection.classList.remove('hidden'); 
+                // ⭐ Sekcija z rezultati je že vidna, zdaj so v njej le še podatki
+                if (searchSection) {
+                    searchSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
                 
             } else {
                 rezultatiContainer.innerHTML = `<div class="p-4 text-center text-gray-600">${i18next.t('messages.no_restaurants_found_criteria') || 'Žal nismo našli restavracij, ki bi ustrezale vašim kriterijem.'}</div>`;
@@ -8775,6 +8891,21 @@ async function naloziBannerjeIzJson() {
 }
 
 document.addEventListener('DOMContentLoaded', naloziBannerjeIzJson);
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loading-screen');
+    
+    // Nastavimo minimalni čas prikaza (npr. 1.8 sekunde), 
+    // da loader ne utripne prehitro, če je internet zelo hiter.
+    setTimeout(() => {
+        loader.classList.add('loader-hidden');
+        
+        // Po končani animaciji ga popolnoma odstranimo iz DOM-a
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500);
+        
+    }, 1800); 
+});
 
 
 

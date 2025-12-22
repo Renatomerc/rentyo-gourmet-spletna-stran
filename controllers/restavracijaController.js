@@ -44,7 +44,6 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 
     try {
         const restavracije = await Restavracija.aggregate([
-            // 🔥 POPRAVLJENO: ODSTRANJENA OMEJITEV $limit: 10
             { $project: {
                 _id: 1, 
                 // Ključni podatki kartice
@@ -52,11 +51,12 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 urlSlike: { 
                     $ifNull: [
                         "$mainImageUrl", 
-                        // 🔥 POPRAVEK: Uporabite prvo sliko iz novega polja galerija_slik
                         { $arrayElemAt: ["$galerija_slik", 0] } 
                     ]
                 },
-                deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
+                
+                // 🔥 POPRAVEK: Namesto prvega elementa vzamemo prve tri (0, 1, 2)
+                deviznaKuhinja: { $slice: ["$cuisine", 3] },
                 
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
@@ -69,11 +69,10 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 veljavnost_besedilo: 1,
                 
                 // 🔥🔥🔥 KRITIČNI POPRAVEK: DODAJ POLJE KOMENTARJI
-                komentarji: 1, // <--- DODANO ZA REŠITEV PROBLEMA Z OCENAMI
+                komentarji: 1, 
                 
                 // ⭐ NOVO: DODAJTE FEATURED POLJE TUKAJ!
                 featured: 1, 
-                // ------------------------------------
                 
                 // Ostala polja
                 galerija_slik: 1, 
@@ -82,7 +81,6 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                 // 🔥 NOVO: Polja za Google oceno in število mnenj
                 googleRating: { $ifNull: ["$googleRating", 0] },
                 googleReviewCount: { $ifNull: ["$googleReviewCount", 0] },
-                // ------------------------------------
                 
                 lokacija: 1,
                 razpolozljivost_status: 1,
