@@ -54,9 +54,10 @@ exports.getPrivzetoRestavracije = async (req, res) => {
                         { $arrayElemAt: ["$galerija_slik", 0] } 
                     ]
                 },
-                
-                // 🔥 POPRAVEK: Namesto prvega elementa vzamemo prve tri (0, 1, 2)
-                deviznaKuhinja: { $slice: ["$cuisine", 3] },
+
+                // 🔥 POPRAVEK: Namesto enega elementa vzamemo prve 3 iz polja kuhinja_filtri
+                // Če polje ne obstaja, vrnemo prazen array []
+                deviznaKuhinja: { $slice: [{ $ifNull: ["$kuhinja_filtri", []] }, 3] },
                 
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
