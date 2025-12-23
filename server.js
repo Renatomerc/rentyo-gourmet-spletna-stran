@@ -152,6 +152,7 @@ function startApp() {
     let uploadRouter;
     let offersRouter; 
     let aiRouter; // ⭐ NOVO: Deklaracija za AI router
+    let promocijaRouter; // ⭐ NOVO: Deklaracija za Promocija router
     let authMiddleware; 
     let preveriGosta; 
     let zahtevajPrijavo; 
@@ -174,6 +175,9 @@ function startApp() {
         // ⭐ NOVO: Inicializacija AI Routerja
         aiRouter = require('./routes/aiRouter'); 
 
+        // ⭐ NOVO: Inicializacija Promocija Routerja
+        promocijaRouter = require('./routes/promocijaRouter'); 
+
     } catch (e) {
         console.error("❌ Kritična napaka pri nalaganju routerjev. Preverite poti modelov znotraj routerjev:", e.message);
         console.error("Stack trace:", e.stack);
@@ -194,6 +198,12 @@ function startApp() {
     if (offersRouter) {
         app.use('/api/offers', offersRouter);
         console.log("✅ API Pot za Ponudbe (/api/offers) je uspešno priključena.");
+    }
+
+    // ⭐ NOVO: Priključitev API Poti za Promocije
+    if (promocijaRouter) {
+        app.use('/api/promocije', promocijaRouter);
+        console.log("✅ API Pot za Promocije (/api/promocije) je uspešno priključena.");
     }
 
     if (userRoutes) {

@@ -3690,6 +3690,96 @@ body.is-capacitor-app #aiChatModal {
 #rezultatiIskanja {
     transition: opacity 0.3s ease-in-out;
 }
+/* Stil za celotno prekrivno okno (Overlay) */
+#radiusModalOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    backdrop-filter: blur(8px);
+}
+
+/* Glavno belo okno */
+#radiusMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px 25px;
+    border-radius: 20px;
+    width: 70%;
+    max-width: 380px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Kontejner za drsnik */
+.slider-container {
+    width: 100%;
+    padding: 20px 0px;
+    box-sizing: border-box;
+}
+
+/* OSNOVNI STIL ZA DRSNIK (Input Range) */
+#radiusRange {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: #e0e0e0;
+    outline: none;
+    margin: 20px 0;
+}
+
+/* KROGEC ZA DRSENJE (Webkit) */
+#radiusRange::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px; 
+    height: 30px;
+    border-radius: 50%;
+    background: #88d82d;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* OVALEN GUMB ZA POTRDITEV */
+#confirmRadiusBtn {
+    display: block;        /* Omogoči centriranje z margin auto */
+    margin: 20px auto 0;  /* 20px zgoraj, sredina levo/desno */
+    width: 80%;           /* Tvoja želena širina */
+    padding: 12px 24px;
+    background-color: #88d82d;
+    color: #333;
+    border: none;
+    border-radius: 25px;  /* Ovalna oblika */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    outline: none;
+}
+
+/* Efekt ob lebdenju in pritisku */
+#confirmRadiusBtn:hover {
+    background-color: #79c225;
+    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+}
+
+#confirmRadiusBtn:active {
+    transform: scale(0.96); /* Odziv na klik */
+}
+
+
+
 
 
 
@@ -3873,7 +3963,32 @@ body.is-capacitor-app #aiChatModal {
     </section>
 
 <section class="kartice-restavracij" id="privzeteRestavracijeSekcija">
-    <h2 data-i18n="results.popular_title">Priljubljeno v vaši bližini</h2>
+    <div style="text-align: center; margin-bottom: 20px; position: relative; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 48px;">
+        
+        <h2 data-i18n="results.popular_title" style="margin: 0; font-size: 1.2rem;">Kam v bližini</h2>
+        
+        <div class="settings-wrapper" style="position: absolute; right: 16px; display: flex; align-items: center;">
+            
+            <i class="fa-solid fa-sliders" id="gearIcon" style="cursor: pointer; color: #000; font-size: 1.3rem; padding: 12px; opacity: 0.7;"></i>
+            
+            <div id="radiusModalOverlay">
+                <div id="radiusMenu">
+                    <h3 data-i18n="filters.select_distance" style="margin-top: 0; font-size: 1.2rem; color: #333;">Izberite razdaljo</h3>
+                    
+                    <div style="font-size: 2rem; font-weight: 800; color: #88d82d; margin: 10px 0;">
+                        <span id="radiusValue">50</span> <small style="font-size: 1rem;">km</small>
+                    </div>
+
+                    <div class="slider-container">
+                        <input type="range" id="radiusRange" min="2" max="100" value="50" step="1">
+                    </div>
+
+                    <button id="confirmRadiusBtn" data-i18n="common.ok"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mreza-kartic" id="restavracije-container">
         <div id="statusKartice" style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">Nalaganje...</div>
     </div>
@@ -4585,7 +4700,7 @@ let userLocation = null;
 const DEFAULT_LAT = 46.0569; // Ljubljana, kot privzeto, če ni lokacije
 const DEFAULT_LON = 14.5058;
 const FALLBACK_IMAGE_URL = 'https://placehold.co/300x200?text=Slika+ni+na+voljo';
-const MAX_DISTANCE_KM = 0;
+let MAX_DISTANCE_KM = 50;
 
 
 // GLOBALNE DEFINICIJE DOM ELEMENTOV (Ohranjene, če so definirane v HTML)
@@ -6101,34 +6216,34 @@ function filterAndRenderRestavracije(optionalFilteredList) {
     
     const filtered = listToRender.filter(r => {
         
-        // =================================================================
-        // ⭐ 1. NOVO: Logika 'Priljubljeno v bližini' (Radij 20 km)
-        // =================================================================
-        if (currentFilterKuhinja === '') {
-            
-            // A. Preverjanje, ali imamo lokacijo uporabnika IN restavracije
-            if (userLocation && r.lokacija?.coordinates) {
-                
-                // Koordinate restavracije (lon je 0, lat je 1)
-                const restaurantLon = r.lokacija.coordinates[0];
-                const restaurantLat = r.lokacija.coordinates[1];
-                
-                // Izračunaj razdaljo (uporablja globalno funkcijo getDistance)
-                const distance = getDistance(
-                    userLocation.lat, 
-                    userLocation.lon, 
-                    restaurantLat, 
-                    restaurantLon
-                );
-                
-                // Vrni TRUE samo, če je razdalja znotraj 20 km
-                return distance <= MAX_DISTANCE_KM; // Uporablja MAX_DISTANCE_KM = 20
+       // =================================================================
+// ⭐ 1. NOVO: Logika 'Priljubljeno v bližini' (Dinamični radij)
+// =================================================================
+if (currentFilterKuhinja === '') {
+    
+    // A. Preverjanje, ali imamo lokacijo uporabnika IN restavracije
+    if (userLocation && r.lokacija?.coordinates) {
+        
+        // Koordinate restavracije (lon je 0, lat je 1)
+        const restaurantLon = r.lokacija.coordinates[0];
+        const restaurantLat = r.lokacija.coordinates[1];
+        
+        // Izračunaj razdaljo
+        const distance = getDistance(
+            userLocation.lat, 
+            userLocation.lon, 
+            restaurantLat, 
+            restaurantLon
+        );
+        
+        // VRNE TRUE, če je razdalja manjša od trenutno nastavljene na drsniku
+        return distance <= MAX_DISTANCE_KM; 
 
-            }
-            
-            // B. Če nimamo lokacije uporabnika, restavracije v tem pogledu ne prikažemo.
-            return false; 
-        } 
+    }
+    
+    // B. Če nimamo lokacije uporabnika, restavracije v tem pogledu ne prikažemo.
+    return false; 
+}
         
         // =================================================================
 // 2. Filtriranje po tipu kuhinje (Ohranjen tvoj originalni način)
@@ -8879,6 +8994,68 @@ window.addEventListener('load', () => {
         }, 500);
         
     }, 1800); 
+});
+// 1. Prepričaj se, da je to na vrhu tvoje celotne skripte (globalno)
+// let MAX_DISTANCE_KM = 50; 
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Poiščemo elemente v HTML-ju
+    const gearIcon = document.getElementById('gearIcon');
+    const modalOverlay = document.getElementById('radiusModalOverlay');
+    const radiusRange = document.getElementById('radiusRange');
+    const radiusValue = document.getElementById('radiusValue');
+    
+    // POPRAVEK: Uskladitev ID-ja z gumbom v HTML (confirmRadiusBtn)
+    const confirmBtn = document.getElementById('confirmRadiusBtn');
+
+    // Preverimo, če osnovni elementi obstajajo
+    if (gearIcon && modalOverlay) {
+        
+        // Funkcija za zapiranje (da je ne ponavljamo)
+        const zapriModal = () => {
+            modalOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Ponovno omogočimo scrollanje
+        };
+
+        // A. ODPIRANJE MODALNEGA OKNA
+        gearIcon.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            modalOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Ustavi scrollanje v ozadju
+        });
+
+        // B. POSODABLJANJE RAZDALJE (DRSNIK)
+        if (radiusRange) {
+            radiusRange.addEventListener('input', (e) => {
+                const novaVrednost = e.target.value;
+                
+                // Posodobi številko v modalnem oknu
+                if (radiusValue) radiusValue.innerText = novaVrednost;
+                
+                // Posodobi globalno spremenljivko razdalje
+                MAX_DISTANCE_KM = parseInt(novaVrednost);
+                
+                // Osvežitev filtra v ozadju
+                if (typeof filterAndRenderRestavracije === "function") {
+                    filterAndRenderRestavracije(); 
+                }
+            });
+        }
+
+        // C. ZAPIRANJE NA GUMB "POTRDI / OK"
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                zapriModal();
+            });
+        }
+
+        // D. ZAPIRANJE OB KLIKU NA TEMNO OZADJE
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                zapriModal();
+            }
+        });
+    }
 });
 
 
