@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const mongoose = require('mongoose');
 
 const PromocijaShema = new mongoose.Schema({
     slika_url: { type: String, required: true }, // Cloudinary link
@@ -43,4 +42,5 @@ const PromocijaShema = new mongoose.Schema({
     ustvarjeno: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Promocija', PromocijaShema);
+// Preverimo, če model že obstaja, da preprečimo napako pri ponovnem nalaganju (OverWriteModelError)
+module.exports = mongoose.models.Promocija || mongoose.model('Promocija', PromocijaShema);
