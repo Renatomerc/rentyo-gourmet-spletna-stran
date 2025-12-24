@@ -1,6 +1,18 @@
 /* ========================================================================= */
 /* OSNOVNI STILI IN RESET                        */
 /* ========================================================================= */
+/* Onemogoči izbiro besedila v celotni aplikaciji */
+* {
+    -webkit-user-select: none;  /* Safari/iOS/Capacitor */
+    user-select: none;          /* Standard */
+    -webkit-touch-callout: none; /* Onemogoči meni ob dolgem pritisku na iOS */
+}
+
+/* Izjema: Če imaš kakšno polje (input), kjer uporabnik MORA pisati */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
 
 /* Ponastavitev osnovnih brskalniških stilov */
 * {
@@ -11,42 +23,29 @@
 
 /* Dodatno: Nastavitev minimalne višine za HTML in BODY */
 html, body {
-    /* To je potrebno, da se telo (body) pravilno raztegne za visoke strani */
-    min-height: 100%; 
-    height: auto;
+    /* Raztegne ozadje čez celoten zaslon, tudi če je malo vsebine */
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Osnovna tipografija in barva ozadja telesa */
 body {
-    background-image: url('circles-and-roundabouts.png'); 
-    background-repeat: repeat; 
-    /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
-    background-color: #F5F5F5; 
+    /* UPORABA GRADIENTA: Od čisto bele zgoraj do nežno sive spodaj */
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
     
-    /* Zelo pomembno: Omogoča, da se body::before pravilno pozicionira */
+    /* Pomembno: Ozadje ostane fiksno, medtem ko uporabnik drsa po vsebini */
+    background-attachment: fixed;
+    
+    /* Rezervna barva, če gradient ne bi deloval */
+    background-color: #f8f9fa; 
+    
+    /* Tipografija ostane čista */
     position: relative; 
 }
 
-body::before {
-    content: ''; /* Obvezno za pseudo-elemente */
-    
-    /* 🔥 POPRAVEK: Uporabite 'fixed' ali 'absolute' v kombinaciji z 100% višine. */
-    /* Uporabimo 'absolute', saj želimo, da se raztegne čez celotno vsebino. */
-    position: absolute; 
-    
-    top: 0;
-    left: 0;
-    width: 100%;
-    
-    /* 🔥 POPRAVEK: Višino nastavite na 100% vsebine BODY elementa */
-    height: 100%;
-    
-    /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
-    background-color: rgba(255, 255, 255, 0.591); 
-    
-    /* Zagotovimo, da je ta sloj pod vso vsebino */
-    z-index: -1; 
-}
+/* 🔥 ODSTRANJENO: body::before sloj ni več potreben, ker nimamo več vzorca. 
+   To bo tudi pohitrilo delovanje tvoje aplikacije na telefonih. 🔥 */
 
 /* Osnovna stilizacija povezav */
 a {
@@ -241,7 +240,7 @@ body.is-capacitor .iskalnik-sekcija {
 .iskalnik input, 
 .iskalnik select {
     padding: 10px; /* Večji padding */
-    border: 1px solid #737373;
+    border: 0px solid #737373;
     border-radius: 20px;
     font-size: 1em;
     background-color: #fff;
@@ -785,7 +784,7 @@ body.is-capacitor .iskalnik-sekcija {
     .iskalnik-sekcija {
         margin: -150px auto 50px auto; 
         max-width: 1000px; 
-        padding: 15px;
+        padding: 10px;
     }
 
     .iskalnik {

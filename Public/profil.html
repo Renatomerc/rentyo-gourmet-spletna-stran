@@ -15,32 +15,32 @@
   <script src="capacitor.js"></script> 
 
 <style>
-   body {
-    background-image: url('circles-and-roundabouts.png'); 
-    background-repeat: repeat; 
-    background-color: #F5F5F5;
-    position: relative; /* za pseudo-element */
-    min-height: 100vh; /* zagotovi vsaj višino zaslona */
-}
+  /* Posodobljena koda za BODY brez vzorca in pseudo-elementov */
+body {
+    /* 1. Nastavitev višine: zagotovi, da ozadje pokrije celoten zaslon */
+    min-height: 100vh;
+    margin: 0;
 
-/* 3. Pseudo-element za blur/posvetlitev */
-body::before {
-    content: '';
-    position: fixed; /* fiksno po viewportu */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    /* 2. Gourmet Gradient: od čisto bele zgoraj do nežno sive spodaj */
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
     
-    /* Sloj za posvetlitev / blur effect */
-    background-color: rgba(255, 255, 255, 0.5);
+    /* 3. Fiksno ozadje: gradient ostane na mestu, ko drsaš (scroll) */
+    background-attachment: fixed;
 
-    /* Če želiš blur: */
-    /* backdrop-filter: blur(5px); */
-    /* -webkit-backdrop-filter: blur(5px); */
+    /* 4. Rezervna barva (Fallback) */
+    background-color: #f8f9fa;
 
-    z-index: -1;
+    /* 5. Pozicioniranje ostane za morebitne druge elemente */
+    position: relative;
+    
+    /* Odstranili smo background-image in body::before */
 }
+
+/* OPOMBA: 
+   Sloj body::before ni več potreben, ker gradient sam po sebi ustvari 
+   čist in posvetljen videz. S tem si sprostil procesor telefona, 
+   saj mu ni treba izračunavati prosojnosti (rgba) čez cel zaslon.
+*/
     /* SPECIFIČEN CSS ZA PROFIL */
     .profil-sekcija {
       padding: 40px 20px;
@@ -790,27 +790,24 @@ body::before {
             </div>
       </div>
       
-      <div class="vsebina-zavihek" id="pomoc">
-        <h3 data-i18n="profile.help_subtitle">Pomoč in podpora</h3> <div class="menu-section mt-6 border-t border-gray-200 pt-4">
+<div class="vsebina-zavihek" id="pomoc">
+        <h3 data-i18n="profile.help_subtitle">Pomoč in podpora</h3> 
+        <div class="menu-section mt-6 border-t border-gray-200 pt-4">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2" data-i18n="profile.support_title">Podpora in pomoč</h2>
             
-<a href="mailto:support@rentyo.eu?subject=Pomo%C4%8D%20za%20Rentyo%20Gourmet%20aplikacijo" 
-   class="flex items-center p-4 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition duration-150 ease-in-out border border-gray-100 mb-2">
-    
-    <div class="flex items-center">
-        <img src="Send-ikona.png" 
-             alt="E-pošta ikona" 
-             class="ikona-posta mr-3" />
-        
-        <span class="text-sm font-medium text-gray-800" data-i18n="profile.help_link">Potrebujete pomoč? Pišite nam!</span>
-    </div>
-</a>
+            <a href="mailto:support@rentyo.eu?subject=Pomo%C4%8D%20za%20Rentyo%20Gourmet%20aplikacijo" 
+               class="flex items-center p-4 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition duration-150 ease-in-out border border-gray-100 mb-2">
+                
+                <div class="flex items-center">
+                    <i class="fa-solid fa-envelope mr-3" 
+                       style="color: #4b5563; font-size: 2rem; display: flex; align-items: center;"></i>
+                    
+                    <span class="text-sm font-medium text-gray-800" data-i18n="profile.help_link">Potrebujete pomoč? Pišite nam!</span>
+                </div>
+            </a>
             
             <p class="text-xs text-gray-400 mt-2 p-2" data-i18n="profile.help_note">Na vprašanja odgovarjamo v najkrajšem možnem času.</p>
         </div>
-                </form>
-            </div>
-            </div>
       </div>
       
     </section>

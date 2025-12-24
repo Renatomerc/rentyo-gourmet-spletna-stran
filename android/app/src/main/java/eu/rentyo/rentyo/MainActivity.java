@@ -10,6 +10,9 @@ import androidx.core.view.WindowCompat;
 import androidx.core.splashscreen.SplashScreen; // ⭐ Potrebno za nadzor logotipa
 import com.getcapacitor.BridgeActivity;
 
+// ⭐ DODANO: Uvoz za FCM plugin
+import com.getcapacitor.community.fcm.FCMPlugin;
+
 public class MainActivity extends BridgeActivity {
 
     // Spremenljivka, ki pove Androidu, ali naj še kaže logotip
@@ -35,6 +38,9 @@ public class MainActivity extends BridgeActivity {
         }
         
         super.onCreate(savedInstanceState);
+
+        // ⭐ DODANO: Ročna registracija FCM plugina
+        registerPlugin(FCMPlugin.class);
 
         // Barva za WebView pod aplikacijo
         if (this.bridge != null && this.bridge.getWebView() != null) {

@@ -33,6 +33,18 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
+    /* Onemogoči izbiro besedila v celotni aplikaciji */
+* {
+    -webkit-user-select: none;  /* Safari/iOS/Capacitor */
+    user-select: none;          /* Standard */
+    -webkit-touch-callout: none; /* Onemogoči meni ob dolgem pritisku na iOS */
+}
+
+/* Izjema: Če imaš kakšno polje (input), kjer uporabnik MORA pisati */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
     .loading-overlay {
     position: fixed;
     top: 0;
@@ -825,7 +837,7 @@
             overflow: hidden; 
             box-shadow: 10 5px 5px rgb(0, 0, 0);
             transition: transform 0.0s, box-shadow 0.0s;
-            background-color: rgb(255, 255, 255);
+            background-color: #ffffff;
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -989,15 +1001,15 @@
     
     width: 100%;
     height: 250px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 10 5px 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    background-color: #88d82d; /* Svetlo ozadje */
-    transition: box-shadow 0.2s, transform 0.2s;
-    border: 0px solid #333;
+    background-color: #ffffff; /* Svetlo ozadje */
+    transition: box-shadow 0.0s, transform 0.0s;
+    border: 1px solid #ebebeb;
 }
 
 .kartica-izpostavljeno:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.15);
     transform: translateY(0px);
     
     
@@ -3521,7 +3533,8 @@ body.is-capacitor-app #aiChatModal {
     /* To bi moralo biti dovolj, če ni drugega močnejšega pravila */
     color: #e74c3c; 
 }
-/* Celoten vsebnik */
+/* --- SKUPNE NASTAVITVE (veljajo za vse) --- */
+
 .cloudinary-banner-sekcija {
     padding: 20px 0; 
     width: 100%;
@@ -3530,26 +3543,21 @@ body.is-capacitor-app #aiChatModal {
     box-sizing: border-box;
 }
 
-/* NOVO: Wrapper, ki drži skupaj slider in pikice */
 .banner-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 1200px; /* Usklajeno z max-width sliderja */
+    max-width: 1200px;
 }
 
-/* Okvir pasu */
 .cloudinary-slider-container.viden-okvir {
     display: flex;
     overflow-x: auto;
     gap: 12px;
     padding: 10px;
-    /* Prilagojeno tvoji višini 200px + nekaj rezerve */
-    min-height: 220px; 
-    width: 95%; 
+    width: 97%; 
     max-width: 1200px; 
-    border: 0px solid #e0e0e0;
     border-radius: 20px;
     align-items: center;
     scroll-snap-type: x mandatory;
@@ -3557,58 +3565,101 @@ body.is-capacitor-app #aiChatModal {
     scrollbar-width: none;
 }
 
-/* Vsebnik za posamezno akcijo (slika + tekst) */
 .banner-item {
     flex: 0 0 auto;
     width: 100%; 
     max-width: 1200px; 
-    height: 200px; /* Tvoja želena višina */
     position: relative; 
     border-radius: 14px;
     overflow: hidden; 
     scroll-snap-align: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-    background: #000;
+    background: transparent; /* Odpravimo črnino v ozadju */
 }
 
-/* Slika se prilagaja vsebniku */
 .banner-item img {
     width: 100%;
     height: 100%;
-    object-fit: contain; 
+    object-fit: cover; /* KLJUČNO: Slika zapolni celoten prostor brez črnih robov */
     display: block;
 }
 
-/* Napis čez sliko */
+/* --- NOVO: OBLIKOVANJE BESEDILA (Naslov in Opis) --- */
+
 .banner-tekst {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     padding: 15px;
+    /* Gradient poskrbi, da je bel tekst berljiv na kateri koli sliki */
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.85)); 
     color: white;
-    pointer-events: none; 
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Razmik med naslovom in opisom */
 }
 
+/* Stil za naslov (npr. Burger Fest 2026) */
 .banner-tekst b {
     display: block;
-    font-size: 16px;
-    margin-bottom: 2px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.1;
 }
 
+/* Stil za opis (npr. Pridruži se nam...) */
 .banner-tekst small {
-    font-size: 12px;
+    display: block;
+    font-weight: 400;
     opacity: 0.9;
+    margin: 0;
+    line-height: 1.3;
 }
 
-/* NOVO: Stili za pikice (indikatorje) */
+/* --- SPECIFIČNE VELIKOSTI GLEDE NA NAPRAVO --- */
+
+/* Mobilne naprave / Capacitor (Zasloni pod 768px) */
+@media (max-width: 767px) {
+    .cloudinary-slider-container.viden-okvir {
+        min-height: 220px; 
+    }
+    .banner-item {
+        height: 200px; /* Višina v aplikaciji */
+    }
+    .banner-tekst b {
+        font-size: 18px; /* Prilagojena velikost naslova za telefon */
+    }
+    .banner-tekst small {
+        font-size: 13px; /* Prilagojena velikost opisa za telefon */
+    }
+}
+
+/* Namizni računalniki / Web (Zasloni nad 768px) */
+@media (min-width: 768px) {
+    .cloudinary-slider-container.viden-okvir {
+        min-height: 420px; 
+    }
+    .banner-item {
+        height: 400px; /* Večja višina za spletno stran */
+    }
+    .banner-tekst b {
+        font-size: 28px; /* Večji naslov na spletu */
+    }
+    .banner-tekst small {
+        font-size: 16px; /* Večji opis na spletu */
+    }
+}
+
+/* --- OSTALI STILI --- */
+
 .banner-dots-container {
     display: flex;
     justify-content: center;
     gap: 8px;
     margin-top: 15px;
-    margin-bottom: 10px;
 }
 
 .dot {
@@ -3617,17 +3668,14 @@ body.is-capacitor-app #aiChatModal {
     background-color: #ccc;
     border-radius: 50%;
     transition: all 0.3s ease;
-    cursor: pointer;
 }
 
-/* Aktivna pikica - postane temnejša in širša */
 .dot.active {
     background-color: #333;
     width: 20px;
     border-radius: 4px;
 }
 
-/* Skrijemo scrollbar */
 .cloudinary-slider-container::-webkit-scrollbar {
     display: none;
 }
@@ -3776,6 +3824,16 @@ body.is-capacitor-app #aiChatModal {
 
 #confirmRadiusBtn:active {
     transform: scale(0.96); /* Odziv na klik */
+}
+/* Animacija za pojavljanje */
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+    animation: popIn 0.3s ease-out forwards;
 }
 
 
@@ -4481,6 +4539,16 @@ body.is-capacitor-app #aiChatModal {
 
     </div>
 </div>
+<div id="customModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index:10000; justify-content:center; align-items:center; pointer-events: none;">
+    <div id="customModalContent" style="background:white; padding:35px; border-radius:30px; text-align:center; width:80%; max-width:280px; box-shadow:0 15px 35px rgba(0,0,0,0.2);">
+        <div id="modalIconContainer" style="margin-bottom: 20px;">
+            <i id="modalIcon" class="fa-solid fa-heart" style="color: #FF4D4D; font-size: 3.5rem;"></i>
+        </div>
+        <h2 id="modalTitle" style="margin: 0; font-family: inherit; font-weight: 800; font-size: 1.4rem; color: #111827;"></h2>
+        <p id="modalMessage" style="color: #6B7280; font-family: inherit; margin-top: 10px; font-size: 0.95rem; line-height: 1.4;"></p>
+    </div>
+</div>
+
 
 
   
@@ -4800,53 +4868,73 @@ const zeton = getUserToken();
 
 
 // =========================================================
-// 🔥 2. FUNKCIJE ZA POSODOBITEV VIZUALNEGA STANJA IN NALAGANJE (POPRAVLJENO) 🔥
+// 🔥 POPRAVLJENO: POMOŽNA FUNKCIJA ZA MODALNI TOAST (z i18n podporo) 🔥
+// =========================================================
+const prikaziModalniToast = (naslovKljuc, sporociloKljuc, tip = 'success') => {
+    const modal = document.getElementById('customModal');
+    const content = document.getElementById('customModalContent');
+    const ikona = document.getElementById('modalIcon');
+    
+    if (!modal || !content || !ikona) return;
+
+    // KLJUČNA SPREMEMBA: Tukaj uporabimo i18next.t() za prevod ključev
+    const naslovPrevod = typeof i18next !== 'undefined' ? i18next.t(naslovKljuc) : naslovKljuc;
+    const sporociloPrevod = typeof i18next !== 'undefined' ? i18next.t(sporociloKljuc) : sporociloKljuc;
+
+    document.getElementById('modalTitle').innerText = naslovPrevod;
+    document.getElementById('modalMessage').innerText = sporociloPrevod;
+    
+    // Prilagodi barvo in ikono glede na akcijo
+    if (tip === 'success') {
+        ikona.className = "fa-solid fa-circle-check";
+        ikona.style.color = "#076b6a"; // Zelena
+    } else if (tip === 'error') {
+        ikona.className = "fa-solid fa-heart-crack";
+        ikona.style.color = "#ff4d4d"; // Rdeča
+    } else {
+        ikona.className = "fa-solid fa-circle-exclamation";
+        ikona.style.color = "#f59e0b"; // Oranžna za opozorila
+    }
+
+    modal.style.display = 'flex';
+    content.classList.add('animate-pop');
+
+    // Samodejno zapri po 3 sekundah
+    setTimeout(() => {
+        modal.style.display = 'none';
+        content.classList.remove('animate-pop');
+    }, 3000);
+};
+
+// =========================================================
+// 🔥 2. FUNKCIJE ZA POSODOBITEV VIZUALNEGA STANJA IN NALAGANJE 🔥
 // =========================================================
 
-/**
- * Posodobi ikone priljubljenih na VSEH karticah na strani glede na globalFavoritesList.
- * To obarva srčke v rdeč okvir (ne-priljubljeno) ali polno rdečo (priljubljeno).
- */
 const posodobiVizualnoStanjePriljubljenih = () => {
-    // Poišče elemente, ki vsebujejo 'data-id' (restavracija ID)
     document.querySelectorAll('[data-id]').forEach(element => {
         const restavracijaId = element.getAttribute('data-id');
-        // Predvidevamo, da je ikona znotraj elementa z razredom '.favorite-icon'
         const icon = element.querySelector('.favorite-icon'); 
         
         if (restavracijaId && icon) {
-             const isFavorite = globalFavoritesList.includes(restavracijaId);
-
-            // 1. Nastavi barvo vedno na rdečo
-            icon.style.color = FAVORITE_RED_COLOR;
-
-            // ⭐ DODATNO ZAGOTOVILO ZA FONT AWESOME DELOVANJE ⭐
-            // Prepričamo se, da je osnovni razred 'fa-heart' vedno prisoten
+            const currentFavorites = typeof globalFavoritesList !== 'undefined' ? globalFavoritesList : [];
+            const isFavorite = currentFavorites.includes(restavracijaId);
+            
+            icon.style.color = typeof FAVORITE_RED_COLOR !== 'undefined' ? FAVORITE_RED_COLOR : '#FF4D4D';
             icon.classList.add('fa-heart');
 
-            // 2. Nastavi razred za polno/prazno srce
             if (isFavorite) {
-                // Priljubljena -> Polno rdeče srce (fas / fa-solid)
-                icon.classList.remove('far', 'fa-regular'); // Odstrani obrobo
-                icon.classList.add('fas', 'fa-solid'); // Dodaj polno obliko
+                icon.classList.remove('far', 'fa-regular');
+                icon.classList.add('fas', 'fa-solid');
             } else {
-                // Ni priljubljena -> Rdeča obroba (far / fa-regular)
-                icon.classList.remove('fas', 'fa-solid'); // Odstrani polno obliko
-                icon.classList.add('far', 'fa-regular'); // Dodaj obrobo
+                icon.classList.remove('fas', 'fa-solid');
+                icon.classList.add('far', 'fa-regular');
             }
         }
     });
 };
 
-
-/**
- * Pridobi seznam ID-jev priljubljenih restavracij trenutnega uporabnika in ga shrani.
- */
 const naloziPriljubljeneRestavracije = async () => {
-    if (!zeton) {
-        console.warn("[FAVORITES] Uporabnik ni prijavljen, preskakujem nalaganje priljubljenih.");
-        return;
-    }
+    if (typeof zeton === 'undefined' || !zeton) return;
 
     try {
         const response = await fetch(FAVORITES_API_URL, {
@@ -4859,38 +4947,38 @@ const naloziPriljubljeneRestavracije = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            // Predpostavljamo, da API vrne { favorites: ['id1', 'id2', ...] }
-            globalFavoritesList = Array.isArray(data.favorites) ? data.favorites : [];
+            if (typeof globalFavoritesList !== 'undefined') {
+                globalFavoritesList = Array.isArray(data) ? data.map(r => r._id) : (Array.isArray(data.favorites) ? data.favorites : []);
+            }
 
-            console.log(`[FAVORITES] Uspešno naloženih ${globalFavoritesList.length} priljubljenih restavracij.`);
-
-            // KLJUČNO: Po nalaganju seznama posodobimo vmesnik
+            // Varno preverjanje FCM vtičnika
+            const fcm = window.Capacitor?.Plugins?.FCM || window.FCM;
+            if (fcm && typeof globalFavoritesList !== 'undefined') {
+                globalFavoritesList.forEach(restId => {
+                    // Naročnina na temo za vsako priljubljeno restavracijo
+                    fcm.subscribeTo({ topic: `rest_${restId}` })
+                       .then(() => console.log(`[FCM] Naročen na: rest_${restId}`))
+                       .catch(e => console.error(`[FCM] Napaka pri naročanju na rest_${restId}:`, e));
+                });
+            }
             posodobiVizualnoStanjePriljubljenih();
-
-        } else {
-            globalFavoritesList = [];
-            console.error(`[FAVORITES] Napaka pri nalaganju priljubljenih: ${response.status}`);
         }
     } catch (error) {
-        console.error("[FAVORITES] Kritična napaka pri nalaganju priljubljenih:", error);
+        console.error("[FAVORITES] Napaka pri nalaganju:", error);
     }
 };
 
-
 // =========================================================
-// 🔥 3. FUNKCIJA ZA PREKLOP PRILJUBLJENIH (POSODOBLJENA) 🔥
+// 🔥 3. FUNKCIJA ZA PREKLOP PRILJUBLJENIH (i18n + HAPTICS + FCM) 🔥
 // =========================================================
 
-/**
- * Preklopi stanje restavracije med priljubljeno in navadno.
- * @param {string} restavracijaId ID restavracije.
- */
 const toggleFavorite = async (restavracijaId) => {
-
-    if (!zeton) {
-        prikaziSporocilo('warning', 'Prijava je potrebna za shranjevanje priljubljenih!');
+    if (typeof zeton === 'undefined' || !zeton) {
+        prikaziModalniToast('favorites.login_needed_title', 'favorites.login_needed_msg', 'error');
         return;
     }
+
+    const haptics = window.Capacitor?.Plugins?.Haptics;
 
     try {
         const response = await fetch(TOGGLE_FAVORITE_API_URL, {
@@ -4904,34 +4992,61 @@ const toggleFavorite = async (restavracijaId) => {
 
         if (response.ok) {
             const data = await response.json();
+            const topicName = `rest_${restavracijaId}`;
+            
+            // Varno preverjanje FCM vtičnika
+            const fcm = window.Capacitor?.Plugins?.FCM || window.FCM;
 
-            // Posodobitev globalnega seznama
-            if (data.action === 'added') {
-                if (!globalFavoritesList.includes(restavracijaId)) {
+            const isAdded = data.status === 'dodano' || data.action === 'added';
+            const isRemoved = data.status === 'odstranjeno' || data.action === 'removed';
+
+            if (isAdded) {
+                if (typeof globalFavoritesList !== 'undefined' && !globalFavoritesList.includes(restavracijaId)) {
                     globalFavoritesList.push(restavracijaId);
                 }
-                prikaziSporocilo('success', 'Restavracija dodana med priljubljene.');
-            } else if (data.action === 'removed') {
-                globalFavoritesList = globalFavoritesList.filter(id => id !== restavracijaId);
-                prikaziSporocilo('success', 'Restavracija odstranjena iz priljubljenih.');
+                
+                // Naročanje na potisna obvestila za to restavracijo
+                if (fcm) {
+                    fcm.subscribeTo({ topic: topicName })
+                       .then(() => console.log(`[FCM] Uspešno naročen na temo: ${topicName}`))
+                       .catch(e => console.error(`[FCM] Napaka pri naročanju:`, e));
+                }
+                
+                if (haptics) haptics.impact({ style: 'MEDIUM' }).catch(() => {});
+                
+                // i18n prevodi za dodajanje
+                prikaziModalniToast('favorites.added_title', 'favorites.added_msg', 'success');
+
+            } else if (isRemoved) {
+                if (typeof globalFavoritesList !== 'undefined') {
+                    globalFavoritesList = globalFavoritesList.filter(id => id !== restavracijaId);
+                }
+                
+                // Odjava iz potisnih obvestil za to restavracijo
+                if (fcm) {
+                    fcm.unsubscribeFrom({ topic: topicName })
+                       .then(() => console.log(`[FCM] Uspešno odjavljen iz teme: ${topicName}`))
+                       .catch(e => console.error(`[FCM] Napaka pri odjavi:`, e));
+                }
+                
+                if (haptics) haptics.impact({ style: 'LIGHT' }).catch(() => {});
+                
+                // i18n prevodi za odstranjevanje
+                prikaziModalniToast('favorites.removed_title', 'favorites.removed_msg', 'error');
             }
 
-            // 🔥 KLJUČNO: Po uspešni API operaciji posodobi vmesnik
-            // To popravi vizualno stanje (fas/far) na VSEH elementih
             posodobiVizualnoStanjePriljubljenih();
-
         } else {
-            const errorData = await response.json().catch(() => ({ msg: response.statusText }));
-            prikaziSporocilo('error', `Napaka pri priljubljenih: ${errorData.msg || response.statusText}`);
+            prikaziModalniToast('common.error_title', 'common.server_error', 'error');
         }
     } catch (error) {
-        console.error("Kritična napaka pri shranjevanju priljubljenih:", error);
-        prikaziSporocilo('error', 'Napaka strežnika pri shranjevanju priljubljenih.');
+        console.error("[FAVORITES] Kritična napaka:", error);
+        prikaziModalniToast('common.error_title', 'common.network_error', 'error');
     }
 };
 
 // =========================================================
-// 🔥 4. EVENT LISTENER (DODANA LOKALNA VIZUALNA POTRDITEV) 🔥
+// 🔥 4. EVENT LISTENER 🔥
 // =========================================================
 
 document.body.addEventListener('click', (e) => {
@@ -4939,32 +5054,24 @@ document.body.addEventListener('click', (e) => {
 
     if (favoriteButton) {
         e.stopPropagation();
-
         const restavracijaId = favoriteButton.getAttribute('data-id');
-        const icon = favoriteButton.querySelector('.favorite-icon'); // 🔥 Pridobimo referenco na ikono
+        const icon = favoriteButton.querySelector('.favorite-icon');
 
         if (restavracijaId && icon) {
-            // ⭐ LOKALNI VIZUALNI POUDAREK (Takojšnja sprememba na polno rdeče)
-            // To služi kot takojšnja vizualna potrditev uporabniku
+            const isRegular = icon.classList.contains('far') || icon.classList.contains('fa-regular');
             
-            // Če trenutno ni polno, ga naredimo polno in rdeče (fas/fa-solid)
-            if (icon.classList.contains('far') || icon.classList.contains('fa-regular')) {
+            if (isRegular) {
                 icon.classList.remove('far', 'fa-regular');
                 icon.classList.add('fas', 'fa-solid');
             } else {
-                // Če je že polno, ga naredimo obrobo (kar simulira odstranitev)
                 icon.classList.remove('fas', 'fa-solid');
                 icon.classList.add('far', 'fa-regular');
             }
             
-            // Barvo ponovno nastavimo (za vsak primer)
-            icon.style.color = FAVORITE_RED_COLOR;
+            const color = typeof FAVORITE_RED_COLOR !== 'undefined' ? FAVORITE_RED_COLOR : '#FF4D4D';
+            icon.style.color = color;
             
-            // Sproži API klic, ki bo po potrditvi s strežnika poklical posodobiVizualnoStanjePriljubljenih()
-            // To bo vizualno stanje POPRAVILO NA PRAVEGA (tudi če pride do napake na strežniku)
-            if (typeof toggleFavorite === 'function') {
-                toggleFavorite(restavracijaId);
-            }
+            toggleFavorite(restavracijaId);
         }
     }
 });
@@ -8879,56 +8986,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // ... ostala DOMContentLoaded koda v index.html
 });
-async function naloziBannerjeIzJson() {
+async function naloziBannerjeIzBaze() {
     const slider = document.getElementById('cloudinarySlider');
     const dotsContainer = document.getElementById('banner-dots');
+    const loader = document.getElementById('loading-screen');
+    
     let jezik = localStorage.getItem('language') || 'sl';
     if (jezik.includes('-')) jezik = jezik.split('-')[0];
 
-    if (!slider) return;
+    // Funkcija za skrivanje loaderja (da je ne podvajamo)
+    const skrijLoader = () => {
+        if (loader && !loader.classList.contains('loader-hidden')) {
+            setTimeout(() => {
+                loader.classList.add('loader-hidden');
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }, 1300);
+        }
+    };
+
+    if (!slider) {
+        skrijLoader();
+        return;
+    }
 
     // Pomožna funkcija za počasno drsenje
     function pocasiDrsajDo(element, cilj, trajanje) {
         const zacetek = element.scrollLeft;
         const razlika = cilj - zacetek;
         let casZacetka = null;
-
         function animacija(trenutniCas) {
             if (!casZacetka) casZacetka = trenutniCas;
             const napredek = trenutniCas - casZacetka;
             const odstotek = Math.min(napredek / trajanje, 1);
-            
-            // "Ease-in-out" funkcija za mehkejši začetek in konec
             const stopnja = odstotek < 0.5 ? 2 * odstotek * odstotek : -1 + (4 - 2 * odstotek) * odstotek;
-            
             element.scrollLeft = zacetek + razlika * stopnja;
-
-            if (napredek < trajanje) {
-                requestAnimationFrame(animacija);
-            }
+            if (napredek < trajanje) requestAnimationFrame(animacija);
         }
         requestAnimationFrame(animacija);
     }
 
     try {
-        const response = await fetch('i18n/akcije.json');
-        if (!response.ok) throw new Error("Ni mogoče prebrati akcije.json");
+        // 🟢 Klic tvojega novega MongoDB API-ja
+        const response = await fetch(`https://philosophical-piranha-rentyo-gourmet-spletna-stran-f9f5e315.koyeb.app/api/promocije?lang=${jezik}`);
+        if (!response.ok) throw new Error("Napaka pri branju iz baze");
         
-        const akcije = await response.json();
+        const promocije = await response.json();
 
-        if (akcije && akcije.length > 0) {
+        if (promocije && promocije.length > 0) {
             slider.innerHTML = ''; 
             if (dotsContainer) dotsContainer.innerHTML = ''; 
 
-            akcije.forEach((akcija, index) => {
-                const prevod = akcija[jezik] || akcija['sl'];
+            promocije.forEach((p, index) => {
+                // Prilagoditev na MongoDB strukturo (p.naslov.sl itd.)
+                const naslov = p.naslov[jezik] || p.naslov['en'] || p.naslov['sl'] || "";
+                const opis = p.opis[jezik] || p.opis['en'] || p.opis['sl'] || "";
+
                 const bannerItem = document.createElement('div');
                 bannerItem.className = 'banner-item';
                 bannerItem.innerHTML = `
-                    <img src="${akcija.slika_ime}" alt="${prevod.naslov}">
+                    <img src="${p.slika_url}" alt="${naslov}">
                     <div class="banner-tekst">
-                        <b>${prevod.naslov}</b>
-                        <small>${prevod.opis}</small>
+                        <b>${naslov}</b>
+                        <small>${opis}</small>
                     </div>
                 `;
                 slider.appendChild(bannerItem);
@@ -8936,64 +9055,62 @@ async function naloziBannerjeIzJson() {
                 if (dotsContainer) {
                     const dot = document.createElement('div');
                     dot.className = 'dot' + (index === 0 ? ' active' : '');
-                    
                     dot.addEventListener('click', () => {
                         const ciljnaPozicija = bannerItem.offsetLeft - slider.offsetLeft;
-                        // Nastavi hitrost tukaj (1200ms = 1.2 sekunde)
                         pocasiDrsajDo(slider, ciljnaPozicija, 2400);
                     });
                     dotsContainer.appendChild(dot);
                 }
             });
 
+            // Scroll in Auto-scroll logika
             if (dotsContainer) {
                 slider.addEventListener('scroll', () => {
-                    const scrollLeft = slider.scrollLeft;
-                    const itemWidth = slider.querySelector('.banner-item').offsetWidth;
-                    const gap = 12; 
-                    const activeIndex = Math.round(scrollLeft / (itemWidth + gap));
-                    
+                    const items = slider.querySelectorAll('.banner-item');
+                    if (items.length === 0) return;
+                    const itemWidth = items[0].offsetWidth;
+                    const activeIndex = Math.round(slider.scrollLeft / (itemWidth + 12));
                     const dots = dotsContainer.querySelectorAll('.dot');
-                    dots.forEach((dot, idx) => {
-                        dot.classList.toggle('active', idx === activeIndex);
-                    });
+                    dots.forEach((dot, idx) => dot.classList.toggle('active', idx === activeIndex));
                 });
 
                 let autoScrollInterval = setInterval(() => {
                     const dots = dotsContainer.querySelectorAll('.dot');
                     const activeDot = dotsContainer.querySelector('.dot.active');
                     if (!dots.length || !activeDot) return;
-
                     let nextIndex = Array.from(dots).indexOf(activeDot) + 1;
                     if (nextIndex >= dots.length) nextIndex = 0;
-
                     dots[nextIndex].click();
-                }, 6000); // Malo podaljšan interval, ker je drsenje zdaj daljše
+                }, 6000);
 
                 slider.addEventListener('touchstart', () => clearInterval(autoScrollInterval), {passive: true});
                 slider.addEventListener('mousedown', () => clearInterval(autoScrollInterval));
             }
+        } else {
+            // Če ni promocij, izprazni slider
+            slider.innerHTML = '';
         }
     } catch (error) {
-        console.error("Napaka:", error);
+        console.error("Napaka pri nalaganju bannerjev:", error);
+        if (slider) slider.innerHTML = ''; 
+    } finally {
+        // 🔥 KLJUČNO: Loader se skrije ne glede na to, ali je fetch uspel ali ne!
+        skrijLoader();
     }
 }
 
-document.addEventListener('DOMContentLoaded', naloziBannerjeIzJson);
+// Zagon ob nalaganju strani
+document.addEventListener('DOMContentLoaded', naloziBannerjeIzBaze);
+
+// Varnostna varovalka: če se karkoli zatakne, loader ugasnemo po max 5 sekundah
 window.addEventListener('load', () => {
-    const loader = document.getElementById('loading-screen');
-    
-    // Nastavimo minimalni čas prikaza (npr. 1.8 sekunde), 
-    // da loader ne utripne prehitro, če je internet zelo hiter.
     setTimeout(() => {
-        loader.classList.add('loader-hidden');
-        
-        // Po končani animaciji ga popolnoma odstranimo iz DOM-a
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
-        
-    }, 1800); 
+        const loader = document.getElementById('loading-screen');
+        if (loader && !loader.classList.contains('loader-hidden')) {
+            loader.classList.add('loader-hidden');
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+        }
+    }, 5000); 
 });
 // 1. Prepričaj se, da je to na vrhu tvoje celotne skripte (globalno)
 // let MAX_DISTANCE_KM = 50; 

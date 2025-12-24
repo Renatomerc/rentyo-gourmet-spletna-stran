@@ -11,34 +11,30 @@
     
     <style>
         /* Dodano pravilo, da preglasi font iz styles.css in zagotovi enoten videz z index.html */
-        body {
-            font-family: 'Poppins', sans-serif; 
-            /* 🔥 DODANO GLOBALNO OZADJE ZA CELOTNO STRAN */
-            background-color: #f9f9f9; 
-        }
-        body {
-    background-image: url('circles-and-roundabouts.png'); 
-    background-repeat: repeat; 
-    /* Če se slika ne naloži, uporabimo svetlo sivo barvo */
-    background-color: #F5F5F5; 
-    
-    /* Preprečimo, da bi se vzorec premikal ob drsenju, če je to želeno */
-    /* background-attachment: fixed; */ 
+      /* Končna in urejena različica za BODY */
+body {
+    /* 1. Pisava: Ohranimo tvoj Poppins stil */
+    font-family: 'Poppins', sans-serif; 
+
+    /* 2. Višina: Zagotovimo, da pokrije celoten zaslon */
+    min-height: 100vh;
+    margin: 0;
+
+    /* 3. Gourmet Gradient: Nadomesti vzorec in posvetlitveni sloj */
+    background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
+    background-attachment: fixed;
+
+    /* 4. Rezervna barva (Fallback) */
+    background-color: #f9f9f9; 
+
+    /* 5. Pozicioniranje: Za morebitne absolutne elemente znotraj strani */
+    position: relative;
 }
-body::before {
-    content: ''; /* Obvezno za pseudo-elemente */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    
-    /* ⭐ SLOJ ZA POSVETLITEV: Uporabimo belo barvo z nizko prosojnostjo */
-    background-color: rgba(255, 255, 255, 0.511); /* Bela barva (255, 255, 255) z 50% prosojnostjo (0.5) */
-    
-    /* Zagotovimo, da je ta sloj pod vso vsebino */
-    z-index: -1; 
-}
+
+/* 🔥 OPOMBA: 
+   Vse podvojene definicije 'body' in 'body::before' lahko varno izbrišeš. 
+   Ta zgornji blok zdaj opravlja delo vseh treh tvojih prejšnjih blokov.
+*/
         
         /* * ======================================
          * 1. ODSTRANITEV SVETLO MODREGA KVADRATA (FOCUS & TAP HIGHLIGHT)

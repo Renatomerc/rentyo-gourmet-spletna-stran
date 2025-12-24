@@ -38,6 +38,25 @@
     "drinks": "Pijača",
     "brunch": "Brunch"
   },
+  "filters": {
+    "select_distance": "Izberite razdaljo",
+    "unit_km": "km"
+  },
+  "common": {
+    "ok": "V redu",
+    "cancel": "Prekliči",
+    "error_title": "Napaka",
+    "server_error": "Prišlo je do napake na strežniku. Poskusite znova.",
+    "network_error": "Težava z omrežjem. Preverite povezavo."
+  },
+  "favorites": {
+    "added_title": "Dodano med priljubljene",
+    "added_msg": "Restavracija je bila uspešno dodana na vaš seznam.",
+    "removed_title": "Odstranjeno",
+    "removed_msg": "Restavracija je bila odstranjena iz seznama.",
+    "login_needed_title": "Potrebna prijava",
+    "login_needed_msg": "Za shranjevanje priljubljenih restavracij se morate prijaviti."
+  },
   "results": {
     "popular_title": "Kam v bližini",
     "featured_title": "Izpostavljeno",
@@ -195,7 +214,7 @@
     "payment_info_prefix": "Varno plačilo, ki ga omogoča",
     "copyright_text": "© 2025 Rentyo Gourmet. Vse pravice pridržane."
   },
- "profile": {
+  "profile": {
     "title": "Moj uporabniški profil",
     "tab_data": "Osebni podatki",
     "tab_current": "Aktualne rezervacije",
@@ -249,8 +268,7 @@
     "support_title": "Pomoč in podpora",
     "tab_help": "Pomoč",
     "tab_favorites": "Priljubljeno"
-
-},
+  },
   "warning": {
     "title": "Opozorilo",
     "default_message": "Prosimo, da upoštevate, da so prikazane informacije o razpoložljivosti in cenah zgolj informativne narave.",

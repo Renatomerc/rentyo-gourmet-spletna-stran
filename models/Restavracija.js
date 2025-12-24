@@ -1,6 +1,7 @@
 // ===============================================
 // 🗄️ RESTAVRACIJA MODEL (Mongoose Shema)
 // POPRAVLJENO: Dodan opomnikPoslan v shemo Rezervacija
+// ✅ DODANO: omogocaRezervacije v glavno shemo
 // ===============================================
 const mongoose = require('mongoose');
 
@@ -128,6 +129,12 @@ veljavnost_besedilo: {
 featured: {
     type: Boolean,
     default: false // Privzeto ni izpostavljeno
+},
+
+// 🛡️ NOVO: POLJE ZA VKLOP/IZKLOP REZERVACIJ (ZA FRONTEND LOGIKO)
+omogocaRezervacije: {
+    type: Boolean,
+    default: true // Privzeto restavracija sprejema rezervacije
 },
     // ----------------------------------------------------
     
