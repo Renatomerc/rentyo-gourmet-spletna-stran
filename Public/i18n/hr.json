@@ -1,8 +1,8 @@
 {
   "app": {
-    "title": "Pretraživanje restorana - Gourmet & Experience",
+    "title": "Tražilica restorana - Gourmet & Experience",
     "profile_title": "Moj profil - Gourmet & Experience",
-    "pageTitle": "Rentyo ponude i doživljaji"
+    "pageTitle": "Rentyo ponude i iskustva"
   },
   "header": {
     "login": "Prijava",
@@ -34,9 +34,28 @@
   "cuisine": {
     "meat": "Mesna",
     "vegetarian": "Vegi",
-    "fish": "Riblja",
+    "fish": "Riblje",
     "drinks": "Piće",
     "brunch": "Brunch"
+  },
+  "filters": {
+    "select_distance": "Odaberite udaljenost",
+    "unit_km": "km"
+  },
+  "common": {
+    "ok": "U redu",
+    "cancel": "Otkaži",
+    "error_title": "Pogreška",
+    "server_error": "Došlo je do pogreške na poslužitelju. Pokušajte ponovno.",
+    "network_error": "Problem s mrežom. Provjerite vezu."
+  },
+  "favorites": {
+    "added_title": "Dodano u favorite",
+    "added_msg": "Restoran je uspješno dodan na vaš popis.",
+    "removed_title": "Uklonjeno",
+    "removed_msg": "Restoran je uklonjen s popisa.",
+    "login_needed_title": "Potrebna prijava",
+    "login_needed_msg": "Za spremanje omiljenih restorana morate se prijaviti."
   },
   "results": {
     "popular_title": "Kamo u blizini",
@@ -44,7 +63,7 @@
     "reserve_button": "Rezerviraj",
     "description_1": "Tradicionalna slovenska kuhinja i ugodna atmosfera.",
     "description_2": "Moderna jela s lokalnim sastojcima.",
-    "description_3": "Autentična talijanska hrana i odlične pizze.",
+    "description_3": "Autentična talijanska hrana i izvrsne pizze.",
     "description_4": "Izvrsna biljna jela za svakoga.",
     "description_5": "Izvrstan brunch za svakoga.",
     "check_tables": "Provjeri stolove u {{time}}",
@@ -57,13 +76,13 @@
     "search_title": "Rezultati pretrage"
   },
   "gourmet_explore": {
-    "title": "Istraži nezaboravna iskustva"
+    "title": "Istražite nezaboravna iskustva"
   },
   "experience": {
     "mainTitle": "Ekskluzivne ponude i oglasi",
     "mainSubtitle": "Otkrijte posebne akcije i preporuke naših partnera.",
     "bestOffersTitle": "Naše najbolje ponude",
-    "fine_dining": "Vrhunska kulinarika",
+    "fine_dining": "Vrhunska gastronomija",
     "fine_dining_href": "experience.html?code=fine-dining",
     "wine": "Degustacija vina",
     "wine_href": "experience.html?code=wine-tasting",
@@ -73,30 +92,30 @@
     "slepa-kuhinja_href": "experience.html?code=slepa-kuhinja",
     "sea": "Morska iskustva",
     "sea_href": "experience.html?code=sea-experience",
-    "city": "Gradski gourmet tour",
+    "city": "Gradska gourmet tura",
     "city_href": "experience.html?code=city-gourmet-tour",
     "romantic": "Romantična iskustva",
     "romantic_href": "experience.html?code=romantic-experience",
     "eco": "Ekološka kuhinja",
     "eco_href": "experience.html?code=eco-cuisine",
-    "pageTitle": "Rentyo ponude i doživljaji",
+    "pageTitle": "Rentyo ponude i iskustva",
     "noActiveOffers": "Trenutno nema aktivnih posebnih ponuda."
   },
   "messages": {
     "enter_search_criteria": "Molimo unesite grad ili vrstu kuhinje za pretragu.",
-    "required_fields_missing": "Molimo ispunite sve obavezne podatke: datum, vrijeme i broj osoba.",
+    "required_fields_missing": "Molimo ispunite sve obvezne podatke: datum, vrijeme i broj osoba.",
     "searching": "Tražim restorane za '{{criteria}}'...",
     "search_success": "Pronađeno {{count}} restorana.",
     "search_error": "Pretraga nije uspjela.",
     "no_restaurants_found": "Nema pronađenih restorana.",
-    "reserving": "Rezerviram za br. osoba {{stevilo}} u {{cas}}...",
-    "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran na {{trajanje}}.",
+    "reserving": "Rezerviram za {{stevilo}} osoba u {{cas}}...",
+    "reservation_success": "Rezervacija uspješna! Stol br. {{miza}} je rezerviran za {{trajanje}}.",
     "reservation_success_minimal": "Uspješno rezervirano u {{cas}}!",
     "reservation_failed": "Rezervacija nije uspjela.",
-    "error_double_booking": "U {{cas}} već imate aktivnu rezervaciju u ovom restoranu. Ne možete rezervirati više stolova istovremeno!",
-    "error_daily_limit": "Dosegli ste dnevno ograničenje ({{limit}}) aktivnih rezervacija u sustavu.",
+    "error_double_booking": "U {{cas}} već imate aktivnu rezervaciju u ovom restoranu.",
+    "error_daily_limit": "Dostigli ste dnevno ograničenje ({{limit}}) aktivnih rezervacija.",
     "error_no_table_available": "Žao nam je, u {{cas}} nema slobodnog stola za {{osebe}} osoba.",
-    "server_connection_error": "Povezivanje s poslužiteljem nije uspjelo.",
+    "server_connection_error": "Veza s poslužiteljem nije uspjela.",
     "server_connection_error_retry": "Pogreška pri povezivanju s poslužiteljem, pokušajte ponovno.",
     "login_success": "Prijava uspješna! Dobrodošli.",
     "registration_success": "Uspješna registracija!",
@@ -126,9 +145,9 @@
     "register_error": "Registracija nije uspjela.",
     "server_error": "Pogreška pri povezivanju s poslužiteljem.",
     "reset_title": "Ponovno postavljanje lozinke",
-    "reset_instructions": "Unesite vašu e-mail adresu za slanje uputa za ponovno postavljanje.",
+    "reset_instructions": "Unesite svoju e-mail adresu za slanje uputa za ponovno postavljanje.",
     "send_instructions_button": "Pošalji upute",
-    "confirm_instructions": "Unesite 6-znamenkasti kod koji ste primili na e-mail i novu lozinku.",
+    "confirm_instructions": "Unesite 6-znamenkasti kod koji ste primili e-mailom i novu lozinku.",
     "new_password_placeholder": "Nova lozinka",
     "confirm_password_button": "Potvrdi novu lozinku",
     "back_to_login_link": "← Natrag na prijavu"
@@ -152,7 +171,7 @@
     "no_menu": "Meni još nije dostupan.",
     "reserve_button": "Provjeri",
     "gallery_title": "Galerija slika",
-    "map_title": "Lokacija na karti",
+    "map_title": "Karta lokacije",
     "reservation_persons": "Broj osoba",
     "reservation_date": "Datum",
     "reservation_modal": {
@@ -163,7 +182,7 @@
       "duration_1_5h": "1 sat i pol (90 min)",
       "duration_2h": "2 sata",
       "confirm_button": "Potvrdi trajanje i rezerviraj",
-      "qr_reminder": "Ne zaboravite pri dolasku skenirati QR kod restorana i ostvariti bodove i pogodnosti!"
+      "qr_reminder": "Ne zaboravite skenirati QR kod restorana pri dolasku kako biste ostvarili bodove i pogodnosti!"
     }
   },
   "footer": {
@@ -181,7 +200,7 @@
     "privacy_policy": "Politika privatnosti",
     "privacy_policy_href": "https://www.rentyo.com/hr/politika-privatnosti.html",
     "cookie_policy": "Kolačići",
-    "cookie_policy_href": "/hr/politika-kolacica.html",
+    "cookie_policy_href": "/hr/politika-kolacici.html",
     "terms_of_use": "Uvjeti korištenja",
     "terms_of_use_href": "https://www.rentyo.com/hr/uvjeti-koristenja.html",
     "legal_notice": "Pravna obavijest",
@@ -209,10 +228,10 @@
     "current_subtitle": "Aktivne rezervacije",
     "no_current_reservations": "Trenutno nemate aktivnih rezervacija.",
     "cancel_button": "Otkaži",
-    "history_subtitle": "Prethodne rezervacije",
+    "history_subtitle": "Prošle rezervacije",
     "no_history_reservations": "Povijest rezervacija je prazna.",
     "points_payment_subtitle": "Bodovi i sredstva plaćanja",
-    "points_title": "Vaši prikupljeni bodovi",
+    "points_title": "Vaši sakupljeni bodovi",
     "points_status": "Trenutno stanje: {{count}} bodova (dovoljno za 10€ popusta)",
     "points_status_dynamic": "Trenutno stanje: {{count}} Gumy",
     "card_title": "Spremljena kreditna kartica",
@@ -226,24 +245,24 @@
     "cancel_success": "Rezervacija je uspješno otkazana.",
     "status_rated": "Već ocijenjeno",
     "status_rate_now": "Kliknite za ocjenu",
-    "rate_title": "Ocijeni restoran",
+    "rate_title": "Ocijenite restoran",
     "rating_label": "Vaša ocjena",
-    "comment_label": "Komentar (neobvezno)",
+    "comment_label": "Komentar (neobavezno)",
     "submit_review": "Pošalji ocjenu",
     "review_missing_data": "Pogreška: Nedostaju podaci za slanje ocjene.",
     "review_success": "Ocjena uspješno poslana! Hvala.",
     "review_error": "Pogreška pri slanju ocjene. Molimo pokušajte ponovno.",
-    "scan_qr_main_text": "Skeniraj QR kod i potvrdi svoj dolazak",
+    "scan_qr_main_text": "Skenirajte QR kod i potvrdite svoj dolazak",
     "status_scanning": "Čitam QR kod",
     "scan_qr_sub_text": "Potvrdom dolaska dobivate 50 bodova te dodatne pogodnosti i pozivnice.",
     "status_error": "Trenutno niste u vremenskom okviru za potvrdu dolaska. Dolazak možete potvrditi 10 min prije rezerviranog termina.",
     "status_confirmed": "Potvrđeno",
-    "scan_unavailable": "Preuzmi aplikaciju i ostvari bodove i pogodnosti",
+    "scan_unavailable": "Preuzmite aplikaciju i ostvarite bodove i pogodnosti",
     "scan_cancelled": "Skeniranje otkazano ili neuspješno.",
     "scanner_error": "Pogreška skenera.",
     "camera_permission_required": "Za skeniranje je potrebno dopuštenje za kameru.",
     "delete_account_confirmation": "Brisanjem računa obrisat ćete sve svoje osobne podatke. Ocjene i komentari restorana ostaju vidljivi, ali pod imenom \"GDPR Deleted User\".",
-    "delete_account_button": "Obriši moj račun",
+    "delete_account_button": "Izbriši moj račun",
     "help_link": "Trebate pomoć? Pišite nam!",
     "help_note": "Na upite odgovaramo u najkraćem mogućem roku.",
     "support_title": "Pomoć i podrška",
@@ -265,9 +284,9 @@
     "politika_zasebnosti_href": "https://www.rentyo.com/hr/politika-privatnosti.html"
   },
   "cookieConsent": {
-    "message": "Ova web stranica koristi kolačiće kako bi osigurala bolje korisničko iskustvo i analitiku prometa. Za nastavak korištenja molimo vaš pristanak.",
+    "message": "Ova web stranica koristi kolačiće kako bi osigurala bolje korisničko iskustvo i analitiku prometa. Za daljnje korištenje molimo vaš pristanak.",
     "moreInfoLink": {
-      "text": "Pročitaj više.",
+      "text": "Pročitajte više.",
       "url": "politika-privatnosti.html"
     },
     "buttons": [
@@ -290,7 +309,7 @@
     "price": "Cijena",
     "noDescription": "Detaljan opis ponude nije dostupan.",
     "searchAndReserve": "Pronađi i rezerviraj",
-    "notSpecified": "Nije određeno",
+    "notSpecified": "Nije navedeno",
     "dataLoadError": "❌ POGREŠKA PRI ČITANJU PODATAKA. Provjerite API endpoint '/api/offers'."
   }
 }

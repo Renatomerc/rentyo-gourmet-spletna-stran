@@ -57,7 +57,7 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 
                 // 🔥 POPRAVEK: Namesto enega elementa vzamemo prve 3 iz polja kuhinja_filtri
                 // Če polje ne obstaja, vrnemo prazen array []
-                deviznaKuhinja: { $slice: [{ $ifNull: ["$kuhinja_filtri", []] }, 3] },
+                deviznaKuhinja: { $slice: [{ $ifNull: ["$kuhinja_filtri", []] }, 5] },
                 
                 // POPRAVEK: Uporabimo polje $meni namesto $menu
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 

@@ -774,22 +774,27 @@ input, textarea {
             background-color: #076b6a;
         }
 
-        /* ===== GUMBI V GLAVI (OSTANE NESPREMENJENO) ===== */
-        .gumb-prijava, 
-        .gumb-profil, 
-        /*... ostalo oblikovanje od tu naprej ostane popolnoma nespremenjeno ...*/
-        .gumb-odjava {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 4px 12px;
-          border-radius: 25px;
-          font-weight: bold;
-          text-decoration: none;
-          transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-          white-space: nowrap;
-          font-size: 14px;
-        }
+    /* ===== GUMBI V GLAVI (POSODOBLJENO ZA SREDINSKO PORAVNAVO) ===== */
+.gumb-prijava, 
+.gumb-profil, 
+/*... ostalo oblikovanje od tu naprej ostane popolnoma nespremenjeno ...*/
+.gumb-odjava {
+  display: flex;           /* Spremenjeno iz inline-flex za boljšo kontrolo */
+  align-items: center;     /* Vertikalna sredina */
+  justify-content: center; /* Horizontalna sredina */
+  gap: 10px;
+  padding: 4px 12px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  font-size: 14px;
+  
+  /* 🚀 KLJUČNI POPRAVEK ZA SREDINSKO BESEDILO: */
+  line-height: 1;          /* Odstrani odvečen prostor nad/pod pisavo */
+  text-align: center;
+}
 
         .gumb-prijava,
         .gumb-profil {
@@ -1541,7 +1546,7 @@ input, textarea {
         .mobilni-meni .gumb-prijava {
             width: 55%;
             justify-content: center;
-            padding: 8px 14px;
+            padding: 8px 16px;
             font-size: 12px;
             border-radius: 20px;
             background-color: #575757; 
@@ -1904,7 +1909,7 @@ input, textarea {
         border-top: none; 
         
         /* Barva vsebine noge, ko je skrita (za splošno uporabo, ni nujno potrebna) */
-        background-color: #000000; /* Barva ozadja, ko se odpre - verjetno črna, kot sedaj */
+        background-color: #444; /* Barva ozadja, ko se odpre - verjetno črna, kot sedaj */
     }
 
     /* Prikaz celotne vsebine, ko je gumb aktiven (ODPRTA NOGA) */
@@ -1913,7 +1918,7 @@ input, textarea {
         padding-top: 15px;
         padding-bottom: 15px;
         border-top: 1px solid #444; /* Standardna črna ločilna črta (kot sedaj) */
-        background-color: #000000; /* <--- POPRAVEK: Poskrbimo, da je ozadje ČRNO, ko se razširi */
+        background-color: #444; /* <--- POPRAVEK: Poskrbimo, da je ozadje ČRNO, ko se razširi */
         color: white; /* <--- DODATEK: Tekst mora biti BEL, ko je ozadje črno */
     }
     
@@ -2951,6 +2956,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
         padding-top: calc(10px + env(safe-area-inset-top));
     }
     
+    
     /* Prav tako lahko izboljšate poravnavo gumba za hamburger (kar smo obravnavali prej) */
     #hamburgerGumb {
         display: flex;
@@ -2966,6 +2972,7 @@ overflow: hidden; /* Zagotovi, da se ozadje ne razlije čez zaobljene robove */
         display: none;
     }
 }
+
 
 /* ========================================= */
 /* --- D. CSS PRAVILA ZA AI POGOVORNO OKNO (CHAT WIDGET) --- */
@@ -3835,6 +3842,7 @@ body.is-capacitor-app #aiChatModal {
 .animate-pop {
     animation: popIn 0.3s ease-out forwards;
 }
+
 
 
 
@@ -6159,26 +6167,39 @@ function initializeCookieConsent() {
 }
 
 
-// ⭐ IZVAJANJE: AGRESIVNA NATIVE LOGIKA + OBRATNA LOGIKA ZA WEB
+// ⭐ IZVAJANJE: AGRESIVNA NATIVE LOGIKA + OBRATNA LOGIKA ZA WEB + PWA FILTRIRANJE
 
 document.addEventListener('DOMContentLoaded', () => {
     const banner = document.getElementById(BANNER_ID);
-    if (!banner) return;
+    const taskbar = document.getElementById('capacitorTaskbar');
     
-    // 1. AGRESIVNO SKRIVANJE ZA NATIVE:
-    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-        banner.remove(); 
-        console.log("Native detected. Pasica prisilno odstranjena iz DOM-a.");
-        return; 
-    }
-    
-    // 2. PRIKAZ ZA WEB: Če smo na spletu, ročno odstranimo prisilni inline stil.
-    banner.style.display = ''; 
-    
-    // Zaženemo obstoječo logiko, ki preveri piškotke in jo prikaže/skrije po potrebi.
-    initializeCookieConsent();
+    // Preverimo, ali smo v zares "native" Capacitor okolju
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
 
-    console.log("Web detected. Inline stil odstranjen, nadaljujemo z logiko piškotkov.");
+    // --- LOGIKA ZA PIŠKOTKE (BANNER) ---
+    if (banner) {
+        if (isNative) {
+            banner.remove(); 
+            console.log("Native detected. Pasica odstranjena.");
+        } else {
+            banner.style.display = ''; 
+            initializeCookieConsent();
+            console.log("Web/PWA detected. Pasica omogočena.");
+        }
+    }
+
+    // --- LOGIKA ZA OPRAVILNO VRSTICO (TASKBAR) ---
+    if (taskbar) {
+        if (isNative) {
+            // Če smo v Capacitor appu, dodamo razred na body za CSS prikaz
+            document.body.classList.add('is-capacitor-native');
+            console.log("Native detected. Taskbar omogočen.");
+        } else {
+            // Če smo v PWA ali brskalniku, taskbar popolnoma odstranimo
+            taskbar.remove();
+            console.log("Web/PWA detected. Taskbar odstranjen, da se ne kaže v brskalniku.");
+        }
+    }
 });
 
 

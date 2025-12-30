@@ -5,9 +5,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.view.WindowInsetsController;
 import android.graphics.Color;
+import android.view.View; // ⭐ Dodano za View.OVER_SCROLL_NEVER
+import android.webkit.WebView; // ⭐ Dodano za WebView
 
 import androidx.core.view.WindowCompat;
-import androidx.core.splashscreen.SplashScreen; // ⭐ Potrebno za nadzor logotipa
+import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 
 // ⭐ DODANO: Uvoz za FCM plugin
@@ -15,45 +17,43 @@ import com.getcapacitor.community.fcm.FCMPlugin;
 
 public class MainActivity extends BridgeActivity {
 
-    // Spremenljivka, ki pove Androidu, ali naj še kaže logotip
     private boolean keepSplashOn = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // 1. Inicializacija novega Android 12+ Splash Screen API-ja
-        // Ta vrstica MORA biti pred super.onCreate
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         
-        // Nastavimo pogoj: dokler je keepSplashOn true, logotip NE izgine
         splashScreen.setKeepOnScreenCondition(() -> keepSplashOn);
 
-        // Po 3 sekundah (3000ms) spremenimo v false, da se logotip umakne
         new Handler().postDelayed(() -> {
             keepSplashOn = false;
         }, 3000);
 
-        // Nastavitev ozadja
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
              getWindow().getDecorView().setBackgroundColor(0xFF076B6A);
         }
         
         super.onCreate(savedInstanceState);
 
-        // ⭐ DODANO: Ročna registracija FCM plugina
         registerPlugin(FCMPlugin.class);
 
-        // Barva za WebView pod aplikacijo
+        // --- NASTAVITVE WEBVIEW-JA ---
         if (this.bridge != null && this.bridge.getWebView() != null) {
-            this.bridge.getWebView().setBackgroundColor(0xFF076B6A);
+            WebView webView = this.bridge.getWebView();
+            
+            // Barva ozadja pod aplikacijo
+            webView.setBackgroundColor(0xFF076B6A);
+
+            // 🛑 ONEMOGOČI RAZTEGOVANJE (OVERSCROLL) 🛑
+            // To prepreči tisti "elastični" učinek vsebine na Androidu
+            webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
 
-        // Status bar nastavitve
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(0xFF076B6A);
         }
         
-        // Bele ikone v status baru
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {

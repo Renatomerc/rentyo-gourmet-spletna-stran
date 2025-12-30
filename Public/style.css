@@ -43,6 +43,23 @@ body {
     /* Tipografija ostane čista */
     position: relative; 
 }
+html {
+    /* To je ključno: prepreči "gumijast" efekt na celotnem dokumentu */
+    overscroll-behavior: none; 
+    height: 100%;
+    overflow: hidden; 
+}
+
+body {
+    height: 100%;
+    /* Omogočimo skrolanje tukaj, a brez bounce efekta */
+    overflow-y: auto; 
+    overscroll-behavior-y: none; 
+    
+    /* Pomoč za iOS, da ne dovoli premikanja viewporta */
+    position: relative;
+}
+
 
 /* 🔥 ODSTRANJENO: body::before sloj ni več potreben, ker nimamo več vzorca. 
    To bo tudi pohitrilo delovanje tvoje aplikacije na telefonih. 🔥 */
@@ -218,6 +235,7 @@ body.is-capacitor .iskalnik-sekcija {
     /* Ostala pravila so ok, ker želimo le odstraniti vizualne poudarke. */
     background-color: #faf9f6;
 }
+
 
 /* Postavitev elementov obrazca (vertikalno na mobilnem) */
 .iskalnik {
