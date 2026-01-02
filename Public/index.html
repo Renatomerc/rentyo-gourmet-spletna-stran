@@ -6405,16 +6405,18 @@ if (currentFilterKuhinja === '') {
     updateContent(); 
 }
 
-// 4. Prikaz Izpostavljenih Restavracij (Brez sprememb v logiki)
-function renderFeaturedRestavracije() {
+// 4. Prikaz Izpostavljenih Restavracij (Spremenjeno: uporabi specifične podatke iz API-ja)
+function renderFeaturedRestavracije(specificneIzpostavljene = null) {
     if (!mrezaIzpostavljenoKarticDiv) return;
     
-    const featuredList = allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
+    // Če funkcija dobi podatke iz API-ja, uporabi te. 
+    // Če ne, poskusi filtrirati (fallback), ampak cilj je klic iz API-ja.
+    const featuredList = specificneIzpostavljene || allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
     
     mrezaIzpostavljenoKarticDiv.innerHTML = '';
     
     if (featuredList.length === 0) {
-        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (i18next.t('messages.no_restaurants_found') || 'Ni izpostavljenih restavracij.') + '</div>'; 
+        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (i18next.t('messages.no_restaurants_found') || 'Ni izpostavljenih restavracij v bližini.') + '</div>'; 
         return;
     }
     

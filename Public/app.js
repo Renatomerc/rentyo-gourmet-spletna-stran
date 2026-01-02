@@ -559,48 +559,20 @@ function handleFilterClick(e) {
 // IV. NALAGANJE PODATKOV IN GLAVNI ZAGON
 // ===============================================
 
-/**
- * Glavna funkcija, ki poskrbi za pridobitev lokacije in nato naloži podatke.
- */
 async function naloziInPrikaziRestavracije() {
-    console.log("Začenjam proces nalaganja restavracij...");
+    console.log("Začenjam nalaganje restavracij (ločeno za privzeto in izpostavljeno)...");
 
-    // Prikaz statusa iskanja
-    if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem lokacijo...';
-    if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem lokacijo...';
+    if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
+    if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
 
-    // 📍 PRIDOBIVANJE LOKACIJE (Z geolokacijo brskalnika)
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                // Shranimo v localStorage za uporabo drugje v aplikaciji
-                localStorage.setItem('lat', lat);
-                localStorage.setItem('lon', lon);
-
-                console.log(`Lokacija potrjena: lat=${lat}, lon=${lon}. Nalagam podatke...`);
-                await izvrsiApiKlice(lat, lon);
-            },
-            async (error) => {
-                console.warn("Uporabnik ni dovolil lokacije. Nalagam brez geo-filtra.");
-                await izvrsiApiKlice("", "");
-            }
-        );
-    } else {
-        console.error("Geolokacija ni podprta v tem brskalniku.");
-        await izvrsiApiKlice("", "");
-    }
-}
-
-/**
- * Pomožna funkcija, ki dejansko izvede klic na strežnik s parametri.
- */
-async function izvrsiApiKlice(userLat, userLon) {
     if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '<p class="text-center w-full col-span-full">Nalagam restavracije...</p>';
 
     try {
+        // 📍 1. POPRAVEK: Uporabi ključe, ki jih imaš v localStorage (preveri če so userLat/userLng ali samo lat/lon)
+        // Če tvoj 'Near Me' uporablja lat/lon, uporabi ta imena spodaj:
+        const userLon = localStorage.getItem('userLng') || localStorage.getItem('lon') || "";
+        const userLat = localStorage.getItem('userLat') || localStorage.getItem('lat') || "";
+
         // --- 1. KLIC ZA SPLOŠNE RESTAVRACIJE ---
         const responsePrivzeto = await fetch(`${API_BASE_URL}/privzeto`, {
             method: 'GET',
@@ -610,9 +582,9 @@ async function izvrsiApiKlice(userLat, userLon) {
         if (!responsePrivzeto.ok) throw new Error(`API Napaka /privzeto: ${responsePrivzeto.status}`);
         const restavracijePrivzeto = await responsePrivzeto.json();
 
-        // --- 2. KLIC ZA IZPOSTAVLJENE RESTAVRACIJE (Z GEO FILTROM 50km) ---
-        // Pazi: Uporabljamo 'lat' in 'lon', da se ujema z Backend krmilnikom
-        const responseIzpostavljene = await fetch(`${API_BASE_URL}/izpostavljene?lat=${userLat}&lon=${userLon}`, {
+        // --- 2. KLIC ZA IZPOSTAVLJENE RESTAVRACIJE (Z GEO FILTROM) ---
+        // 📍 2. POPRAVEK: URL parametra morata biti 'lon' in 'lat', ker tako bere tvoj Backend krmilnik
+        const responseIzpostavljene = await fetch(`${API_BASE_URL}/izpostavljene?lon=${userLon}&lat=${userLat}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -620,38 +592,36 @@ async function izvrsiApiKlice(userLat, userLon) {
         let izpostavljeneFiltrirane = [];
         if (responseIzpostavljene.ok) {
             izpostavljeneFiltrirane = await responseIzpostavljene.json();
+        } else {
+            console.error("Napaka pri pridobivanju filtriranih izpostavljenih restavracij.");
         }
 
-        // Shranjevanje v globalno spremenljivko za filtre
         allRestavracije = restavracijePrivzeto;
-
         console.log("Uspešno naloženo:", allRestavracije.length, "splošnih,", izpostavljeneFiltrirane.length, "izpostavljenih v radiju 50km.");
 
-        // Vizualni prikaz
-        if (allRestavracije.length === 0 && statusKarticeDiv) {
-            statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Trenutno ni restavracij.';
+        if (allRestavracije.length === 0) {
+            if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Trenutno ni restavracij.';
             if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '';
         }
 
-        // 1. Nastavimo filtre kuhinj
-        if (typeof setupKuhinjaFiltersListeners === 'function') setupKuhinjaFiltersListeners();
+        setupKuhinjaFiltersListeners();
+        filterAndRenderRestavracije();
 
-        // 2. Prikaz glavne mreže
-        if (typeof filterAndRenderRestavracije === 'function') filterAndRenderRestavracije();
-
-        // 3. 🔥 PRIKAZ IZPOSTAVLJENIH (Uporabimo prefiltriran seznam s strežnika)
+        // 3. 🔥 PRIKAZ IZPOSTAVLJENIH (Uporabimo prefiltriran seznam)
         renderFeaturedRestavracijeManual(izpostavljeneFiltrirane);
 
         if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
 
     } catch (error) {
         console.error("Kritična napaka pri naloziInPrikaziRestavracije:", error);
-        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center; width: 100%;">${error.message}</p>`;
+        const errorMessage = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri nalaganju podatkov.';
+        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
+        if (statusKarticeDiv) statusKarticeDiv.textContent = errorMessage;
     }
 }
 
 /**
- * Pomožna funkcija za izris prefiltriranih izpostavljenih restavracij.
+ * Pomožna funkcija za izris prefiltriranih izpostavljenih restavracij
  */
 function renderFeaturedRestavracijeManual(seznam) {
     if (!mrezaIzpostavljenoKarticDiv) return;
@@ -659,14 +629,12 @@ function renderFeaturedRestavracijeManual(seznam) {
     mrezaIzpostavljenoKarticDiv.innerHTML = '';
     
     if (seznam.length === 0) {
-        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (window.i18next ? i18next.t('messages.no_restaurants_found') : 'Ni izpostavljenih restavracij v vaši bližini (50km).') + '</div>'; 
+        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (window.i18next ? i18next.t('messages.no_restaurants_found') : 'Ni izpostavljenih restavracij v vaši bližini.') + '</div>'; 
         return;
     }
     
     seznam.forEach(restavracija => {
-        if (typeof renderFeaturedCard === 'function') {
-            mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
-        }
+        mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
     });
     
     if (typeof updateContent === 'function') updateContent();
