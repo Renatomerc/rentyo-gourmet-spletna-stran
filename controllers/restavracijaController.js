@@ -98,46 +98,21 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 };
 
 /**
- * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (Z GEOLOKACIJO 50km)
- * Vrača restavracije s popustom (veljavnost_besedilo), ki so v bližini uporabnika.
+ * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (POPRAVLJEN KLON getPrivzetoRestavracije)
+ * Vrača samo restavracije, ki imajo neprazno polje 'popust'.
  */
 exports.getIzpostavljeneRestavracije = async (req, res) => {
-    console.log("===> API klic za /izpostavljene prejet. Filtriranje na 50km aktivirano.");
+    console.log("===> API klic za /izpostavljene prejet. Vrnjeni bodo samo filtrirani podatki.");
 
     try {
-        // Pridobivanje koordinat iz query parametrov (?lat=XX&lon=YY)
-        const { lat, lon } = req.query;
-        let pipeline = [];
-
-        // 📍 1. GEO-LOKACIJSKO FILTRIRANJE (Mora biti prva faza v aggregate)
-        if (lat && lon) {
-            pipeline.push({
-                $geoNear: {
-                    near: {
-                        type: "Point",
-                        coordinates: [parseFloat(lon), parseFloat(lat)] // MongoDB uporablja [longitude, latitude]
-                    },
-                    distanceField: "razdalja",
-                    maxDistance: 50000, // 50km v metrih
-                    spherical: true,
-                    // Filter: restavracija mora imeti popust zapisan v 'veljavnost_besedilo'
-                    query: { 
-                        veljavnost_besedilo: { $exists: true, $ne: null, $ne: "" } 
-                    }
-                }
-            });
-        } else {
-            // Fallback: Če koordinat ni, uporabi klasičen $match filter na veljavnost_besedilo
-            pipeline.push({
-                $match: { 
-                    veljavnost_besedilo: { $exists: true, $ne: null, $ne: "" } 
-                }
-            });
-        }
-
-        // 📍 2. PROJEKCIJA PODATKOV (Tvoja originalna sintetika)
-        pipeline.push({
-            $project: {
+        const restavracije = await Restavracija.aggregate([
+            // ⭐ KLJUČNA SPREMEMBA: DODAJANJE $match FAZE FILTRIRANJA
+            { $match: { 
+                popust: { $exists: true, $ne: null, $ne: "" } 
+            }},
+            // ----------------------------------------------------------------------
+            
+            { $project: {
                 _id: 1, 
                 // Ključni podatki kartice
                 imeRestavracije: { $ifNull: ["$ime", "$naziv", "Ime manjka v bazi (Controller)"] }, 
@@ -152,11 +127,13 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
                 meni: 1, 
                 
-                // ⭐ POPUST: Uporabljamo tvoje polje veljavnost_besedilo
+                // ⭐ NOVO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
                 popust: 1,
+                
+                // ➡️ DODANO: VKLJUČITEV POLJA VELJAVNOST BESEDILO (STRING) V PROJEKCIJO
                 veljavnost_besedilo: 1,
                 
-                // 🔥 IZPOSTAVLJENOST
+                // 🔥 DODANO: VKLJUČITEV POLJA FEATURED V PROJEKCIJO
                 featured: 1,
                 // ---------------------------------------------
                 
@@ -168,18 +145,10 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                 googleReviewCount: { $ifNull: ["$googleReviewCount", 0] },
                 
                 lokacija: 1,
-                razdalja: 1, // Vključi izračunano razdaljo v metrih
                 razpolozljivost_status: 1,
                 razpolozljivost_cas: 1
-            }
-        });
-
-        // 📍 3. SORTIRANJE (Najprej featured:true, nato po razdalji)
-        pipeline.push({
-            $sort: { featured: -1, razdalja: 1 }
-        });
-
-        const restavracije = await Restavracija.aggregate(pipeline);
+            }}
+        ]);
         
         res.status(200).json(restavracije);
 
