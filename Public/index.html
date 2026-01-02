@@ -6263,7 +6263,7 @@ function renderCard(restavracija) {
                 
                 if (klasaIkone) {
                     // Barva nastavljena na BLACK (črna)
-                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: black; font-size: 1.1em; margin-left: 8px;" title="${item}"></i>`;
+                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: black; font-size: 1em; margin-left: 8px;" title="${item}"></i>`;
                 }
             }
         });
@@ -7593,7 +7593,7 @@ async function prikaziPodrobnosti(restavracija) {
                 const kljuc = item.toUpperCase().trim();
                 const klasaIkone = kljuc.includes('FA-') ? item : mapaIkon[kljuc];
                 if (klasaIkone) {
-                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: #333; font-size: 1.3em; margin-right: 8px;" title="${item}"></i>`;
+                    vseIkoneHTML += `<i class="${klasaIkone}" style="color: #333; font-size: 1.2em; margin-right: 8px;" title="${item}"></i>`;
                 }
             }
         });

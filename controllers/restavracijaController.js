@@ -98,23 +98,45 @@ exports.getPrivzetoRestavracije = async (req, res) => {
 };
 
 /**
- * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (POPRAVLJEN KLON getPrivzetoRestavracije)
- * Vrača samo restavracije, ki imajo neprazno polje 'popust'.
+ * 🌟 FUNKCIJA ZA IZPOSTAVLJENO SEKCIJO (S FILTROM RAZDALJE 50KM)
+ * Vrača restavracije s popustom, ki so v radiju 50km od uporabnika.
  */
 exports.getIzpostavljeneRestavracije = async (req, res) => {
-    console.log("===> API klic za /izpostavljene prejet. Vrnjeni bodo samo filtrirani podatki.");
+    console.log("===> API klic za /izpostavljene prejet. Filtriranje po lokaciji in popustu.");
+
+    // Pridobivanje lokacije iz query parametrov
+    const { lng, lat } = req.query;
 
     try {
-        const restavracije = await Restavracija.aggregate([
-            // ⭐ KLJUČNA SPREMEMBA: DODAJANJE $match FAZE FILTRIRANJA
-            { $match: { 
+        // Priprava cevovoda (pipeline)
+        let pipeline = [];
+
+        // 1. FAZA: Geo-lokacijsko filtriranje (če sta podana lng in lat)
+        if (lng && lat) {
+            pipeline.push({
+                $geoNear: {
+                    near: { 
+                        type: "Point", 
+                        coordinates: [parseFloat(lng), parseFloat(lat)] 
+                    },
+                    distanceField: "razdalja_metri",
+                    maxDistance: 50000, // 50km v metrih
+                    spherical: true
+                }
+            });
+        }
+
+        // 2. FAZA: Filtriranje restavracij, ki imajo popust
+        pipeline.push({
+            $match: { 
                 popust: { $exists: true, $ne: null, $ne: "" } 
-            }},
-            // ----------------------------------------------------------------------
-            
-            { $project: {
+            }
+        });
+
+        // 3. FAZA: Projekcija (izbor polj za frontend)
+        pipeline.push({
+            $project: {
                 _id: 1, 
-                // Ključni podatki kartice
                 imeRestavracije: { $ifNull: ["$ime", "$naziv", "Ime manjka v bazi (Controller)"] }, 
                 urlSlike: { 
                     $ifNull: [
@@ -123,33 +145,25 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                     ]
                 },
                 deviznaKuhinja: { $arrayElemAt: ["$cuisine", 0] },
-                
                 opis: { $ifNull: ["$opis", "Opis manjka."] }, 
                 meni: 1, 
-                
-                // ⭐ NOVO: VKLJUČITEV POLJA POPUST V PROJEKCIJO
                 popust: 1,
-                
-                // ➡️ DODANO: VKLJUČITEV POLJA VELJAVNOST BESEDILO (STRING) V PROJEKCIJO
                 veljavnost_besedilo: 1,
-                
-                // 🔥 DODANO: VKLJUČITEV POLJA FEATURED V PROJEKCIJO
                 featured: 1,
-                // ---------------------------------------------
-                
                 komentarji: 1, 
                 galerija_slik: 1, 
                 ocena_povprecje: { $ifNull: ["$ocena_povprecje", "$ocena", 0] },
-                
                 googleRating: { $ifNull: ["$googleRating", 0] },
                 googleReviewCount: { $ifNull: ["$googleReviewCount", 0] },
-                
                 lokacija: 1,
                 razpolozljivost_status: 1,
-                razpolozljivost_cas: 1
-            }}
-        ]);
-        
+                razpolozljivost_cas: 1,
+                // Izračunana razdalja v kilometrih (opcijsko za prikaz)
+                razdalja_km: { $divide: ["$razdalja_metri", 1000] }
+            }
+        });
+
+        const restavracije = await Restavracija.aggregate(pipeline);
         res.status(200).json(restavracije);
 
     } catch (error) {
