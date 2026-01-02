@@ -560,7 +560,7 @@ function handleFilterClick(e) {
 // ===============================================
 
 async function naloziInPrikaziRestavracije() {
-    console.log("Začenjam nalaganje restavracij iz API-ja (/privzeto)...");
+    console.log("Začenjam nalaganje restavracij (ločeno za privzeto in izpostavljeno)...");
 
     if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
     if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
@@ -569,63 +569,89 @@ async function naloziInPrikaziRestavracije() {
     if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '<p class="text-center w-full col-span-full">Nalagam restavracije...</p>';
 
     try {
-        const response = await fetch(`${API_BASE_URL}/privzeto`, {
+        // 📍 Pridobivanje lokacije uporabnika (prilagodi ključe, če so v tvojem localStorage drugačni)
+        const userLng = localStorage.getItem('userLng') || "";
+        const userLat = localStorage.getItem('userLat') || "";
+
+        // --- 1. KLIC ZA SPLOŠNE RESTAVRACIJE ---
+        const responsePrivzeto = await fetch(`${API_BASE_URL}/privzeto`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!response.ok) {
-            let errorText;
-            try {
-                // Poskusimo prebrati telo odgovora kot JSON, če je na voljo
-                const errorData = await response.json();
-                errorText = errorData.message || JSON.stringify(errorData);
-            } catch {
-                // Če ni JSON, uporabimo le status
-                errorText = response.statusText;
-            }
-            // 🚨 Izpišemo napako v konzolo za pomoč pri razhroščevanju
-            console.error(`Napaka API klice /privzeto: Status ${response.status}`, errorText);
-            throw new Error(`API Napaka ${response.status}: ${errorText}`);
+        if (!responsePrivzeto.ok) throw new Error(`API Napaka /privzeto: ${responsePrivzeto.status}`);
+        const restavracijePrivzeto = await responsePrivzeto.json();
+
+        // --- 2. KLIC ZA IZPOSTAVLJENE RESTAVRACIJE (Z GEO FILTROM) ---
+        // Uporabimo najin novi endpoint in pošljemo koordinate
+        const responseIzpostavljene = await fetch(`${API_BASE_URL}/izpostavljene?lng=${userLng}&lat=${userLat}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        let izpostavljeneFiltrirane = [];
+        if (responseIzpostavljene.ok) {
+            izpostavljeneFiltrirane = await responseIzpostavljene.json();
+        } else {
+            console.error("Napaka pri pridobivanju filtriranih izpostavljenih restavracij.");
         }
 
-        // 🔥 POPRAVLJENO: API vrne Array restavracij v formatu JSON, kar je pričakovano.
-        const restavracije = await response.json(); 
+        // 🔥 SHRANJEVANJE: AllRestavracije uporabljaš za glavno mrežo in filtre
+        allRestavracije = restavracijePrivzeto;
 
-        // 🔥 KLJUČNO: Shranimo podatke v globalno spremenljivko
-        allRestavracije = restavracije;
+        console.log("Uspešno naloženo:", allRestavracije.length, "splošnih,", izpostavljeneFiltrirane.length, "izpostavljenih v radiju 50km.");
 
-        console.log("Uspešno naložene restavracije:", allRestavracije.length);
-
-        // Če ni restavracij, to prikažemo.
+        // Če ni restavracij sploh
         if (allRestavracije.length === 0) {
-            console.warn("API je vrnil prazen seznam restavracij.");
-            if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Trenutno ni restavracij za prikaz.';
+            if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Trenutno ni restavracij.';
             if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '';
         }
 
         // 1. Nastavimo filtre
         setupKuhinjaFiltersListeners();
 
-        // 2. Prikaz glavne mreže (filtrirano)
+        // 2. Prikaz glavne mreže (standardno kot do sedaj)
         filterAndRenderRestavracije();
 
-        // 3. Prikaz izpostavljenih restavracij
-        renderFeaturedRestavracije();
+        // 3. 🔥 PRIKAZ IZPOSTAVLJENIH (Uporabimo prefiltriran seznam s strežnika)
+        renderFeaturedRestavracijeManual(izpostavljeneFiltrirane);
 
-        // Skrijemo status nalaganja za izpostavljeno mrežo (če ni napake)
+        // Skrijemo status nalaganja
         if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
 
     } catch (error) {
-        console.error("Kritična napaka pri Fetch klicu /privzeto:", error);
-        const errorMessage = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri nalaganju restavracij. Preverite konzolo za podrobnosti.';
+        console.error("Kritična napaka pri naloziInPrikaziRestavracije:", error);
+        const errorMessage = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri nalaganju podatkov.';
 
-        // Prikažemo specifično sporočilo na spletni strani
-        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center; width: 100%; padding: 20px;">NAPAKA: ${error.message}</p>`;
+        if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
         if (statusKarticeDiv) statusKarticeDiv.textContent = errorMessage;
-        if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = errorMessage;
-        if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'block';
+        if (statusIzpostavljenoKarticeDiv) {
+            statusIzpostavljenoKarticeDiv.textContent = errorMessage;
+            statusIzpostavljenoKarticeDiv.style.display = 'block';
+        }
     }
+}
+
+/**
+ * Nova pomožna funkcija, ki izriše izpostavljene restavracije, 
+ * ki so že prišle prefiltrirane iz strežnika (radij 50km).
+ */
+function renderFeaturedRestavracijeManual(seznam) {
+    if (!mrezaIzpostavljenoKarticDiv) return;
+    
+    mrezaIzpostavljenoKarticDiv.innerHTML = '';
+    
+    if (seznam.length === 0) {
+        mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (window.i18next ? i18next.t('messages.no_restaurants_found') : 'Ni izpostavljenih restavracij v vaši bližini.') + '</div>'; 
+        return;
+    }
+    
+    seznam.forEach(restavracija => {
+        // Uporabimo tvoj obstoječi renderFeaturedCard
+        mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
+    });
+    
+    if (typeof updateContent === 'function') updateContent();
 }
 
 // ===============================================
