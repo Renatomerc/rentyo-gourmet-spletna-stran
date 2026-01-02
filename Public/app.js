@@ -511,20 +511,33 @@ function filterAndRenderRestavracije() {
 }
 
 
-// Prikaz Izpostavljenih Restavracij (Uporabimo prve 3 kot featured)
-function renderFeaturedRestavracije() {
-    const featuredList = allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
+/**
+ * 🌟 POSODOBLJENO: Prikaz Izpostavljenih Restavracij
+ * @param {Array} specificneIzpostavljene - Seznam restavracij, ki jih vrne Backend (že filtrirane na 50km)
+ */
+function renderFeaturedRestavracije(specificneIzpostavljene = null) {
+    if (!mrezaIzpostavljenoKarticDiv) return;
 
-    if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.innerHTML = '';
+    // 1. Če smo dobili podatke iz API-ja (v app.js), uporabi tiste.
+    // Če ne, uporabi stari način (fallback na vse naložene).
+    let featuredList = specificneIzpostavljene || allRestavracije.filter(r => !!r.featured || !!r.izpostavljeno);
+
+    // Počistimo mrežo in skrijemo loader
+    mrezaIzpostavljenoKarticDiv.innerHTML = '';
     if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
 
+    // 2. Preverimo, če je seznam prazen (npr. nihče ni v radiju 50km)
     if (featuredList.length === 0) {
-        if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.innerHTML = '<div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">' + (window.i18next ? i18next.t('messages.no_restaurants_found') : 'Ni restavracij za prikaz.') + '</div>';
+        mrezaIzpostavljenoKarticDiv.innerHTML = `
+            <div style="text-align: center; grid-column: 1 / -1; padding-top: 20px;">
+                ${window.i18next ? i18next.t('messages.no_restaurants_found') : 'Ni izpostavljenih ponudb v vaši bližini (50km).'}
+            </div>`;
         return;
     }
 
+    // 3. Izris kartic
     featuredList.forEach(restavracija => {
-        if (mrezaIzpostavljenoKarticDiv) mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
+        mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
     });
 
     if (typeof updateContent === 'function') updateContent();
