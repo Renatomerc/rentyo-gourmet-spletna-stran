@@ -102,31 +102,35 @@ exports.getPrivzetoRestavracije = async (req, res) => {
  * Vrača restavracije s popustom, ki so v radiju 50km od uporabnika.
  */
 exports.getIzpostavljeneRestavracije = async (req, res) => {
-    console.log("===> API klic za /izpostavljene prejet. Filtriranje po lokaciji in popustu.");
+    console.log("===> API klic za /izpostavljene prejet. Filtriranje po lokaciji (50km) in popustu.");
 
-    // Pridobivanje lokacije iz query parametrov
-    const { lng, lat } = req.query;
+    // 📍 Prilagojeno na tvoja imena parametrov: lat in lon
+    const { lat, lon } = req.query;
+    
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
 
     try {
-        // Priprava cevovoda (pipeline)
         let pipeline = [];
 
-        // 1. FAZA: Geo-lokacijsko filtriranje (če sta podana lng in lat)
-        if (lng && lat) {
+        // 1. FAZA: Geo-lokacijsko filtriranje (MORA BITI PRVA FAZA)
+        // Preverimo, če sta koordinati veljavni številki
+        if (!isNaN(latitude) && !isNaN(longitude)) {
             pipeline.push({
                 $geoNear: {
                     near: { 
                         type: "Point", 
-                        coordinates: [parseFloat(lng), parseFloat(lat)] 
+                        // MongoDB zahteva vrstni red: [longitude, latitude]
+                        coordinates: [longitude, latitude] 
                     },
                     distanceField: "razdalja_metri",
-                    maxDistance: 50000, // 50km v metrih
+                    maxDistance: 50000, // Omejitev na 50km (50.000 metrov)
                     spherical: true
                 }
             });
         }
 
-        // 2. FAZA: Filtriranje restavracij, ki imajo popust
+        // 2. FAZA: Filtriranje restavracij, ki imajo neprazen popust
         pipeline.push({
             $match: { 
                 popust: { $exists: true, $ne: null, $ne: "" } 
@@ -158,12 +162,22 @@ exports.getIzpostavljeneRestavracije = async (req, res) => {
                 lokacija: 1,
                 razpolozljivost_status: 1,
                 razpolozljivost_cas: 1,
-                // Izračunana razdalja v kilometrih (opcijsko za prikaz)
-                razdalja_km: { $divide: ["$razdalja_metri", 1000] }
+                // Izračunana razdalja v kilometrih za morebiten prikaz na kartici
+                razdalja_km: { 
+                    $cond: {
+                        if: { $gt: ["$razdalja_metri", null] },
+                        then: { $divide: ["$razdalja_metri", 1000] },
+                        else: null
+                    }
+                }
             }
         });
 
         const restavracije = await Restavracija.aggregate(pipeline);
+        
+        // Diagnostika v konzoli strežnika
+        console.log(`Najdenih restavracij s popustom v radiju 50km: ${restavracije.length}`);
+        
         res.status(200).json(restavracije);
 
     } catch (error) {

@@ -565,13 +565,13 @@ async function naloziInPrikaziRestavracije() {
     if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
     if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.textContent = window.i18next ? i18next.t('messages.searching', { criteria: '...' }) : 'Iščem...';
 
-    // Prikaz nalaganja v glavni mreži
     if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '<p class="text-center w-full col-span-full">Nalagam restavracije...</p>';
 
     try {
-        // 📍 Pridobivanje lokacije uporabnika (prilagodi ključe, če so v tvojem localStorage drugačni)
-        const userLng = localStorage.getItem('userLng') || "";
-        const userLat = localStorage.getItem('userLat') || "";
+        // 📍 1. POPRAVEK: Uporabi ključe, ki jih imaš v localStorage (preveri če so userLat/userLng ali samo lat/lon)
+        // Če tvoj 'Near Me' uporablja lat/lon, uporabi ta imena spodaj:
+        const userLon = localStorage.getItem('userLng') || localStorage.getItem('lon') || "";
+        const userLat = localStorage.getItem('userLat') || localStorage.getItem('lat') || "";
 
         // --- 1. KLIC ZA SPLOŠNE RESTAVRACIJE ---
         const responsePrivzeto = await fetch(`${API_BASE_URL}/privzeto`, {
@@ -583,8 +583,8 @@ async function naloziInPrikaziRestavracije() {
         const restavracijePrivzeto = await responsePrivzeto.json();
 
         // --- 2. KLIC ZA IZPOSTAVLJENE RESTAVRACIJE (Z GEO FILTROM) ---
-        // Uporabimo najin novi endpoint in pošljemo koordinate
-        const responseIzpostavljene = await fetch(`${API_BASE_URL}/izpostavljene?lng=${userLng}&lat=${userLat}`, {
+        // 📍 2. POPRAVEK: URL parametra morata biti 'lon' in 'lat', ker tako bere tvoj Backend krmilnik
+        const responseIzpostavljene = await fetch(`${API_BASE_URL}/izpostavljene?lon=${userLon}&lat=${userLat}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -596,45 +596,32 @@ async function naloziInPrikaziRestavracije() {
             console.error("Napaka pri pridobivanju filtriranih izpostavljenih restavracij.");
         }
 
-        // 🔥 SHRANJEVANJE: AllRestavracije uporabljaš za glavno mrežo in filtre
         allRestavracije = restavracijePrivzeto;
-
         console.log("Uspešno naloženo:", allRestavracije.length, "splošnih,", izpostavljeneFiltrirane.length, "izpostavljenih v radiju 50km.");
 
-        // Če ni restavracij sploh
         if (allRestavracije.length === 0) {
             if (statusKarticeDiv) statusKarticeDiv.textContent = window.i18next ? i18next.t('messages.no_restaurants_found') : 'Trenutno ni restavracij.';
             if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = '';
         }
 
-        // 1. Nastavimo filtre
         setupKuhinjaFiltersListeners();
-
-        // 2. Prikaz glavne mreže (standardno kot do sedaj)
         filterAndRenderRestavracije();
 
-        // 3. 🔥 PRIKAZ IZPOSTAVLJENIH (Uporabimo prefiltriran seznam s strežnika)
+        // 3. 🔥 PRIKAZ IZPOSTAVLJENIH (Uporabimo prefiltriran seznam)
         renderFeaturedRestavracijeManual(izpostavljeneFiltrirane);
 
-        // Skrijemo status nalaganja
         if (statusIzpostavljenoKarticeDiv) statusIzpostavljenoKarticeDiv.style.display = 'none';
 
     } catch (error) {
         console.error("Kritična napaka pri naloziInPrikaziRestavracije:", error);
         const errorMessage = window.i18next ? i18next.t('messages.search_error') : 'Napaka pri nalaganju podatkov.';
-
         if (mrezaKarticDiv) mrezaKarticDiv.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
         if (statusKarticeDiv) statusKarticeDiv.textContent = errorMessage;
-        if (statusIzpostavljenoKarticeDiv) {
-            statusIzpostavljenoKarticeDiv.textContent = errorMessage;
-            statusIzpostavljenoKarticeDiv.style.display = 'block';
-        }
     }
 }
 
 /**
- * Nova pomožna funkcija, ki izriše izpostavljene restavracije, 
- * ki so že prišle prefiltrirane iz strežnika (radij 50km).
+ * Pomožna funkcija za izris prefiltriranih izpostavljenih restavracij
  */
 function renderFeaturedRestavracijeManual(seznam) {
     if (!mrezaIzpostavljenoKarticDiv) return;
@@ -647,7 +634,6 @@ function renderFeaturedRestavracijeManual(seznam) {
     }
     
     seznam.forEach(restavracija => {
-        // Uporabimo tvoj obstoječi renderFeaturedCard
         mrezaIzpostavljenoKarticDiv.appendChild(renderFeaturedCard(restavracija));
     });
     
